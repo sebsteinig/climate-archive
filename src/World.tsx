@@ -17,6 +17,7 @@ type WorldProps = {
 }
 
 const World: React.FC<WorldProps> = ({ config }) => {
+  // for Leva debug GUI (there must be a better way for this ...)
   const { usePerformance, useTitle } = useControls('global', {
     usePerformance: true,
     useTitle: true,

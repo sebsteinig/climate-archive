@@ -37,7 +37,7 @@ const Title = forwardRef<TitleType, TitleProps>(({ config }, ref) => {
             size={ 0.75 }
             height={ 0.2 }
             curveSegments={ 2 }
-            position={ [ -3, 1.5, -2. ] }
+            position={ [ -2.3, -0.95, 2. ] }
             bevelEnabled={true}
             bevelThickness={ 0.02 }
             bevelSize={ 0.02 }
