@@ -9,8 +9,8 @@ import SearchBar from '@/components/utils/searchbar/SearchBar'
 export default function Home() {
   return (
     <main className={styles.main}>
-      <SearchBar/>
       <Main />
+      <SearchBar/>
     </main>
   )
 }
