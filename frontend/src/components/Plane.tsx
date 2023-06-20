@@ -1,3 +1,4 @@
+"use client";
 function Plane() {
   return (
     <mesh

@@ -1,9 +1,9 @@
+"use client";
 import { Canvas } from '@react-three/fiber'
 import { Leva } from 'leva'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { World } from './World'
-import './styles/main.css'
 
 type modelDesciptor = {
   model: string,
@@ -18,7 +18,7 @@ var config: modelDesciptor = {
 const Main: React.FC = () => {
 
   return (
-    <div className='main'>
+    <>
       <Leva
         collapsed={false}
         oneLineLabels={false}
@@ -35,12 +35,8 @@ const Main: React.FC = () => {
       >
         <World config={config}/>
       </Canvas>
-    </div>
+    </>
   )
 }
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <Main />
-  </React.StrictMode>
-)
+export { Main }

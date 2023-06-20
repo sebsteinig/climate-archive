@@ -1,3 +1,4 @@
+"use client";
 import { forwardRef } from 'react'
 import { useTexture } from "@react-three/drei";
 import { Mesh, SphereGeometry, MeshStandardMaterial, NearestFilter } from 'three'

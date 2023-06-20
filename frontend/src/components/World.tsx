@@ -1,13 +1,14 @@
+"use client";
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
 import { Perf } from 'r3f-perf'
 import { useRef, forwardRef } from 'react'
 import { SphereGeometry, Mesh, MeshStandardMaterial } from 'three'
-import { Title } from './components/Title.tsx'
-import Lights from './components/Lights.tsx'
-import Controls from './components/Controls.tsx'
-import { Plane } from './components/Plane'
-import { Surface } from './components/Surface.js'
+import { Title } from './Title'
+import Lights from './Lights'
+import Controls from './Controls'
+import { Plane } from './Plane'
+import { Surface } from './Surface'
 
 type WorldProps = {
   config: {
