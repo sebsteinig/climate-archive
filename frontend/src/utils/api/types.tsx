@@ -1,8 +1,8 @@
 
 export type Publication = {
-    title : string
-    journal : string
-    authors_short : string
+    title? : string
+    journal? : string
+    authors_short? : string
     /*owner_name : string
     owner_email : string
     abstract : string
