@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react'
 import styles from "./searchbar.module.css"
 import Publication from './publication';
 import { searchPublication } from '@/utils/api/api';
+import FilterPublication from './filters/FilterPublication';
+import FilterLabels from './filters/FilterLabels';
+import FilterAdvanced from './filters/FilterAdvanced';
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -14,11 +17,25 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     }, [ref]);
 }
 
+function MoreOptions() {
+    return  (
+        <div className={styles.more_options}>
+
+            <FilterPublication />
+            <FilterLabels/>
+            <FilterAdvanced />
+
+            <span className={styles.more_options_sep}/>
+        </div>
+    )
+}
+
 export default function SearchBar() {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
     const [publications,setPublications] = useState<any[]>([])
+    const [display_more_options,setDisplayMoreOptions] = useState(false)
 
     useOutsideClick(search_panel_ref.current!, () => {
         setSearchPanelVisible(false)
@@ -29,13 +46,13 @@ export default function SearchBar() {
         () => {
         let ignore = false;
         if (searched_content !== "" ) {
-            searchPublication({
-                title: searched_content
-            })?.then((data) => 
-                    setPublications(data)
-                ).catch(
+            // searchPublication({
+            //     title: searched_content
+            // })?.then((data) => 
+            //         setPublications(data)
+            //     ).catch(
 
-                )
+            //     )
         }else {
             setPublications([])
         }
@@ -61,7 +78,10 @@ export default function SearchBar() {
                 />
                 {search_panel_visible && 
                     <div className={styles.search_panel}>
-                        <p className={styles.options}>More options ...</p>
+                        <p className={styles.options}
+                            onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
+                        >More options ...</p>
+                        {display_more_options && <MoreOptions/>}
                         { publications.length > 0 && 
                             <p className={styles.results}>
                                 {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
