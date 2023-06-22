@@ -11,17 +11,26 @@ export type Publication = {
     year : number*/
 }
 
-
 export type DefaultParameter = {
-    like : string
-    with : string
-    config_name : string
-	extension : string
-	lossless : boolean
-	nan_value_encoding : number
-	threshold : number
-	chunks_time : number
-	chunks_vertical : number
-	rx : number
-	ry : number
+    config_name?: string
+	extension?: string
+	lossless?: boolean
+	nan_value_encoding?: number
+	threshold?: number
+	chunks_time?: number
+	chunks_vertical?: number
+	rx?: number
+	ry?: number
+}
+export type SearchExperiment = DefaultParameter & {
+    like?: string
+    with?: string
+}
+
+export type SelectSingleParameter = DefaultParameter & {
+    id?: string
+}
+
+export type SelectCollectionParameter = DefaultParameter & {
+    ids?: string[]
 }
