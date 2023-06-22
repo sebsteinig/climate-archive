@@ -10,7 +10,12 @@ import FilterAdvanced from './filters/FilterAdvanced';
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
         if (ref) {
-            const onClick = ({target}: any) => !ref.contains(target) && onClickOut?.()
+            const onClick = ({target}: any) => {
+                if(!ref.contains(target)) {
+                    console.log(target);
+                    !ref.contains(target) && onClickOut?.()
+                }
+            }
             document.addEventListener("click", onClick);
             return () => document.removeEventListener("click", onClick);
         }
