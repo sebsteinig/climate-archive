@@ -11,8 +11,7 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
         if (ref) {
             const onClick = ({target}: any) => {
-                if(!ref.contains(target)) {
-                    console.log(target);
+                if(target.parentNode && !ref.contains(target)) {
                     !ref.contains(target) && onClickOut?.()
                 }
             }

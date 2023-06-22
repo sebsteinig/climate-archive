@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import styles from './filter_labels.module.css'
+import styles from './filter.module.css'
 
 type Label = {
     label : string
