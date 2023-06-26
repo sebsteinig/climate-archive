@@ -8,7 +8,7 @@ import { Main } from '../components/3D_components/Main'
 export default function Home() {
   return (
     <main className={styles.main}>
-      <Main />
+      {/* <Main /> */}
     </main>
   )
 }
