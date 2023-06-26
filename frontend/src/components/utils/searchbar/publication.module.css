@@ -34,14 +34,10 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     cursor: pointer;
-}
-
-.load_button {
     border: none;
     color: var(--light-blue);
     outline: none;
     border-radius: 10px;
-    cursor: pointer;
     font-size: 14px;
     height: 36px;
     line-height: 27px;
@@ -52,10 +48,10 @@
     -webkit-user-select: none;
     touch-action: manipulation;
     white-space: pre;
-    transition: all 200ms ease-in-out;
+    transition: all 400ms ease-in-out;
     margin: 0 auto;
 }
 .load_button:hover {
     background-color: var(--light-gray2);
-
 }
+

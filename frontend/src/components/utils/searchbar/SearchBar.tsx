@@ -50,13 +50,13 @@ export default function SearchBar() {
         () => {
         let ignore = false;
         if (searched_content !== "" ) {
-            // searchPublication({
-            //     title: searched_content
-            // })?.then((data) => 
-            //         setPublications(data)
-            //     ).catch(
+            searchPublication({
+                title: searched_content
+            })?.then((data) => 
+                    setPublications(data)
+                ).catch(
 
-            //     )
+                )
         }else {
             setPublications([])
         }
@@ -93,12 +93,12 @@ export default function SearchBar() {
                         }
                         {
                             publications.length > 0 && 
-                            publications.slice(0,5).map((publication: { Title: string; Year: string; Authors_short: string; },idx:number) => {
+                            publications.slice(0,5).map((publication: { title: string; year: string; authors_short: string; },idx:number) => {
                                 return (
                                     <Publication key={idx}
-                                        title={publication.Title} 
-                                        year={publication.Year} 
-                                        author={publication.Authors_short}
+                                        title={publication.title} 
+                                        year={publication.year} 
+                                        author={publication.authors_short}
                                     />
                                 )
                             })

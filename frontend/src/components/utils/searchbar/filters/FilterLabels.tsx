@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import styles from './filter.module.css'
 
+
 type Label = {
     label : string
     display: boolean
@@ -8,17 +9,17 @@ type Label = {
 
 function LabelButton({label,remove}:{label:Label,remove:Function}) {
     return (
-        <div className={`${!label.display ? styles.invisible : ""}`}>
-            <p>{label.label}</p>
-            <p onClick={() => remove()}></p>
+        <div className={`${!label.display ? styles.invisible : styles.label}`}>
+            {label.label}
+            <div onClick={() => remove()}></div>
         </div>
     )
 }
 
 function FoundLabelButton({label,add}:{label:Label,add:Function}) {
     return (
-        <div onClick={() => add()} className={`${!label.display ? styles.invisible : ""}`}>
-            <p>{label.label}</p>
+        <div onClick={() => add()} className={`${!label.display ? styles.invisible : styles.label}`}>
+            {label.label}
         </div>
     )
 }
@@ -45,9 +46,9 @@ export default function FilterLabels() {
     if (!display) {
         return (
             <>
-                <span onClick={() => setDisplay(true)} onMouseEnter={() => setDisplay(true)}>
+                <span className={`${styles.line}`}  onClick={() => setDisplay(true)}>
 
-                    <p>Filter with labels</p>
+                    <p className={styles.field}>Filter with labels</p>
                 </span>
 
             </>
@@ -56,7 +57,7 @@ export default function FilterLabels() {
     
     return (
         <>
-            <span onClick={() => {
+            <span className={`${styles.line}`}  onClick={() => {
                 setLabels((prev) => {
                     return {
                         searched:"",
@@ -66,9 +67,9 @@ export default function FilterLabels() {
                 })
                 setDisplay(false)
             }}>
-                <p>Filter with labels</p>
+                <p className={styles.field}>Filter with labels</p>
             </span>
-            <span>
+            <span className={`${styles.line}`} >
                 {labels.selected?.map((label,idx) => {
                     return <LabelButton label={label} key={idx} remove={()=> {
                         setLabels((prev) => {
@@ -79,8 +80,9 @@ export default function FilterLabels() {
                 })}
             </span>
             
-            <div>
+            <div className={`${styles.line}`}>
                 <input 
+                    className={`${styles.text_input}`}
                     type="text" 
                     name="searched_label" 
                     id="searched_label"  

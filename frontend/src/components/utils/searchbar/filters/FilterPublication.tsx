@@ -1,5 +1,5 @@
 import { useState } from "react"
-import styles from "./searchbar.module.css"
+import styles from './filter.module.css'
 import { fetchJournals, select } from "@/utils/api/api"
 
 const DEFAULT_LOWER = "jurassic"
@@ -11,35 +11,35 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
     if (period) {    
         return (
             <>
-                <select name="period_lower" id="period_lower" onChange={(e) => {
-                    if(e.target.value === DEFAULT_LOWER) {
-                        setYearLower(1900)
-                    } else{
-                        setYearLower(parseInt(e.target.value))
-                    }
-                }}>
-                    {LOWER_PERIOD.map((year,index) => {
-                            return <option key = {index} value = {year}>{year}</option>
-                    })}
-                </select>
+                    <select className={`${styles.select_input}`} name="period_lower" id="period_lower" onChange={(e) => {
+                        if(e.target.value === DEFAULT_LOWER) {
+                            setYearLower(1900)
+                        } else{
+                            setYearLower(parseInt(e.target.value))
+                        }
+                    }}>
+                        {LOWER_PERIOD.map((year,index) => {
+                                return <option key = {index} value = {year}>{year}</option>
+                        })}
+                    </select>
 
-                <p>...</p>
-                <select name="period_upper" id="period_upper" onChange={(e) => {
-                    if(e.target.value === DEFAULT_UPPER) {
-                        setYearUpper(new Date().getFullYear())
-                    } else{
-                        setYearUpper(parseInt(e.target.value))
-                    }
-                }}>
-                    {UPPER_PERIOD.map((year,index) => {
-                            return <option key = {index} value = {year}>{year}</option>
-                    })}
-                </select>
+                <p className={`${styles.field}`} > and </p>     
+                    <select className={`${styles.select_input}`} name="period_upper" id="period_upper" onChange={(e) => {
+                        if(e.target.value === DEFAULT_UPPER) {
+                            setYearUpper(new Date().getFullYear())
+                        } else{
+                            setYearUpper(parseInt(e.target.value))
+                        }
+                    }}>
+                        {UPPER_PERIOD.map((year,index) => {
+                                return <option key = {index} value = {year}>{year}</option>
+                        })}
+                    </select>
             </>
         )
     }
     return (
-        <select name="period_upper" id="period_upper" onChange={(e) => {
+        <select className={`${styles.select_input}`} name="period_upper" id="period_upper" onChange={(e) => {
             if(e.target.value === DEFAULT_UPPER) {
                 setYearUpper(new Date().getFullYear())
             } else{
@@ -63,8 +63,8 @@ export default function FilterPublication() {
     if (!display_filters){
         return (
             <>
-            <span onClick={() => {setDisplayFilters(true)}} onMouseEnter={() => setDisplayFilters(true)}>
-                <p>Filter on publication</p>
+            <span className={`${styles.line}`}  onClick={() => {setDisplayFilters(true)}}>
+                <p className={styles.field}>Filter on publication</p>
             </span>
             </>
         )
@@ -72,27 +72,25 @@ export default function FilterPublication() {
         let journals = fetchJournals()
         return (
             <>
-            <span onClick={() => {setDisplayFilters(false)}}>
-                <p>Filter on publication</p>
+            <span className={`${styles.line}`}  onClick={() => {setDisplayFilters(false)}}>
+                <p className={styles.field}>Filter on publication</p>
             </span>
-            <div>
-                <div>
-                    <p>Year : </p> 
-                    <button onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</button>
-                    <Period period = {on_period} setYearLower={setYearLower} setYearUpper={setYearUpper}/>
-                    {on_period && year_lower > year_upper && <p color="red">Please enter a valid period</p>}
-                </div>
-                <div>
-                    <p>Journal : </p>
-                    <select placeholder={journal}>
-                        {journals.map((journal : string, index) => 
-                            <option key = {index} value = {journal} onClick={() => setJournal(journal)}>{journal}</option>)}
-                    </select>
-                </div>
-                <div>
-                    <p>Author : </p>
-                    <input type="text" placeholder="like valdes et al" value = {author} onChange={(e) => setAuthor(e.target.value)}/>
-                </div>
+            <div  className={`${styles.line}`} >
+                <p className={styles.field}>Year : </p> 
+                <button  className={`${styles.button}`} onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</button>
+                <Period period = {on_period} setYearLower={setYearLower} setYearUpper={setYearUpper}/>
+                {on_period && year_lower > year_upper && <p color="red">Please enter a valid period</p>}
+            </div>
+            <div className={`${styles.line}`} >
+                <p className={styles.field}>Journal : </p>
+                <select className={`${styles.select_input}`} placeholder={journal}>
+                    {journals.map((journal : string, index) => 
+                        <option key = {index} value = {journal} onClick={() => setJournal(journal)}>{journal}</option>)}
+                </select>
+            </div>
+            <div className={`${styles.line}`} >
+                <p className={styles.field}>Author : </p>
+                <input className={`${styles.text_input}`} type="text" placeholder="like valdes et al" value = {author} onChange={(e) => setAuthor(e.target.value)}/>
             </div>
             </>
         )
