@@ -1,0 +1,95 @@
+.invisible {
+    display: none;
+}
+
+.field {
+    color: var(--green);
+    letter-spacing: 1.5px;
+}
+.text_input{
+    background-color: var(--light-gray);
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    border-left: 4px var(--green) solid;
+    color: var(--green);
+    border-right: 4px var(--light-blue) solid;
+    margin-bottom: 1vh;
+}
+.text_input::placeholder {
+    color: var(--light-blue);
+    opacity: 0.7;
+    letter-spacing: 1.5px;
+}
+
+.select_input {
+    outline:0;
+    box-shadow:none;
+    border:0!important;
+    background: var(--light-gray);
+    background-image: none;
+    padding:  0px 20px;
+    color:var(--light-blue);
+    cursor:pointer;
+    border-radius: 4px;
+}
+
+.button {
+    border: none;
+    outline: none ;
+    background: var(--light-gray);
+    padding: 0px 20px;
+    color: var(--light-blue);
+    border-radius: 4px;
+}
+
+.label {
+    background-color: var(--light-gray);
+    color: var(--light-blue);
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    border: none;
+    color: var(--light-blue);
+    outline: none;
+    border-radius: 10px;
+    min-width: 54px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: pre;
+    padding: 10px 10px;
+}
+.load_button {
+    background-color: var(--light-gray);
+    color: var(--light-blue);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    color: var(--light-blue);
+    outline: none;
+    border-radius: 4px;
+    min-width: 54px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: pre;
+    padding: 10px 10px;
+    transition: all 250ms ease-in-out;
+    margin: 0 auto;
+}
+.load_button:hover {
+    background-color: var(--light-gray2);
+
+}
+.line{
+    display: flex;
+    overflow: hidden;
+    justify-content: left;
+    margin-bottom: 1vh;
+}
+.line * {
+    margin-right: 2vw;
+}
