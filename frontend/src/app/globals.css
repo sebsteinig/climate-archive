@@ -5,8 +5,15 @@
 
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  
+  --dark-blue : #181A1F;
+  --light-blue : #A2BFEA;
+  --green : #A9E487;
+  --gray : #383E4A;
+  --light-gray : #464C5A;
+  --light-gray2 : #68728B;
+  
+  background-color: var(--dark-blue);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

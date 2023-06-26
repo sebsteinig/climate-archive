@@ -15,7 +15,7 @@ var config: modelDesciptor = {
   heightData: "/assets/textures/tfgzk_height.smoothed.png"
 }
 
-const Main: React.FC = () => {
+export default function Main() {
 
   return (
     <>
@@ -38,5 +38,3 @@ const Main: React.FC = () => {
     </>
   )
 }
-
-export { Main }
