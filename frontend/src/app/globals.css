@@ -1,35 +1,50 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  
-  --dark-blue : #181A1F;
-  --light-blue : #A2BFEA;
-  --green : #A9E487;
-  --gray : #383E4A;
-  --light-gray : #464C5A;
-  --light-gray2 : #68728B;
-  
-  background-color: var(--dark-blue);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@layer base {
+  body {
+    @apply bg-slate-800 min-w-full 
+      min-h-full p-5 antialiased text-slate-300 
+      font-rubik overflow-hidden m-0 tracking-wider
+  }
+  h1 {
+    @apply text-emerald-300 text-4xl
+  }
+  h2 {
+    @apply text-emerald-300 text-2xl
+  }
+  h3 {
+    @apply text-emerald-300 text-xl
+  }
+  h4 {
+    @apply text-emerald-300 text-lg
+  }
+  h5 {
+    @apply text-emerald-300 text-base
+  }
 }
+@layer components{
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+  .label {
+    @apply bg-slate-600 text-slate-300 rounded-lg outline-none px-5 py-2 shadow-xl w-fit
+  }
+
+  .input-field {
+    @apply bg-slate-600 border-x-4 border-r-sky-600 border-l-emerald-400 px-5 py-2 placeholder:text-slate-300/80 outline-none
+  }
+
+  .btn-secondary {
+    @apply bg-slate-600 text-slate-300 rounded-lg outline-none px-5 py-2 uppercase tracking-widest shadow
+  }
+
+  .checkbox {
+    @apply bg-slate-600 border-2 border-slate-500 
+      checked:bg-sky-400
+       w-5 h-5 outline-none appearance-none rounded
+  }
+
+  .select {
+    @apply bg-slate-600  px-5 py-2 border-r-slate-500 border-l-slate-500 border-x-4 placeholder:text-slate-300/80 outline-none
+  }
 }
-
-#root {
-  height: 100%;
-  width: 100%;
-}
-

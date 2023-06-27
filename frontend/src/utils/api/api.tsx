@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { log } from 'console';
 import {Publication, DefaultParameter, SelectCollectionParameter, SearchExperiment} from "./types"
-import { todo } from 'node:test';
+
 
 const URL_API = "http://localhost:3000/"
 const URL_IMAGE = "http://localhost:3060/"

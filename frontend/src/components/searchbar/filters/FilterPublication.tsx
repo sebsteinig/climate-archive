@@ -1,5 +1,4 @@
 import { useState } from "react"
-import styles from './filter.module.css'
 import { fetchJournals, select } from "@/utils/api/api"
 
 const DEFAULT_LOWER = "jurassic"
@@ -11,7 +10,7 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
     if (period) {    
         return (
             <>
-                    <select className={`${styles.select_input}`} name="period_lower" id="period_lower" onChange={(e) => {
+                    <select className='select'  name="period_lower" id="period_lower" onChange={(e) => {
                         if(e.target.value === DEFAULT_LOWER) {
                             setYearLower(1900)
                         } else{
@@ -23,8 +22,8 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
                         })}
                     </select>
 
-                <p className={`${styles.field}`} > and </p>     
-                    <select className={`${styles.select_input}`} name="period_upper" id="period_upper" onChange={(e) => {
+                <h4  > and </h4>     
+                    <select className='select'  name="period_upper" id="period_upper" onChange={(e) => {
                         if(e.target.value === DEFAULT_UPPER) {
                             setYearUpper(new Date().getFullYear())
                         } else{
@@ -39,7 +38,7 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
         )
     }
     return (
-        <select className={`${styles.select_input}`} name="period_upper" id="period_upper" onChange={(e) => {
+        <select className='select'  name="period_upper" id="period_upper" onChange={(e) => {
             if(e.target.value === DEFAULT_UPPER) {
                 setYearUpper(new Date().getFullYear())
             } else{
@@ -63,8 +62,8 @@ export default function FilterPublication() {
     if (!display_filters){
         return (
             <>
-            <span className={`${styles.line}`}  onClick={() => {setDisplayFilters(true)}}>
-                <p className={styles.field}>Filter on publication</p>
+            <span onClick={() => {setDisplayFilters(true)}}>
+                <h3 >Filter on publication</h3>
             </span>
             </>
         )
@@ -72,25 +71,25 @@ export default function FilterPublication() {
         let journals = fetchJournals()
         return (
             <>
-            <span className={`${styles.line}`}  onClick={() => {setDisplayFilters(false)}}>
-                <p className={styles.field}>Filter on publication</p>
+            <span  onClick={() => {setDisplayFilters(false)}}>
+                <h3 >Filter on publication</h3>
             </span>
-            <div  className={`${styles.line}`} >
-                <p className={styles.field}>Year : </p> 
-                <button  className={`${styles.button}`} onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</button>
-                <Period period = {on_period} setYearLower={setYearLower} setYearUpper={setYearUpper}/>
-                {on_period && year_lower > year_upper && <p color="red">Please enter a valid period</p>}
+            <div   >
+                <h4 >Year : </h4> 
+                <button className="btn-secondary" onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</button>
+                <Period period={on_period} setYearLower={setYearLower} setYearUpper={setYearUpper}/>
+                {on_period && year_lower > year_upper && <h4 color="red">Please enter a valid period</h4>}
             </div>
-            <div className={`${styles.line}`} >
-                <p className={styles.field}>Journal : </p>
-                <select className={`${styles.select_input}`} placeholder={journal}>
+            <div  >
+                <h4 >Journal : </h4>
+                <select className='select'  placeholder={journal}>
                     {journals.map((journal : string, index) => 
                         <option key = {index} value = {journal} onClick={() => setJournal(journal)}>{journal}</option>)}
                 </select>
             </div>
-            <div className={`${styles.line}`} >
-                <p className={styles.field}>Author : </p>
-                <input className={`${styles.text_input}`} type="text" placeholder="like valdes et al" value = {author} onChange={(e) => setAuthor(e.target.value)}/>
+            <div  >
+                <h4 >Author : </h4>
+                <input className="input-field" type="text" placeholder="like valdes et al" value = {author} onChange={(e) => setAuthor(e.target.value)}/>
             </div>
             </>
         )

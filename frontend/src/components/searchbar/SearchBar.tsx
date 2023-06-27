@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from 'react'
-import styles from "./searchbar.module.css"
 import Publication from './publication';
 import { searchPublication } from '@/utils/api/api';
 import FilterPublication from './filters/FilterPublication';
@@ -23,13 +22,13 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
 
 function MoreOptions() {
     return  (
-        <div className={styles.more_options}>
+        <div >
 
             <FilterPublication />
             <FilterLabels/>
             <FilterAdvanced />
 
-            <span className={styles.more_options_sep}/>
+            <span />
         </div>
     )
 }
@@ -67,11 +66,12 @@ export default function SearchBar() {
     ,[searched_content])
 
     return (
-        <div className={`${styles.container}`} ref={search_panel_ref}>
-            <div  className={`${styles.search} ${search_panel_visible && styles.open_panel}`}
+        <div className="bg-slate-700 p-5 rounded-md " ref={search_panel_ref}>
+            <div  
              onClick={() => setSearchPanelVisible(true)}
              >
-                <input className={`${styles.input} ${search_panel_visible && styles.sep}`} 
+                <input  
+                    className='w-full bg-transparent hover:placeholder:opacity-90  placeholder:text-emerald-300 placeholder:opacity-70 outline-none placeholder:tracking-wider'
                     type="text"
                     name="searchbar" 
                     id="searcbar" 
@@ -81,20 +81,20 @@ export default function SearchBar() {
                     onClick={() => setSearchPanelVisible(true)}
                 />
                 {search_panel_visible && 
-                    <div className={styles.search_panel}>
-                        <p className={styles.options}
+                    <div >
+                        <p  className='text-right text-emerald-300'
                             onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
                         >More options ...</p>
                         {display_more_options && <MoreOptions/>}
                         { publications.length > 0 && 
-                            <p className={styles.results}>
+                            <p >
                                 {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
                             </p>
                         }
-                        <div className={styles.publications_results}>
+                        <div >
                             {
                                 publications.length > 0 && 
-                                publications.slice(0,5).map((publication: { title: string; year: string; 
+                                publications.slice(0,5).map((publication: { title: string; year: number; 
                                                             authors_short: string; authors_full : string;
                                                             abstract : string; journal : string; exps : any[]},idx:number) => {
                                     return (

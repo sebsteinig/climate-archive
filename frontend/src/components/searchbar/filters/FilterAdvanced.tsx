@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react"
-import styles from './filter.module.css'
-
 type Exp = {
     id : string,
     display : boolean,
@@ -12,9 +10,9 @@ const SUPPORTED_RESOLUTION = ["default",1,2]
 
 function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
     return (
-        <div className={`${!exp.display ? styles.invisible : ""}`}>
+        <div className="label">
             <p>{exp.id}</p>
-            <p onClick={() => remove()}></p>
+            <h4 onClick={() => remove()}></h4>
         </div>
     )
 }
@@ -30,9 +28,9 @@ export default function FilterAdvanced() {
     if (!display) {
         return (
             <>
-                <span className={`${styles.line}`}  onClick={() => setDisplay(true)}>
+                <span onClick={() => setDisplay(true)}>
 
-                    <p className={styles.field}>Advanced filters</p>
+                    <h3>Advanced filters</h3>
                 </span>
 
             </>
@@ -40,12 +38,12 @@ export default function FilterAdvanced() {
     }
     return (
         <>
-            <span className={`${styles.line}`}  onClick={() => {
+            <span onClick={() => {
                 setDisplay(false)
             }}>
-                <p className={styles.field}>Advanced filters</p>
+                <h3>Advanced filters</h3>
             </span>
-            <span className={`${styles.line}`} >
+            <span >
                 {exp_ids.exp_ids?.map((exp,idx) => {
                     return <ExpButton exp={exp} key={idx} remove={()=> {
                         setExpIds((prev) => {
@@ -55,14 +53,14 @@ export default function FilterAdvanced() {
                     }}/>
                 })}
             </span>
-                <span className={`${styles.line}`} >
-                    <p className={styles.field} >experiments :</p>
+                <span  >
+                    <h4  >experiments :</h4>
                     <input 
                         type="text" 
                         name="expid_input" 
                         id="expid_input" 
                         placeholder="experiment id ..."
-                        className={`${styles.text_input}`}
+                        className="input-field"
                         value={exp_ids.search}
                         onChange={(e)=>{
                             setExpIds((prev) => {
@@ -86,31 +84,32 @@ export default function FilterAdvanced() {
                         }}
                     />
                 </span>
-                <span className={`${styles.line}`} >
-                    <p className={styles.field} >configuration :</p>
-                    <input className={`${styles.text_input}`} type="text" name="config" id="config" placeholder="configuration ..." 
+                <span  >
+                    <h4  >configuration :</h4>
+                    <input  type="text" name="config" id="config" placeholder="configuration ..." 
                         value={config}
+                        className="input-field"
                         onChange={(e) => setConfig(e.target.value)}
                     />
                 </span>
-                <span className={`${styles.line}`} >
-                <p className={styles.field} >extension :</p>
-                <select className={`${styles.select_input}`} name="extension" id="extension" defaultValue={extension}
+                <span  >
+                <h4>extension :</h4>
+                <select className="select"  name="extension" id="extension" defaultValue={extension}
                     onChange={(e) => setExtension(e.target.value)}
                 >
                     {SUPPORTED_EXTENSION.map((ext,idx) => {
-                        return <option className={`${styles.option}`} value={ext} key={idx}>{ext}</option>
+                        return <option value={ext} key={idx}>{ext}</option>
                     })}
                 </select>
                 </span>
-                <span className={`${styles.line}`} >
-                    <p className={styles.field}>lossless :</p>
-                    <input type="checkbox" name="lossless" id="lossless" checked={lossless} onChange={(e) => setLossless((prev)=> !prev)} />
+                <span  >
+                    <h4 >lossless :</h4>
+                    <input className="checkbox"  type="checkbox" name="lossless" id="lossless" checked={lossless} onChange={(e) => setLossless((prev)=> !prev)} />
                 </span>
-                <span className={`${styles.line}`} >
-                    <p className={styles.field}  >resolution :</p>
-                    <p className={styles.field} >x :</p>              
-                    <select className={`${styles.select_input}`} name="ry" id="ry" defaultValue={SUPPORTED_RESOLUTION[0]}
+                <span  >
+                    <h4   >resolution :</h4>
+                    <h5  >x :</h5>              
+                    <select className="select" name="ry" id="ry" defaultValue={SUPPORTED_RESOLUTION[0]}
                         onChange={(e) => {
                             if (e.target.value == SUPPORTED_RESOLUTION[0]) {
                                 setResolution((prev) => {
@@ -130,11 +129,11 @@ export default function FilterAdvanced() {
                         }}
                     >
                         {SUPPORTED_RESOLUTION.map((ext,idx) => {
-                            return <option className={`${styles.option}`}  value={ext} key={idx}>{ext}</option>
+                            return <option value={ext} key={idx}>{ext}</option>
                         })}
                     </select>
-                    <p className={styles.field} >y :</p>                 
-                        <select className={`${styles.select_input}`} name="rx" id="rx" defaultValue={SUPPORTED_RESOLUTION[0]}
+                    <h5  >y :</h5>                 
+                        <select className="select"  name="rx" id="rx" defaultValue={SUPPORTED_RESOLUTION[0]}
                             onChange={(e) => {
                                 if (e.target.value == SUPPORTED_RESOLUTION[0]) {
                                     setResolution((prev) => {
@@ -154,11 +153,11 @@ export default function FilterAdvanced() {
                             }}
                         >
                             {SUPPORTED_RESOLUTION.map((ext,idx) => {
-                                return <option className={`${styles.option}`} value={ext} key={idx}>{ext}</option>
+                                return <option value={ext} key={idx}>{ext}</option>
                             })}
                         </select>
                 </span>
-                <button className={styles.load_button}>Search</button>
+                <button className="btn-secondary">Search</button>
         </>
     )
 }

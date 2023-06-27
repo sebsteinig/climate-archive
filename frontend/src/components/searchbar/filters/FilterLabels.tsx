@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import styles from './filter.module.css'
 
 
 type Label = {
@@ -9,7 +8,7 @@ type Label = {
 
 function LabelButton({label,remove}:{label:Label,remove:Function}) {
     return (
-        <div className={`${!label.display ? styles.invisible : styles.label}`}>
+        <div className={label.display ? 'label' : 'invisible'}>
             {label.label}
             <div onClick={() => remove()}></div>
         </div>
@@ -18,7 +17,7 @@ function LabelButton({label,remove}:{label:Label,remove:Function}) {
 
 function FoundLabelButton({label,add}:{label:Label,add:Function}) {
     return (
-        <div onClick={() => add()} className={`${!label.display ? styles.invisible : styles.label}`}>
+        <div className={label.display ? 'label' : 'invisible'} onClick={() => add()} >
             {label.label}
         </div>
     )
@@ -46,9 +45,9 @@ export default function FilterLabels() {
     if (!display) {
         return (
             <>
-                <span className={`${styles.line}`}  onClick={() => setDisplay(true)}>
+                <span onClick={() => setDisplay(true)}>
 
-                    <p className={styles.field}>Filter with labels</p>
+                    <h3>Filter with labels</h3>
                 </span>
 
             </>
@@ -57,7 +56,7 @@ export default function FilterLabels() {
     
     return (
         <>
-            <span className={`${styles.line}`}  onClick={() => {
+            <span   onClick={() => {
                 setLabels((prev) => {
                     return {
                         searched:"",
@@ -67,9 +66,9 @@ export default function FilterLabels() {
                 })
                 setDisplay(false)
             }}>
-                <p className={styles.field}>Filter with labels</p>
+                <h3 >Filter with labels</h3>
             </span>
-            <span className={`${styles.line}`} >
+            <span  >
                 {labels.selected?.map((label,idx) => {
                     return <LabelButton label={label} key={idx} remove={()=> {
                         setLabels((prev) => {
@@ -80,9 +79,9 @@ export default function FilterLabels() {
                 })}
             </span>
             
-            <div className={`${styles.line}`}>
+            <div >
                 <input 
-                    className={`${styles.text_input}`}
+                    className="input-field"
                     type="text" 
                     name="searched_label" 
                     id="searched_label"  
