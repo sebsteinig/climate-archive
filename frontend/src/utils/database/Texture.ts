@@ -1,12 +1,11 @@
 
 
 export default class Texture {
-    id?:number
     exp_id!:string
     variable!:string
     path!: string
 
-    image! : Blob
+    image! : ArrayBuffer
 
     chunk_time! : {
         current :number
@@ -20,5 +19,19 @@ export default class Texture {
         x : number
         y : number
     }
-
+    levels! : number
+    timesteps! : number
+    xsize! : number
+    xfirst! : number
+    xinc! : number
+    ysize! : number
+    yfirst! : number
+    yinc! : number
+    //metadata! : Object
+    created_at! : string
+    config_name! : string
+    extension! : string
+    lossless! : boolean
+    nan_value_encoding! : number
+    threshold! : number
 }

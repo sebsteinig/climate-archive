@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { log } from 'console';
-import {Publication, DefaultParameter, SelectCollectionParameter, SearchExperiment} from "./types"
+import {Publication, DefaultParameter, SelectCollectionParameter, SearchExperiment, SelectSingleParameter, SelectSingleResult} from "./types"
 import { todo } from 'node:test';
 
 const URL_API = "http://localhost:3000/"
@@ -63,30 +63,26 @@ async function getData(url : string){
 }
 
 export async function selectCollection(query : SelectCollectionParameter) {
-    if (!Object.values(query).every((value,index, number) => {value == null})){
-        let url = new URL("select/collection/", URL_API)
-        Object.entries(query).map(bind => {
-            const [key,value] = bind
-            if (value) {
-                url.searchParams.append(key, JSON.stringify(value))  
-        }})
-        return getData(url.href)
-    }
+    let url = new URL("select/collection/", URL_API)
+    Object.entries(query).forEach(bind => {
+        const [key,value] = bind
+        if (value) {
+            url.searchParams.append(key, JSON.stringify(value))  
+        }
+    })
+    return getData(url.href)
 }
 
-export async function select(query : DefaultParameter) {
-    const query_param = Object.entries(query).map(bind => {
+export async function select(id:string,query : SelectSingleParameter) {
+    let url = new URL(`select/${id}/`, URL_API)
+    Object.entries(query).forEach(bind => {
         const [key,value] = bind
-        return `${key}=${JSON.stringify(value)}`
-    }).join("&")
-
-    let url = URL + "select/" + (query_param && "/?"+query_param)
-    try {
-        let data = await axios.get(url)        
-        return data.data
-    } catch (error) {
-        throw error
-    }
+        if (value) {
+            url.searchParams.append(key, JSON.stringify(value))  
+        }
+    })
+    let data = await axios.get(url.href)
+    return data.data as SelectSingleResult[]
 }
 
 
@@ -105,6 +101,20 @@ export async function getImage(path : string) {
             )
         ) 
         return base64
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function getImageArrayBuffer(path : string) {
+
+    let url = URL_API + path;
+    try {
+        let res = await axios.get(url, {
+                    responseType: "arraybuffer"
+                    })
+
+        return res.data as ArrayBuffer
     } catch (error) {
         throw error
     }
