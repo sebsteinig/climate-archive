@@ -91,18 +91,26 @@ export default function SearchBar() {
                                 {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
                             </p>
                         }
-                        {
-                            publications.length > 0 && 
-                            publications.slice(0,5).map((publication: { title: string; year: string; authors_short: string; },idx:number) => {
-                                return (
-                                    <Publication key={idx}
-                                        title={publication.title} 
-                                        year={publication.year} 
-                                        author={publication.authors_short}
-                                    />
-                                )
-                            })
-                        }
+                        <div className={styles.publications_results}>
+                            {
+                                publications.length > 0 && 
+                                publications.slice(0,5).map((publication: { title: string; year: string; 
+                                                            authors_short: string; authors_full : string;
+                                                            abstract : string; journal : string; exps : any[]},idx:number) => {
+                                    return (
+                                        <Publication key={idx}
+                                            title={publication.title} 
+                                            year={publication.year} 
+                                            author={publication.authors_short}
+                                            authors_full={publication.authors_full}
+                                            abstract={publication.abstract}
+                                            journal={publication.journal}
+                                            exps={publication.exps}
+                                        />
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 }
             </div>

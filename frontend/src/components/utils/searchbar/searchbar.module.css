@@ -87,3 +87,9 @@
 .more_options_sep {
     
 }
+
+.publications_results{
+    overflow-x: hidden;
+    max-height: 590px;
+    overflow-y: auto;
+}
