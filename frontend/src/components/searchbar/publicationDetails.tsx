@@ -9,12 +9,13 @@ type Props = {
     year:number,
     authors_full:string
     abstract:string,
-    exps:string[]
+    exps:string[],
+    load:Function,
 }
 
     
 
-export default function PublicationDetails({title,journal,year,authors_full,abstract,exps}:Props) {
+export default function PublicationDetails({title,journal,year,authors_full,abstract,exps, load}:Props) {
     const [display_see_details,setDisplaySeeDetails] = useState(false)
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked_all,setCheckedAll] = useState(false)
@@ -37,7 +38,9 @@ export default function PublicationDetails({title,journal,year,authors_full,abst
                 {display_abstract ? "Hide" : "Full abstract"}
             </p>
             </div>
-            <button onClick={() => {console.log("load exps : TODO")}}>
+            <button onClick={() => {
+                load()
+            }}>
                 {`Load all ${exps.length} experiments`}
             </button>
             <table id="exps-table">

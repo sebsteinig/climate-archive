@@ -1,17 +1,16 @@
 "use client";
 import { useState, useEffect, useRef } from 'react'
-import Publication from './publication';
 import { searchPublication } from '@/utils/api/api';
 import FilterPublication from './filters/FilterPublication';
 import FilterLabels from './filters/FilterLabels';
 import FilterAdvanced from './filters/FilterAdvanced';
+import {Publication,PublicationShort} from './publication';
+import { DefaultParameter, SearchPublication } from '@/utils/api/types';
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
         if (ref) {
             const onClick = ({target}: any) => {
-                //console.log(target);
-                
                 if(target.parentNode && target.parentNode.parentNode && !ref.contains(target)) {
                     !ref.contains(target) && onClickOut?.()
                 }
@@ -22,25 +21,33 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     }, [ref]);
 }
 
-function MoreOptions() {
+function MoreOptions({filters,setRequestFilters,load}:{filters:SearchPublication,setRequestFilters:(filters:SearchPublication) => void,
+    load:(x:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}) => void}) {
     return  (
         <div >
 
-            <FilterPublication />
-            <FilterLabels/>
-            <FilterAdvanced />
+            <FilterPublication filters={filters} setRequestFilters={setRequestFilters}/>
+            {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
+            <FilterAdvanced load={load}/>
 
             <span />
         </div>
     )
 }
 
+async function load({exp_ids,variables,paramaters}:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}){
+    console.log({exp_ids,variables,paramaters});
+
+}
+
 export default function SearchBar() {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
-    const [publications,setPublications] = useState<any[]>([])
+    const [publications,setPublications] = useState<Publication[]>([])
     const [display_more_options,setDisplayMoreOptions] = useState(false)
+
+    const [requestFilters,setRequestFilters] = useState<SearchPublication>({})
 
     useOutsideClick(search_panel_ref.current!, () => {
         setSearchPanelVisible(false)
@@ -52,7 +59,8 @@ export default function SearchBar() {
         let ignore = false;
         if (searched_content !== "" ) {
             searchPublication({
-                title: searched_content
+                ...requestFilters,
+                title: searched_content,
             })?.then((data) => 
                     setPublications(data)
                 ).catch(
@@ -87,7 +95,20 @@ export default function SearchBar() {
                         <p  className='text-right text-emerald-300'
                             onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
                         >More options ...</p>
-                        {display_more_options && <MoreOptions/>}
+                        {
+                        display_more_options && 
+                        <MoreOptions   
+                            filters={requestFilters}
+                            setRequestFilters={(filters:SearchPublication) => {
+                                setRequestFilters((prev) => {
+                                    return {
+                                        ...prev,
+                                        ...filters,
+                                    }
+                                })
+                            }} 
+                            load={load}/>
+                        }
                         { publications.length > 0 && 
                             <p >
                                 {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
@@ -96,18 +117,17 @@ export default function SearchBar() {
                         <div >
                             {
                                 publications.length > 0 && 
-                                publications.slice(0,5).map((publication: { title: string; year: number; 
-                                                            authors_short: string; authors_full : string;
-                                                            abstract : string; journal : string; exps : any[]},idx:number) => {
+                                publications.slice(0,5).map((publication: Publication,idx:number) => {
                                     return (
-                                        <Publication key={idx}
+                                        <PublicationShort key={idx}
                                             title={publication.title} 
                                             year={publication.year} 
-                                            author={publication.authors_short}
+                                            authors_short={publication.authors_short}
                                             authors_full={publication.authors_full}
                                             abstract={publication.abstract}
                                             journal={publication.journal}
                                             exps={publication.exps}
+                                            load={load}
                                         />
                                     )
                                 })

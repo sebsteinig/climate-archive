@@ -1,17 +1,17 @@
 import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
 
-type Publication = {
+export type Publication = {
     title : string
-    author : string
+    authors_short : string
     year : number
     authors_full : string
     abstract : string
     journal : string
-    exps:any[]
+    exps:any[],
 }
 
-export default function Publication({title,author,year,authors_full, abstract, journal, exps} : Publication) {
+export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps, load} : Publication & {load:Function}) {
     const [display_see_details,setDisplaySeeDetails] = useState(false)
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked_all,setCheckedAll] = useState(false)
@@ -26,7 +26,7 @@ export default function Publication({title,author,year,authors_full, abstract, j
         return (
             < >
                 <p>{title}</p>
-                <p>{`${author} (${year})`}</p>
+                <p>{`${authors_short} (${year})`}</p>
                 <button 
                     
                     onClick={() => {
@@ -40,7 +40,7 @@ export default function Publication({title,author,year,authors_full, abstract, j
         )
     } 
     return (
-        <PublicationDetails title={title} abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
+        <PublicationDetails load={load} title={title} abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
     )
 }
 

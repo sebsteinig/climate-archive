@@ -1,8 +1,9 @@
 
-export type Publication = {
+export type SearchPublication = {
     title? : string
     journal? : string
     authors_short? : string
+    year? : number[]
     /*owner_name : string
     owner_email : string
     abstract : string

@@ -15,6 +15,7 @@ function LabelButton({label,remove}:{label:Label,remove:Function}) {
             <DeletableLabel onClick = {()=> {}} onRemove = {() => remove()}> {label.label}</DeletableLabel>
         )
     }
+    return null
 }
 function FoundLabelButton({label,add}:{label:Label,add:Function}) {
     if(label.display){
@@ -24,8 +25,9 @@ function FoundLabelButton({label,add}:{label:Label,add:Function}) {
             </Label>
         )
     }
+    return null
 }
-export default function FilterLabels() {
+export default function FilterLabels({setRequestFilters}:{setRequestFilters:Function}) {
     const [display,setDisplay] = useState(false)
     const [labels,setLabels] = useState<{searched : string, found : Label[], selected: Label[]}>({searched : "",found:[],selected:[]})
     useEffect(() => {

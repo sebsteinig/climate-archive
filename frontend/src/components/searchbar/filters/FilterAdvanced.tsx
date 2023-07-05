@@ -1,6 +1,8 @@
 import Checkbox from "@/components/inputs/Checkbox"
 import InputField from "@/components/inputs/InputField"
+import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
+import { DefaultParameter } from "@/utils/api/types"
 import { useEffect, useState } from "react"
 type Exp = {
     id : string,
@@ -9,7 +11,8 @@ type Exp = {
 
 const SUPPORTED_EXTENSION = ["png","webp","jpg"]
 const SUPPORTED_RESOLUTION = ["default",1,2]
-
+const SUPPORTED_VARIABLES = ["clt", "height", "mlotst", "pr", "sic", "tas", "currents", 
+    "liconc", "pfts", "snc", "tos", "winds",]
 
 function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
     return (
@@ -21,13 +24,15 @@ function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
 }
 
 
-export default function FilterAdvanced() {
+export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}) => void}) {
     const [display,setDisplay] = useState(false)
     const [exp_ids,setExpIds] = useState<{exp_ids:Exp[], search:string}>({exp_ids:[],search:""})
     const [config,setConfig] = useState("")
     const [extension,setExtension] = useState(SUPPORTED_EXTENSION[0])
     const [lossless,setLossless] = useState(true)
     const [resolution,setResolution] = useState<{x?:number,y?:number}>({})
+    const [variables, setVariables] = useState<string[]>([])
+    
     if (!display) {
         return (
             <>
@@ -75,12 +80,34 @@ export default function FilterAdvanced() {
                                     return {
                                         ...prev,
                                         search:"",
-                                        exp_ids : [...prev.exp_ids,{id:prev.search,display:true}]
+                                        exp_ids : [...prev.exp_ids
+                                            ,...prev.search
+                                                .replaceAll(","," ")
+                                                .split(" ")
+                                                .filter(e=>e)
+                                                .map((id) => {return {id,display:true}})]
                                     }
                                 })
                             }
                         }}></InputField>
                 </span>
+                <span  >
+                    <h4  >variables :</h4>
+                    <MultiSelect name="variables" id="variables" defaultValue={[]}
+                        onChange={(e : any) => setVariables(
+                            (prev) => {
+                            const variable =  e.target.value
+                            if (prev.includes(variable)) {
+                                return prev
+                            }
+                            return [...prev,variable] 
+                        })}>
+                                {SUPPORTED_VARIABLES.map((ext,idx) => {
+                                    return <option value={ext} key={idx}>{ext}</option>
+                                })}
+                    </MultiSelect>
+                </span>
+
                 <span  >
                     <h4  >configuration :</h4>
                     <InputField name="config" id="config" placeholder="configuration ..." 
@@ -151,7 +178,22 @@ export default function FilterAdvanced() {
                             })}
                         </Select>
                 </span>
-                <button className="btn-secondary">Search</button>
+                <button className="btn-secondary" onClick={
+                    () =>{
+                        load({
+                            exp_ids: exp_ids.exp_ids.map(e=>e.id),
+                            variables : variables,
+                            paramaters : {
+                                config_name: config != "" ? config : undefined,
+                                extension:extension,
+                                lossless:lossless,
+                                rx:resolution.x,
+                                ry:resolution.y,
+                            }
+                        })
+
+                    }
+                }>Load</button>
         </>
     )
 }
