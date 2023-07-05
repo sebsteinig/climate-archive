@@ -1,5 +1,8 @@
 import { useState } from "react"
 import { fetchJournals, select } from "@/utils/api/api"
+import ButtonSecondary from "@/components/buttons/ButtonSecondary"
+import InputField from "@/components/inputs/InputField"
+import Select from "@/components/inputs/Select"
 
 const DEFAULT_LOWER = "jurassic"
 const DEFAULT_UPPER = "now"
@@ -10,20 +13,20 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
     if (period) {    
         return (
             <>
-                    <select className='select'  name="period_lower" id="period_lower" onChange={(e) => {
+                <Select name="period_lower" id="period_lower" onChange={(e : any) => {
                         if(e.target.value === DEFAULT_LOWER) {
                             setYearLower(1900)
                         } else{
                             setYearLower(parseInt(e.target.value))
                         }
                     }}>
-                        {LOWER_PERIOD.map((year,index) => {
-                                return <option key = {index} value = {year}>{year}</option>
-                        })}
-                    </select>
+                    {LOWER_PERIOD.map((year,index) => {
+                        return <option key = {index} value = {year}>{year}</option>
+                    })}
+                </Select>
 
-                <h4  > and </h4>     
-                    <select className='select'  name="period_upper" id="period_upper" onChange={(e) => {
+                <h4  > and </h4>
+                    <Select name="period_upper" id="period_upper" onChange={(e : any) => {
                         if(e.target.value === DEFAULT_UPPER) {
                             setYearUpper(new Date().getFullYear())
                         } else{
@@ -33,12 +36,12 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
                         {UPPER_PERIOD.map((year,index) => {
                                 return <option key = {index} value = {year}>{year}</option>
                         })}
-                    </select>
+                    </Select>
             </>
         )
     }
     return (
-        <select className='select'  name="period_upper" id="period_upper" onChange={(e) => {
+        <Select name="period_upper" id="period_upper" onChange={(e : any) => {
             if(e.target.value === DEFAULT_UPPER) {
                 setYearUpper(new Date().getFullYear())
             } else{
@@ -48,7 +51,7 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
             {UPPER_PERIOD.map((year,index) => {
                     return <option key = {index} value = {year}>{year}</option>
             })}
-        </select>
+        </Select>
     )
 }
 
@@ -76,20 +79,21 @@ export default function FilterPublication() {
             </span>
             <div   >
                 <h4 >Year : </h4> 
-                <button className="btn-secondary" onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</button>
+                <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
                 <Period period={on_period} setYearLower={setYearLower} setYearUpper={setYearUpper}/>
                 {on_period && year_lower > year_upper && <h4 color="red">Please enter a valid period</h4>}
             </div>
             <div  >
                 <h4 >Journal : </h4>
-                <select className='select'  placeholder={journal}>
+                <Select defaultValue={journal} onChange={(e : any) => { setJournal(e.target.value)}}>
                     {journals.map((journal : string, index) => 
-                        <option key = {index} value = {journal} onClick={() => setJournal(journal)}>{journal}</option>)}
-                </select>
+                        <option key = {index} value = {journal}>{journal}</option>)}
+                </Select>
             </div>
             <div  >
                 <h4 >Author : </h4>
-                <input className="input-field" type="text" placeholder="like valdes et al" value = {author} onChange={(e) => setAuthor(e.target.value)}/>
+                <InputField  placeholder="like valdes et al" value = {author} 
+                onChange={(e : any) => setAuthor(e.target.value)}></InputField>
             </div>
             </>
         )
