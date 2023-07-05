@@ -1,3 +1,6 @@
+import InputField from "@/components/inputs/InputField"
+import DeletableLabel from "@/components/labels/DeletableLabel"
+import Label from "@/components/labels/Label"
 import { useEffect, useState } from "react"
 
 
@@ -7,20 +10,20 @@ type Label = {
 }
 
 function LabelButton({label,remove}:{label:Label,remove:Function}) {
-    return (
-        <div className={label.display ? 'label' : 'invisible'}>
-            {label.label}
-            <div onClick={() => remove()}></div>
-        </div>
-    )
+    if (label.display){
+        return (            
+            <DeletableLabel onClick = {()=> {}} onRemove = {() => remove()}> {label.label}</DeletableLabel>
+        )
+    }
 }
-
 function FoundLabelButton({label,add}:{label:Label,add:Function}) {
-    return (
-        <div className={label.display ? 'label' : 'invisible'} onClick={() => add()} >
-            {label.label}
-        </div>
-    )
+    if(label.display){
+        return (
+            <Label onClick={() => add()} >
+                {label.label}
+            </Label>
+        )
+    }
 }
 export default function FilterLabels() {
     const [display,setDisplay] = useState(false)
@@ -80,15 +83,11 @@ export default function FilterLabels() {
             </span>
             
             <div >
-                <input 
-                    className="input-field"
-                    type="text" 
-                    name="searched_label" 
+                <InputField name="searched_label" 
                     id="searched_label"  
                     placeholder="Search a label ..."
                     value={labels.searched} 
-                    onChange={(e) => setLabels((prev) => {return {...prev,searched:e.target.value}})}
-                />
+                    onChange={(e : any) => setLabels((prev) => {return {...prev,searched:e.target.value}})}></InputField>
                 {
                     labels.found?.map((label,idx) => {
                         return <FoundLabelButton label={label} add={() => {

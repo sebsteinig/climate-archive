@@ -1,6 +1,7 @@
 
 
 import { useState } from "react"
+import Checkbox from "../inputs/Checkbox"
 
 type Props = {
     title:string,
@@ -44,8 +45,10 @@ export default function PublicationDetails({title,journal,year,authors_full,abst
                     <tr>
                         <th>Experiments</th>
                         <th>Age</th>
-                        <th><input name="checked_all" type="checkbox" 
-                        checked={checked_all} onChange={(event) => {selectAll(event.target.checked)}}/></th>
+                        <th>
+                            <Checkbox name="checked_all" checked={checked_all}
+                            onChange={(event : any) => {selectAll(event.target.checked)}}></Checkbox>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,11 +57,13 @@ export default function PublicationDetails({title,journal,year,authors_full,abst
                             let label = exp_object.metadata[0].metadata.text
                             return( 
                             <tr key={exp_object.id}>
-                            <td>{exp_object.id}</td>
-                            <td>{label}</td>
-                            <td><input type="checkbox" name={title+"_"+exp_object.id}
-                                 onChange={(event) => checkExperiment(event.target.checked, setChecked, checked, exp_object.id)}
-                                checked={checked.includes(exp_object.id)}/></td>
+                                <td>{exp_object.id}</td>
+                                <td>{label}</td>
+                                <td>
+                                    <Checkbox name={title+"_"+exp_object.id}
+                                    onChange={(event : any) => checkExperiment(event.target.checked, setChecked, checked, exp_object.id)}
+                                    checked={checked.includes(exp_object.id)}></Checkbox>
+                                </td>
                             </tr>
                             )})}
                 </tbody>

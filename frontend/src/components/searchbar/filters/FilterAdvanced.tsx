@@ -1,3 +1,6 @@
+import Checkbox from "@/components/inputs/Checkbox"
+import InputField from "@/components/inputs/InputField"
+import Select from "@/components/inputs/Select"
 import { useEffect, useState } from "react"
 type Exp = {
     id : string,
@@ -55,14 +58,9 @@ export default function FilterAdvanced() {
             </span>
                 <span  >
                     <h4  >experiments :</h4>
-                    <input 
-                        type="text" 
-                        name="expid_input" 
-                        id="expid_input" 
-                        placeholder="experiment id ..."
-                        className="input-field"
-                        value={exp_ids.search}
-                        onChange={(e)=>{
+                    <InputField name="expid_input" value={exp_ids.search}
+                    id="expid_input" placeholder="experiment id ..."
+                    onChange={(e : any)=>{
                             setExpIds((prev) => {
                                 return {
                                     ...prev,
@@ -71,7 +69,7 @@ export default function FilterAdvanced() {
                                 }
                             })
                         }}
-                        onKeyDown={(e) => {
+                        onKeyDown={(e : any) => {
                             if (e.key === 'Enter') {
                                 setExpIds((prev) => {
                                     return {
@@ -81,81 +79,77 @@ export default function FilterAdvanced() {
                                     }
                                 })
                             }
-                        }}
-                    />
+                        }}></InputField>
                 </span>
                 <span  >
                     <h4  >configuration :</h4>
-                    <input  type="text" name="config" id="config" placeholder="configuration ..." 
-                        value={config}
-                        className="input-field"
-                        onChange={(e) => setConfig(e.target.value)}
-                    />
+                    <InputField name="config" id="config" placeholder="configuration ..." 
+                        value={config} onChange={(e : any) => setConfig(e.target.value)} ></InputField>
                 </span>
                 <span  >
                 <h4>extension :</h4>
-                <select className="select"  name="extension" id="extension" defaultValue={extension}
-                    onChange={(e) => setExtension(e.target.value)}
-                >
-                    {SUPPORTED_EXTENSION.map((ext,idx) => {
-                        return <option value={ext} key={idx}>{ext}</option>
-                    })}
-                </select>
+                    <Select name="extension" id="extension" defaultValue={extension}
+                    onChange={(e : any) => setExtension(e.target.value)}>
+                            {SUPPORTED_EXTENSION.map((ext,idx) => {
+                                return <option value={ext} key={idx}>{ext}</option>
+                            })}
+                    </Select>
+                
                 </span>
                 <span  >
                     <h4 >lossless :</h4>
-                    <input className="checkbox"  type="checkbox" name="lossless" id="lossless" checked={lossless} onChange={(e) => setLossless((prev)=> !prev)} />
+                    <Checkbox name="lossless" id="lossless" checked={lossless} 
+                    onChange={(e:any) => setLossless((prev)=> !prev)}></Checkbox>
                 </span>
                 <span  >
                     <h4   >resolution :</h4>
-                    <h5  >x :</h5>              
-                    <select className="select" name="ry" id="ry" defaultValue={SUPPORTED_RESOLUTION[0]}
-                        onChange={(e) => {
+                    <h5  >x :</h5>  
+                    <Select name="ry" id="ry" defaultValue={SUPPORTED_RESOLUTION[0].toString()}
+                    onChange={(e:any) => {
+                        if (e.target.value == SUPPORTED_RESOLUTION[0]) {
+                            setResolution((prev) => {
+                                return {
+                                    ...prev,
+                                    y : 0,
+                                }
+                            })
+                        }else {
+                            setResolution((prev) => {
+                                return {
+                                    ...prev,
+                                    y : parseFloat(e.target.value),
+                                }
+                            })
+                        }
+                    }}>
+                        {SUPPORTED_RESOLUTION.map((ext,idx) => {
+                            return <option value={ext} key={idx}>{ext}</option>
+                        })}
+                    </Select>
+
+                    <h5  >y :</h5>  
+                        <Select name="rx" id="rx" defaultValue={SUPPORTED_RESOLUTION[0].toString()}
+                        onChange={(e:any) => {
                             if (e.target.value == SUPPORTED_RESOLUTION[0]) {
                                 setResolution((prev) => {
                                     return {
                                         ...prev,
-                                        y : 0,
+                                        x : 0,
                                     }
                                 })
                             }else {
                                 setResolution((prev) => {
                                     return {
                                         ...prev,
-                                        y : parseFloat(e.target.value),
+                                        x : parseFloat(e.target.value),
                                     }
                                 })
                             }
-                        }}
-                    >
-                        {SUPPORTED_RESOLUTION.map((ext,idx) => {
-                            return <option value={ext} key={idx}>{ext}</option>
-                        })}
-                    </select>
-                    <h5  >y :</h5>                 
-                        <select className="select"  name="rx" id="rx" defaultValue={SUPPORTED_RESOLUTION[0]}
-                            onChange={(e) => {
-                                if (e.target.value == SUPPORTED_RESOLUTION[0]) {
-                                    setResolution((prev) => {
-                                        return {
-                                            ...prev,
-                                            x : 0,
-                                        }
-                                    })
-                                }else {
-                                    setResolution((prev) => {
-                                        return {
-                                            ...prev,
-                                            x : parseFloat(e.target.value),
-                                        }
-                                    })
-                                }
-                            }}
-                        >
+                        }}>
                             {SUPPORTED_RESOLUTION.map((ext,idx) => {
                                 return <option value={ext} key={idx}>{ext}</option>
                             })}
-                        </select>
+                        </Select>
                 </span>
                 <button className="btn-secondary">Search</button>
         </>
