@@ -16,6 +16,3 @@ export class Database extends Dexie {
     this.textures.mapToClass (Texture);
   }
 }
-
-
-export const database = new Database()
