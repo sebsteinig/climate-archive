@@ -26,7 +26,7 @@ export default function PublicationDetails({title,journal,year,authors_full,abst
 
     return(
         <>
-        <div>
+        <div className="bg-slate-700">
             <p>{title}</p>
             <p>{journal}, {year}</p>
             <p>{authors_full}</p>
@@ -53,7 +53,7 @@ export default function PublicationDetails({title,journal,year,authors_full,abst
                             let exp_object = JSON.parse(exp)
                             let label = exp_object.metadata[0].metadata.text
                             return( 
-                            <tr>
+                            <tr key={exp_object.id}>
                             <td>{exp_object.id}</td>
                             <td>{label}</td>
                             <td><input type="checkbox" name={title+"_"+exp_object.id}

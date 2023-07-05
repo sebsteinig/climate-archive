@@ -1,5 +1,5 @@
 import { useState } from "react"
-import PublicationDetails from "./publication_details"
+import PublicationDetails from "./publicationDetails"
 
 type Publication = {
     title : string
@@ -24,7 +24,7 @@ export default function Publication({title,author,year,authors_full, abstract, j
 
     if (!display_see_details){
         return (
-            <div >
+            < >
                 <p>{title}</p>
                 <p>{`${author} (${year})`}</p>
                 <button 
@@ -36,7 +36,7 @@ export default function Publication({title,author,year,authors_full, abstract, j
                 >
                     See Details
                 </button>
-            </div>
+            </>
         )
     } 
     return (
