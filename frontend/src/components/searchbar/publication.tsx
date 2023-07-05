@@ -1,5 +1,7 @@
 import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
+import ButtonPrimary from "../buttons/ButtonPrimary"
+import ButtonSecondary from "../buttons/ButtonSecondary"
 
 type Publication = {
     title : string
@@ -25,22 +27,24 @@ export default function Publication({title,author,year,authors_full, abstract, j
     if (!display_see_details){
         return (
             < >
-                <p>{title}</p>
-                <p>{`${author} (${year})`}</p>
-                <button 
-                    
-                    onClick={() => {
-                        setDisplaySeeDetails(true)
-                        console.log("load")
-                    }}
-                >
-                    See Details
-                </button>
+                <div  className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-50'>
+                <p className="font-semibold text-sky-200">{title}</p>
+                <p className="italic text-slate-400">{`${author} (${year})`}</p>
+                    <ButtonSecondary
+                        
+                        onClick={() => {
+                            setDisplaySeeDetails(true)
+                            console.log("load")
+                        }}
+                        >
+                        See Details
+                    </ButtonSecondary>
+                </div>
             </>
         )
     } 
     return (
-        <PublicationDetails title={title} abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
+        <PublicationDetails setDisplaySeeDetails={setDisplaySeeDetails} title={title} abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
     )
 }
 

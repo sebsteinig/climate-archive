@@ -83,7 +83,7 @@ export default function SearchBar() {
                     onClick={() => setSearchPanelVisible(true)}
                 />
                 {search_panel_visible && 
-                    <div >
+                    <div className='overflow-y-auto overflow-x-hidden max-h-96' >
                         <p  className='text-right text-emerald-300'
                             onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
                         >More options ...</p>
@@ -93,7 +93,7 @@ export default function SearchBar() {
                                 {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
                             </p>
                         }
-                        <div >
+                        <div>
                             {
                                 publications.length > 0 && 
                                 publications.slice(0,5).map((publication: { title: string; year: number; 
