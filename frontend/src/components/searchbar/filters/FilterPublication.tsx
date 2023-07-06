@@ -3,22 +3,29 @@ import { fetchJournals, select } from "@/utils/api/api"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import InputField from "@/components/inputs/InputField"
 import Select from "@/components/inputs/Select"
+import { SearchPublication } from "@/utils/api/types"
 
 const DEFAULT_LOWER = "jurassic"
 const DEFAULT_UPPER = "now"
 const LOWER_PERIOD = rangeYear(1970,new Date().getFullYear(), DEFAULT_LOWER, false)
 const UPPER_PERIOD = rangeYear(1970,new Date().getFullYear(), DEFAULT_UPPER, true)
 
-function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearLower:Function, setYearUpper:Function}) {
-    if (period) {    
+function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => void}) {
+    const [on_period, setOnPeriod] = useState((!year || year.length > 1))    
+    const [year_lower, setYearLower] = useState(year && year[0] || DEFAULT_LOWER)
+    const [year_upper, setYearUpper] = useState(year && year[1] || DEFAULT_UPPER)
+    if (on_period) {    
         return (
             <>
-                <Select name="period_lower" id="period_lower" onChange={(e : any) => {
-                        if(e.target.value === DEFAULT_LOWER) {
-                            setYearLower(1900)
-                        } else{
-                            setYearLower(parseInt(e.target.value))
+                <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
+                <Select defaultValue={`${year_lower}`} name="period_lower" id="period_lower" onChange={(e : any) => {
+                        let new_year = 1900
+                        if(e.target.value !== DEFAULT_LOWER) {
+                            new_year = parseInt(e.target.value)
                         }
+                        const yu = year_upper === DEFAULT_UPPER ? new Date().getFullYear() : parseInt(year_upper.toString())
+                        onChange([new_year,yu])
+                        setYearLower(new_year)
                     }}>
                     {LOWER_PERIOD.map((year,index) => {
                         return <option key = {index} value = {year}>{year}</option>
@@ -26,12 +33,14 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
                 </Select>
 
                 <h4  > and </h4>
-                    <Select name="period_upper" id="period_upper" onChange={(e : any) => {
-                        if(e.target.value === DEFAULT_UPPER) {
-                            setYearUpper(new Date().getFullYear())
-                        } else{
-                            setYearUpper(parseInt(e.target.value))
+                    <Select defaultValue={`${year_upper}`} name="period_upper" id="period_upper" onChange={(e : any) => {
+                        let new_year = new Date().getFullYear()
+                        if(e.target.value !== DEFAULT_LOWER) {
+                            new_year = parseInt(e.target.value)
                         }
+                        const yl = year_lower === DEFAULT_UPPER ? 1900 : parseInt(year_lower.toString())
+                        onChange([yl,new_year])
+                        setYearUpper(new_year)
                     }}>
                         {UPPER_PERIOD.map((year,index) => {
                                 return <option key = {index} value = {year}>{year}</option>
@@ -41,27 +50,29 @@ function Period({period, setYearLower, setYearUpper} : {period:boolean, setYearL
         )
     }
     return (
-        <Select name="period_upper" id="period_upper" onChange={(e : any) => {
-            if(e.target.value === DEFAULT_UPPER) {
-                setYearUpper(new Date().getFullYear())
-            } else{
-                setYearUpper(parseInt(e.target.value))
-            }
-        }}>
-            {UPPER_PERIOD.map((year,index) => {
-                    return <option key = {index} value = {year}>{year}</option>
-            })}
-        </Select>
+        <>
+            <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
+            <Select defaultValue={`${year_upper}`} name="period_upper" id="period_upper" onChange={(e : any) => {
+                let new_year = new Date().getFullYear()
+                if(e.target.value !== DEFAULT_LOWER) {
+                    new_year = parseInt(e.target.value)
+                }
+                const yl = year_lower === DEFAULT_UPPER ? 1900 : parseInt(year_lower.toString())
+                onChange([yl,new_year])
+                setYearUpper(new_year)
+            }}>
+                {UPPER_PERIOD.map((year,index) => {
+                        return <option key = {index} value = {year}>{year}</option>
+                })}
+            </Select>
+        </>
     )
 }
 
-export default function FilterPublication() {
+export default function FilterPublication({filters,setRequestFilters}:{filters:SearchPublication,setRequestFilters:(filters:SearchPublication) => void}) {
     const [display_filters, setDisplayFilters] = useState(false)
-    const [on_period, setOnPeriod] = useState(true)    
-    const [year_lower, setYearLower] = useState(1900)
-    const [year_upper, setYearUpper] = useState(new Date().getFullYear())
-    const [journal, setJournal] = useState("")
-    const [author, setAuthor] = useState("")
+    const [journal, setJournal] = useState(filters.journal ?? "")
+    const [author, setAuthor] = useState(filters.authors_short ?? "")
     if (!display_filters){
         return (
             <>
@@ -79,13 +90,20 @@ export default function FilterPublication() {
             </span>
             <div   >
                 <h4 >Year : </h4> 
-                <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
-                <Period period={on_period} setYearLower={setYearLower} setYearUpper={setYearUpper}/>
-                {on_period && year_lower > year_upper && <h4 color="red">Please enter a valid period</h4>}
+                <Period year={filters.year} onChange={
+                    (year) => {
+                        setRequestFilters({year})
+                    }
+                }/>
             </div>
             <div  >
                 <h4 >Journal : </h4>
-                <Select defaultValue={journal} onChange={(e : any) => { setJournal(e.target.value)}}>
+                <Select defaultValue={journal} 
+                    onChange={(e : any) => { 
+                        setJournal(e.target.value);
+                        setRequestFilters({journal:e.target.value})
+                    }
+                }>
                     {journals.map((journal : string, index) => 
                         <option key = {index} value = {journal}>{journal}</option>)}
                 </Select>
@@ -93,7 +111,10 @@ export default function FilterPublication() {
             <div  >
                 <h4 >Author : </h4>
                 <InputField  placeholder="like valdes et al" value = {author} 
-                onChange={(e : any) => setAuthor(e.target.value)}></InputField>
+                onChange={(e : any) => {
+                    setAuthor(e.target.value);
+                    setRequestFilters({authors_short:e.target.value})
+                }}></InputField>
             </div>
             </>
         )

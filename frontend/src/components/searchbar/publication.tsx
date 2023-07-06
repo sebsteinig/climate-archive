@@ -2,17 +2,17 @@ import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
 import ButtonSecondary from "../buttons/ButtonSecondary"
 
-type Publication = {
+export type Publication = {
     title : string
-    author : string
+    authors_short : string
     year : number
     authors_full : string
     abstract : string
     journal : string
-    exps:any[]
+    exps:any[],
 }
 
-export default function Publication({title,author,year,authors_full, abstract, journal, exps} : Publication) {
+export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps, load} : Publication & {load:Function}) {
     const [display_see_details,setDisplaySeeDetails] = useState(false)
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked_all,setCheckedAll] = useState(false)
@@ -28,7 +28,7 @@ export default function Publication({title,author,year,authors_full, abstract, j
             < >
                 <div  className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-50'>
                 <p className="font-semibold text-sky-200">{title}</p>
-                <p className="italic text-slate-400">{`${author} (${year})`}</p>
+                <p className="italic text-slate-400">{`${authors_short} (${year})`}</p>
                     <ButtonSecondary
                         
                         onClick={() => {
@@ -43,7 +43,8 @@ export default function Publication({title,author,year,authors_full, abstract, j
         )
     } 
     return (
-        <PublicationDetails setDisplaySeeDetails={setDisplaySeeDetails} title={title} abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
+        <PublicationDetails load={load} setDisplaySeeDetails={setDisplaySeeDetails} title={title} 
+            abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
     )
 }
 

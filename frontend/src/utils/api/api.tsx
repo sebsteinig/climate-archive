@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Publication, DefaultParameter, SelectCollectionParameter, SearchExperiment} from "./types"
+import {SearchPublication, DefaultParameter, SelectCollectionParameter, SearchExperiment} from "./types"
 
 
 const URL_API = "http://localhost:3000/"
@@ -10,7 +10,7 @@ const URL_IMAGE = "http://localhost:3060/"
  * @param query {'title', 'journal', 'authors_short'} 
  * @returns experiments from publication as json
  */
-export function searchPublication(query : Publication) {
+export function searchPublication(query : SearchPublication) {
     let url = new URL("search/publication/", URL_API)
     if (query.title || query.journal || query.authors_short){
         Object.entries(query).map(bind => {

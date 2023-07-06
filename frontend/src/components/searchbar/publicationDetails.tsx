@@ -11,12 +11,13 @@ type Props = {
     year:number,
     authors_full:string
     abstract:string,
-    exps:string[]
+    exps:string[],
+    load:Function,
 }
 
     
 
-export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,abstract,exps}:Props) {
+export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,abstract,exps, load}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked_all,setCheckedAll] = useState(false)
     const [checked, setChecked] = useState<string[]>([])
