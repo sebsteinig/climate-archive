@@ -6,6 +6,11 @@ import FilterLabels from './filters/FilterLabels';
 import FilterAdvanced from './filters/FilterAdvanced';
 import {Publication,PublicationShort} from './publication';
 import { DefaultParameter, SearchPublication } from '@/utils/api/types';
+import Image from 'next/image';
+import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
+import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
+import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
+
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -76,12 +81,32 @@ export default function SearchBar() {
     ,[searched_content, requestFilters])
 
     return (
-        <div className="bg-slate-700 p-5 rounded-md " ref={search_panel_ref}>
+        <div className={`bg-slate-700 
+        p-5 m-5 
+        rounded-md 
+        lg:w-1/3 
+        absolute top-0 right-0 lg:left-1/2 lg:-translate-x-1/2
+        ${search_panel_visible && "max-sm:w-[calc(100%_-_2.5rem)]"}
+        `} ref={search_panel_ref}>
             <div  
              onClick={() => setSearchPanelVisible(true)}
              >
+                <Image 
+                    priority
+                    src={SearchIcon}
+                    className={`w-8 h-8 lg:invisible lg:hidden ${search_panel_visible ? "hidden": ""}`}
+                    alt="Search a publication"
+                />
                 <input  
-                    className='w-full bg-transparent hover:placeholder:opacity-90  placeholder:text-emerald-300 placeholder:opacity-70 outline-none placeholder:tracking-wider'
+                    className={`${search_panel_visible ?  "max-sm:block":"max-sm:hidden" }
+                        w-full
+                        bg-transparent 
+                        hover:placeholder:opacity-90
+                        placeholder:text-emerald-300 
+                        placeholder:opacity-70 
+                        outline-none 
+                        placeholder:tracking-wider`}
+                        
                     type="text"
                     name="searchbar" 
                     id="searchbar" 
@@ -92,9 +117,24 @@ export default function SearchBar() {
                 />
                 {search_panel_visible && 
                     <div className='overflow-y-auto overflow-x-hidden max-h-96' >
-                        <p  className='text-right text-emerald-300'
+                        <p  className='text-right text-emerald-300 inline-flex'
                             onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
-                        >More options ...</p>
+                        >More options {
+                            display_more_options ?
+                            <Image 
+                                priority
+                                alt='close'
+                                className={`w-4 h-4 self-center`}
+                                src={ArrowUp}
+                            /> :
+                            <Image
+                                priority
+                                alt='open'
+                                className={`w-4 h-4 self-center`}
+                                src={ArrowDown} 
+                             />
+                        }
+                        </p>
                         {
                         display_more_options && 
                         <MoreOptions   
