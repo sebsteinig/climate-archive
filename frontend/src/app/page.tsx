@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       {/* <Main /> */}
-      {/* <SearchBar/> */}
+      <SearchBar/>
       <TestImage />
     </main>
   )
