@@ -1,6 +1,5 @@
 import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
-import ButtonPrimary from "../buttons/ButtonPrimary"
 import ButtonSecondary from "../buttons/ButtonSecondary"
 
 type Publication = {

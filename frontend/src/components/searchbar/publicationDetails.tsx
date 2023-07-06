@@ -30,10 +30,10 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
         <>
         <div className='border-s-4 border-sky-700 mt-2 mb-2 pl-4'>
             <p className="font-semibold text-sky-200">{title}</p>
-            <p>{journal}, {year}</p>
-            <p>{authors_full}</p>
-            <div >
-            <p>Abstract : {display_abstract? abstract : abstract.slice(0,60) + ' ...'}</p>
+            <p className="italic">{journal}, {year}</p>
+            <p className="font-medium tracking-wide">{authors_full}</p>
+            <div>
+            <p className="pt-2 pb-2">Abstract : {display_abstract? abstract : abstract.slice(0,60) + ' ...'}</p>
             <p className="hover:underline cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
                 {display_abstract ? "Hide" : "Full abstract"}
             </p>
