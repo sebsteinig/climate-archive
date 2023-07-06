@@ -15,8 +15,6 @@ type Props = {
     load:Function,
 }
 
-    
-
 export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,abstract,exps, load}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked_all,setCheckedAll] = useState(false)
@@ -39,7 +37,7 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 {display_abstract ? "Hide" : "Full abstract"}
             </p>
             </div>
-            <ButtonPrimary onClick={() => {console.log("load exps : TODO")}}>
+            <ButtonPrimary onClick={() => {load();console.log("load exps : TODO")}}>
                 {`Load all ${exps.length} experiments`}
             </ButtonPrimary>
             <div className="flex flex-col">

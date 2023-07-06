@@ -1,3 +1,4 @@
+import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import Checkbox from "@/components/inputs/Checkbox"
 import InputField from "@/components/inputs/InputField"
 import MultiSelect from "@/components/inputs/MultiSelect"
@@ -61,8 +62,8 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                     }}/>
                 })}
             </span>
-                <span  >
-                    <h4  >experiments :</h4>
+                <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
+                    <h4  > Experiments :</h4>
                     <InputField name="expid_input" value={exp_ids.search}
                     id="expid_input" placeholder="experiment id ..."
                     onChange={(e : any)=>{
@@ -91,8 +92,8 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                             }
                         }}></InputField>
                 </span>
-                <span  >
-                    <h4  >variables :</h4>
+                <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
+                    <h4  >Variables :</h4>
                     <MultiSelect name="variables" id="variables" defaultValue={[]}
                         onChange={(e : any) => setVariables(
                             (prev) => {
@@ -108,13 +109,13 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                     </MultiSelect>
                 </span>
 
-                <span  >
-                    <h4  >configuration :</h4>
+                <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
+                    <h4  >Configuration :</h4>
                     <InputField name="config" id="config" placeholder="configuration ..." 
                         value={config} onChange={(e : any) => setConfig(e.target.value)} ></InputField>
                 </span>
-                <span  >
-                <h4>extension :</h4>
+                <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
+                <h4>Extension :</h4>
                     <Select name="extension" id="extension" defaultValue={extension}
                     onChange={(e : any) => setExtension(e.target.value)}>
                             {SUPPORTED_EXTENSION.map((ext,idx) => {
@@ -123,13 +124,13 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                     </Select>
                 
                 </span>
-                <span  >
-                    <h4 >lossless :</h4>
+                <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
+                    <h4 >Lossless :</h4>
                     <Checkbox name="lossless" id="lossless" checked={lossless} 
                     onChange={(e:any) => setLossless((prev)=> !prev)}></Checkbox>
                 </span>
-                <span  >
-                    <h4   >resolution :</h4>
+                <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
+                    <h4   >Resolution :</h4>
                     <h5  >x :</h5>  
                     <Select name="ry" id="ry" defaultValue={SUPPORTED_RESOLUTION[0].toString()}
                     onChange={(e:any) => {
@@ -178,7 +179,7 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                             })}
                         </Select>
                 </span>
-                <button className="btn-secondary" onClick={
+                <ButtonSecondary onClick={
                     () =>{
                         load({
                             exp_ids: exp_ids.exp_ids.map(e=>e.id),
@@ -193,7 +194,7 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                         })
 
                     }
-                }>Load</button>
+                }>Load</ButtonSecondary>
         </>
     )
 }

@@ -13,7 +13,11 @@ export default function Home() {
     <main className={styles.main}>
       {/* <Main /> */}
       <SearchBar/>
+<<<<<<< HEAD
+      {/* <TestImage /> */}
+=======
       <TestImage />
+>>>>>>> origin/develop
     </main>
   )
 }
