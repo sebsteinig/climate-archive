@@ -97,27 +97,29 @@ export default function SearchBar() {
                     className={`w-8 h-8 lg:invisible lg:hidden ${search_panel_visible ? "hidden": ""}`}
                     alt="Search a publication"
                 />
-                <input  
-                    className={`${search_panel_visible ?  "max-sm:block":"max-sm:hidden" }
-                        w-full
-                        bg-transparent 
-                        hover:placeholder:opacity-90
-                        placeholder:text-emerald-300 
-                        placeholder:opacity-70 
-                        outline-none 
-                        placeholder:tracking-wider`}
-                        
-                    type="text"
-                    name="searchbar" 
-                    id="searchbar" 
-                    placeholder="Search a publication ..." 
-                    value={searched_content} 
-                    onChange={(e) => setSearchContent(e.target.value)}
-                    onClick={() => setSearchPanelVisible(true)}
-                />
-                {search_panel_visible && 
-                    <div className='overflow-y-auto overflow-x-hidden max-h-96' >
-                        <p  className='text-right text-emerald-300 inline-flex'
+                <div>
+
+                    <input  
+                        className={`${search_panel_visible ?  "max-sm:block":"max-sm:hidden" }
+                            w-full
+                            bg-transparent 
+                            hover:placeholder:opacity-90
+                            placeholder:text-emerald-300 
+                            placeholder:opacity-70 
+                            outline-none 
+                            sticky
+                            top-0
+                            placeholder:tracking-wider`}
+                            
+                        type="text"
+                        name="searchbar" 
+                        id="searchbar" 
+                        placeholder="Search a publication ..." 
+                        value={searched_content} 
+                        onChange={(e) => setSearchContent(e.target.value)}
+                        onClick={() => setSearchPanelVisible(true)}
+                    />
+                    {search_panel_visible && <p  className='text-right text-emerald-300 inline-flex sticky top-0'
                             onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
                         >More options {
                             display_more_options ?
@@ -134,7 +136,15 @@ export default function SearchBar() {
                                 src={ArrowDown} 
                              />
                         }
-                        </p>
+                        </p>}
+                        { publications.length > 0 && 
+                            <p>
+                                {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
+                            </p>
+                        }
+                </div>
+                {search_panel_visible && 
+                    <div className='overflow-y-auto overflow-x-hidden max-h-96' >
                         {
                         display_more_options && 
                         <MoreOptions   
@@ -148,11 +158,6 @@ export default function SearchBar() {
                                 })
                             }} 
                             load={load}/>
-                        }
-                        { publications.length > 0 && 
-                            <p >
-                                {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
-                            </p>
                         }
                         <div>
                             {
