@@ -20,6 +20,7 @@
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.6",
     "leva": "^0.9.35",
+    "lru-cache": "^10.0.0",
     "next": "13.4.6",
     "r3f-perf": "^7.1.2",
     "react": "18.2.0",
