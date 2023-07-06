@@ -1,5 +1,7 @@
+import InputField from "@/components/inputs/InputField"
+import DeletableLabel from "@/components/labels/DeletableLabel"
+import Label from "@/components/labels/Label"
 import { useEffect, useState } from "react"
-import styles from './filter.module.css'
 
 
 type Label = {
@@ -8,22 +10,24 @@ type Label = {
 }
 
 function LabelButton({label,remove}:{label:Label,remove:Function}) {
-    return (
-        <div className={`${!label.display ? styles.invisible : styles.label}`}>
-            {label.label}
-            <div onClick={() => remove()}></div>
-        </div>
-    )
+    if (label.display){
+        return (            
+            <DeletableLabel onClick = {()=> {}} onRemove = {() => remove()}> {label.label}</DeletableLabel>
+        )
+    }
+    return null
 }
-
 function FoundLabelButton({label,add}:{label:Label,add:Function}) {
-    return (
-        <div onClick={() => add()} className={`${!label.display ? styles.invisible : styles.label}`}>
-            {label.label}
-        </div>
-    )
+    if(label.display){
+        return (
+            <Label onClick={() => add()} >
+                {label.label}
+            </Label>
+        )
+    }
+    return null
 }
-export default function FilterLabels() {
+export default function FilterLabels({setRequestFilters}:{setRequestFilters:Function}) {
     const [display,setDisplay] = useState(false)
     const [labels,setLabels] = useState<{searched : string, found : Label[], selected: Label[]}>({searched : "",found:[],selected:[]})
     useEffect(() => {
@@ -46,9 +50,9 @@ export default function FilterLabels() {
     if (!display) {
         return (
             <>
-                <span className={`${styles.line}`}  onClick={() => setDisplay(true)}>
+                <span onClick={() => setDisplay(true)}>
 
-                    <p className={styles.field}>Filter with labels</p>
+                    <h3>Filter with labels</h3>
                 </span>
 
             </>
@@ -57,7 +61,7 @@ export default function FilterLabels() {
     
     return (
         <>
-            <span className={`${styles.line}`}  onClick={() => {
+            <span   onClick={() => {
                 setLabels((prev) => {
                     return {
                         searched:"",
@@ -67,9 +71,9 @@ export default function FilterLabels() {
                 })
                 setDisplay(false)
             }}>
-                <p className={styles.field}>Filter with labels</p>
+                <h3 >Filter with labels</h3>
             </span>
-            <span className={`${styles.line}`} >
+            <span  >
                 {labels.selected?.map((label,idx) => {
                     return <LabelButton label={label} key={idx} remove={()=> {
                         setLabels((prev) => {
@@ -80,16 +84,12 @@ export default function FilterLabels() {
                 })}
             </span>
             
-            <div className={`${styles.line}`}>
-                <input 
-                    className={`${styles.text_input}`}
-                    type="text" 
-                    name="searched_label" 
+            <div >
+                <InputField name="searched_label" 
                     id="searched_label"  
                     placeholder="Search a label ..."
                     value={labels.searched} 
-                    onChange={(e) => setLabels((prev) => {return {...prev,searched:e.target.value}})}
-                />
+                    onChange={(e : any) => setLabels((prev) => {return {...prev,searched:e.target.value}})}></InputField>
                 {
                     labels.found?.map((label,idx) => {
                         return <FoundLabelButton label={label} add={() => {
