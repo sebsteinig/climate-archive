@@ -12,8 +12,8 @@ export default function Home() {
   return (
     <main className={styles.main}>
       {/* <Main /> */}
-      {/* <SearchBar/> */}
-      <TestImage />
+      <SearchBar/>
+      {/* <TestImage /> */}
     </main>
   )
 }

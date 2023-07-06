@@ -17,12 +17,14 @@ function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => 
     if (on_period) {    
         return (
             <>
+            <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center">
+                <h4>Year : </h4> 
                 <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
                 <Select defaultValue={`${year_lower}`} name="period_lower" id="period_lower" onChange={(e : any) => {
-                        let new_year = 1900
-                        if(e.target.value !== DEFAULT_LOWER) {
-                            new_year = parseInt(e.target.value)
-                        }
+                    let new_year = 1900
+                    if(e.target.value !== DEFAULT_LOWER) {
+                        new_year = parseInt(e.target.value)
+                    }                    
                         const yu = year_upper === DEFAULT_UPPER ? new Date().getFullYear() : parseInt(year_upper.toString())
                         onChange([new_year,yu])
                         setYearLower(new_year)
@@ -31,26 +33,24 @@ function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => 
                         return <option key = {index} value = {year}>{year}</option>
                     })}
                 </Select>
-
                 <h4  > and </h4>
-                    <Select defaultValue={`${year_upper}`} name="period_upper" id="period_upper" onChange={(e : any) => {
-                        let new_year = new Date().getFullYear()
-                        if(e.target.value !== DEFAULT_LOWER) {
-                            new_year = parseInt(e.target.value)
-                        }
-                        const yl = year_lower === DEFAULT_UPPER ? 1900 : parseInt(year_lower.toString())
-                        onChange([yl,new_year])
-                        setYearUpper(new_year)
-                    }}>
-                        {UPPER_PERIOD.map((year,index) => {
-                                return <option key = {index} value = {year}>{year}</option>
-                        })}
-                    </Select>
+                <Select defaultValue={`${year_upper}`} name="period_upper" id="period_upper" onChange={(e : any) => {
+                    let new_year = e.target.value !== DEFAULT_LOWER?parseInt(e.target.value) : new Date().getFullYear()
+                    const yl = year_lower === DEFAULT_UPPER ? 1900 : parseInt(year_lower.toString())
+                    onChange([yl,new_year])
+                    setYearUpper(new_year)}}>
+                    {UPPER_PERIOD.map((year,index) => {
+                            return <option key = {index} value = {year}>{year}</option>
+                    })}
+                </Select>
+            </div>
             </>
         )
     }
     return (
         <>
+        <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center">
+            <h4 >Year : </h4> 
             <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
             <Select defaultValue={`${year_upper}`} name="period_upper" id="period_upper" onChange={(e : any) => {
                 let new_year = new Date().getFullYear()
@@ -65,6 +65,7 @@ function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => 
                         return <option key = {index} value = {year}>{year}</option>
                 })}
             </Select>
+        </div>
         </>
     )
 }
@@ -89,14 +90,13 @@ export default function FilterPublication({filters,setRequestFilters}:{filters:S
                 <h3 >Filter on publication</h3>
             </span>
             <div   >
-                <h4 >Year : </h4> 
                 <Period year={filters.year} onChange={
                     (year) => {
                         setRequestFilters({year})
                     }
                 }/>
             </div>
-            <div  >
+            <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
                 <h4 >Journal : </h4>
                 <Select defaultValue={journal} 
                     onChange={(e : any) => { 
@@ -108,7 +108,7 @@ export default function FilterPublication({filters,setRequestFilters}:{filters:S
                         <option key = {index} value = {journal}>{journal}</option>)}
                 </Select>
             </div>
-            <div  >
+            <div className="pt-3 pb-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
                 <h4 >Author : </h4>
                 <InputField  placeholder="like valdes et al" value = {author} 
                 onChange={(e : any) => {
