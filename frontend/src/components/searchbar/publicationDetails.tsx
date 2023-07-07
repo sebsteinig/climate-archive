@@ -29,10 +29,10 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
         <>
         <div className='border-s-4 border-sky-700 mt-2 mb-2 pl-4'>
             <p className="font-semibold text-sky-200">{title}</p>
-            <p className="italic text-sm">{journal}, {year}</p>
+            <p className="italic text-slate-400 text-sm">{journal}, {year}</p>
             <p className="font-medium tracking-wide">{authors_full}</p>
             <div className="pt-2 pr-4" >
-                <p className="pb-1">Abstract : {display_abstract? abstract : abstract.slice(0,90) + ' ...'}</p>
+                <p className="pb-1 font-semibold">Abstract : </p><p>{display_abstract? abstract : abstract.slice(0,90) + ' ...'}</p>
                 <p className="hover:underline text-right cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
                     {display_abstract ? "Hide" : "Full abstract"}</p>
             </div>

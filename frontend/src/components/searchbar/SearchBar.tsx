@@ -160,8 +160,8 @@ export default function SearchBar() {
                                 publications.length > 0 && 
                                 <>  
                                     <br />
-                                    {display_more_options && <MdSeparator />}
-                                    <p>
+                                    {display_more_options && <MdSeparator className='block self-center'/>}
+                                    <p className='text-slate-400'>
                                         {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
                                     </p>
                                     <br />
