@@ -1,6 +1,8 @@
 import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
 import ButtonSecondary from "../buttons/ButtonSecondary"
+import { DefaultParameter } from "@/utils/api/api.types"
+import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
 
 export type Publication = {
     title : string
@@ -12,7 +14,11 @@ export type Publication = {
     exps:any[],
 }
 
-export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps, load} : Publication & {load:Function}) {
+type Props=  Publication & {
+    load:(x:RequestMultipleTexture) => void
+}
+
+export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps, load} : Props) {
     const [display_see_details,setDisplaySeeDetails] = useState(false)
 
     if (!display_see_details){

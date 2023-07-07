@@ -3,7 +3,7 @@ import { fetchJournals, select } from "@/utils/api/api"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import InputField from "@/components/inputs/InputField"
 import Select from "@/components/inputs/Select"
-import { SearchPublication } from "@/utils/api/types"
+import { SearchPublication } from "@/utils/api/api.types"
 import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";

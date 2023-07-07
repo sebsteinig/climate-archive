@@ -3,11 +3,12 @@ import Checkbox from "@/components/inputs/Checkbox"
 import InputField from "@/components/inputs/InputField"
 import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
-import { DefaultParameter } from "@/utils/api/types"
+import { DefaultParameter } from "@/utils/api/api.types"
 import { useEffect, useState } from "react"
 import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
+import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
 type Exp = {
     id : string,
     display : boolean,
@@ -26,9 +27,11 @@ function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
         </div>
     )
 }
+type Props = {
+    load:(x:RequestMultipleTexture) => void
+}
 
-
-export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}) => void}) {
+export default function FilterAdvanced({load}:Props) {
     const [display,setDisplay] = useState(false)
     const [exp_ids,setExpIds] = useState<{exp_ids:Exp[], search:string}>({exp_ids:[],search:""})
     const [config,setConfig] = useState("")
@@ -218,13 +221,13 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                         load({
                             exp_ids: exp_ids.exp_ids.map(e=>e.id),
                             variables : variables,
-                            paramaters : {
-                                config_name: config != "" ? config : undefined,
-                                extension:extension,
-                                lossless:lossless,
-                                rx:resolution.x,
-                                ry:resolution.y,
-                            }
+                            config_name: config != "" ? config : undefined,
+                            extension:extension,
+                            lossless:lossless,
+                            resolution:{
+                                x:resolution.x??0,
+                                y:resolution.y??0,
+                            },
                         })
 
                     }
