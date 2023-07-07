@@ -4,6 +4,9 @@ import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import InputField from "@/components/inputs/InputField"
 import Select from "@/components/inputs/Select"
 import { SearchPublication } from "@/utils/api/types"
+import Image from 'next/image';
+import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
+import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 
 const DEFAULT_LOWER = "jurassic"
 const DEFAULT_UPPER = "now"
@@ -69,23 +72,33 @@ function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => 
 }
 
 export default function FilterPublication({filters,setRequestFilters}:{filters:SearchPublication,setRequestFilters:(filters:SearchPublication) => void}) {
-    const [display_filters, setDisplayFilters] = useState(false)
+    const [display_filters, setDisplayFilters] = useState(true)
     const [journal, setJournal] = useState(filters.journal ?? "")
     const [author, setAuthor] = useState(filters.authors_short ?? "")
     if (!display_filters){
         return (
-            <>
-            <span onClick={() => {setDisplayFilters(true)}}>
+            <span onClick={() => {setDisplayFilters(true)}} className="inline-flex" >
                 <h3 >Filter on publication</h3>
+                <Image
+                    priority
+                    alt='open'
+                    className={`w-4 h-4 self-center ml-4`}
+                    src={ArrowDown} 
+                />
             </span>
-            </>
         )
     } else {
         let journals = fetchJournals()
         return (
             <>
-            <span  onClick={() => {setDisplayFilters(false)}}>
+            <span  onClick={() => {setDisplayFilters(false)}} className="inline-flex" >
                 <h3 >Filter on publication</h3>
+                <Image
+                    priority
+                    alt='open'
+                    className={`w-4 h-4 self-center ml-4`}
+                    src={ArrowUp} 
+                />
             </span>
             {/* <div className="container grid grid-rows-3"> */}
             <div className="grid grid-flow-col auto-cols-max items-center">

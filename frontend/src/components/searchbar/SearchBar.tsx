@@ -10,6 +10,7 @@ import Image from 'next/image';
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
+import { FullWidthSeparator, MdSeparator } from '../separators/separators';
 
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
@@ -32,10 +33,10 @@ function MoreOptions({filters,setRequestFilters,load}:{filters:SearchPublication
         <div >
 
             <FilterPublication filters={filters} setRequestFilters={setRequestFilters}/>
+            <br />
             {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
             <FilterAdvanced load={load}/>
-
-            <span />
+            <br />
         </div>
     )
 }
@@ -107,8 +108,7 @@ export default function SearchBar() {
                             placeholder:text-emerald-300 
                             placeholder:opacity-70 
                             outline-none 
-                            sticky
-                            top-0
+                            mb-4
                             placeholder:tracking-wider`}
                             
                         type="text"
@@ -119,46 +119,59 @@ export default function SearchBar() {
                         onChange={(e) => setSearchContent(e.target.value)}
                         onClick={() => setSearchPanelVisible(true)}
                     />
-                    {search_panel_visible && <p  className='text-right text-emerald-300 inline-flex sticky top-0'
-                            onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
-                        >More options {
-                            display_more_options ?
-                            <Image 
-                                priority
-                                alt='close'
-                                className={`w-4 h-4 self-center`}
-                                src={ArrowUp}
-                            /> :
-                            <Image
-                                priority
-                                alt='open'
-                                className={`w-4 h-4 self-center`}
-                                src={ArrowDown} 
-                             />
-                        }
-                        </p>}
-                        { publications.length > 0 && 
-                            <p>
-                                {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
-                            </p>
-                        }
+                    <FullWidthSeparator className='mb-2'/>
+                    {search_panel_visible && 
+                        <>  
+                            <div className='block text-end'>
+                                <p  className='text-right text-emerald-300 inline-flex'
+                                    onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
+                                >More options {
+                                    display_more_options ?
+                                    <Image 
+                                        priority
+                                        alt='close'
+                                        className={`w-4 h-4 self-center ml-4`}
+                                        src={ArrowUp}
+                                    /> :
+                                    <Image
+                                        priority
+                                        alt='open'
+                                        className={`w-4 h-4 self-center ml-4`}
+                                        src={ArrowDown} 
+                                    />
+                                }
+                                </p>
+                            </div>
+                            {
+                                display_more_options && 
+                                <MoreOptions   
+                                filters={requestFilters}
+                                setRequestFilters={(filters:SearchPublication) => {
+                                    setRequestFilters((prev) => {
+                                        return {
+                                            ...prev,
+                                            ...filters,
+                                        }
+                                    })
+                                }} 
+                                load={load}/>
+                            }
+                            { 
+                                publications.length > 0 && 
+                                <>  
+                                    <br />
+                                    {display_more_options && <MdSeparator />}
+                                    <p>
+                                        {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
+                                    </p>
+                                    <br />
+                                </>
+                            }
+                        </>
+                    }
                 </div>
                 {search_panel_visible && 
                     <div className='overflow-y-auto overflow-x-hidden max-h-96' >
-                        {
-                        display_more_options && 
-                        <MoreOptions   
-                            filters={requestFilters}
-                            setRequestFilters={(filters:SearchPublication) => {
-                                setRequestFilters((prev) => {
-                                    return {
-                                        ...prev,
-                                        ...filters,
-                                    }
-                                })
-                            }} 
-                            load={load}/>
-                        }
                         <div>
                             {
                                 publications.length > 0 && 

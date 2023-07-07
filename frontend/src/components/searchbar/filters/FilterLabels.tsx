@@ -2,6 +2,9 @@ import InputField from "@/components/inputs/InputField"
 import DeletableLabel from "@/components/labels/DeletableLabel"
 import Label from "@/components/labels/Label"
 import { useEffect, useState } from "react"
+import Image from 'next/image';
+import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
+import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 
 
 type Label = {
@@ -50,9 +53,15 @@ export default function FilterLabels({setRequestFilters}:{setRequestFilters:Func
     if (!display) {
         return (
             <>
-                <span onClick={() => setDisplay(true)}>
+                <span onClick={() => setDisplay(true)} className="inline-flex" >
 
                     <h3>Filter with labels</h3>
+                    <Image
+                        priority
+                        alt='open'
+                        className={`w-4 h-4 self-center ml-4`}
+                        src={ArrowDown} 
+                    />
                 </span>
 
             </>
@@ -70,8 +79,15 @@ export default function FilterLabels({setRequestFilters}:{setRequestFilters:Func
                     }
                 })
                 setDisplay(false)
-            }}>
+            }}
+            className="inline-flex" >
                 <h3 >Filter with labels</h3>
+                <Image
+                    priority
+                    alt='open'
+                    className={`w-4 h-4 self-center ml-4`}
+                    src={ArrowUp} 
+                />
             </span>
             <span  >
                 {labels.selected?.map((label,idx) => {

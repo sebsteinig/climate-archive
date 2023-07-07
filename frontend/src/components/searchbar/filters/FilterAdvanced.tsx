@@ -5,6 +5,9 @@ import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
 import { DefaultParameter } from "@/utils/api/types"
 import { useEffect, useState } from "react"
+import Image from 'next/image';
+import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
+import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 type Exp = {
     id : string,
     display : boolean,
@@ -33,13 +36,19 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
     const [lossless,setLossless] = useState(true)
     const [resolution,setResolution] = useState<{x?:number,y?:number}>({})
     const [variables, setVariables] = useState<string[]>([])
-    
     if (!display) {
         return (
             <>
-                <span onClick={() => setDisplay(true)}>
+                <span onClick={() => setDisplay(true)}
+                    className="inline-flex" >
 
                     <h3>Advanced filters</h3>
+                    <Image 
+                        priority
+                        alt='close'
+                        className={`w-4 h-4 self-center ml-4`}
+                        src={ArrowDown}
+                    />
                 </span>
 
             </>
@@ -49,8 +58,16 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
         <>
             <span onClick={() => {
                 setDisplay(false)
-            }}>
+            }}
+            className="inline-flex"
+            >
                 <h3>Advanced filters</h3>
+                <Image
+                    priority
+                    alt='open'
+                    className={`w-4 h-4 self-center ml-4`}
+                    src={ArrowUp} 
+                />
             </span>
             <span >
                 {exp_ids.exp_ids?.map((exp,idx) => {

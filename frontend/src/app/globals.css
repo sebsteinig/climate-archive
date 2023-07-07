@@ -9,16 +9,16 @@
       font-rubik overflow-hidden m-0 tracking-wider
   }
   h1 {
-    @apply text-emerald-300 text-4xl
+    @apply text-emerald-300 text-4xl tracking-widest
   }
   h2 {
-    @apply text-emerald-300 text-2xl
+    @apply text-emerald-300 text-2xl tracking-widest
   }
   h3 {
-    @apply text-emerald-300 text-xl
+    @apply text-emerald-300 text-lg tracking-widest
   }
   h4 {
-    @apply text-emerald-300 text-lg
+    @apply text-emerald-300 text-base tracking-widest
   }
   h5 {
     @apply text-emerald-300 text-base
