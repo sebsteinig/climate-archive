@@ -18,7 +18,7 @@ export function PublicationShort({title,authors_short,year,authors_full, abstrac
     if (!display_see_details){
         return (
             < >
-                <div  className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-50'>
+                <div  className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-80'>
                 <p className="font-semibold text-sky-200">{title}</p>
                 <p className="italic text-slate-400">{`${authors_short} (${year})`}</p>
                     <ButtonSecondary

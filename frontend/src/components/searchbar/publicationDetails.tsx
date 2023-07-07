@@ -17,8 +17,8 @@ type Props = {
 
 export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,abstract,exps, load}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
-    const [checked_all,setCheckedAll] = useState(false)
-    const [checked, setChecked] = useState<string[]>([])
+    const [checked_all,setCheckedAll] = useState(true)
+    const [checked, setChecked] = useState<string[]>(exps.map((exp : string) => {return JSON.parse(exp).id}))
     
     function selectAll(is_checked : boolean){
         setCheckedAll(is_checked)
@@ -29,17 +29,16 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
         <>
         <div className='border-s-4 border-sky-700 mt-2 mb-2 pl-4'>
             <p className="font-semibold text-sky-200">{title}</p>
-            <p className="italic">{journal}, {year}</p>
+            <p className="italic text-sm">{journal}, {year}</p>
             <p className="font-medium tracking-wide">{authors_full}</p>
-            <div>
-            <p className="pt-2 pb-2">Abstract : {display_abstract? abstract : abstract.slice(0,60) + ' ...'}</p>
-            <p className="hover:underline cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
-                {display_abstract ? "Hide" : "Full abstract"}
-            </p>
+            <div className="pt-2 pr-4" >
+                <p className="pb-1">Abstract : {display_abstract? abstract : abstract.slice(0,90) + ' ...'}</p>
+                <p className="hover:underline text-right cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
+                    {display_abstract ? "Hide" : "Full abstract"}</p>
             </div>
-            <ButtonPrimary onClick={() => {load();console.log("load exps : TODO")}}>
-                {`Load all ${exps.length} experiments`}
-            </ButtonPrimary>
+            <div><ButtonPrimary onClick={() => {load();console.log("load exps : TODO")}}>
+                {`Load ${checked_all? "all " : ""} ${checked.length} experiment${checked.length >1 ? "s":""}`}
+            </ButtonPrimary></div>
                 <div className="pt-3">
                 <div className="overflow-y-visible overflow-x-hidden max-h-48">
                 <table className='w-11/12 table-fixed border' id="exps-table">
@@ -72,9 +71,9 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 </table>
                 </div>
                 </div>
-            <button className="hover:underline" onClick={() => {setDisplaySeeDetails(false)}}>
-                Hide
-            </button>
+
+                <p className="hover:underline text-right pt-3 pr-4 cursor-pointer" 
+                    onClick={() => {setDisplaySeeDetails((false))}}>Hide</p>
         </div>
         </>
     )
