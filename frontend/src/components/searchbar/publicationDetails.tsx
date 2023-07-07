@@ -40,17 +40,14 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
             <ButtonPrimary onClick={() => {load();console.log("load exps : TODO")}}>
                 {`Load all ${exps.length} experiments`}
             </ButtonPrimary>
-            <div className="flex flex-col">
-                <div className="sm:-mx-6 lg:-mx-8">
-                <div className="inline-block min-w-fit py-2 sm:px-6 lg:px-8">
-                <div className=" overflow-y-visible overflow-x-hidden max-h-48">
-
-                <table className='min-w-full border text-sm font-light dark:border-neutral-500' id="exps-table">
-                    <thead className="border-b text-left font-medium dark:border-neutral-500 bg-slate-600 sticky top-0">
-                        <tr>
-                            <th scope="col" className="border-r px-6 py-2 dark:border-neutral-500">Experiments</th>
-                            <th scope="col" className="border-r px-6 py-2 dark:border-neutral-500">Age</th>
-                            <th scope="col" className="border-r px-6 py-2 dark:border-neutral-500">
+                <div className="pt-3">
+                <div className="overflow-y-visible overflow-x-hidden max-h-48">
+                <table className='w-11/12 table-fixed border' id="exps-table">
+                    <thead className="border-b text-left font-medium border-neutral-500 bg-slate-600 sticky top-0">
+                        <tr className="">
+                            <th scope="col" className="border-r px-6 py-2 border-neutral-500">Experiments</th>
+                            <th scope="col" className="border-r px-6 py-2 border-neutral-500">Age</th>
+                            <th scope="col" className="border-r px-6 py-2 border-neutral-500 w-1/4">
                                 <Checkbox name="checked_all" checked={checked_all}
                                 onChange={(event : any) => {selectAll(event.target.checked)}}></Checkbox>
                             </th>
@@ -61,10 +58,10 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                                 let exp_object = JSON.parse(exp)
                                 let label = exp_object.metadata[0].metadata.text
                                 return( 
-                                <tr className="border-b dark:border-neutral-500" key={exp_object.id}>                                    
-                                    <td className="whitespace-nowrap border-r px-6 py-2 font-medium dark:border-neutral-500">{exp_object.id}</td>
-                                    <td className="whitespace-nowrap border-r px-6 py-2 font-medium dark:border-neutral-500">{label}</td>
-                                    <td className="whitespace-nowrap border-r px-6 py-2 font-medium dark:border-neutral-500">
+                                <tr className="w-6 border-b dark:border-neutral-500" key={exp_object.id}>                                    
+                                    <td className="border px-6 py-2 font-medium dark:border-neutral-500">{exp_object.id}</td>
+                                    <td className="border px-6 py-2 font-medium dark:border-neutral-500">{label}</td>
+                                    <td className="border px-6 py-2 font-medium dark:border-neutral-500">
                                         <Checkbox name={title+"_"+exp_object.id}
                                         onChange={(event : any) => checkExperiment(event.target.checked, setChecked, checked, exp_object.id, setCheckedAll)}
                                         checked={checked.includes(exp_object.id)}></Checkbox>
@@ -75,8 +72,6 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 </table>
                 </div>
                 </div>
-                </div>
-            </div>
             <button className="hover:underline" onClick={() => {setDisplaySeeDetails(false)}}>
                 Hide
             </button>

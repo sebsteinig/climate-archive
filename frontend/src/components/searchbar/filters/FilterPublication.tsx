@@ -18,7 +18,6 @@ function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => 
         return (
             <>
             <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center">
-                <h4>Year : </h4> 
                 <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
                 <Select defaultValue={`${year_lower}`} name="period_lower" id="period_lower" onChange={(e : any) => {
                     let new_year = 1900
@@ -50,7 +49,6 @@ function Period({year,onChange} : {year?:number[] , onChange:(year:number[]) => 
     return (
         <>
         <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center">
-            <h4 >Year : </h4> 
             <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}> {on_period ?"Between" : "Exactly"}</ButtonSecondary>
             <Select defaultValue={`${year_upper}`} name="period_upper" id="period_upper" onChange={(e : any) => {
                 let new_year = new Date().getFullYear()
@@ -89,15 +87,19 @@ export default function FilterPublication({filters,setRequestFilters}:{filters:S
             <span  onClick={() => {setDisplayFilters(false)}}>
                 <h3 >Filter on publication</h3>
             </span>
-            <div   >
+            {/* <div className="container grid grid-rows-3"> */}
+            <div className="grid grid-flow-col auto-cols-max items-center">
+            <div className="w-24"> <h4>Year : </h4> </div>
                 <Period year={filters.year} onChange={
                     (year) => {
                         setRequestFilters({year})
                     }
                 }/>
             </div>
-            <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                <h4 >Journal : </h4>
+
+            <div className="grid grid-flow-col auto-cols-max items-center">            
+                <div className="w-24"><h4>Journal : </h4></div> 
+                <div className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
                 <Select defaultValue={journal} 
                     onChange={(e : any) => { 
                         setJournal(e.target.value);
@@ -107,15 +109,20 @@ export default function FilterPublication({filters,setRequestFilters}:{filters:S
                     {journals.map((journal : string, index) => 
                         <option key = {index} value = {journal}>{journal}</option>)}
                 </Select>
+                </div>
             </div>
-            <div className="pt-3 pb-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                <h4 >Author : </h4>
+
+            <div className="grid grid-flow-col auto-cols-max items-center">
+                <div className="w-24"><h4>Author : </h4></div>
+                <div className="pt-3 pb-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
                 <InputField  placeholder="like valdes et al" value = {author} 
                 onChange={(e : any) => {
                     setAuthor(e.target.value);
                     setRequestFilters({authors_short:e.target.value})
                 }}></InputField>
+                </div>
             </div>
+            {/* </div> */}
             </>
         )
     }

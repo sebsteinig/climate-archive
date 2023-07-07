@@ -62,8 +62,10 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                     }}/>
                 })}
             </span>
+            
+                <div className="grid grid-flow-col auto-cols-max items-center">
+                <h4 className="w-40" > Experiments :</h4>
                 <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                    <h4  > Experiments :</h4>
                     <InputField name="expid_input" value={exp_ids.search}
                     id="expid_input" placeholder="experiment id ..."
                     onChange={(e : any)=>{
@@ -92,8 +94,11 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                             }
                         }}></InputField>
                 </span>
+                </div>
+
+                <div className="grid grid-flow-col auto-cols-max items-center">
+                <h4 className="w-40" >Variables :</h4>
                 <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                    <h4  >Variables :</h4>
                     <MultiSelect name="variables" id="variables" defaultValue={[]}
                         onChange={(e : any) => setVariables(
                             (prev) => {
@@ -108,29 +113,39 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                                 })}
                     </MultiSelect>
                 </span>
+                </div>
 
+                <div className="grid grid-flow-col auto-cols-max items-center">
+                <h4 className="w-40" >Configuration :</h4>
                 <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                    <h4  >Configuration :</h4>
                     <InputField name="config" id="config" placeholder="configuration ..." 
                         value={config} onChange={(e : any) => setConfig(e.target.value)} ></InputField>
                 </span>
+                </div>
+
+                <div className="grid grid-flow-col auto-cols-max items-center">
+                <h4 className="w-40">Extension :</h4>
                 <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                <h4>Extension :</h4>
                     <Select name="extension" id="extension" defaultValue={extension}
                     onChange={(e : any) => setExtension(e.target.value)}>
                             {SUPPORTED_EXTENSION.map((ext,idx) => {
                                 return <option value={ext} key={idx}>{ext}</option>
                             })}
                     </Select>
-                
                 </span>
+                </div>
+
+                <div className="grid grid-flow-col auto-cols-max items-center">
+                <h4 className="w-40" >Lossless :</h4>
                 <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                    <h4 >Lossless :</h4>
                     <Checkbox name="lossless" id="lossless" checked={lossless} 
                     onChange={(e:any) => setLossless((prev)=> !prev)}></Checkbox>
                 </span>
+                </div>
+
+                <div className="grid grid-flow-col auto-cols-max items-center">
+                <h4  className="w-40" >Resolution :</h4>
                 <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center" >
-                    <h4   >Resolution :</h4>
                     <h5  >x :</h5>  
                     <Select name="ry" id="ry" defaultValue={SUPPORTED_RESOLUTION[0].toString()}
                     onChange={(e:any) => {
@@ -179,6 +194,8 @@ export default function FilterAdvanced({load}:{load:(x:{exp_ids:string[],variabl
                             })}
                         </Select>
                 </span>
+                </div>
+
                 <ButtonSecondary onClick={
                     () =>{
                         load({
