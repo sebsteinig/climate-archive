@@ -162,7 +162,7 @@ export default function SearchBar() {
                         <div>
                             {
                                 publications.length > 0 && 
-                                publications.slice(0,5).map((publication: Publication,idx:number) => {
+                                publications.map((publication: Publication,idx:number) => {
                                     return (
                                         <PublicationShort key={idx}
                                             title={publication.title} 
