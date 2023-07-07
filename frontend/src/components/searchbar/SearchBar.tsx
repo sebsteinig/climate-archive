@@ -13,7 +13,7 @@ import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { FullWidthSeparator, MdSeparator } from '../separators/separators';
 import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
 import { texture_provider } from '@/utils/texture_provider/TextureProvider';
-
+import { PropsWithChildren } from "react"
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -29,12 +29,17 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     }, [ref, onClickOut]);
 }
 
-function MoreOptions({filters,setRequestFilters,load}:{filters:SearchPublication,setRequestFilters:(filters:SearchPublication) => void,
-    load:(x:RequestMultipleTexture) => void}) {
+type MoreOptionsProps = {
+    filters:SearchPublication,
+    setRequestFilters:(filters:SearchPublication) => void,
+    load:(x:RequestMultipleTexture) => void
+}
+
+function MoreOptions({filters,setRequestFilters,load,children}:PropsWithChildren<MoreOptionsProps>) {
     return  (
         <div >
 
-            <FilterPublication filters={filters} setRequestFilters={setRequestFilters}/>
+            <FilterPublication filters={filters} setRequestFilters={setRequestFilters}>{children}</FilterPublication>
             <br />
             {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
             <FilterAdvanced load={load}/>
@@ -55,7 +60,7 @@ async function load(setStates: (x:SearchTexture[][]) => void,request:RequestMult
     setStates(res)
 }
 
-export default function SearchBar({setStates}:Props) {
+export default function SearchBar({setStates,children}:PropsWithChildren<Props>) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -163,7 +168,9 @@ export default function SearchBar({setStates}:Props) {
                                         }
                                     })
                                 }} 
-                                load={(x) => {load(setStates,x)}}/>
+                                load={(x) => {load(setStates,x)}}>
+                                    {children}
+                                </MoreOptions>
                             }
                             { 
                                 publications.length > 0 && 

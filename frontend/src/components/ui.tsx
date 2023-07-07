@@ -6,7 +6,11 @@ import TestImage from "./TestImage";
 
 const TextureContext = createContext<SearchTexture[]>([])
 
-export default function UI() {
+type Props = {
+    journals : JSX.Element
+}
+
+export default function UI({journals}:Props) {
     const [states,setStates] = useState<SearchTexture[]>([])
     return (
         <TextureContext.Provider value={states}>
@@ -16,7 +20,9 @@ export default function UI() {
             setStates((prev) => {
                 return [...prev,...res.flat()]
             })
-            }}/>
+            }}>
+                {journals}
+            </SearchBar>
             <TestImage context={TextureContext}/>
         </TextureContext.Provider>
     )
