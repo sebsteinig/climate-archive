@@ -27,12 +27,12 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     }, [ref, onClickOut]);
 }
 
-function MoreOptions({filters,setRequestFilters,load}:{filters:SearchPublication,setRequestFilters:(filters:SearchPublication) => void,
+function MoreOptions({filters,setRequestFilters,children, load}:{filters:SearchPublication,children : React.ReactNode, setRequestFilters:(filters:SearchPublication) => void,
     load:(x:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}) => void}) {
     return  (
         <div >
 
-            <FilterPublication filters={filters} setRequestFilters={setRequestFilters}/>
+            <FilterPublication filters={filters} setRequestFilters={setRequestFilters}>{children}</FilterPublication>
             <br />
             {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
             <FilterAdvanced load={load}/>
@@ -46,7 +46,7 @@ async function load({exp_ids,variables,paramaters}:{exp_ids:string[],variables:s
 
 }
 
-export default function SearchBar() {
+export default function SearchBar({children}:{children : React.ReactNode}) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -154,7 +154,7 @@ export default function SearchBar() {
                                         }
                                     })
                                 }} 
-                                load={load}/>
+                                load={load}>{children}</MoreOptions>
                             }
                             { 
                                 publications.length > 0 && 

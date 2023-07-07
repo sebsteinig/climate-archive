@@ -119,7 +119,10 @@ export async function getImageArrayBuffer(path : string) {
     }
 }
 
-export function fetchJournals() {
-    // todo 
-    return ["journal1", "journal2"]
+export async function getJournals() {
+    //console.log("FECTH JOURNAL <getJournals>")    
+    let url = new URL("select/journal/", URL_API)
+    let data = await axios.get(url.href)
+    let journals = data.data.map(((e:{journal : string}) => e.journal))
+    return journals as string[]    
 }
