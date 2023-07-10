@@ -58,6 +58,10 @@ export type SelectSingleResult = {
     threshold : number
 }
 
-export type SelectCollectionParameter = DefaultParameter & {
+
+export type SelectCollectionParameter = SelectSingleParameter & {
     ids: string[]
+}
+export type SelectCollectionResult = {
+    exp_id : SelectSingleResult[]
 }

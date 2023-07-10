@@ -1,8 +1,8 @@
 'use client'
-import { getImageArrayBuffer, select } from "../api/api"
+import { getImageArrayBuffer, select, selectAll } from "../api/api"
 import Texture from "../database/Texture"
 import {Database} from "@/utils/database/database"
-import { RequestTexture, SearchTexture, TextureInfo } from "./types"
+import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from "./texture_provider.types"
 import { LRUCache } from 'lru-cache'
 
 class TextureNotFound extends Error {
@@ -35,7 +35,7 @@ class TextureProvider {
     async load(requested_texture:RequestTexture) {
     
         const response = await select(requested_texture.exp_id,{
-            vars : requested_texture.variable
+            vars : requested_texture.variables
             /** TODO : chunks */
     
             /** TODO : resolutions */
@@ -67,12 +67,53 @@ class TextureProvider {
         }))
     }
 
-    async  loadAll(requested_textures:RequestTexture[]) {
-        return Promise.all(requested_textures.map(
-            (requested_texture) => {
-                return this.load(requested_texture)
-            }
-        ))
+    async  loadAll(requested_textures:RequestMultipleTexture) {
+
+        const response = await selectAll({
+                    vars : requested_textures.variables,
+                    ids : requested_textures.exp_ids
+                    /** TODO : chunks */
+            
+                    /** TODO : resolutions */
+            })
+        
+        const res = await Promise.all(Object.entries(response).flatMap(async tmp=>{
+            const [exp_id,single_result_arr] = tmp
+
+            const res = await Promise.all(single_result_arr.map(async res => {
+                const searched_texture : TextureInfo = {
+                    ...res,
+                    path : res.paths_mean[0],
+                    variable : res.variable_name,
+                    /** TODO : chunks */
+            
+                    /** TODO : resolutions */
+        
+                };
+                let texture = await this.loadFromDb(searched_texture)
+        
+                if ( !texture ) { // texture is undefined => not in the db, must be fetched and inserted in db
+                    texture = await this.loadFromServer(searched_texture)
+                }
+                if (!texture) {
+                    throw new TextureNotFound(searched_texture)
+                }
+                this.cache.set(searched_texture.path,texture)
+                return {
+                    exp_id : searched_texture.exp_id,
+                    path : searched_texture.path,
+                    variable : searched_texture.variable,
+                } as SearchTexture
+            }))
+
+            return res
+        }))
+        return res
+        // return Promise.all(requested_textures.map(
+        //     (requested_texture) => {
+        //         return this.load(requested_texture)
+        //     }
+        // ))
     }
 
     async loadFromDb(searched_texture:TextureInfo) {

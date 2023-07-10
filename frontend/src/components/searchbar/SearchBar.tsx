@@ -5,13 +5,15 @@ import FilterPublication from './filters/FilterPublication';
 import FilterLabels from './filters/FilterLabels';
 import FilterAdvanced from './filters/FilterAdvanced';
 import {Publication,PublicationShort} from './publication';
-import { DefaultParameter, SearchPublication } from '@/utils/api/types';
+import { DefaultParameter, SearchPublication } from '@/utils/api/api.types';
 import Image from 'next/image';
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { FullWidthSeparator, MdSeparator } from '../separators/separators';
-
+import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
+import { texture_provider } from '@/utils/texture_provider/TextureProvider';
+import { PropsWithChildren } from "react"
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -27,8 +29,13 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     }, [ref, onClickOut]);
 }
 
-function MoreOptions({filters,setRequestFilters,children, load}:{filters:SearchPublication,children : React.ReactNode, setRequestFilters:(filters:SearchPublication) => void,
-    load:(x:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}) => void}) {
+type MoreOptionsProps = {
+    filters:SearchPublication,
+    setRequestFilters:(filters:SearchPublication) => void,
+    load:(x:RequestMultipleTexture) => void
+}
+
+function MoreOptions({filters,setRequestFilters,load,children}:PropsWithChildren<MoreOptionsProps>) {
     return  (
         <div >
 
@@ -41,12 +48,19 @@ function MoreOptions({filters,setRequestFilters,children, load}:{filters:SearchP
     )
 }
 
-async function load({exp_ids,variables,paramaters}:{exp_ids:string[],variables:string[]} & {paramaters : DefaultParameter}){
-    console.log({exp_ids,variables,paramaters});
-
+type Props = {
+    setStates : (x:SearchTexture[][]) => void
 }
 
-export default function SearchBar({children}:{children : React.ReactNode}) {
+async function load(setStates: (x:SearchTexture[][]) => void,request:RequestMultipleTexture){
+    const res = await texture_provider.loadAll({
+        exp_ids:request.exp_ids,
+        variables:request.variables,
+    })
+    setStates(res)
+}
+
+export default function SearchBar({setStates,children}:PropsWithChildren<Props>) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -154,7 +168,9 @@ export default function SearchBar({children}:{children : React.ReactNode}) {
                                         }
                                     })
                                 }} 
-                                load={load}>{children}</MoreOptions>
+                                load={(x) => {load(setStates,x)}}>
+                                    {children}
+                                </MoreOptions>
                             }
                             { 
                                 publications.length > 0 && 
@@ -185,7 +201,7 @@ export default function SearchBar({children}:{children : React.ReactNode}) {
                                             abstract={publication.abstract}
                                             journal={publication.journal}
                                             exps={publication.exps}
-                                            load={load}
+                                            load={(x) => {load(setStates,x)}}
                                         />
                                     )
                                 })

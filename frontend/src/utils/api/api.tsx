@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {SearchPublication, DefaultParameter, SelectCollectionParameter, SearchExperiment, SelectSingleParameter, SelectSingleResult} from "./types"
+import {SearchPublication, DefaultParameter, SelectCollectionParameter, SearchExperiment, SelectSingleParameter, SelectSingleResult, SelectCollectionResult} from "./api.types"
 
 
 const URL_API = "http://localhost:3000/"
@@ -83,7 +83,17 @@ export async function select(id:string,query : SelectSingleParameter) {
     let data = await axios.get(url.href)
     return data.data as SelectSingleResult[]
 }
-
+export async function selectAll(query : SelectCollectionParameter) {
+    let url = new URL(`select/collection/`, URL_API)
+    Object.entries(query).forEach(bind => {
+        const [key,value] = bind
+        if (value) {
+            url.searchParams.append(key, JSON.stringify(value))  
+        }
+    })
+    let data = await axios.get(url.href)
+    return data.data as SelectCollectionResult
+}
 
 export async function getImage(path : string) {
 
