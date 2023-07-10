@@ -3,6 +3,7 @@ import { SearchTexture } from "@/utils/texture_provider/texture_provider.types";
 import { createContext, useState } from "react";
 import SearchBar from "./searchbar/SearchBar";
 import TestImage from "./TestImage";
+import { Variables } from "./variables/Variables";
 
 const TextureContext = createContext<SearchTexture[]>([])
 
@@ -14,6 +15,7 @@ export default function UI({journals}:Props) {
     const [states,setStates] = useState<SearchTexture[]>([])
     return (
         <TextureContext.Provider value={states}>
+            <Variables />
             <SearchBar setStates={(res) => {
             console.log(res);
             
