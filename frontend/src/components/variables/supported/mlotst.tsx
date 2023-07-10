@@ -1,4 +1,4 @@
-
+import { Variable } from "../utils"
 
 
 type Props = {
@@ -8,6 +8,9 @@ type Props = {
 export function Mlotst(props:Props) {
     return (
         <>
+        <Variable>
+        
+        </Variable> 
         
         </>
     )

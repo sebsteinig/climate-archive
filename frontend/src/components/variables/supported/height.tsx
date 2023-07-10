@@ -1,4 +1,4 @@
-
+import { Variable } from "../utils"
 
 
 type Props = {
@@ -8,7 +8,9 @@ type Props = {
 export function Height(props:Props) {
     return (
         <>
-        
+            <Variable>
+            
+            </Variable> 
         </>
     )
 }

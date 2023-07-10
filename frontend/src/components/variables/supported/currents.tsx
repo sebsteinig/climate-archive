@@ -1,3 +1,4 @@
+import { Variable } from "../utils"
 
 
 type Props = {
@@ -7,7 +8,9 @@ type Props = {
 export function Currents(props:Props) {
     return (
         <>
-        
+            <Variable>
+            
+            </Variable> 
         </>
     )
 }
