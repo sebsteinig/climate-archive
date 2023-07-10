@@ -117,10 +117,10 @@ export default function FilterPublication({filters, children, setRequestFilters}
             <div className="flex flex-wrap items-center gap-3 pt-3 ">            
                 <div className="w-1/6"><h4>Journal : </h4></div> 
                 <div className="w-3/4">
-                <Select defaultValue={journal} 
+                <Select defaultValue={journal} title = {journal}
                     onChange={(e : any) => { 
                         setJournal(e.target.value);
-                        setRequestFilters({journal:e.target.value})
+                        setRequestFilters({journal:e.target.value})                        
                     }}>{children}</Select>
                 </div>
             </div>
