@@ -19,3 +19,13 @@ export function Variable(props:PropsWithChildren<Props>) {
         </div>
     )
 }
+
+export function addVariable(variable : string, setVariables : Function){
+    return () => {setVariables((prev : string[]) => {
+        let index = prev.findIndex((e) => e===variable)
+        index == -1 ? prev.push("currents") : prev.splice(index, 1)
+        console.log(prev)
+
+        return prev
+    })}
+}

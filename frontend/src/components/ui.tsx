@@ -13,9 +13,10 @@ type Props = {
 
 export default function UI({journals}:Props) {
     const [states,setStates] = useState<SearchTexture[]>([])
+    const [variables, setVariables] = useState<string[]>([])
     return (
         <TextureContext.Provider value={states}>
-            <Variables />
+            <Variables setVariables= {setVariables}/>
             <SearchBar setStates={(res) => {
             console.log(res);
             

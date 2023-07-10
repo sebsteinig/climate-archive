@@ -1,16 +1,16 @@
 import { useState } from "react"
-import { Variable } from "../utils"
+import { Variable, addVariable } from "../utils"
 import Image from 'next/image';
 import WindsIcon from "$/assets/icons/winds-slate-500.svg";
 
 type Props = {
-
+    setVariables : Function
 }
 
-export function Currents(props:Props) {
+export function Currents({setVariables}:Props) {
     return (
         <>
-            <Variable>
+            <Variable onClick={addVariable("currents", setVariables)}>
                 <div className="flex flex-row">
                     <Image 
                         priority
