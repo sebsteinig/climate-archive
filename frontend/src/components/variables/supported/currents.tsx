@@ -1,5 +1,4 @@
-import { useState } from "react"
-import { Variable, addVariable } from "../utils"
+import { Variable } from "../utils"
 import Image from 'next/image';
 import WindsIcon from "$/assets/icons/winds-slate-500.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";

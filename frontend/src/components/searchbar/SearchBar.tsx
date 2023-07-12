@@ -11,7 +11,7 @@ import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { FullWidthSeparator, MdSeparator } from '../separators/separators';
-import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
+import { RequestMultipleTexture, RequestTexture, TextureLeaf, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
 import { texture_provider } from '@/utils/texture_provider/TextureProvider';
 import { PropsWithChildren } from "react"
 import { useClusterStore } from '@/utils/store/cluster.store';
@@ -53,7 +53,7 @@ type Props = {
     
 }
 
-async function load(update: (x:SearchTexture[]) => void,request:RequestMultipleTexture){
+async function load(update: (x:TextureLeaf[]) => void,request:RequestMultipleTexture){
     const res = await texture_provider.loadAll({
         exp_ids:request.exp_ids,
         variables:request.variables,
@@ -70,7 +70,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
 
     const [requestFilters,setRequestFilters] = useState<SearchPublication>({})
 
-    const updateSearchTextures = useClusterStore((state) => state.updateSearchTextures)
+    const updateTextureTree = useClusterStore((state) => state.pushAll)
 
 
     useOutsideClick(search_panel_ref.current!, () => {
@@ -172,7 +172,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                                         }
                                     })
                                 }} 
-                                load={(x) => {load(updateSearchTextures,x)}}>
+                                load={(x) => {load(updateTextureTree,x)}}>
                                     {children}
                                 </MoreOptions>
                             }
@@ -205,7 +205,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                                             abstract={publication.abstract}
                                             journal={publication.journal}
                                             exps={publication.exps}
-                                            load={(x) => {load(updateSearchTextures,x)}}
+                                            load={(x) => {load(updateTextureTree,x)}}
                                         />
                                     )
                                 })

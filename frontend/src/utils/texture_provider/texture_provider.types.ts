@@ -1,3 +1,4 @@
+import { VariableName } from "../store/variables/variable.types"
 
 
 export type TextureInfo = {
@@ -81,8 +82,12 @@ export type RequestMultipleTexture = {
 	threshold?: number
 }
 
-export type SearchTexture = {    
+export type TextureLeaf = {    
     exp_id:string
-    variable: string
+    variable: VariableName
     path: string
+}
+
+export type TextureTree = {
+    root : Map<string, Map<VariableName, TextureLeaf[]>>
 }

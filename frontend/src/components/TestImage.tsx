@@ -1,8 +1,9 @@
 'use client'
 import { useClusterStore } from "@/utils/store/cluster.store"
+import { VariableName } from "@/utils/store/variables/variable.types"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
-import { SearchTexture } from "@/utils/texture_provider/texture_provider.types"
-import React, { useContext, useEffect, useMemo, useState } from "react"
+import { TextureLeaf } from "@/utils/texture_provider/texture_provider.types"
+import React, { useEffect, useState } from "react"
 
 
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
 
 type Content = {
     base64 : string,
-    variable : string
+    variable : VariableName
 }
 
 export default function TestImage({}:Props) {
@@ -20,41 +21,50 @@ export default function TestImage({}:Props) {
     const variables = useClusterStore(
         (state) => state.variables)
     
-    const search_textures = useClusterStore((state) => state.searchTextures)
-    console.log({search_textures});
-        
+    const [texture_tree, current] = useClusterStore((state) => [state.texture_tree, state.current])
+    
     useEffect(
         () => {
             console.log("EFFECT STATE IMAGE");
             const active_variables = Object.entries(variables).filter(([name,slice]) => {
                 return slice.active
-            }).map(([name,slice]) => name)
+            }).map(([name,slice]) => slice.name)
 
             console.log({active_variables});
-            const requests = search_textures.filter((st) => active_variables.includes(st.variable)).map(
-                async (texture) => {
-                    console.log(`loading ${texture.exp_id} : ${texture.variable}`);
+            if (current) {
+
+                const exp = texture_tree.root.get(current)                
+                if (exp) {
                     
-                    return {
-                        base64: await texture_provider.getImageBase64({
-                            path : texture.path,
-                            exp_id : texture.exp_id,
-                            variable :texture.variable,
-                        }),
-                        variable : texture.variable
-                    }
+                    const tmp = active_variables.map((name) => exp.get(name)).filter((e)=>e).flat() as TextureLeaf[]
+                    
+                    const requests = tmp.map(
+                        async (texture) => {
+                                    console.log(`loading ${texture.exp_id} : ${texture.variable}`);
+                                    return {
+                                        base64: await texture_provider.getImageBase64({
+                                            path : texture.path,
+                                            exp_id : texture.exp_id,
+                                            variable :texture.variable,
+                                        }),
+                                        variable : texture.variable
+                                    }
+                            }
+                        )
+                    Promise.all(requests).then((data) => {
+                        setImages((prev) => {return [...data]})
+                    })
                 }
-            )
-            Promise.all(requests).then((data) => {
-                setImages((prev) => {return [...data]})
-            })
+    
+            }
+            
 
         }
-    ,[variables,search_textures])
+    ,[variables,texture_tree])
     return (
         <div>
             <h1>Images :</h1>
-            <div className="flex flex-wrap">
+            <div className="flex">
                 {images.map((image,idx) => <img key={idx} src={`data:image/jpeg;base64,${image.base64}`} />)}
             </div>
 

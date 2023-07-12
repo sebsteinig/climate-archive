@@ -1,26 +1,9 @@
-import { StateCreator, create } from "zustand";
+import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { VariableSlice, createVariableSlice } from "./variables/variable.store";
-import { SearchTexture } from "../texture_provider/texture_provider.types";
+import { TextureTreeSlice, createTextureTreeSlice } from "./texture_tree.store";
 
-interface SearchTextureSlice {
-    searchTextures : SearchTexture[],
-    updateSearchTextures : ((searchTextures : SearchTexture[]) => void)
-}
-const createSearchTextureSlice : StateCreator<SearchTextureSlice,[["zustand/immer",never]],[],SearchTextureSlice> = 
-    (set) => {
-        return {
-            searchTextures : [],
-            updateSearchTextures : 
-                (searchTextures : SearchTexture[]) => 
-                set((state) => {
-                    state.searchTextures.push(...searchTextures)
-                })
-        }
-    }
-
-
-type Store = VariableSlice & SearchTextureSlice
+type Store = VariableSlice & TextureTreeSlice
 
 
 export const useClusterStore =  create<Store,[["zustand/immer",never]]>(
@@ -28,7 +11,7 @@ export const useClusterStore =  create<Store,[["zustand/immer",never]]>(
     (...a) => {
         return {
             ...createVariableSlice(...a),
-            ...createSearchTextureSlice(...a),
+            ...createTextureTreeSlice(...a),
         }
     })
 )
