@@ -14,6 +14,7 @@ import { FullWidthSeparator, MdSeparator } from '../separators/separators';
 import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
 import { texture_provider } from '@/utils/texture_provider/TextureProvider';
 import { PropsWithChildren } from "react"
+import { useClusterStore } from '@/utils/store/cluster.store';
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -49,18 +50,18 @@ function MoreOptions({filters,setRequestFilters,load,children}:PropsWithChildren
 }
 
 type Props = {
-    setStates : (x:SearchTexture[][]) => void
+    
 }
 
-async function load(setStates: (x:SearchTexture[][]) => void,request:RequestMultipleTexture){
+async function load(update: (x:SearchTexture[]) => void,request:RequestMultipleTexture){
     const res = await texture_provider.loadAll({
         exp_ids:request.exp_ids,
         variables:request.variables,
     })
-    setStates(res)
+    update(res.flat())
 }
 
-export default function SearchBar({setStates,children}:PropsWithChildren<Props>) {
+export default function SearchBar({children}:PropsWithChildren<Props>) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -68,6 +69,9 @@ export default function SearchBar({setStates,children}:PropsWithChildren<Props>)
     const [display_more_options,setDisplayMoreOptions] = useState(false)
 
     const [requestFilters,setRequestFilters] = useState<SearchPublication>({})
+
+    const updateSearchTextures = useClusterStore((state) => state.updateSearchTextures)
+
 
     useOutsideClick(search_panel_ref.current!, () => {
         setSearchPanelVisible(false)
@@ -168,7 +172,7 @@ export default function SearchBar({setStates,children}:PropsWithChildren<Props>)
                                         }
                                     })
                                 }} 
-                                load={(x) => {load(setStates,x)}}>
+                                load={(x) => {load(updateSearchTextures,x)}}>
                                     {children}
                                 </MoreOptions>
                             }
@@ -201,7 +205,7 @@ export default function SearchBar({setStates,children}:PropsWithChildren<Props>)
                                             abstract={publication.abstract}
                                             journal={publication.journal}
                                             exps={publication.exps}
-                                            load={(x) => {load(setStates,x)}}
+                                            load={(x) => {load(updateSearchTextures,x)}}
                                         />
                                     )
                                 })

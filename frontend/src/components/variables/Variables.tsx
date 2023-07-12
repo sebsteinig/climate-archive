@@ -14,14 +14,14 @@ import { Winds } from "./supported/winds"
 
 
 type Props = {
-    setVariables : Function
+    
 }
 
-export function Variables({setVariables}:Props) {
+export function Variables({}:Props) {
     return (
         <div className="absolute top-1/2 -translate-y-1/2 left-0 ml-5 h-1/2 grid grid-rows-6 grid-cols-2 grid-flow-col gap-5 ">
             <Clt  />
-            <Currents setVariables = {setVariables}/>
+            <Currents/>
             <Height />
             <Liconc />
             <Mlotst />
