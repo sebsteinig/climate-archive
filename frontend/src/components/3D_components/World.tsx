@@ -46,11 +46,11 @@ export function World({ config, tick } : Props) {
   return (
     <>
       {usePerformance && <Perf position='bottom-right' />}
-      {useTitle && <Title config={config}/>}
+      {/* {useTitle && <Title config={config}/>} */}
       <Controls />
       <Lights />
       <Surface ref={sphereRef} config={config} />
-      <Plane />
+      {/* <Plane /> */}
     </>
   )
 }

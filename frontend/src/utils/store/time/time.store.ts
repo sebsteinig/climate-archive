@@ -11,10 +11,10 @@ export interface TimeSlice {
         remove : (idx:number) => void
 
         prepare : (idx:number) => void
-        start : (idx:number) => void
+        play : (idx:number) => void
         pause : (idx:number) => void
         stop : (idx:number) => void
-        set : (idx:number) => void
+        set : (idx:number,t:number) => void
     }
 }
 
@@ -45,6 +45,7 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                         speed,
                         state,
                         exps,
+                        idx : direction === TimeDirection.forward ? 0 : exps.length - 1,
                         frame : {
                             current : "",
                             next : "",
@@ -73,7 +74,7 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                         time.state = TimeState.ready
                     })
                 },
-                start : (idx:number) => {
+                play : (idx:number) => {
                     set((state) => {
                         const size = state.time.frames.length
                         if (idx < 0 || idx >= size) {
@@ -109,8 +110,10 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                         }
                     })
                 },
-                set : (idx:number) => {
-                    
+                set : (idx:number,t:number) => {
+                    set(state=>{
+                        state.time.frames[idx].idx = t
+                    })
                 },
             }
         }

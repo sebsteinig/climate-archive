@@ -34,5 +34,6 @@ export type Time = {
     kind : TimeKind
     state : TimeState
     speed : number
+    idx : number
     exps : string[]
 }
