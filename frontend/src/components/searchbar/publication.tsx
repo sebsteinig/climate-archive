@@ -15,10 +15,9 @@ export type Publication = {
 }
 
 type Props=  Publication & {
-    load:(x:RequestMultipleTexture) => void
 }
 
-export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps, load} : Props) {
+export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps} : Props) {
     const [display_see_details,setDisplaySeeDetails] = useState(false)
 
     if (!display_see_details){
@@ -41,7 +40,7 @@ export function PublicationShort({title,authors_short,year,authors_full, abstrac
         )
     } 
     return (
-        <PublicationDetails load={load} setDisplaySeeDetails={setDisplaySeeDetails} title={title} 
-            abstract={abstract} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
+        <PublicationDetails setDisplaySeeDetails={setDisplaySeeDetails} title={title} 
+            abstract={abstract} authors_short={authors_short} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
     )
 }

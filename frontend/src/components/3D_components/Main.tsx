@@ -1,7 +1,7 @@
 "use client";
 import { Canvas } from '@react-three/fiber'
 import { Leva } from 'leva'
-import React from 'react'
+import React, { RefObject } from 'react'
 import ReactDOM from 'react-dom/client'
 import { World } from './World'
 
@@ -15,10 +15,14 @@ var config: modelDesciptor = {
   heightData: "/assets/textures/tfgzk_height.smoothed.png"
 }
 
-export default function Main() {
+type Props = {
+  tick : (delta:number) => void
+}
+
+export default function Main({tick}:Props) {
 
   return (
-    <>
+    <div className='h-screen w-screen absolute top-0 left-0'>
       <Leva
         collapsed={false}
         oneLineLabels={false}
@@ -33,8 +37,8 @@ export default function Main() {
         }}
         shadows
       >
-        <World config={config}/>
+        <World config={config} tick={tick}/>
       </Canvas>
-    </>
+    </div>
   )
 }
