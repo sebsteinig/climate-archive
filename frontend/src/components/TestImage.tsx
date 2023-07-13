@@ -64,7 +64,7 @@ export default function TestImage({}:Props) {
     return (
         <div>
             <h1>Images :</h1>
-            <div className="flex">
+            <div className="grid grid-rows-12 grid-flow-col">
                 {images.map((image,idx) => <img key={idx} src={`data:image/jpeg;base64,${image.base64}`} />)}
             </div>
 
