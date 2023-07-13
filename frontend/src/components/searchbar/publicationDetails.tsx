@@ -5,6 +5,9 @@ import Checkbox from "../inputs/Checkbox"
 import ButtonPrimary from "../buttons/ButtonPrimary"
 import { DefaultParameter } from "@/utils/api/api.types"
 import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
+import { texture_provider } from "@/utils/texture_provider/TextureProvider"
+import { useClusterStore } from "@/utils/store/cluster.store"
+import { Collection, Publication } from "@/utils/store/texture_tree.store"
 
 type Props = {
     setDisplaySeeDetails:Function,
@@ -12,6 +15,7 @@ type Props = {
     journal:string,
     year:number,
     authors_full:string
+    authors_short:string
     abstract:string,
     exps:{
         id:string,
@@ -22,7 +26,6 @@ type Props = {
             }|any
         }[]
     }[],
-    load:(x:RequestMultipleTexture) => void
 }
 
 type CheckedExp = {
@@ -30,7 +33,7 @@ type CheckedExp = {
     checked : boolean
 }
 
-export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,abstract,exps, load}:Props) {
+export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked, setChecked] = useState<CheckedExp[]>(exps.map((exp) => {
         return {
@@ -50,6 +53,8 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
         })
     }
     const nb_checked = checked.reduce((acc,e)=> acc + Number(e.checked),0)
+    const [pushAll,addCollection] = useClusterStore((state) => [state.pushAll,state.addCollection])
+
     return(
         <>
         <div className='border-s-4 border-sky-700 mt-2 mb-2 pl-4'>
@@ -61,10 +66,24 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 <p className="hover:underline text-right cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
                     {display_abstract ? "Hide" : "Full abstract"}</p>
             </div>
-            <div><ButtonPrimary onClick={() => {
-                load({
-                    exp_ids : checked.filter(e => e.checked).map(e => e.exp),
-                });
+            <div><ButtonPrimary onClick={
+                async () => {
+                    const request = {
+                        exp_ids : checked.filter(e => e.checked).map(e => e.exp),
+                    }
+                    const res = await texture_provider.loadAll({
+                        exp_ids:request.exp_ids,
+                    })
+                    pushAll(res.flat())
+                    addCollection({
+                        exps : request.exp_ids,
+                        abstract,
+                        authors_full,
+                        authors_short,
+                        journal,
+                        title,
+                        year,
+                    } as Publication)
                 } 
 
             }>

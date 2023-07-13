@@ -15,9 +15,7 @@ const Main = dynamic(() => import('@/components/3D_components/Main'))
 export default function Home() {
   return (
     <main className={styles.main}>
-      {/* <Main /> */}
       <UI journals={SelectJournal()}/>
-      {/* <TestImage /> */}
     </main>
   )
 }

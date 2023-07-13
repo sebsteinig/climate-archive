@@ -33,17 +33,16 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
 type MoreOptionsProps = {
     filters:SearchPublication,
     setRequestFilters:(filters:SearchPublication) => void,
-    load:(x:RequestMultipleTexture) => void
 }
 
-function MoreOptions({filters,setRequestFilters,load,children}:PropsWithChildren<MoreOptionsProps>) {
+function MoreOptions({filters,setRequestFilters,children}:PropsWithChildren<MoreOptionsProps>) {
     return  (
         <div >
 
             <FilterPublication filters={filters} setRequestFilters={setRequestFilters}>{children}</FilterPublication>
             <br />
             {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
-            <FilterAdvanced load={load}/>
+            <FilterAdvanced />
             <br />
         </div>
     )
@@ -69,9 +68,6 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
     const [display_more_options,setDisplayMoreOptions] = useState(false)
 
     const [requestFilters,setRequestFilters] = useState<SearchPublication>({})
-
-    const updateTextureTree = useClusterStore((state) => state.pushAll)
-
 
     useOutsideClick(search_panel_ref.current!, () => {
         setSearchPanelVisible(false)
@@ -172,7 +168,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                                         }
                                     })
                                 }} 
-                                load={(x) => {load(updateTextureTree,x)}}>
+                                >
                                     {children}
                                 </MoreOptions>
                             }
@@ -205,7 +201,6 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                                             abstract={publication.abstract}
                                             journal={publication.journal}
                                             exps={publication.exps}
-                                            load={(x) => {load(updateTextureTree,x)}}
                                         />
                                     )
                                 })
