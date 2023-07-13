@@ -27,7 +27,19 @@ export const createVariableSlice: StateCreator<VariableSlice,[["zustand/immer",n
             currents : {
                 active : false,
                 name : VariableName.currents,
-                toggle : () => set((state) => {state.variables.currents.active = !state.variables.currents.active})
+                animation_speed : 0.025,
+                reference_speed : 50,
+                arrows : 1.3,
+                arrows_size : 1,
+                scale_by_magnitude : true,
+                color_by_magnitude : false,
+                toggle : () => set((state) => {state.variables.currents.active = !state.variables.currents.active}),
+                updateAnimationSpeed : (value : number) => set((state) => {state.variables.currents.animation_speed = value}),
+                updateReferenceSpeed : (value : number) => set((state) => {state.variables.currents.reference_speed = value}),
+                updateArrows : (value : number) => set((state) => {state.variables.currents.arrows = value}),
+                updateArrowsSize : (value : number) => set((state) => {state.variables.currents.arrows_size = value}),
+                toggleScaleByMagnitude : () => set((state) => {state.variables.currents.scale_by_magnitude = !state.variables.currents.scale_by_magnitude}),
+                toggleColorByMagnitude : () => set((state) => {state.variables.currents.color_by_magnitude = !state.variables.currents.color_by_magnitude})
             },
             clt : {
                 active : false,
@@ -37,7 +49,9 @@ export const createVariableSlice: StateCreator<VariableSlice,[["zustand/immer",n
             height : {
                 active : false,
                 name : VariableName.height,
-                toggle : () => set((state) => {state.variables.height.active = !state.variables.height.active})
+                diplacement : 0.2,
+                toggle : () => set((state) => {state.variables.height.active = !state.variables.height.active}),
+                updateDiplacement : (value : number) => set((state) => {state.variables.height.diplacement = value})
             },
             liconc : {
                 active : false,
@@ -57,7 +71,11 @@ export const createVariableSlice: StateCreator<VariableSlice,[["zustand/immer",n
             pr : {
                 active : false,
                 name : VariableName.pr,
-                toggle : () => set((state) => {state.variables.pr.active = !state.variables.pr.active})
+                min : 3.5,
+                max : 12,
+                toggle : () => set((state) => {state.variables.pr.active = !state.variables.pr.active}),
+                updateMin : (value : number) => set((state) => {state.variables.pr.min = value}),
+                updateMax : (value : number) => set((state) => {state.variables.pr.max = value})
             },
             sic : {
                 active : false,
@@ -76,13 +94,37 @@ export const createVariableSlice: StateCreator<VariableSlice,[["zustand/immer",n
             },
             tos : {
                 active : false,
+                min : -2,
+                max : 36,
+                anomaly_range : 15,
+                anomalies_lower_bound : 2.5,
+                sea_ice : true,
                 name : VariableName.tos,
-                toggle : () => set((state) => {state.variables.tos.active = !state.variables.tos.active})
+                toggle : () => set((state) => {state.variables.tos.active = !state.variables.tos.active}),
+                updateMin : (value : number) => set((state) => {state.variables.tos.min = value}),
+                updateMax : (value : number) => set((state) => {state.variables.tos.max = value}),
+                updateAnomalyRange : (value : number) => set((state) => {state.variables.tos.anomaly_range = value}),
+                updateAnomaliesLowerBound : (value : number) => set((state) => {state.variables.tos.anomalies_lower_bound = value}),
+                toggleSeaIce : () => set((state) => {state.variables.tos.sea_ice = !state.variables.tos.sea_ice})
             },
             winds : {
                 active : false,
                 name : VariableName.winds,
-                toggle : () => set((state) => {state.variables.winds.active = !state.variables.winds.active})
+                animation_speed : 0.025,
+                min_speed : 20,
+                reference_speed : 35,
+                arrows : 10000,
+                arrows_size : 2,
+                scale_by_magnitude : true,
+                color_by_magnitude : true,
+                toggle : () => set((state) => {state.variables.winds.active = !state.variables.winds.active}),
+                updateAnimationSpeed : (value : number) => set((state) => {state.variables.winds.animation_speed = value}),
+                updateMinSpeed : (value : number) => set((state) => {state.variables.winds.min_speed = value}),
+                updateReferenceSpeed : (value : number) => set((state) => {state.variables.winds.reference_speed = value}),
+                updateArrows : (value : number) => set((state) => {state.variables.winds.arrows = value}),
+                updateArrowsSize : (value : number) => set((state) => {state.variables.winds.arrows_size = value}),
+                toggleScaleByMagnitude : () => set((state) => {state.variables.winds.scale_by_magnitude = !state.variables.winds.scale_by_magnitude}),
+                toggleColorByMagnitude : () => set((state) => {state.variables.winds.color_by_magnitude = !state.variables.winds.color_by_magnitude})
             }
             
         }

@@ -18,9 +18,9 @@
     @apply text-emerald-300 text-lg tracking-widest
   }
   h4 {
-    @apply text-emerald-300 text-base tracking-widest
+    @apply text-slate-400 text-base capitalize tracking-widest
   }
   h5 {
-    @apply text-emerald-300 text-base
+    @apply text-sky-300 text-base capitalize tracking-wider
   }
 }
