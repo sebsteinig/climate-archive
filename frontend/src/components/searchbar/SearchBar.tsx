@@ -11,9 +11,10 @@ import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { FullWidthSeparator, MdSeparator } from '../separators/separators';
-import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
+import { RequestMultipleTexture, RequestTexture, TextureLeaf, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
 import { texture_provider } from '@/utils/texture_provider/TextureProvider';
 import { PropsWithChildren } from "react"
+import { useClusterStore } from '@/utils/store/cluster.store';
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -32,35 +33,34 @@ function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
 type MoreOptionsProps = {
     filters:SearchPublication,
     setRequestFilters:(filters:SearchPublication) => void,
-    load:(x:RequestMultipleTexture) => void
 }
 
-function MoreOptions({filters,setRequestFilters,load,children}:PropsWithChildren<MoreOptionsProps>) {
+function MoreOptions({filters,setRequestFilters,children}:PropsWithChildren<MoreOptionsProps>) {
     return  (
         <div >
 
             <FilterPublication filters={filters} setRequestFilters={setRequestFilters}>{children}</FilterPublication>
             <br />
             {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
-            <FilterAdvanced load={load}/>
+            <FilterAdvanced />
             <br />
         </div>
     )
 }
 
 type Props = {
-    setStates : (x:SearchTexture[][]) => void
+    
 }
 
-async function load(setStates: (x:SearchTexture[][]) => void,request:RequestMultipleTexture){
+async function load(update: (x:TextureLeaf[]) => void,request:RequestMultipleTexture){
     const res = await texture_provider.loadAll({
         exp_ids:request.exp_ids,
         variables:request.variables,
     })
-    setStates(res)
+    update(res.flat())
 }
 
-export default function SearchBar({setStates,children}:PropsWithChildren<Props>) {
+export default function SearchBar({children}:PropsWithChildren<Props>) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -168,7 +168,7 @@ export default function SearchBar({setStates,children}:PropsWithChildren<Props>)
                                         }
                                     })
                                 }} 
-                                load={(x) => {load(setStates,x)}}>
+                                >
                                     {children}
                                 </MoreOptions>
                             }
@@ -201,7 +201,6 @@ export default function SearchBar({setStates,children}:PropsWithChildren<Props>)
                                             abstract={publication.abstract}
                                             journal={publication.journal}
                                             exps={publication.exps}
-                                            load={(x) => {load(setStates,x)}}
                                         />
                                     )
                                 })

@@ -2,8 +2,9 @@
 import { getImageArrayBuffer, select, selectAll } from "../api/api"
 import Texture from "../database/Texture"
 import {Database} from "@/utils/database/database"
-import { RequestMultipleTexture, RequestTexture, SearchTexture, TextureInfo } from "./texture_provider.types"
+import { RequestMultipleTexture, RequestTexture, TextureLeaf, TextureInfo } from "./texture_provider.types"
 import { LRUCache } from 'lru-cache'
+import { VariableName } from "../store/variables/variable.types"
 
 class TextureNotFound extends Error {
     texture!: TextureInfo
@@ -13,8 +14,8 @@ class TextureNotFound extends Error {
     }
 }
 class TextureMustBeLoaded extends Error {
-    texture!: SearchTexture
-    constructor(searched_texture:SearchTexture) {
+    texture!: TextureLeaf
+    constructor(searched_texture:TextureLeaf) {
         super()
         this.texture = searched_texture
     }
@@ -62,8 +63,8 @@ class TextureProvider {
             return {
                 exp_id : searched_texture.exp_id,
                 path : searched_texture.path,
-                variable : searched_texture.variable,
-            } as SearchTexture
+                variable : VariableName[searched_texture.variable as keyof typeof VariableName],
+            } as TextureLeaf
         }))
     }
 
@@ -102,8 +103,8 @@ class TextureProvider {
                 return {
                     exp_id : searched_texture.exp_id,
                     path : searched_texture.path,
-                    variable : searched_texture.variable,
-                } as SearchTexture
+                    variable : VariableName[searched_texture.variable as keyof typeof VariableName]
+                } as TextureLeaf
             }))
 
             return res
@@ -151,7 +152,7 @@ class TextureProvider {
         return texture!
     }
 
-    async getImageBase64(searched_texture:SearchTexture) {
+    async getImageBase64(searched_texture:TextureLeaf) {
         console.log(`loading ${searched_texture.exp_id} : ${searched_texture.variable}`);
 
         const texture = await this.getTexture(searched_texture)
@@ -166,7 +167,7 @@ class TextureProvider {
         return base64
     }
     
-    async getTexture(searched_texture:SearchTexture) {
+    async getTexture(searched_texture:TextureLeaf) {
         let texture = this.cache.get(searched_texture.path)
         if (!texture) {
             texture = await this.database.textures.get({path:searched_texture.path})

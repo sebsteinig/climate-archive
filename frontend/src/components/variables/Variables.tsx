@@ -14,24 +14,29 @@ import { Winds } from "./supported/winds"
 
 
 type Props = {
-    setVariables : Function
+    
 }
 
-export function Variables({setVariables}:Props) {
+export function Variables({}:Props) {
     return (
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 ml-5 h-1/2 grid grid-rows-6 grid-cols-2 grid-flow-col gap-5 ">
-            <Clt  />
-            <Currents setVariables = {setVariables}/>
-            <Height />
-            <Liconc />
-            <Mlotst />
-            <Pfts />
-            <Pr />
-            <Sic />
-            <Snc />
-            <Tas />
-            <Tos />
-            <Winds />
+        <div className="absolute
+                        top-1/2 -translate-y-1/2 left-0 ml-5 h-3/4">            
+            <div className="overflow-y-auto overflow-x-hidden max-h-full">
+                <div className="px-2 py-2 grid grid-rows-12 gap-5">
+                    <Winds />
+                    <Pr />
+                    <Height />
+                    <Pfts />
+                    <Tos />
+                    <Currents/>
+                    {/* <Liconc />
+                    <Clt  />
+                    <Mlotst />
+                    <Sic />
+                    <Snc />
+                    <Tas /> */}
+                </div>
+            </div>
         </div>
     )    
 }

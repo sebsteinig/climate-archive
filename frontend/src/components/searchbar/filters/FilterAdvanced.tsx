@@ -9,6 +9,9 @@ import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
+import { Collection } from "@/utils/store/texture_tree.store"
+import { useClusterStore } from "@/utils/store/cluster.store"
+import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 type Exp = {
     id : string,
     display : boolean,
@@ -28,10 +31,9 @@ function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
     )
 }
 type Props = {
-    load:(x:RequestMultipleTexture) => void
 }
 
-export default function FilterAdvanced({load}:Props) {
+export default function FilterAdvanced({}:Props) {
     const [display,setDisplay] = useState(false)
     const [exp_ids,setExpIds] = useState<{exp_ids:Exp[], search:string}>({exp_ids:[],search:""})
     const [config,setConfig] = useState("")
@@ -57,6 +59,8 @@ export default function FilterAdvanced({load}:Props) {
             </>
         )
     }
+    const [pushAll,addCollection] = useClusterStore((state) => [state.pushAll,state.addCollection])
+
     return (
         <>
             <span onClick={() => {
@@ -217,8 +221,8 @@ export default function FilterAdvanced({load}:Props) {
                 </div>
 
                 <ButtonSecondary onClick={
-                    () =>{
-                        load({
+                    async () =>{
+                        const request = {
                             exp_ids: exp_ids.exp_ids.map(e=>e.id),
                             variables : variables,
                             config_name: config != "" ? config : undefined,
@@ -228,7 +232,14 @@ export default function FilterAdvanced({load}:Props) {
                                 x:resolution.x??0,
                                 y:resolution.y??0,
                             },
+                        } 
+                        const res = await texture_provider.loadAll({
+                            exp_ids:request.exp_ids,
                         })
+                        pushAll(res.flat())
+                        addCollection({
+                            exps : request.exp_ids,
+                        } as Collection)
 
                     }
                 }>Load</ButtonSecondary>
