@@ -1,16 +1,17 @@
 import { Variable } from "../utils"
-
+import MountainIcon from "$/assets/icons/mountain-slate-500.svg";
+import { useClusterStore } from "@/utils/store/cluster.store";
 
 type Props = {
-
 }
 
-export function Tas(props:Props) {
+export function Tas({}:Props) {
+    const tas = useClusterStore((state) => state.variables.tas)
     return (
-        <>
-            <Variable>
-            
-            </Variable> 
-        </>
+        <Variable title = {"Tas"} toggle = {() => tas.toggle()}
+        src={MountainIcon} active = {tas.active}  controls = {false}>
+            <div>
+            </div>
+        </Variable> 
     )
 }
