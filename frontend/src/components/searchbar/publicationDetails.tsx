@@ -3,11 +3,9 @@
 import { useState } from "react"
 import Checkbox from "../inputs/Checkbox"
 import ButtonPrimary from "../buttons/ButtonPrimary"
-import { DefaultParameter } from "@/utils/api/api.types"
-import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { Collection, Publication } from "@/utils/store/texture_tree.store"
+import { Publication } from "@/utils/store/texture_tree.store"
 
 type Props = {
     setDisplaySeeDetails:Function,
@@ -132,7 +130,7 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                     </tbody>
                 </table>
                 </div>
-            </div>
+                </div>
         </div>
         </>
     )

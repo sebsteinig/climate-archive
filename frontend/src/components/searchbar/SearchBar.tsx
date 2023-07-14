@@ -11,10 +11,7 @@ import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { FullWidthSeparator, MdSeparator } from '../separators/separators';
-import { RequestMultipleTexture, RequestTexture, TextureLeaf, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
-import { texture_provider } from '@/utils/texture_provider/TextureProvider';
 import { PropsWithChildren } from "react"
-import { useClusterStore } from '@/utils/store/cluster.store';
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -50,14 +47,6 @@ function MoreOptions({filters,setRequestFilters,children}:PropsWithChildren<More
 
 type Props = {
     
-}
-
-async function load(update: (x:TextureLeaf[]) => void,request:RequestMultipleTexture){
-    const res = await texture_provider.loadAll({
-        exp_ids:request.exp_ids,
-        variables:request.variables,
-    })
-    update(res.flat())
 }
 
 export default function SearchBar({children}:PropsWithChildren<Props>) {
@@ -186,9 +175,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                         </>
                     }
                 </div>
-                {search_panel_visible && <Publications publications = {publications}></Publications>
-                    
-                }
+                { search_panel_visible && <Publications publications = {publications}></Publications> }
             </div>
         </div>
     )
