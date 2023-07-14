@@ -1,5 +1,6 @@
 import { Variable } from "../utils"
 import WindsIcon from "$/assets/icons/winds-slate-500.svg";
+import WindsGreenIcon from "$/assets/icons/winds-emerald-300.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";
 import InputNumber from "@/components/inputs/InputNumber";
 import Slider from "@/components/inputs/Slider";
@@ -12,7 +13,7 @@ export function Winds({}:Props) {
     const winds = useClusterStore((state) => state.variables.winds)
     return (
         <Variable title = {"Jet Stream"} toggle = {() => winds.toggle()}
-        src={WindsIcon} active = {winds.active} controls = {true}>
+        src={winds.active?WindsGreenIcon:WindsIcon} active = {winds.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center py-1">
                     <h5 className="w-56"> animation speed :</h5>

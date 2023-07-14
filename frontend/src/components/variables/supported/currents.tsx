@@ -1,5 +1,6 @@
 import { Variable } from "../utils"
 import WaveIcon from "$/assets/icons/water-slate-500.svg";
+import WaveGreenIcon from "$/assets/icons/water-emerald-300.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";
 import Slider from "@/components/inputs/Slider";
 import InputNumber from "@/components/inputs/InputNumber";
@@ -12,7 +13,7 @@ export function Currents({}:Props) {
     const currents = useClusterStore((state) => state.variables.currents)
     return (
         <Variable title={"Currents"} toggle={() => currents.toggle()}
-        src = {WaveIcon} active={currents.active} controls = {true}>
+        src = {currents.active?WaveGreenIcon:WaveIcon} active={currents.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center py-1">
                     <h5 className="w-56"> animation speed </h5>

@@ -1,5 +1,6 @@
 import { Variable } from "../utils"
 import TemperatureIcon from "$/assets/icons/temperature-slate-500.svg";
+import TemperatureGreenIcon from "$/assets/icons/temperature-emerald-300.svg"
 import { useClusterStore } from "@/utils/store/cluster.store";
 import Slider from "@/components/inputs/Slider";
 import InputNumber from "@/components/inputs/InputNumber";
@@ -12,7 +13,7 @@ export function Tos({}:Props) {
     const tos = useClusterStore((state) => state.variables.tos)
     return (
         <Variable title = {"SST"} toggle = {() => tos.toggle()}
-        src={TemperatureIcon} active = {tos.active} controls = {true}>
+        src={tos.active?TemperatureGreenIcon:TemperatureIcon} active = {tos.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center  py-1">
                     <h5 className="w-56"> SST min. [°C]</h5>

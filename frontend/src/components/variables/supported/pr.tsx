@@ -1,12 +1,8 @@
 import { Variable } from "../utils"
-import Image from 'next/image';
-import {useState} from 'react'
 import RainIcon from "$/assets/icons/cloud-rain-slate-500.svg";
+import RainGreenIcon from "$/assets/icons/cloud-rain-emerald-300.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";
-import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
-import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
-import EyeOpen from "$/assets/icons/eye-svgrepo-com.svg";
-import EyeClosed from "$/assets/icons/eye-closed-svgrepo-com.svg";
+
 import Slider from "@/components/inputs/Slider";
 import InputNumber from "@/components/inputs/InputNumber";
 
@@ -17,7 +13,7 @@ export function Pr({}:Props) {
     const pr = useClusterStore((state) => state.variables.pr)
     return (
         <Variable title = {"Precipitation"} toggle = {() => pr.toggle()} 
-            src = {RainIcon} active = {pr.active} controls = {true}>
+            src = {pr.active?RainGreenIcon:RainIcon} active = {pr.active} controls = {true}>
             
             <div>
                 <div className="flex flex-wrap gap-2 items-center py-1">

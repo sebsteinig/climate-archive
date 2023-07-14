@@ -1,4 +1,5 @@
 import { Variable } from "../utils"
+import MountainGreeIcon from "$/assets/icons/mountain-emerald-300.svg";
 import MountainIcon from "$/assets/icons/mountain-slate-500.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";
 import Slider from "@/components/inputs/Slider";
@@ -11,7 +12,7 @@ export function Height({}:Props) {
     const height = useClusterStore((state) => state.variables.height)
     return (
         <Variable title = {"Surface"} toggle = {() => height.toggle()}
-        src={MountainIcon} active = {height.active} controls = {true}>
+        src={height.active?MountainGreeIcon:MountainIcon} active = {height.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center py-1">
                     <h5 className="w-56"> height diplacement</h5>

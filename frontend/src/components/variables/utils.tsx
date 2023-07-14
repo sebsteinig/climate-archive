@@ -18,8 +18,8 @@ type Props = {
 export function Variable({toggle, src, active, title, controls, children}:PropsWithChildren<Props>) {
     const [open_control, setOpenControl] = useState(false)
     return (
-        <div className={`group flex flex-row ${open_control?"hover:bg-slate-900" :"hover:bg-gray-900"}
-        ${open_control?"bg-gray-900" :"bg-gray-900"} rounded-lg p-2 h-fit w-fit`}>
+        <div className={`group flex flex-row bg-gray-900
+         rounded-lg p-2 h-fit w-fit ${active ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""}`}>
             <Image onClick={() => toggle()}
                 priority
                 src={src}
@@ -37,7 +37,7 @@ export function Variable({toggle, src, active, title, controls, children}:PropsW
                 {controls && <div className="flex flex-wrap">
                     <h4 className='inline-flex'
                         onClick={() => {setOpenControl((prev) => !prev)}}
-                    >Open controls
+                    >{open_control?"Close controls":"Open controls"}
                         <Image priority
                             alt='close'
                             className={`w-4 h-4 self-center ml-4`}
