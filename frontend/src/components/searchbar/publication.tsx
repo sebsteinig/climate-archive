@@ -1,8 +1,6 @@
 import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
 import ButtonSecondary from "../buttons/ButtonSecondary"
-import { DefaultParameter } from "@/utils/api/api.types"
-import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
 
 export type Publication = {
     title : string
@@ -14,33 +12,56 @@ export type Publication = {
     exps:any[],
 }
 
-type Props=  Publication & {
+type Props=   {
+    publications : Publication[] 
 }
 
-export function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps} : Props) {
+export function Publications( {publications} : Props){
     const [display_see_details,setDisplaySeeDetails] = useState(false)
-
-    if (!display_see_details){
-        return (
-            < >
-                <div  className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-80'>
-                <p className="font-semibold text-sky-200">{title}</p>
-                <p className="italic text-slate-400">{`${authors_short} (${year})`}</p>
-                    <ButtonSecondary
-                        
-                        onClick={() => {
-                            setDisplaySeeDetails(true)
-                            console.log("load")
-                        }}
-                        >
-                        See Details
-                    </ButtonSecondary>
-                </div>
-            </>
-        )
-    } 
+    const [displayed_publication, setDisplayedPublication] = useState<Publication>()
     return (
-        <PublicationDetails setDisplaySeeDetails={setDisplaySeeDetails} title={title} 
-            abstract={abstract} authors_short={authors_short} year={year} authors_full={authors_full} exps={exps} journal={journal}/>
+        <div className={`${publications.length > 0?'h-[64vh]':''} overflow-y-auto overflow-x-hidden max-h-full`} >
+            <div>
+                {(publications.length > 0 && !display_see_details) && 
+                    publications.map((publication: Publication,idx:number) => {
+                        return(
+                            <div className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-80'>
+                                <p className="font-semibold text-sky-200">{publication.title}</p>
+                                <p className="italic text-slate-400">{`${publication.authors_short} (${publication.year})`}</p>
+                                    <ButtonSecondary onClick={() => {
+                                        setDisplaySeeDetails(true)
+                                        setDisplayedPublication(publication)
+                                        console.log("load")
+                                    }}>See Details
+                                </ButtonSecondary>
+                            </div>
+                        )                        
+                })}
+                {displayed_publication != undefined && display_see_details &&
+                    <PublicationDetails 
+                        setDisplaySeeDetails={setDisplaySeeDetails} 
+                        title={displayed_publication.title} 
+                        abstract={displayed_publication.abstract} 
+                        authors_short={displayed_publication.authors_short} 
+                        year={displayed_publication.year} 
+                        authors_full={displayed_publication.authors_full} 
+                        exps={displayed_publication.exps} 
+                        journal={displayed_publication.journal}
+                    />
+                }
+            </div>
+        </div>
     )
 }
+
+
+
+
+
+function PublicationShort({title,authors_short,year,authors_full, abstract, journal, exps} : Publication) {
+        return (
+            < >
+                
+            </>
+        )
+} 
