@@ -42,9 +42,9 @@ class TextureProvider {
             /** TODO : resolutions */
         })
         return Promise.all(response.map(async res=>{
+
             const searched_texture : TextureInfo = {
                 ...res,
-                path : res.paths_mean[0],
                 variable : res.variable_name,
                 /** TODO : chunks */
         
@@ -82,6 +82,9 @@ class TextureProvider {
             const [exp_id,single_result_arr] = tmp
 
             const res = await Promise.all(single_result_arr.map(async res => {
+
+                
+
                 const searched_texture : TextureInfo = {
                     ...res,
                     path : res.paths_mean[0],

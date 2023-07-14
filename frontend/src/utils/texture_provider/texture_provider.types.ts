@@ -4,7 +4,9 @@ import { VariableName } from "../store/variables/variable.types"
 export type TextureInfo = {
     exp_id:string
     variable: string
-    path: string
+    
+    paths_ts : string[]
+    paths_mean : string[]
 
     chunk_time? : {
         current :number
@@ -88,6 +90,22 @@ export type TextureLeaf = {
     path: string
 }
 
-export type TextureTree = {
-    root : Map<string, Map<VariableName, TextureLeaf[]>>
+export type TextureLeaf_C = {
+    exp_id:string
+    variable: VariableName
+    time_chunks : {
+        id:number,
+        path:string,
+    }[]
+    vertical_chunk : {
+        id:number,
+        path:string,
+    }[]
 }
+
+export type TextureBranch = {
+    mean : (TextureLeaf | TextureLeaf_C)[]
+    ts : (TextureLeaf | TextureLeaf_C)[]
+}
+
+export type TextureTree = Map<string, Map<VariableName, TextureBranch>>
