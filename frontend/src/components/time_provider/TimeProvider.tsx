@@ -64,7 +64,6 @@ export function TimeProvider(props:Props) {
                     <World config={config} 
                         tick={
                             (delta,callback) => {
-                                //console.log("tick "+ delta);
                                 if (time_store.frames[0] && variable) {
                                     if (time_store.frames[0].state === TimeState.playing){
                                         t = (t + delta)  % exps.exps.length
@@ -77,11 +76,7 @@ export function TimeProvider(props:Props) {
                                         const branch = findInTree(exps.exps[idx],variable.name,tree)
                                         if (branch) {
                                             const path = branch.mean.paths[0].grid[0][0]
-                                            
-                                            texture_provider.getImageBase64(path).then((data) => {
-                                                console.log({data});
-                                                
-                                            })
+                            
                                             Promise.all([texture_provider.getTexture(path),
                                                 texture_provider.getInfo(exps.exps[idx], variable.name)]
                                                 )
@@ -90,7 +85,6 @@ export function TimeProvider(props:Props) {
                                         }
                                     }
                                 }
-                                return [undefined,undefined]
                             }
                         }
                     />

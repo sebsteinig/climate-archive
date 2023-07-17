@@ -45,18 +45,21 @@ export function World({ config, tick } : Props) {
 
   const exps = useClusterStore((state) => state.collections.current)
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
-  let texture = new THREE.Texture()
+  let texture = new THREE.TextureLoader()
 
   useFrame((_, delta) => {
     // if (input_ref) {
     //   console.log(input_ref.current?.value);
     // }
     tick(delta, ([t,info]) => {
-      if (sphereRef.current){
-        texture.dispose()
-        texture = buildTexture(t.image,info)
-        sphereRef.current.material.map = texture
-      }
+      //texture = buildTexture(t.image,info)
+      var blob = new Blob([t.image], { type: "image/png" });
+        var url = URL.createObjectURL(blob);
+        texture.load(url,(tt) => {
+          if (sphereRef.current){
+            sphereRef.current.material.map = tt
+          }
+        })
     })
     
     if (rotate) {

@@ -11,12 +11,11 @@ type Props = {
 }
 
 export default function UI({journals}:Props) {
-    const [variables, setVariables] = useState<string[]>([])
 
     return (
         <>        
             <TimeProvider />
-            <Variables/>
+            <Variables/> 
             <SearchBar >
                 {journals}
             </SearchBar>

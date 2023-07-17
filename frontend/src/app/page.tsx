@@ -9,8 +9,6 @@ import UI from '@/components/ui'
 import SelectJournal from '@/components/searchbar/filters/SelectJournals'
 
 
-const Main = dynamic(() => import('@/components/3D_components/Main'))
-
 
 export default function Home() {
   return (
