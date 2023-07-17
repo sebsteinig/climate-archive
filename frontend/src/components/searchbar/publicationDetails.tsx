@@ -1,13 +1,11 @@
 
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Checkbox from "../inputs/Checkbox"
 import ButtonPrimary from "../buttons/ButtonPrimary"
-import { DefaultParameter } from "@/utils/api/api.types"
-import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { Collection, Publication } from "@/utils/store/texture_tree.store"
+import { Publication } from "@/utils/store/texture_tree.store"
 
 type Props = {
     setDisplaySeeDetails:Function,
@@ -26,6 +24,7 @@ type Props = {
             }|any
         }[]
     }[],
+    setSearchPanelVisible : Function
 }
 
 type CheckedExp = {
@@ -33,12 +32,12 @@ type CheckedExp = {
     checked : boolean
 }
 
-export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps}:Props) {
+export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps, setSearchPanelVisible}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked, setChecked] = useState<CheckedExp[]>(exps.map((exp) => {
         return {
             exp : exp.id,
-            checked : false,
+            checked : true,
         }
     }))
     
@@ -57,8 +56,9 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
 
     return(
         <>
-        <div className='border-s-4 border-sky-700 mt-2 mb-2 pl-4'>
-            <p className="font-semibold text-sky-200">{title}</p>
+        <div className='border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4'>
+            <p className="hover:underline cursor-pointer" onClick={() => setDisplaySeeDetails(false)}>{"<"} Back</p>
+            <p className="font-semibold tracking-widest text-center pr-4 text-sky-200">{title}</p>
             <p className="italic text-slate-400 text-sm">{journal}, {year}</p>
             <p className="font-medium tracking-wide">{authors_full}</p>
             <div className="pt-2 pr-4" >
@@ -66,8 +66,8 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 <p className="hover:underline text-right cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
                     {display_abstract ? "Hide" : "Full abstract"}</p>
             </div>
-            <div><ButtonPrimary onClick={
-                async () => {
+            <div><ButtonPrimary onClick={async () => {
+                    setSearchPanelVisible(false)
                     const request = {
                         exp_ids : checked.filter(e => e.checked).map(e => e.exp),
                     }
@@ -84,15 +84,13 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                         title,
                         year,
                     } as Publication)
-                } 
-
-            }>
-                {`Load ${nb_checked === checked.length ? "all " : nb_checked } experiment${nb_checked >1 ? "s" : ""}`}
+                }
+            }> {`Load ${nb_checked === checked.length ? "all ":""} ${nb_checked} experiment${nb_checked >1 ? "s" : ""}`}
             </ButtonPrimary></div>
-                <div className="pt-3">
-                <div className="overflow-y-visible overflow-x-hidden max-h-48">
-                <table className='w-11/12 table-fixed border' id="exps-table">
-                    <thead className="border-b text-left font-medium border-neutral-500 bg-slate-600 sticky top-0">
+                <div className="pt-3 pr-5">
+                <div className="overflow-y-visible overflow-x-hidden max-h-52">
+                <table className='w-11/12 table-fixed border-t-0 border' id="exps-table">
+                    <thead className="border-b  text-left font-medium border-neutral-500 bg-slate-600 sticky top-0">
                         <tr className="">
                             <th scope="col" className="border-r px-6 py-2 border-neutral-500">Experiments</th>
                             <th scope="col" className="border-r px-6 py-2 border-neutral-500">Age</th>
@@ -102,7 +100,7 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="">
                             {exps.length>0 && exps.map((exp) => {
                                 let label = exp.metadata[0].metadata.text
                                 return( 
@@ -134,9 +132,6 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 </table>
                 </div>
                 </div>
-
-                <p className="hover:underline text-right pt-3 pr-4 cursor-pointer" 
-                    onClick={() => {setDisplaySeeDetails((false))}}>Hide</p>
         </div>
         </>
     )

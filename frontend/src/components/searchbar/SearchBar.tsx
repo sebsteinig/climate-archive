@@ -4,17 +4,14 @@ import { searchPublication } from '@/utils/api/api';
 import FilterPublication from './filters/FilterPublication';
 import FilterLabels from './filters/FilterLabels';
 import FilterAdvanced from './filters/FilterAdvanced';
-import {Publication,PublicationShort} from './publication';
+import {Publication, Publications} from './publication';
 import { DefaultParameter, SearchPublication } from '@/utils/api/api.types';
 import Image from 'next/image';
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { FullWidthSeparator, MdSeparator } from '../separators/separators';
-import { RequestMultipleTexture, RequestTexture, TextureLeaf, TextureInfo } from '@/utils/texture_provider/texture_provider.types';
-import { texture_provider } from '@/utils/texture_provider/TextureProvider';
 import { PropsWithChildren } from "react"
-import { useClusterStore } from '@/utils/store/cluster.store';
 
 function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
     useEffect(() => {
@@ -50,14 +47,6 @@ function MoreOptions({filters,setRequestFilters,children}:PropsWithChildren<More
 
 type Props = {
     
-}
-
-async function load(update: (x:TextureLeaf[]) => void,request:RequestMultipleTexture){
-    const res = await texture_provider.loadAll({
-        exp_ids:request.exp_ids,
-        variables:request.variables,
-    })
-    update(res.flat())
 }
 
 export default function SearchBar({children}:PropsWithChildren<Props>) {
@@ -186,29 +175,8 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                         </>
                     }
                 </div>
-                {search_panel_visible && 
-                    <div className='overflow-y-auto overflow-x-hidden max-h-96' >
-                        <div>
-                            {
-                                publications.length > 0 && 
-                                publications.map((publication: Publication,idx:number) => {
-                                    return (
-                                        <PublicationShort key={idx}
-                                            title={publication.title} 
-                                            year={publication.year} 
-                                            authors_short={publication.authors_short}
-                                            authors_full={publication.authors_full}
-                                            abstract={publication.abstract}
-                                            journal={publication.journal}
-                                            exps={publication.exps}
-                                        />
-                                    )
-                                })
-                            }
-                        </div>
-                    </div>
-                }
             </div>
+            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchPanelVisible = {setSearchPanelVisible}></Publications> }
         </div>
     )
 }

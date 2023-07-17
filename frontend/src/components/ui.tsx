@@ -5,6 +5,7 @@ import SearchBar from "./searchbar/SearchBar";
 import TestImage from "./TestImage";
 import { Variables } from "./variables/Variables";
 import { TimeProvider } from "./time_provider/TimeProvider";
+import TestExp from "./TestExp";
 
 type Props = {
     journals : JSX.Element
@@ -19,7 +20,7 @@ export default function UI({journals}:Props) {
             <SearchBar >
                 {journals}
             </SearchBar>
-
+            <TestExp/>
         </>
     )
   }

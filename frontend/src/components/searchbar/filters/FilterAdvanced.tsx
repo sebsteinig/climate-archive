@@ -34,6 +34,7 @@ type Props = {
 }
 
 export default function FilterAdvanced({}:Props) {
+    const [pushAll,addCollection] = useClusterStore((state) => [state.pushAll,state.addCollection])
     const [display,setDisplay] = useState(false)
     const [exp_ids,setExpIds] = useState<{exp_ids:Exp[], search:string}>({exp_ids:[],search:""})
     const [config,setConfig] = useState("")
@@ -59,7 +60,6 @@ export default function FilterAdvanced({}:Props) {
             </>
         )
     }
-    const [pushAll,addCollection] = useClusterStore((state) => [state.pushAll,state.addCollection])
 
     return (
         <>
