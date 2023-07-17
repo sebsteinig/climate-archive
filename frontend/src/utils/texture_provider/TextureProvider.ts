@@ -1,10 +1,11 @@
 'use client'
 import { getImageArrayBuffer, select, selectAll } from "../api/api"
-import Texture from "../database/Texture"
+import {Texture,TextureInfo} from "../database/Texture"
 import {Database} from "@/utils/database/database"
-import { RequestMultipleTexture, RequestTexture, TextureLeaf, TextureInfo } from "./texture_provider.types"
+import { RequestMultipleTexture, RequestTexture, TextureBranch, TextureLeaf } from "./texture_provider.types"
 import { LRUCache } from 'lru-cache'
 import { VariableName } from "../store/variables/variable.types"
+import { SelectSingleResult } from "../api/api.types"
 
 class TextureNotFound extends Error {
     texture!: TextureInfo
@@ -14,10 +15,10 @@ class TextureNotFound extends Error {
     }
 }
 class TextureMustBeLoaded extends Error {
-    texture!: TextureLeaf
-    constructor(searched_texture:TextureLeaf) {
+    path!: string | TextureInfo | {exp_id:string, variable:VariableName}
+    constructor(path: string | TextureInfo | {exp_id:string, variable:VariableName}) {
         super()
-        this.texture = searched_texture
+        this.path = path
     }
 }
 
@@ -25,162 +26,156 @@ class TextureProvider {
 
     database! : Database
     cache! : LRUCache<string,Texture>
+    info_cache! : LRUCache<{exp_id:string, variable:VariableName},TextureInfo>
 
     constructor() {
         this.database = new Database()
         this.cache = new LRUCache({
             max:100
         })
+        this.info_cache = new LRUCache({
+            max:100
+        })
     }
 
+    private async _loadPaths(paths:{grid:string[][]}[],info:TextureInfo) {
+        await Promise.all(
+            paths.flatMap(({grid}) => {
+                return grid.flatMap(row => {
+                    return row.map(async path => {
+                        let texture = await this.loadFromDb(path)
+                
+                        if ( !texture ) { // texture is undefined => not in the db, must be fetched and inserted in db
+                            texture = await this.loadFromServer(path)
+                        }
+                        if (!texture) {
+                            throw new TextureNotFound(info)
+                        }
+                        this.cache.set(path,texture)
+                    })
+                })
+            })
+        )
+    }
+
+    private async _loadFromSingleResult(res:SelectSingleResult){
+        const info : TextureInfo = {
+            ...res,
+            variable : res.variable_name,
+            /** TODO : resolutions */
+
+        };
+        
+        await this._loadPaths(info.paths_ts.paths,info)
+        await this._loadPaths(info.paths_mean.paths,info)
+
+        try {
+            
+            const is_already = await this.database.textures_info.get([info.exp_id,info.variable])
+            if( ! is_already ) {
+                this.database.textures_info.add(info)
+            }
+        } catch (error) {
+            console.log("ERROR ----");
+            
+            console.log({info});
+            
+        }
+
+        const leaf_ts =  {
+            paths : info.paths_ts.paths,
+        } as TextureLeaf
+        const leaf_mean = {
+            paths : info.paths_mean.paths,
+        }
+        return {
+            exp_id : info.exp_id,
+            variable : VariableName[info.variable as keyof typeof VariableName],
+            mean : leaf_mean,
+            ts : leaf_ts,
+        } as TextureBranch
+    }
     async load(requested_texture:RequestTexture) {
     
         const response = await select(requested_texture.exp_id,{
             vars : requested_texture.variables
-            /** TODO : chunks */
-    
             /** TODO : resolutions */
         })
         return Promise.all(response.map(async res=>{
-
-            const searched_texture : TextureInfo = {
-                ...res,
-                variable : res.variable_name,
-                /** TODO : chunks */
-        
-                /** TODO : resolutions */
-    
-            };
-            let texture = await this.loadFromDb(searched_texture)
-    
-            if ( !texture ) { // texture is undefined => not in the db, must be fetched and inserted in db
-                texture = await this.loadFromServer(searched_texture)
-            }
-            if (!texture) {
-                throw new TextureNotFound(searched_texture)
-            }
-            this.cache.set(searched_texture.path,texture)
-            return {
-                exp_id : searched_texture.exp_id,
-                path : searched_texture.path,
-                variable : VariableName[searched_texture.variable as keyof typeof VariableName],
-            } as TextureLeaf
+            return this._loadFromSingleResult(res)
         }))
     }
 
     async  loadAll(requested_textures:RequestMultipleTexture) {
-
         const response = await selectAll({
                     vars : requested_textures.variables,
                     ids : requested_textures.exp_ids
-                    /** TODO : chunks */
-            
                     /** TODO : resolutions */
             })
-        
         const res = await Promise.all(Object.entries(response).flatMap(async tmp=>{
-            const [exp_id,single_result_arr] = tmp
-
+            const [_,single_result_arr] = tmp
             const res = await Promise.all(single_result_arr.map(async res => {
-
-                
-
-                const searched_texture : TextureInfo = {
-                    ...res,
-                    path : res.paths_mean[0],
-                    variable : res.variable_name,
-                    /** TODO : chunks */
-            
-                    /** TODO : resolutions */
-        
-                };
-                let texture = await this.loadFromDb(searched_texture)
-        
-                if ( !texture ) { // texture is undefined => not in the db, must be fetched and inserted in db
-                    texture = await this.loadFromServer(searched_texture)
-                }
-                if (!texture) {
-                    throw new TextureNotFound(searched_texture)
-                }
-                this.cache.set(searched_texture.path,texture)
-                return {
-                    exp_id : searched_texture.exp_id,
-                    path : searched_texture.path,
-                    variable : VariableName[searched_texture.variable as keyof typeof VariableName]
-                } as TextureLeaf
+                return this._loadFromSingleResult(res)
             }))
 
             return res
         }))
         return res
-        // return Promise.all(requested_textures.map(
-        //     (requested_texture) => {
-        //         return this.load(requested_texture)
-        //     }
-        // ))
     }
 
-    async loadFromDb(searched_texture:TextureInfo) {
-        const texture = await this.database.textures.get({path:searched_texture.path})
-        if (texture) {
-            console.log(`fetch ${searched_texture.exp_id}:${searched_texture.variable} locally`);
-        }
+    async loadFromDb(path:string) {
+        const texture = await this.database.textures.get({path:path})
         return texture
     }
     
-    async loadFromServer(searched_texture:TextureInfo) {
-        console.log(`fetch ${searched_texture.exp_id}:${searched_texture.variable} remotly`);
-                
-        const image_blob = await getImageArrayBuffer(searched_texture.path)
+    async loadFromServer(path:string) {
+        const image_blob = await getImageArrayBuffer(path)
         
         const texture = {
-            ...searched_texture,
-        
-            image : image_blob,
-        
-            chunk_time  : {
-                current :searched_texture.chunk_time?.current || 1,
-                max : searched_texture.chunk_time?.max || 1,
-            },
-            chunk_vertical : {
-                current : searched_texture.chunk_vertical?.current || 1,
-                max : searched_texture.chunk_vertical?.max || 1,
-            },
-            resolution : {
-                x : searched_texture.resolution?.x || 0,
-                y : searched_texture.resolution?.y || 0,
-            }
+            path,
+            image : image_blob
+        } as Texture
+        const is_already = await this.database.textures.get({path})
+        if (!is_already) {
+            this.database.textures.add(texture)
         }
-        this.database.textures.add(texture)
         return texture!
     }
 
-    async getImageBase64(searched_texture:TextureLeaf) {
-        console.log(`loading ${searched_texture.exp_id} : ${searched_texture.variable}`);
-
-        const texture = await this.getTexture(searched_texture)
+    async getImageBase64(path:string) {
+        const texture = await this.getTexture(path)
         const base64 = btoa(
             new Uint8Array(texture.image).reduce(
                 (data, byte) => data + String.fromCharCode(byte),
                 ''
             )
         )
-        console.log(`data loaded for ${texture.exp_id} : ${texture.variable} size = ${base64.length}`);
-        
         return base64
     }
     
-    async getTexture(searched_texture:TextureLeaf) {
-        let texture = this.cache.get(searched_texture.path)
+    async getInfo(exp_id:string,variable:VariableName) {
+        let texture_info = this.info_cache.get({exp_id,variable}) 
+        if (!texture_info) {
+            texture_info = await this.database.textures_info.get([exp_id,VariableName[variable]]) 
+        }
+        if (!texture_info) {
+            console.log("GET INFO ERROR ");
+            console.log({variable,exp_id});
+            throw new TextureMustBeLoaded({variable,exp_id})
+        }
+        return texture_info
+    }
+
+    async getTexture(path:string) {
+        let texture = this.cache.get(path)
         if (!texture) {
-            texture = await this.database.textures.get({path:searched_texture.path})
-            this.cache.set(searched_texture.path,texture)
-        }else {
-            console.log(`data loaded from lru cache`);
-            
+            texture = await this.database.textures.get({path:path})
+            this.cache.set(path,texture)
         }
         if (!texture) {
-            throw new TextureMustBeLoaded(searched_texture)
+            console.log("GET TEXTURE ERROR ");
+            console.log({path});
+            throw new TextureMustBeLoaded(path)
         }
         return texture!
     }
