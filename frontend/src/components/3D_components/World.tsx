@@ -46,6 +46,9 @@ export function World({ config, tick } : Props) {
   const exps = useClusterStore((state) => state.collections.current)
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
   let texture = new THREE.TextureLoader()
+  const canvas = document.createElement("canvas")
+  const ctx = canvas.getContext('2d')
+
 
   useFrame((_, delta) => {
     // if (input_ref) {
@@ -53,13 +56,28 @@ export function World({ config, tick } : Props) {
     // }
     tick(delta, ([t,info]) => {
       //texture = buildTexture(t.image,info)
-      var blob = new Blob([t.image], { type: "image/png" });
-        var url = URL.createObjectURL(blob);
-        texture.load(url,(tt) => {
-          if (sphereRef.current){
-            sphereRef.current.material.map = tt
+      if (ctx) {
+        console.log({x_size:info.xsize, y_size:info.ysize , levels:info.levels , ts : info.timesteps});
+
+        const blob = new Blob([t.image], { type: "image/png" });
+        const url = URL.createObjectURL(blob);
+        createImageBitmap(blob).then(
+          (bitmap) => {
+            canvas.width = info.xsize
+            canvas.height = info.ysize
+            ctx.drawImage(bitmap,0,0,info.xsize,info.ysize,0,0,info.xsize,info.ysize)
+            return canvas.toDataURL("image/png")
           }
-        })
+        ).then(
+          (frame_url) => {
+            texture.load(frame_url,(tt) => {
+              if (sphereRef.current){
+                sphereRef.current.material.map = tt
+              }
+            })
+          }
+        )
+      }
     })
     
     if (rotate) {

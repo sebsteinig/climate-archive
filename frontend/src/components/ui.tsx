@@ -20,6 +20,7 @@ export default function UI({journals}:Props) {
             <SearchBar >
                 {journals}
             </SearchBar>
+            {/* <TestImage/> */}
             <TestExp/>
         </>
     )
