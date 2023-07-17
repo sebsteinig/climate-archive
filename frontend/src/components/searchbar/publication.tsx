@@ -14,11 +14,11 @@ export type Publication = {
 
 type Props=   {
     publications : Publication[] 
-    setSearchPanelVisible : Function
+    setSearchBarVisible : Function
     more_options : boolean
 }
 
-export function Publications( {publications, more_options, setSearchPanelVisible} : Props){
+export function Publications( {publications, more_options, setSearchBarVisible} : Props){
     const [display_see_details,setDisplaySeeDetails] = useState(false)
     const [displayed_publication, setDisplayedPublication] = useState<Publication>()
     return (
@@ -28,9 +28,9 @@ export function Publications( {publications, more_options, setSearchPanelVisible
                 {(publications.length > 0 && !display_see_details) && 
                     publications.map((publication: Publication,idx:number) => {
                         return(
-                            <div key={idx} className='border-s-4 border-sky-300 mt-2 mb-2 pl-4 hover:opacity-100 opacity-80'>
+                            <div key={idx} className='border-s-4 border-sky-300 mt-2 mb-2 px-4 hover:opacity-100 opacity-80'>
                                 <p className="font-semibold text-sky-200">{publication.title}</p>
-                                <p className="italic text-slate-400">{`${publication.authors_short} (${publication.year})`}</p>
+                                <p className="italic text-right text-slate-400">{`${publication.authors_short} (${publication.year})`}</p>
                                     <ButtonSecondary onClick={() => {
                                         setDisplaySeeDetails(true)
                                         setDisplayedPublication(publication)
@@ -42,7 +42,7 @@ export function Publications( {publications, more_options, setSearchPanelVisible
                 })}
                 {displayed_publication != undefined && display_see_details &&
                     <PublicationDetails 
-                        setSearchPanelVisible = {setSearchPanelVisible}
+                        setSearchBarVisible = {setSearchBarVisible}
                         setDisplaySeeDetails={setDisplaySeeDetails} 
                         title={displayed_publication.title} 
                         abstract={displayed_publication.abstract} 

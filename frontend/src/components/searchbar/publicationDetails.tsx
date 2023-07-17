@@ -24,7 +24,7 @@ type Props = {
             }|any
         }[]
     }[],
-    setSearchPanelVisible : Function
+    setSearchBarVisible : Function
 }
 
 type CheckedExp = {
@@ -32,7 +32,7 @@ type CheckedExp = {
     checked : boolean
 }
 
-export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps, setSearchPanelVisible}:Props) {
+export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps, setSearchBarVisible}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked, setChecked] = useState<CheckedExp[]>(exps.map((exp) => {
         return {
@@ -67,7 +67,7 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                     {display_abstract ? "Hide" : "Full abstract"}</p>
             </div>
             <div><ButtonPrimary onClick={async () => {
-                    setSearchPanelVisible(false)
+                    setSearchBarVisible(false)
                     const request = {
                         exp_ids : checked.filter(e => e.checked).map(e => e.exp),
                     }

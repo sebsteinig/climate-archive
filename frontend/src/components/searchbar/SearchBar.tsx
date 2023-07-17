@@ -46,10 +46,10 @@ function MoreOptions({filters,setRequestFilters,children}:PropsWithChildren<More
 }
 
 type Props = {
-    
+    setSearchBarVisible : Function
 }
 
-export default function SearchBar({children}:PropsWithChildren<Props>) {
+export default function SearchBar({setSearchBarVisible, children}:PropsWithChildren<Props>) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -176,7 +176,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                     }
                 </div>
             </div>
-            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchPanelVisible = {setSearchPanelVisible}></Publications> }
+            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchBarVisible = {setSearchBarVisible}></Publications> }
         </div>
     )
 }
