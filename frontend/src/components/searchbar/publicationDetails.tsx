@@ -1,6 +1,6 @@
 
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Checkbox from "../inputs/Checkbox"
 import ButtonPrimary from "../buttons/ButtonPrimary"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
@@ -24,6 +24,7 @@ type Props = {
             }|any
         }[]
     }[],
+    setSearchPanelVisible : Function
 }
 
 type CheckedExp = {
@@ -31,7 +32,7 @@ type CheckedExp = {
     checked : boolean
 }
 
-export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps}:Props) {
+export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps, setSearchPanelVisible}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked, setChecked] = useState<CheckedExp[]>(exps.map((exp) => {
         return {
@@ -65,8 +66,8 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                 <p className="hover:underline text-right cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
                     {display_abstract ? "Hide" : "Full abstract"}</p>
             </div>
-            <div><ButtonPrimary onClick={
-                async () => {
+            <div><ButtonPrimary onClick={async () => {
+                    setSearchPanelVisible(false)
                     const request = {
                         exp_ids : checked.filter(e => e.checked).map(e => e.exp),
                     }

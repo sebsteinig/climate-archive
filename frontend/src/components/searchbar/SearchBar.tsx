@@ -175,8 +175,8 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                         </>
                     }
                 </div>
-                { search_panel_visible && <Publications publications = {publications}></Publications> }
             </div>
+            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchPanelVisible = {setSearchPanelVisible}></Publications> }
         </div>
     )
 }
