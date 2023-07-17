@@ -1,20 +1,20 @@
 
 
-export default class Texture {
+export class TextureInfo  {
     exp_id!:string
-    variable!:string
-    path!: string
-
-    image! : ArrayBuffer
-
-    chunk_time! : {
-        current :number
-        max : number
+    variable!: string
+    
+    paths_ts! : {
+        paths : {
+            grid : string[][]
+        }[]
     }
-    chunk_vertical! : {
-        current :number
-        max : number
+    paths_mean! : {
+        paths : {
+            grid : string[][]
+        }[]
     }
+
     resolution? : {
         x : number
         y : number
@@ -34,4 +34,8 @@ export default class Texture {
     lossless! : boolean
     nan_value_encoding! : number
     threshold! : number
+}
+export class Texture {
+    path!: string
+    image! : ArrayBuffer
 }

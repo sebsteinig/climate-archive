@@ -3,6 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
 import { Perf } from 'r3f-perf'
 import { useRef, forwardRef, RefObject } from 'react'
+
+import * as THREE from 'three';
 import { SphereGeometry, Mesh, MeshStandardMaterial } from 'three'
 import { Title } from './Title'
 import Lights from './Lights'
@@ -10,13 +12,25 @@ import Controls from './Controls'
 import { Plane } from './Plane'
 import { Surface } from './Surface'
 import { useClusterStore } from '@/utils/store/cluster.store';
+import { Texture, TextureInfo } from '@/utils/database/Texture';
 
 type Props = {
   config: {
     model: string,
     heightData: string
   }
-  tick : (delta:number) => void
+  tick : (delta:number, callback:((x:[Texture,TextureInfo]) => void)) => void
+}
+
+function buildTexture(data:ArrayBuffer,info:TextureInfo) {
+  var blob = new Blob([data], { type: "image/png" });
+  var url = URL.createObjectURL(blob);
+  var texture = new THREE.TextureLoader().load(url);
+  //, THREE.RGBAFormat, THREE.UnsignedByteType
+  // var dataView = new DataView(data);
+  // let texture = new THREE.DataTexture(dataView, info.xsize, info.ysize);
+  texture.needsUpdate = true;
+  return texture;
 }
 
 export function World({ config, tick } : Props) {
@@ -31,12 +45,22 @@ export function World({ config, tick } : Props) {
 
   const exps = useClusterStore((state) => state.collections.current)
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
+  let texture = new THREE.TextureLoader()
 
   useFrame((_, delta) => {
     // if (input_ref) {
     //   console.log(input_ref.current?.value);
     // }
-    tick(delta)
+    tick(delta, ([t,info]) => {
+      //texture = buildTexture(t.image,info)
+      var blob = new Blob([t.image], { type: "image/png" });
+        var url = URL.createObjectURL(blob);
+        texture.load(url,(tt) => {
+          if (sphereRef.current){
+            sphereRef.current.material.map = tt
+          }
+        })
+    })
     
     if (rotate) {
       sphereRef.current!.rotation.y += delta / 3

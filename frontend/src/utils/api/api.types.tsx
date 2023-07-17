@@ -34,8 +34,16 @@ export type SelectSingleParameter = DefaultParameter & {
 
 export type SelectSingleResult = {
     variable_name : string
-    paths_ts : string[]
-    paths_mean : string[]
+    paths_ts : {
+        paths : {
+            grid : string[][]
+        }[]
+    }
+    paths_mean : {
+        paths : {
+            grid : string[][]
+        }[]
+    }
     levels : number
     timesteps : number
     xsize : number
@@ -50,8 +58,8 @@ export type SelectSingleResult = {
     extension : string
     lossless : boolean
     nan_value_encoding : number
-    chunks_time : number
-    chunks_vertical : number
+    //chunks_time : number
+    //chunks_vertical : number
     rx : number
     ry : number
     exp_id : string

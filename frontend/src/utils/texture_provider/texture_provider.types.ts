@@ -1,39 +1,5 @@
 import { VariableName } from "../store/variables/variable.types"
 
-
-export type TextureInfo = {
-    exp_id:string
-    variable: string
-    path: string
-
-    chunk_time? : {
-        current :number
-        max : number
-    }
-    chunk_vertical? : {
-        current :number
-        max : number
-    }
-    resolution? : {
-        x : number
-        y : number
-    }
-    levels : number
-    timesteps : number
-    xsize : number
-    xfirst : number
-    xinc : number
-    ysize : number
-    yfirst : number
-    yinc : number
-    //metadata! : Object
-    created_at : string
-    config_name : string
-    extension : string
-    lossless : boolean
-    nan_value_encoding : number
-    threshold : number
-}
 export type RequestTexture = {
     exp_id:string
     variables?: string[]
@@ -83,11 +49,16 @@ export type RequestMultipleTexture = {
 }
 
 export type TextureLeaf = {    
-    exp_id:string
-    variable: VariableName
-    path: string
+    paths: {
+        grid : string[][]
+    }[]
 }
 
-export type TextureTree = {
-    root : Map<string, Map<VariableName, TextureLeaf[]>>
+export type TextureBranch = {
+    exp_id:string
+    variable: VariableName
+    mean : TextureLeaf
+    ts : TextureLeaf
 }
+
+export type TextureTree = Map<string, Map<VariableName, TextureBranch>>
