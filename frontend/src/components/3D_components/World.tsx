@@ -13,13 +13,14 @@ import { Plane } from './Plane'
 import { Surface } from './Surface'
 import { useClusterStore } from '@/utils/store/cluster.store';
 import { Texture, TextureInfo } from '@/utils/database/Texture';
+import { VariableName } from '@/utils/store/variables/variable.types';
 
 type Props = {
   config: {
     model: string,
     heightData: string
   }
-  tick : (delta:number, callback:((x:[Texture,TextureInfo]) => void)) => void
+  tick : (delta:number) => Promise<Map<VariableName,{current_url:string,next_url:string,weight:number}>>
 }
 
 function buildTexture(data:ArrayBuffer,info:TextureInfo) {
@@ -46,37 +47,17 @@ export function World({ config, tick } : Props) {
   const exps = useClusterStore((state) => state.collections.current)
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
   let texture = new THREE.TextureLoader()
-  const canvas = document.createElement("canvas")
-  const ctx = canvas.getContext('2d')
 
 
   useFrame((_, delta) => {
-    // if (input_ref) {
-    //   console.log(input_ref.current?.value);
-    // }
-    tick(delta, ([t,info]) => {
-      //texture = buildTexture(t.image,info)
-      if (ctx) {
-        console.log({x_size:info.xsize, y_size:info.ysize , levels:info.levels , ts : info.timesteps});
-
-        const blob = new Blob([t.image], { type: "image/png" });
-        const url = URL.createObjectURL(blob);
-        createImageBitmap(blob).then(
-          (bitmap) => {
-            canvas.width = info.xsize
-            canvas.height = info.ysize
-            ctx.drawImage(bitmap,0,0,info.xsize,info.ysize,0,0,info.xsize,info.ysize)
-            return canvas.toDataURL("image/png")
+    tick(delta).then((res)=> {
+      for(let [variable,data] of res) {
+        texture.load(data.current_url,(tt) => {
+          if (sphereRef.current){
+            sphereRef.current.material.map = tt
           }
-        ).then(
-          (frame_url) => {
-            texture.load(frame_url,(tt) => {
-              if (sphereRef.current){
-                sphereRef.current.material.map = tt
-              }
-            })
-          }
-        )
+        })
+        break;
       }
     })
     

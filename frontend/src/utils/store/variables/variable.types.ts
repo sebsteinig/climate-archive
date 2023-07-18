@@ -10,7 +10,7 @@ export enum VariableName {
     snc,
     tas,
     tos,
-    winds
+    winds,
 }
 
 

@@ -1,5 +1,6 @@
 import { StateCreator } from "zustand";
-import { Time, TimeConfig, TimeDirection, TimeKind, TimeSpeed, TimeState } from "./time.type";
+import { Time, TimeConfig, TimeDirection, TimeKind, TimeMode, TimeSpeed, TimeState } from "./time.type";
+import { nextCircular } from "./time.utils";
 
 
 
@@ -17,6 +18,8 @@ export interface TimeSlice {
         set : (idx:number,t:number) => void
     }
 }
+
+
 
 export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],[],TimeSlice> = 
     (set) => {
@@ -39,19 +42,17 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                     if (config_speed === TimeSpeed.fast) {
                         speed = 250
                     }
+                    const mode =  config.mode ?? TimeMode.mean
                     const time = {
+                        mode,
                         kind,
                         direction,
                         speed,
                         state,
                         exps,
                         idx : direction === TimeDirection.forward ? 0 : exps.length - 1,
-                        frame : {
-                            current : "",
-                            next : "",
-                            cursor : 0,
-                        }
-                    }
+                        next : nextCircular
+                    } as Time
                     set((state) => {
                         state.time.frames.push(time)
                     })

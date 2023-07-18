@@ -1,4 +1,5 @@
-
+import { TextureInfo } from "@/utils/database/Texture"
+import { VariableName } from "../variables/variable.types"
 
 export enum TimeKind {
     circular,
@@ -22,18 +23,44 @@ export enum TimeSpeed {
     fast
 }
 
+export enum TimeMode {
+    ts,
+    mean,
+}
+
 export type TimeConfig = {
     kind? : TimeKind,
     direction? : TimeDirection,
     speed? : TimeSpeed | number
+    mode? : TimeMode
 }
 
+export type TimeResultValue = {
+    current : {
+        idx : number
+        exp : string
+        info : TextureInfo
+        time_chunk : number
+        frame : number
+    }
+    next ?: {
+        idx : number
+        exp : string
+        info : TextureInfo
+        time_chunk : number
+        frame : number
+    }
+    weight : number
+}
+export type TimeResult = Map<VariableName,TimeResultValue>
 
 export type Time = {
+    mode : TimeMode
     direction : TimeDirection
     kind : TimeKind
     state : TimeState
     speed : number
     idx : number
     exps : string[]
+    next : (time:Time,current:TimeResult, delta:number,active_variable:VariableName[]) => Promise<TimeResult>
 }
