@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { Time, TimeConfig, TimeDirection, TimeKind, TimeMode, TimeSpeed, TimeState } from "./time.type";
+import { Time, TimeConfig, TimeDirection, TimeKind, TimeMode, TimeResult, TimeSpeed, TimeState } from "./time.type";
 import { nextCircular } from "./time.utils";
 
 
@@ -15,7 +15,7 @@ export interface TimeSlice {
         play : (idx:number) => void
         pause : (idx:number) => void
         stop : (idx:number) => void
-        set : (idx:number,t:number) => void
+        set : (idx:number,t:TimeResult | undefined) => void
     }
 }
 
@@ -111,9 +111,9 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                         }
                     })
                 },
-                set : (idx:number,t:number) => {
+                set : (idx:number,t:TimeResult | undefined) => {
                     set(state=>{
-                        state.time.frames[idx].idx = t
+                        state.time.frames[idx].current_result = t
                     })
                 },
             }

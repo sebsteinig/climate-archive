@@ -10,6 +10,37 @@ export async function nextCircular(time:Time,current:TimeResult,  delta:number,a
         for (let variable of active_variable) {
             const res = current.get(variable)
             if (!res) {
+                // newly selected variable 
+                const [_,tr] = current.entries().next().value as [VariableName, TimeResultValue]
+
+                const current_info = await texture_provider.getInfo(tr.current.exp,variable)
+                const new_current = {
+                    idx : tr.current.idx,
+                    exp : tr.current.exp,
+                    info : current_info,
+                    time_chunk : 0, // because mean => no chunks
+                    frame : 0, // same here 
+                }
+
+                const didx = time.direction === TimeDirection.forward ? 1 : -1
+                const new_idx = (tr.current.idx + didx) % time.exps.length
+                const new_exp = time.exps[new_idx]
+                const new_info = await texture_provider.getInfo(new_exp,variable)
+                
+                const new_next = {
+                    idx : new_idx,
+                    exp: new_exp,
+                    info : new_info,
+                    time_chunk : 0, 
+                    frame : 0,
+                }
+                new_res.set(variable,
+                    {
+                        current:new_current,
+                        next:new_next,
+                        weight:tr.weight
+                    }
+                )
                 continue;
             }
             
@@ -25,11 +56,28 @@ export async function nextCircular(time:Time,current:TimeResult,  delta:number,a
                 continue;
             } 
             new_weight = 0
-            const new_current = res.next
+            let new_current
+            if(!res.next) {
+
+                const didx = time.direction === TimeDirection.forward ? 1 : -1
+                const new_idx = (res.current.idx + didx) % time.exps.length
+                const new_exp = time.exps[new_idx]
+                const new_info = await texture_provider.getInfo(new_exp,variable)
+                
+                new_current = {
+                    idx : new_idx,
+                    exp: new_exp,
+                    info : new_info,
+                    time_chunk : 0, 
+                    frame : 0,
+                }
+            }else {
+                new_current = res.next
+            }
 
             const didx = time.direction === TimeDirection.forward ? 1 : -1
 
-            const new_idx = (res.next.idx + didx) % time.exps.length
+            const new_idx = (new_current.idx + didx) % time.exps.length
             const new_exp = time.exps[new_idx]
             const new_info = await texture_provider.getInfo(new_exp,variable)
 
@@ -54,8 +102,79 @@ export async function nextCircular(time:Time,current:TimeResult,  delta:number,a
         for (let variable of active_variable) {
             const res = current.get(variable)
             if (!res) {
+                // newly selected variable 
+                const [_,tr] = current.entries().next().value as [VariableName, TimeResultValue]
+                
+                const current_info = await texture_provider.getInfo(tr.current.exp,variable)
+
+                const tr_ts_chunks_size = tr.current.info.paths_ts.paths[0].grid[0].length
+                const tr_frames_size = tr.current.info.timesteps / tr_ts_chunks_size
+
+                const tr_ratio = (tr.current.frame+tr.current.time_chunk*tr_frames_size) / tr.current.info.timesteps
+
+                const ts_chunks_size = current_info.paths_ts.paths[0].grid[0].length
+                const frames_size = current_info.timesteps / ts_chunks_size
+
+                const tmp_frame = Math.floor(current_info.timesteps * tr_ratio)
+                const time_chunk = Math.floor(tmp_frame / frames_size)
+                const frame = tmp_frame % frames_size
+
+                const new_current = {
+                    idx : tr.current.idx,
+                    exp : tr.current.exp,
+                    info : current_info,
+                    time_chunk : time_chunk,
+                    frame :frame,
+                }
+
+                const didx = time.direction === TimeDirection.forward ? 1 : -1
+                let new_frame = frame + didx
+                let new_time_chunk = time_chunk 
+    
+                let new_idx = tr.current.idx
+                let new_exp = time.exps[new_idx]
+                let new_info = current_info
+                
+                if (new_frame >= frames_size) {
+                    new_frame = 0
+                    new_time_chunk += 1
+                    if ( new_time_chunk === ts_chunks_size) {
+                        // end of the ts for the current exp
+                        new_idx = (new_idx + 1) % time.exps.length
+                        new_exp = time.exps[new_idx]
+                        new_info = await texture_provider.getInfo(new_exp,variable)
+                        new_time_chunk = 0
+                    }
+                }else if( new_frame < 0) {
+                    new_frame = frames_size - 1
+                    new_time_chunk -= 1
+                    if ( new_time_chunk < 0) {
+                        new_idx = (new_idx - 1) % time.exps.length
+                        new_exp = time.exps[new_idx]
+                        new_info = await texture_provider.getInfo(new_exp,variable)
+    
+                        const new_ts_chunks_size = new_info.paths_ts.paths[0].grid[0].length
+                        new_time_chunk = new_ts_chunks_size - 1
+                    }
+                }
+                
+                const new_next = {
+                    idx : new_idx,
+                    exp: new_exp,
+                    info : new_info,
+                    time_chunk : new_time_chunk, 
+                    frame : new_frame,
+                }
+                new_res.set(variable,
+                    {
+                        current:new_current,
+                        next:new_next,
+                        weight:tr.weight
+                    }
+                )
                 continue;
             }
+
             let new_weight = (res.weight + delta)
             if (new_weight < 1) {
                 new_res.set(variable,
@@ -68,26 +187,72 @@ export async function nextCircular(time:Time,current:TimeResult,  delta:number,a
                 continue;
             } 
             new_weight = 0
-            const new_current = res.next
 
             const ts_chunks_size = res.current.info.paths_ts.paths[0].grid[0].length
             const frames_size = res.current.info.timesteps / ts_chunks_size
+            let new_current
+            if(!res.next) {
+                                
+
+                const didx = time.direction === TimeDirection.forward ? 1 : -1
+                let new_frame = res.current.frame + didx
+                let new_time_chunk = res.current.time_chunk 
+    
+                let new_idx = res.current.idx
+                let new_exp = time.exps[new_idx]
+                let new_info = res.current.info
+                
+                if (new_frame >= frames_size) {
+                    new_frame = 0
+                    new_time_chunk += 1
+                    if ( new_time_chunk === ts_chunks_size) {
+                        // end of the ts for the current exp
+                        new_idx = (res.current.idx + 1) % time.exps.length
+                        new_exp = time.exps[new_idx]
+                        new_info = await texture_provider.getInfo(new_exp,variable)
+                        new_time_chunk = 0
+                    }
+                }else if( new_frame < 0) {
+                    new_frame = frames_size - 1
+                    new_time_chunk -= 1
+                    if ( new_time_chunk < 0) {
+                        new_idx = (res.current.idx - 1) % time.exps.length
+                        new_exp = time.exps[new_idx]
+                        new_info = await texture_provider.getInfo(new_exp,variable)
+    
+                        const new_ts_chunks_size = new_info.paths_ts.paths[0].grid[0].length
+                        new_time_chunk = new_ts_chunks_size - 1
+                    }
+                }
+    
+                new_current = {
+                    idx : new_idx,
+                    exp : new_exp,
+                    info : new_info,
+                    frame : new_frame,
+                    time_chunk : new_time_chunk,
+                }
+            }else {
+                new_current = res.next
+            }
+
+
 
             const didx = time.direction === TimeDirection.forward ? 1 : -1
 
-            let new_frame = res.next.frame + didx
-            let new_time_chunk = res.next.time_chunk 
+            let new_frame = new_current.frame + didx
+            let new_time_chunk = new_current.time_chunk 
 
-            let new_idx = res.next.idx
+            let new_idx = new_current.idx
             let new_exp = time.exps[new_idx]
-            let new_info = res.next.info
+            let new_info = new_current.info
             
             if (new_frame >= frames_size) {
                 new_frame = 0
                 new_time_chunk += 1
                 if ( new_time_chunk === ts_chunks_size) {
                     // end of the ts for the current exp
-                    new_idx = (res.next.idx + 1) % time.exps.length
+                    new_idx = (new_current.idx + 1) % time.exps.length
                     new_exp = time.exps[new_idx]
                     new_info = await texture_provider.getInfo(new_exp,variable)
                     new_time_chunk = 0
@@ -96,7 +261,7 @@ export async function nextCircular(time:Time,current:TimeResult,  delta:number,a
                 new_frame = frames_size - 1
                 new_time_chunk -= 1
                 if ( new_time_chunk < 0) {
-                    new_idx = (res.next.idx - 1) % time.exps.length
+                    new_idx = (new_current.idx - 1) % time.exps.length
                     new_exp = time.exps[new_idx]
                     new_info = await texture_provider.getInfo(new_exp,variable)
 

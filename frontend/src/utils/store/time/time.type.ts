@@ -60,7 +60,7 @@ export type Time = {
     kind : TimeKind
     state : TimeState
     speed : number
-    idx : number
+    current_result? : TimeResult
     exps : string[]
     next : (time:Time,current:TimeResult, delta:number,active_variable:VariableName[]) => Promise<TimeResult>
 }
