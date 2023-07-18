@@ -1,6 +1,6 @@
 'use client'
 import TestImage from "./TestImage";
-import { SearchButton } from "./SearchButton";
+import { SearchButton } from "./searchbar/SearchButton";
 import { TimeProvider } from "./time_provider/TimeProvider";
 import { Variables } from "./variables/Variables";
 

@@ -1,29 +1,16 @@
-
-
-import { useState, useEffect } from "react"
+import Image from 'next/image';
+import ArrowLeft from "$/assets/icons/arrow-left-emerald-300.svg"
+import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg"
+import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg"
+import { useState } from "react"
 import Checkbox from "../inputs/Checkbox"
 import ButtonPrimary from "../buttons/ButtonPrimary"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { Publication } from "@/utils/store/texture_tree.store"
+import { Publication, Experiment } from "../../utils/types"
 
-type Props = {
+type Props = Publication & {
     setDisplaySeeDetails:Function,
-    title:string,
-    journal:string,
-    year:number,
-    authors_full:string
-    authors_short:string
-    abstract:string,
-    exps:{
-        id:string,
-        metadata:{
-            label:string,
-            metadata:{
-                text:string
-            }|any
-        }[]
-    }[],
     setSearchBarVisible : Function
 }
 
@@ -32,7 +19,7 @@ type CheckedExp = {
     checked : boolean
 }
 
-export default function PublicationDetails({setDisplaySeeDetails, title,journal,year,authors_full,authors_short,abstract,exps, setSearchBarVisible}:Props) {
+export default function PublicationDetails({title,journal,year,authors_full,authors_short,abstract,exps, setDisplaySeeDetails, setSearchBarVisible}:Props) {
     const [display_abstract,setDisplayAbstract] = useState(false)
     const [checked, setChecked] = useState<CheckedExp[]>(exps.map((exp) => {
         return {
@@ -57,14 +44,25 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
     return(
         <>
         <div className='border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4'>
-            <p className="hover:underline cursor-pointer" onClick={() => setDisplaySeeDetails(false)}>{"<"} Back</p>
+            <Image 
+                priority
+                alt='back'
+                title='back'
+                className="w-4 h-4 cursor-pointer"
+                src={ArrowLeft}
+                onClick={() => setDisplaySeeDetails(false)}
+            />
+                
             <p className="font-semibold tracking-widest text-center pr-4 text-sky-200">{title}</p>
             <p className="italic text-slate-400 text-sm">{journal}, {year}</p>
             <p className="font-medium tracking-wide">{authors_full}</p>
             <div className="pt-2 pr-4" >
                 <p className="pb-1 font-semibold">Abstract : </p><p>{display_abstract? abstract : abstract.slice(0,90) + ' ...'}</p>
-                <p className="hover:underline text-right cursor-pointer" onClick={() => {setDisplayAbstract((prev => !prev))}}>
-                    {display_abstract ? "Hide" : "Full abstract"}</p>
+                <div className='cursor-pointer flex flex-row-reverse gap-2 items-center' onClick={() => {setDisplayAbstract((prev => !prev))}}>
+                    <Image src={display_abstract?ArrowUp:ArrowDown} priority alt="up" className='w-3 h-3'/>
+                    <p className="hover:underline text-right" >
+                        {display_abstract ? "Hide" : "Full abstract"}</p>
+                </div>
             </div>
             <div><ButtonPrimary onClick={async () => {
                     setSearchBarVisible(false)
@@ -76,7 +74,7 @@ export default function PublicationDetails({setDisplaySeeDetails, title,journal,
                     })
                     pushAll(res.flat())
                     addCollection({
-                        exps : request.exp_ids,
+                        exps :  exps.filter((exp : Experiment) => request.exp_ids.includes(exp.id)),
                         abstract,
                         authors_full,
                         authors_short,

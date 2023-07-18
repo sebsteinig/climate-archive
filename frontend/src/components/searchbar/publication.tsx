@@ -1,16 +1,7 @@
 import { useState } from "react"
 import PublicationDetails from "./publicationDetails"
 import ButtonSecondary from "../buttons/ButtonSecondary"
-
-export type Publication = {
-    title : string
-    authors_short : string
-    year : number
-    authors_full : string
-    abstract : string
-    journal : string
-    exps:any[],
-}
+import { Publication, Experiment } from "../../utils/types"
 
 type Props=   {
     publications : Publication[] 

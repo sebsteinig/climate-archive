@@ -32,7 +32,7 @@ export function TimeProvider(props:Props) {
         () => {
             console.log("USE EFFECT TIME PROVIDER");
             if(exps){
-                time_store.add(exps.exps,{})
+                time_store.add(exps.exps.map((exp) => exp.id),{})
             }
         }
     ,[exps])
@@ -71,14 +71,14 @@ export function TimeProvider(props:Props) {
                                         setTime(idx)
         
                                         if (div_ref.current) {
-                                            div_ref.current.textContent = exps.exps[idx]
+                                            div_ref.current.textContent = exps.exps[idx].id
                                         }
-                                        const branch = findInTree(exps.exps[idx],variable.name,tree)
+                                        const branch = findInTree(exps.exps[idx].id,variable.name,tree)
                                         if (branch) {
                                             const path = branch.mean.paths[0].grid[0][0]
                             
                                             Promise.all([texture_provider.getTexture(path),
-                                                texture_provider.getInfo(exps.exps[idx], variable.name)]
+                                                texture_provider.getInfo(exps.exps[idx].id, variable.name)]
                                                 )
                                                 .then(callback)
 
@@ -118,7 +118,7 @@ export function TimeProvider(props:Props) {
                     onChange = {(value) => {
                         if (div_ref.current) {
                             setT(value)
-                            div_ref.current.textContent = exps.exps[value]
+                            div_ref.current.textContent = exps.exps[value].id
                         }
                     }}
                     ref={time_ref}

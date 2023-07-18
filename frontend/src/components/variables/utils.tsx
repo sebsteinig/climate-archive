@@ -18,7 +18,7 @@ type Props = {
 export function Variable({toggle, src, active, title, controls, children}:PropsWithChildren<Props>) {
     const [open_control, setOpenControl] = useState(false)
     return (
-        <div className={`group flex flex-row bg-gray-900
+        <div className={`group flex flex-row bg-gray-900 cursor-pointer
          rounded-lg p-2 h-fit w-fit ${active ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""}`}>
             <Image onClick={() => toggle()}
                 priority

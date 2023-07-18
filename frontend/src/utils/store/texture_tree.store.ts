@@ -2,22 +2,9 @@ import { enableMapSet  } from "immer";
 import { StateCreator } from "zustand";
 import { TextureBranch, TextureLeaf, TextureTree } from "../texture_provider/texture_provider.types";
 import { VariableName } from "./variables/variable.types";
+import { Collection, Publication } from "../types";
 enableMapSet()
 
-
-export type Publication = {
-    title : string
-    authors_short : string
-    year : number
-    authors_full : string
-    abstract : string
-    journal : string
-    exps:string[],
-}
-
-export type Collection = {
-    exps : string[]
-}
 
 export interface TextureTreeSlice {
     texture_tree : TextureTree,
