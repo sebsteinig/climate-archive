@@ -15,6 +15,7 @@ export enum TimeState {
     stopped,
     playing,
     ready,
+    zero,
 } 
 
 export enum TimeSpeed {
@@ -35,7 +36,7 @@ export type TimeConfig = {
     mode? : TimeMode
 }
 
-export type TimeResultValue = {
+export type TimeFrameValue = {
     current : {
         idx : number
         exp : string
@@ -43,7 +44,7 @@ export type TimeResultValue = {
         time_chunk : number
         frame : number
     }
-    next ?: {
+    next : {
         idx : number
         exp : string
         info : TextureInfo
@@ -52,7 +53,10 @@ export type TimeResultValue = {
     }
     weight : number
 }
-export type TimeResult = Map<VariableName,TimeResultValue>
+export type TimeFrame = {
+    variables : Map<VariableName,TimeFrameValue>,
+    initialized:boolean
+}
 
 export type Time = {
     mode : TimeMode
@@ -60,7 +64,6 @@ export type Time = {
     kind : TimeKind
     state : TimeState
     speed : number
-    current_result? : TimeResult
+    current_frame : TimeFrame
     exps : string[]
-    next : (time:Time,current:TimeResult, delta:number,active_variable:VariableName[]) => Promise<TimeResult>
 }

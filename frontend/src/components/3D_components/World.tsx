@@ -65,7 +65,7 @@ export function World({ config, tick } : Props) {
       sphereRef.current!.rotation.y += delta / 3
     }
   })
-
+  
   return (
     <>
       {usePerformance && <Perf position='bottom-right' />}

@@ -12,7 +12,7 @@ type Props = {
 }
 
 export function TimeController({className,play,pause,stop}:Props) {
-    const [is_playing,setPlaying] = useState(true)
+    const [is_playing,setPlaying] = useState(false)
 
     return (
         <div className={className + "align-middle flex"}>

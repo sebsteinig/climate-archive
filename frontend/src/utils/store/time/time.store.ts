@@ -1,21 +1,20 @@
 import { StateCreator } from "zustand";
-import { Time, TimeConfig, TimeDirection, TimeKind, TimeMode, TimeResult, TimeSpeed, TimeState } from "./time.type";
-import { nextCircular } from "./time.utils";
+import { Time, TimeConfig, TimeDirection, TimeKind, TimeMode, TimeFrame, TimeSpeed, TimeState } from "./time.type";
 
 
 
 export interface TimeSlice {
     time : {
-        frames : Time[]
+        slots : Time[]
     
         add : (exps:string[],config:TimeConfig) => void
         remove : (idx:number) => void
 
-        prepare : (idx:number) => void
+        prepare : (idx:number,frame:TimeFrame,callback:(is_ready:boolean,frame:TimeFrame|undefined)=>void) => void
         play : (idx:number) => void
         pause : (idx:number) => void
         stop : (idx:number) => void
-        set : (idx:number,t:TimeResult | undefined) => void
+        set : (idx:number,t:TimeFrame) => void
     }
 }
 
@@ -25,12 +24,12 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
     (set) => {
         return {
             time : {
-                frames : [],
+                slots : [],
     
                 add : (exps:string[],config:TimeConfig) => {
                     const kind = config.kind ?? TimeKind.circular
                     const direction = config.direction ?? TimeDirection.forward
-                    const state = TimeState.ready
+                    const state = TimeState.zero
                     let config_speed = config.speed ?? TimeSpeed.medium
                     let speed = config_speed
                     if (config_speed === TimeSpeed.slow) {
@@ -49,39 +48,51 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                         direction,
                         speed,
                         state,
+                        current_frame: {
+                            variables : new Map(),
+                            initialized : false,
+                        },
                         exps,
                         idx : direction === TimeDirection.forward ? 0 : exps.length - 1,
-                        next : nextCircular
                     } as Time
                     set((state) => {
-                        state.time.frames.push(time)
+                        state.time.slots.push(time)
                     })
                 },
                 remove : (idx:number) => {
                     set((state) => {
-                        const size = state.time.frames.length
+                        const size = state.time.slots.length
                         if (idx >= 0 && idx < size) {
-                            state.time.frames.splice(idx,idx)
+                            state.time.slots.splice(idx,idx)
                         }
                     })
                 },
-                prepare : (idx:number) => {
+                prepare : (idx,frame,callback) => {
                     set((state) => {
-                        const size = state.time.frames.length
+                        const size = state.time.slots.length
                         if (idx < 0 || idx >= size) {
                             return
                         }
-                        const time = state.time.frames[idx]
-                        time.state = TimeState.ready
+                        const time = state.time.slots[idx]
+
+                        if(frame.variables.size > 0) {
+                            if(time.state === TimeState.zero || time.state === TimeState.stopped) {
+                                time.state = TimeState.ready
+                                time.current_frame = frame
+                            }
+                            callback(true,frame)
+                        }else {
+                            callback(false,undefined)
+                        }
                     })
                 },
                 play : (idx:number) => {
                     set((state) => {
-                        const size = state.time.frames.length
+                        const size = state.time.slots.length
                         if (idx < 0 || idx >= size) {
                             return
                         }
-                        const time = state.time.frames[idx]
+                        const time = state.time.slots[idx]
                         if (time.state === TimeState.ready || time.state === TimeState.paused) {
                             time.state = TimeState.playing
                         }
@@ -89,11 +100,11 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 pause : (idx:number) => {
                     set((state) => {
-                        const size = state.time.frames.length
+                        const size = state.time.slots.length
                         if (idx < 0 || idx >= size) {
                             return
                         }
-                        const time = state.time.frames[idx]
+                        const time = state.time.slots[idx]
                         if (time.state === TimeState.playing) {
                             time.state = TimeState.paused
                         }
@@ -101,19 +112,19 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 stop : (idx:number) => {
                     set((state) => {
-                        const size = state.time.frames.length
+                        const size = state.time.slots.length
                         if (idx < 0 || idx >= size) {
                             return
                         }
-                        const time = state.time.frames[idx]
+                        const time = state.time.slots[idx]
                         if (time.state === TimeState.playing || time.state === TimeState.paused) {
                             time.state = TimeState.stopped
                         }
                     })
                 },
-                set : (idx:number,t:TimeResult | undefined) => {
+                set : (idx:number,t:TimeFrame) => {
                     set(state=>{
-                        state.time.frames[idx].current_result = t
+                        state.time.slots[idx].current_frame = t
                     })
                 },
             }
