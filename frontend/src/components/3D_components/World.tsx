@@ -20,7 +20,7 @@ type Props = {
     model: string,
     heightData: string
   }
-  tick : (delta:number) => Promise<Map<VariableName,{current_url:string,next_url:string,weight:number}>>
+  tick : (delta:number) => Promise<Map<VariableName,{current_url:string,next_url:string,weight:number,current_info:TextureInfo,next_info:TextureInfo}>>
 }
 
 function buildTexture(data:ArrayBuffer,info:TextureInfo) {

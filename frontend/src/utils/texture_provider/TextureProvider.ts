@@ -167,6 +167,7 @@ class TextureProvider {
     }
 
     async getTexture(path:string) {
+        
         let texture = this.cache.get(path)
         if (!texture) {
             texture = await this.database.textures.get({path:path})

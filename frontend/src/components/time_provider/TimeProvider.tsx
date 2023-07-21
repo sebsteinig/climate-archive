@@ -11,7 +11,8 @@ import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { findInTree } from "@/utils/store/texture_tree.store"
 import { initFrame } from "@/utils/store/time/time.utils";
 import { View } from "@react-three/drei";
-import { tickBuilder } from "./tick";
+import { CanvasHolder, tickBuilder } from "./tick";
+import { produce } from "immer";
 
 
 type Props = {
@@ -33,17 +34,35 @@ export function TimeProvider(props:Props) {
     const tracking = useRef<HTMLDivElement>(null!)
     const [time_ref,setTime] = useTimeSlider()
     const variables = useClusterStore((state) => state.variables)
+    const tree = useClusterStore(state => state.texture_tree)
     const active_variable = useMemo(() => {
         return Object.values(variables).filter((v)=> v.active).map(e => e.name)
     },[variables])
 
     let [frames,setFrames] = useState<TimeFrame[]>(time_slots.map(time=>time.current_frame))
 
+    const current_canvas = document.createElement("canvas")
+    const current_ctx = current_canvas.getContext('2d')
+    const next_canvas = document.createElement("canvas")
+    const next_ctx = next_canvas.getContext('2d')
+    const context = {
+        current : {
+            canvas : current_canvas,
+            ctx : current_ctx,
+        },
+        next : {
+            canvas : next_canvas,
+            ctx : next_ctx,
+        }
+    } as CanvasHolder
+
     useEffect(
         ()=>{
             if(current) {
                 console.log('ADD NEW TIME');
-                addTime(current.exps,{})
+                addTime(current.exps,{
+                    mode:TimeMode.ts
+                })
             }
         }
     ,[current])
@@ -61,9 +80,13 @@ export function TimeProvider(props:Props) {
                         prepareTime(idx,frame,
                             (is_ready)=>{
                                 if(is_ready) {
-                                    console.log(frame);
+                                    setFrames(
+                                        produce((draft) => {
+                                            draft[idx] = frame;
+                                          })
+                                    )
                                 }else {
-                                    console.log('NOT READY');
+                                    
                                 }
                             }
                         )
@@ -76,7 +99,7 @@ export function TimeProvider(props:Props) {
     
     return (
         <>
-        <div ref={tracking} >
+        {/* <div ref={tracking} > */}
             <Canvas
                 camera={{
                 fov: 55,
@@ -88,9 +111,9 @@ export function TimeProvider(props:Props) {
             >
                 {time_slots.map((time,idx) => {
                     return (
-                        <View track={tracking} key={idx}>
-                            <World config={config} tick={tickBuilder(time,frames[idx],active_variable)}/>
-                        </View>
+                        // <View track={tracking} key={idx}>
+                            <World key={idx} config={config} tick={tickBuilder(time,frames[idx],active_variable,tree,context)}/>
+                        // </View>
                     )
                 })}
             </Canvas>
@@ -135,7 +158,7 @@ export function TimeProvider(props:Props) {
                     )
                 }
             )}
-        </div>
+        {/* </div> */}
         </>
     )
 }

@@ -25,7 +25,7 @@ function computeFramePos(ratio:number,timesteps:number,fpc:number):[number,numbe
     return [frame,time_chunk]
 }
 
-async function peekNextTs(
+export async function peekNextTs(
     exps:string[],
     variable:VariableName,
     nb_c:number,
@@ -40,7 +40,8 @@ async function peekNextTs(
             next_frame = 0
             next_chunk += 1
         }
-        if ( current_chunk >= nb_c) {
+        
+        if ( next_chunk >= nb_c) {
             next_chunk = 0
             next_idx = (next_idx + 1) % exps.length
         }
@@ -48,7 +49,7 @@ async function peekNextTs(
         return [next_frame,next_chunk,next_idx,exps[next_idx],info]
 }
 
-async function peekPreviousTs(
+export async function peekPreviousTs(
     exps:string[],
     variable:VariableName,
     nb_c:number,
@@ -78,6 +79,9 @@ async function syncMean(time:Time,frame:TimeFrame,active_variable:VariableName[]
     const sync_frame : TimeFrame = {
         variables : new Map(),
         initialized : true,
+    }
+    if(frame.variables.size === 0) {
+        return await initMean(time,active_variable)
     }
     const [_,ref] = frame.variables.entries().next().value as [VariableName, TimeFrameValue]
     
@@ -125,7 +129,10 @@ async function syncTs(time:Time,frame:TimeFrame,active_variable:VariableName[]):
     const sync_frame : TimeFrame = {
         variables : new Map(),
         initialized : true,
-    }    
+    } 
+    if(frame.variables.size === 0) {
+        return await initTs(time,active_variable)
+    }
     const [_,ref] = frame.variables.entries().next().value as [VariableName, TimeFrameValue]
     
     for( let variable of active_variable) {
