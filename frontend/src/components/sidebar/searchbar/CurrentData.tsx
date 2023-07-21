@@ -28,12 +28,10 @@ export function CurrentData({search_bar_visible, display_details, setDisplayDeta
             <div className={`bg-gray-900 max-w-full mt-3 rounded-md ${search_bar_visible?"hidden":""}`} >
                 <div className='overflow-y-auto overflow-x-hidden max-h-[80vh]' 
                     onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)} >
-                    <div onClick={()=> setDisplayDetails((prev : boolean) => {
-                            setCurrentVariableControls(undefined)
-                            return !prev
-                        })}
-                    > <CurrentTitle display_details={display_details} current_details = {current_details} />
-                    </div>
+                    <CurrentTitle onClick={()=> setDisplayDetails((prev : boolean) => {
+                                setCurrentVariableControls(undefined)
+                                return !prev})} 
+                        display_details={display_details} current_details = {current_details} />
                     { display_details && <>{isPublication(current_details) ?
                         <CurrentPublication current_details = {current_details}/>
                         :<ExperimentsTab exps={current_details.exps}/>
@@ -47,9 +45,10 @@ export function CurrentData({search_bar_visible, display_details, setDisplayDeta
     return(<></>)
 }
 
-function CurrentTitle({current_details, display_details} : {current_details : Publication | Collection, display_details : boolean}){
+function CurrentTitle({current_details, display_details, onClick} : {current_details : Publication | Collection, display_details : boolean, onClick : Function}){
     return(
-        <div className={`${display_details?"":" border-s-4 border-sky-300"} m-2 cursor-pointer px-4`}>
+        <div onClick={() => onClick()} 
+        className={`${display_details?"":" border-s-4 border-sky-300"} m-2 cursor-pointer px-4`}>
             {isPublication(current_details)
             ?<>
                 <p className="py-2 font-semibold text-sky-200">{current_details.title}</p>
@@ -60,7 +59,7 @@ function CurrentTitle({current_details, display_details} : {current_details : Pu
                         priority 
                         alt=""
                     />
-                {!display_details &&<p className="py-2 italic text-right text-slate-400">
+                {!display_details && <p className="py-2 italic text-right text-slate-400">
                     {`${current_details.authors_short} (${current_details.year})`}
                 </p>}
                 </div>
@@ -68,13 +67,15 @@ function CurrentTitle({current_details, display_details} : {current_details : Pu
             :<>
                 {current_details.exps.length>0 && <>
                     <p className="font-semibold text-sky-200"> 
-                        Collection of {current_details.exps.length} Experiment{current_details.exps.length>1?"s":""} : {current_details.exps[0].id}, ...
+                        Collection of {current_details.exps.length}
+                        Experiment{current_details.exps.length>1?"s":""} :
+                        {current_details.exps[0].id}, ...
                     </p>
                     <Image 
-                    src = {display_details?ArrowUp:ArrowDown} 
-                    className='w-4 h-4 cursor-pointer' 
-                    priority 
-                    alt=""
+                        src = {display_details?ArrowUp:ArrowDown} 
+                        className='w-4 h-4 cursor-pointer' 
+                        priority 
+                        alt=""
                     />
                 </>}
             </>
@@ -92,10 +93,9 @@ function CurrentPublication({current_details} : {current_details : Publication})
             <div className="pt-2 pr-4" >
                 <p className="pb-1 font-semibold">Abstract : </p>
                 <p>{display_abstract? current_details.abstract : current_details.abstract.slice(0,90) + ' ...'}</p>
-                <div className='cursor-pointer flex flex-row-reverse gap-2 items-center' 
+                <div className='cursor-pointer hover:underline text-right' 
                     onClick={() => {setDisplayAbstract((prev => !prev))}}>
-                    <p className="hover:underline text-right" >
-                        {display_abstract ? "Hide" : "Full abstract"}</p>
+                        {display_abstract ? "Hide" : "Full abstract"}
                 </div>
             </div>
             <ExperimentsTab exps = {current_details.exps}/>

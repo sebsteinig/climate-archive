@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import {useState} from 'react'
 import SearchIcon from "$/assets/icons/magnifying-glass-slate-500.svg"
 import SearchGreenIcon from "$/assets/icons/magnifying-glass-emerald-400.svg"
 
@@ -19,10 +18,8 @@ export function SearchButton({search_bar_visible, setSearchBarVisible}:Props) {
                         className="w-12 h-12 cursor-pointer px-2"
                         alt={"search"}
                     />
-                </div>
-                
-            </div>
-            
+                </div>                
+            </div>            
         </div>
     )    
 }
