@@ -1,4 +1,4 @@
-import { current, enableMapSet  } from "immer";
+import { enableMapSet  } from "immer";
 import { StateCreator } from "zustand";
 import { TextureBranch, TextureLeaf, TextureTree } from "../texture_provider/texture_provider.types";
 import { VariableName } from "./variables/variable.types";
@@ -8,15 +8,13 @@ enableMapSet()
 
 export interface TextureTreeSlice {
     texture_tree : TextureTree,
-    collections : {
-        current ?: Publication | Collection
-        store : (Publication | Collection)[]
-    }
-    current ?: string,
+    collections :  (Publication | Collection)[]
+    displayed_collections : Set<number>,
     addCollection : (collection:(Collection|Publication)) => void
     push : ((branch : TextureBranch) => void),
     pushAll :((branches : TextureBranch[]) => void)
-    setCurrent:((current : Publication|Collection) => void)
+    displayCollection:((idx : number) => void)
+    hideCollection:((idx : number) => void)
 }
 
 function pushBranchToTree(branch:TextureBranch,tree:TextureTree) {
@@ -46,16 +44,16 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
     (set) => {
         return {
             texture_tree : new Map(),
-            current : undefined,
-            collections : {
-                store : []
-            },
+            collections : [],
+            displayed_collections : new Set(),
             addCollection : (collection : (Collection | Publication)) => {
                 set(state => {
-                    if (!state.collections.store.includes(collection)){
-                        state.collections.store.push(collection)
+                    let idx = state.collections.indexOf(collection)
+                    if (idx === -1){
+                        state.collections.push(collection)
+                        idx = state.collections.length -1
                     }
-                    state.collections.current = collection
+                    state.displayed_collections.add(idx)
                 })
             },
             push : (branch : TextureBranch) => {
@@ -65,15 +63,25 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
             },
             pushAll : (branches : TextureBranch[]) => {
                 set((state) =>{
-                    state.current = branches[0].exp_id
                     branches.forEach((branch) => {
                         pushBranchToTree(branch,state.texture_tree)
                     })                
                 })
             },
-            setCurrent : (current : Publication|Collection) => {
+            displayCollection : (idx : number) => {
                 set((state) =>{
-                    state.collections.current = current
+                    if(idx < 0 || idx >= state.collections.length) {
+                        return
+                    }
+                    state.displayed_collections.add(idx)
+                })
+            },
+            hideCollection : (idx : number) => {
+                set((state) =>{
+                    if(idx < 0 || idx >= state.collections.length) {
+                        return
+                    }
+                    state.displayed_collections.delete(idx)
                 })
             }
         }

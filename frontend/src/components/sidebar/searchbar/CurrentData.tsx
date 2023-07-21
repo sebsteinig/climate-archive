@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Image from 'next/image';
 import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg";
@@ -15,13 +15,16 @@ type Props ={
 
 
 export function CurrentData({search_bar_visible, display_details, setDisplayDetails, setCurrentVariableControls} : Props){
-    const [collections] = useClusterStore((state) => [state.collections])
-    const [current_details, setCurrentDetails] = useState<Publication|Collection>()
+    const collections = useClusterStore((state) => state.collections)
     const [hover, setHover] = useState(false)
-    useEffect(()=>{    
-        setCurrentDetails(collections.current)
-        setDisplayDetails(false)
-    }, [collections.current])
+    const displayed_collections = useClusterStore((state) => state.displayed_collections)
+    const current_details = useMemo(()=>{    
+        if(displayed_collections.size !== 0){
+            const idx = displayed_collections.values().next().value as number
+            setDisplayDetails(false)
+            return {collection:collections[idx],idx}
+        }
+    }, [displayed_collections])
     
     if (current_details){
         return(
@@ -31,10 +34,10 @@ export function CurrentData({search_bar_visible, display_details, setDisplayDeta
                     <CurrentTitle onClick={()=> setDisplayDetails((prev : boolean) => {
                                 setCurrentVariableControls(undefined)
                                 return !prev})} 
-                        display_details={display_details} current_details = {current_details} />
-                    { display_details && <>{isPublication(current_details) ?
-                        <CurrentPublication current_details = {current_details}/>
-                        :<ExperimentsTab exps={current_details.exps}/>
+                        display_details={display_details} current_details = {current_details.collection} />
+                    { display_details && <>{isPublication(current_details.collection) ?
+                        <CurrentPublication current_details = {current_details.collection}/>
+                        :<ExperimentsTab exps={current_details.collection.exps}/>
                     }</>}
                     <ChangeData display_details={display_details} hover={hover} current_details = {current_details}/>
                 </div>
