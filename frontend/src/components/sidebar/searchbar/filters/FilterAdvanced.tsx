@@ -9,7 +9,7 @@ import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
-import { Collection } from "@/utils/store/texture_tree.store"
+import { Collection } from "../../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 type Exp = {
@@ -31,9 +31,10 @@ function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
     )
 }
 type Props = {
+    setSearchBarVisible:Function
 }
 
-export default function FilterAdvanced({}:Props) {
+export default function FilterAdvanced({setSearchBarVisible}:Props) {
     const [pushAll,addCollection] = useClusterStore((state) => [state.pushAll,state.addCollection])
     const [display,setDisplay] = useState(false)
     const [exp_ids,setExpIds] = useState<{exp_ids:Exp[], search:string}>({exp_ids:[],search:""})
@@ -220,8 +221,9 @@ export default function FilterAdvanced({}:Props) {
                 </span>
                 </div>
 
-                <ButtonSecondary onClick={
+                <ButtonSecondary disabled={exp_ids.exp_ids.length == 0} onClick={
                     async () =>{
+                        setSearchBarVisible(false)
                         const request = {
                             exp_ids: exp_ids.exp_ids.map(e=>e.id),
                             variables : variables,
@@ -238,7 +240,7 @@ export default function FilterAdvanced({}:Props) {
                         })
                         pushAll(res.flat())
                         addCollection({
-                            exps : request.exp_ids,
+                            exps : request.exp_ids.map((exp) => {return {id :exp, metadata : []} }),
                         } as Collection)
 
                     }

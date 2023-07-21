@@ -9,10 +9,6 @@ type Props = {
 export function Sic({}:Props) {
     const sic = useClusterStore((state) => state.variables.sic)
     return (
-        <Variable title = {"Sic"} toggle = {() => sic.toggle()}
-        src={MountainIcon} active = {sic.active}  controls = {false}>
-            <div>
-            </div>
-        </Variable> 
+        <></> 
     )
 }

@@ -1,4 +1,4 @@
-import { Variable } from "../utils"
+import { Variable, VariableProps } from "../utils"
 import WindsIcon from "$/assets/icons/winds-slate-500.svg";
 import WindsGreenIcon from "$/assets/icons/winds-emerald-300.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";
@@ -6,13 +6,12 @@ import InputNumber from "@/components/inputs/InputNumber";
 import Slider from "@/components/inputs/Slider";
 import Checkbox from "@/components/inputs/Checkbox";
 
-type Props = {
-}
-
-export function Winds({}:Props) {
+export function Winds({current_variable_controls, setCurrentVariableControls}:VariableProps) {
     const winds = useClusterStore((state) => state.variables.winds)
     return (
-        <Variable title = {"Jet Stream"} toggle = {() => winds.toggle()}
+        <Variable title = {winds.name} toggle = {() => winds.toggle()}
+        current_variable_controls = {current_variable_controls} 
+        setCurrentVariableControls={setCurrentVariableControls}
         src={winds.active?WindsGreenIcon:WindsIcon} active = {winds.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center py-1">

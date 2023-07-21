@@ -9,10 +9,6 @@ type Props = {
 export function Snc({}:Props) {
     const snc = useClusterStore((state) => state.variables.snc)
     return (
-        <Variable title = {"Surface"} toggle = {() => snc.toggle()}
-        src={MountainIcon} active = {snc.active}  controls = {false}>
-            <div>
-            </div>
-        </Variable> 
+        <></>
     )
 }

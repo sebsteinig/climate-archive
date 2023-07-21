@@ -9,7 +9,7 @@
       font-rubik overflow-hidden m-0 tracking-wider
   }
   h1 {
-    @apply text-emerald-300 text-4xl tracking-widest
+    @apply  text-2xl tracking-[.5em]
   }
   h2 {
     @apply text-emerald-300 text-2xl tracking-widest
