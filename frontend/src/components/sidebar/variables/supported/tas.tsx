@@ -8,10 +8,6 @@ type Props = {
 export function Tas({}:Props) {
     const tas = useClusterStore((state) => state.variables.tas)
     return (
-        <Variable title = {"Tas"} toggle = {() => tas.toggle()}
-        src={MountainIcon} active = {tas.active}  controls = {false}>
-            <div>
-            </div>
-        </Variable> 
+        <></> 
     )
 }

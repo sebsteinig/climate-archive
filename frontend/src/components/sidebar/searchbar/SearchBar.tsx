@@ -5,14 +5,14 @@ import FilterPublication from './filters/FilterPublication';
 import FilterLabels from './filters/FilterLabels';
 import FilterAdvanced from './filters/FilterAdvanced';
 import {Publications} from './publication';
-import { Publication } from "../../utils/types"
+import { Publication } from "../../../utils/types"
 import { DefaultParameter, SearchPublication } from '@/utils/api/api.types';
 import Image from 'next/image';
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import Cross from "$/assets/icons/cross-small-emerald-300.svg";
-import { FullWidthSeparator, MdSeparator } from '../separators/separators';
+import { FullWidthSeparator, MdSeparator } from '../../separators/separators';
 import { PropsWithChildren } from "react"
 
 // function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){

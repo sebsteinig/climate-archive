@@ -1,4 +1,4 @@
-import { enableMapSet  } from "immer";
+import { current, enableMapSet  } from "immer";
 import { StateCreator } from "zustand";
 import { TextureBranch, TextureLeaf, TextureTree } from "../texture_provider/texture_provider.types";
 import { VariableName } from "./variables/variable.types";
@@ -16,6 +16,7 @@ export interface TextureTreeSlice {
     addCollection : (collection:(Collection|Publication)) => void
     push : ((branch : TextureBranch) => void),
     pushAll :((branches : TextureBranch[]) => void)
+    setCurrent:((current : Publication|Collection) => void)
 }
 
 function pushBranchToTree(branch:TextureBranch,tree:TextureTree) {
@@ -51,7 +52,9 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
             },
             addCollection : (collection : (Collection | Publication)) => {
                 set(state => {
-                    state.collections.store.push(collection)
+                    if (!state.collections.store.includes(collection)){
+                        state.collections.store.push(collection)
+                    }
                     state.collections.current = collection
                 })
             },
@@ -66,6 +69,11 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
                     branches.forEach((branch) => {
                         pushBranchToTree(branch,state.texture_tree)
                     })                
+                })
+            },
+            setCurrent : (current : Publication|Collection) => {
+                set((state) =>{
+                    state.collections.current = current
                 })
             }
         }

@@ -9,11 +9,6 @@ type Props = {
 export function Liconc({}:Props) {
     const liconc = useClusterStore((state) => state.variables.liconc)
     return (
-        <Variable title = {"Liconc"} toggle={() => liconc.toggle()}
-        src = {MountainIcon} active = {liconc.active} controls = {false}>
-            <div >
-                
-            </div>
-        </Variable> 
+        <></> 
     )
 }

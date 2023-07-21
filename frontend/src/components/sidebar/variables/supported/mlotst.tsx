@@ -9,11 +9,6 @@ type Props = {
 export function Mlotst({}:Props) {
     const mlotst = useClusterStore((state) => state.variables.mlotst)
     return (
-        <Variable title = {"Mlotst"} toggle={() => mlotst.toggle()}
-        src = {MountainIcon} active = {mlotst.active} controls = {false}>
-            <div >
-                
-            </div>
-        </Variable> 
+        <></> 
     )
 }

@@ -9,7 +9,7 @@ import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
-import { Collection } from "../../../utils/types"
+import { Collection } from "../../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 type Exp = {

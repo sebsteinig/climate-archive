@@ -1,18 +1,19 @@
-import { Variable } from "../utils"
+import { Variable , VariableProps} from "../utils"
 import WaveIcon from "$/assets/icons/water-slate-500.svg";
 import WaveGreenIcon from "$/assets/icons/water-emerald-300.svg";
 import { useClusterStore } from "@/utils/store/cluster.store";
 import Slider from "@/components/inputs/Slider";
 import InputNumber from "@/components/inputs/InputNumber";
 import Checkbox from "@/components/inputs/Checkbox";
+import { VariableName } from "@/utils/store/variables/variable.types";
 
-type Props = {
-}
 
-export function Currents({}:Props) {
+export function Currents({current_variable_controls, setCurrentVariableControls}:VariableProps) {
     const currents = useClusterStore((state) => state.variables.currents)
     return (
-        <Variable title={"Currents"} toggle={() => currents.toggle()}
+        <Variable title={currents.name} toggle={() => currents.toggle()}
+        current_variable_controls = {current_variable_controls} 
+        setCurrentVariableControls={setCurrentVariableControls}
         src = {currents.active?WaveGreenIcon:WaveIcon} active={currents.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center py-1">

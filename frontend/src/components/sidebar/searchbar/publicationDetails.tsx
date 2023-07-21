@@ -3,11 +3,11 @@ import ArrowLeft from "$/assets/icons/arrow-left-emerald-300.svg"
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg"
 import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg"
 import { useState } from "react"
-import Checkbox from "../inputs/Checkbox"
-import ButtonPrimary from "../buttons/ButtonPrimary"
+import Checkbox from "../../inputs/Checkbox"
+import ButtonPrimary from "../../buttons/ButtonPrimary"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { Publication, Experiment } from "../../utils/types"
+import { Publication, Experiment } from "../../../utils/types"
 
 type Props = Publication & {
     setDisplaySeeDetails:Function,
