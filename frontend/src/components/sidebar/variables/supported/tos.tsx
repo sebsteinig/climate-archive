@@ -1,4 +1,4 @@
-import { Variable } from "../utils"
+import { Variable, VariableProps } from "../utils"
 import TemperatureIcon from "$/assets/icons/temperature-slate-500.svg";
 import TemperatureGreenIcon from "$/assets/icons/temperature-emerald-300.svg"
 import { useClusterStore } from "@/utils/store/cluster.store";
@@ -6,13 +6,12 @@ import Slider from "@/components/inputs/Slider";
 import InputNumber from "@/components/inputs/InputNumber";
 import Checkbox from "@/components/inputs/Checkbox";
 
-type Props = {
-}
-
-export function Tos({}:Props) {
+export function Tos({current_variable_controls, setCurrentVariableControls}:VariableProps) {
     const tos = useClusterStore((state) => state.variables.tos)
     return (
-        <Variable title = {"SST"} toggle = {() => tos.toggle()}
+        <Variable title = {tos.name} toggle = {() => tos.toggle()}
+        current_variable_controls = {current_variable_controls} 
+        setCurrentVariableControls={setCurrentVariableControls}
         src={tos.active?TemperatureGreenIcon:TemperatureIcon} active = {tos.active} controls = {true}>
             <div>
                 <div className="flex flex-wrap gap-2 items-center  py-1">

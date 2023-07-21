@@ -1,14 +1,23 @@
 import { StateCreator } from "zustand";
 import { Time, TimeConfig, TimeDirection, TimeKind, TimeMode, TimeFrame, TimeSpeed, TimeState } from "./time.type";
+import { buildTime } from "./time.utils";
 
 
 
 export interface TimeSlice {
     time : {
-        slots : Time[]
-    
-        add : (exps:string[],config:TimeConfig) => void
-        remove : (idx:number) => void
+        slots : {map:Map<number,Time>,last:number}
+        binder : Map<number,number> // collection => slot
+
+        saved_frames : Map<number,Map<number,TimeFrame>>
+
+        addSync : (collection_idx:number , config : TimeConfig| undefined) => void
+        addUnSync : (collection_idx:number, config : TimeConfig) => void
+
+        link : (collection_idx:number,time_slots_idx:number) => void
+        unlink : (collection_idx : number,config : TimeConfig) => void
+
+        remove : (collection_idx:number) => void
 
         prepare : (idx:number,frame:TimeFrame,callback:(is_ready:boolean,frame:TimeFrame|undefined)=>void) => void
         play : (idx:number) => void
@@ -24,56 +33,126 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
     (set) => {
         return {
             time : {
-                slots : [],
-    
-                add : (exps:string[],config:TimeConfig) => {
-                    const kind = config.kind ?? TimeKind.circular
-                    const direction = config.direction ?? TimeDirection.forward
-                    const state = TimeState.zero
-                    let config_speed = config.speed ?? TimeSpeed.medium
-                    let speed = config_speed
-                    if (config_speed === TimeSpeed.slow) {
-                        speed = 1000
-                    }
-                    if (config_speed === TimeSpeed.medium) {
-                        speed = 500
-                    }
-                    if (config_speed === TimeSpeed.fast) {
-                        speed = 250
-                    }
-                    const mode =  config.mode ?? TimeMode.mean
-                    const time = {
-                        mode,
-                        kind,
-                        direction,
-                        speed,
-                        state,
-                        current_frame: {
-                            variables : new Map(),
-                            initialized : false,
-                        },
-                        exps,
-                        idx : direction === TimeDirection.forward ? 0 : exps.length - 1,
-                    } as Time
+                slots : {map:new Map(),last:-1},
+                binder : new Map(),
+                saved_frames : new Map(),
+                addSync : (collection_idx:number , config : TimeConfig| undefined) => {
                     set((state) => {
-                        state.time.slots.push(time)
-                    })
-                },
-                remove : (idx:number) => {
-                    set((state) => {
-                        const size = state.time.slots.length
-                        if (idx >= 0 && idx < size) {
-                            state.time.slots.splice(idx,idx)
+                        const slots_size = state.time.slots.map.size
+                        let time:Time;
+                        let time_idx:number;
+                        if(slots_size === 0) {
+                            time = buildTime(config ?? {})
+                            state.time.slots.map.set(slots_size,time)
+                            time_idx = 0
+                            state.time.slots.last = time_idx
+                        }else {
+                            time = state.time.slots.map.get(state.time.slots.last)!
+                            time_idx = state.time.slots.last
                         }
+                        time.collections.add(collection_idx)
+                        state.time.binder.set(collection_idx,time_idx)
                     })
                 },
-                prepare : (idx,frame,callback) => {
+                addUnSync : (collection_idx:number, config : TimeConfig) => {
                     set((state) => {
-                        const size = state.time.slots.length
-                        if (idx < 0 || idx >= size) {
+                        let time = buildTime(config)
+                        time.collections.add(collection_idx)
+                        let idx = state.time.slots.map.size + 1
+                        state.time.slots.map.set(idx,time)
+                        state.time.slots.last = idx
+                        state.time.binder.set(collection_idx,idx)
+                    })
+                },
+        
+                link : (collection_idx:number,time_slots_idx:number) => {
+                    set(state => {
+                        const new_time = state.time.slots.map.get(time_slots_idx)
+                        if(!new_time) {
+                            return 
+                        }
+                        const prev_time_idx = state.time.binder.get(collection_idx)
+                        if (!prev_time_idx) {
                             return
                         }
-                        const time = state.time.slots[idx]
+                        state.time.binder.set(collection_idx,time_slots_idx)
+                        new_time.collections.add(collection_idx)
+                        const prev_time = state.time.slots.map.get(prev_time_idx)
+                        if(prev_time) {
+                            prev_time.collections.delete(collection_idx)
+                            if(prev_time.collections.size === 0) {
+                                state.time.slots.map.delete(prev_time_idx)
+                                if(prev_time_idx === state.time.slots.last) {
+                                    let new_last = -1
+                                    if(state.time.slots.map.size) {
+                                        new_last = state.time.slots.map.keys().next().value
+                                    }
+                                    state.time.slots.last = new_last
+                                }
+                            }
+                        }
+                    })
+                },
+                unlink : (collection_idx : number,config : TimeConfig) => {
+                    set(state => {
+                        let time = buildTime(config)
+                        time.collections.add(collection_idx)
+                        let idx = state.time.slots.map.size + 1
+                        state.time.slots.map.set(idx,time)
+                        const prev_time_idx = state.time.binder.get(collection_idx)
+                        if (!prev_time_idx) {
+                            return
+                        }
+                        state.time.binder.set(collection_idx,idx)
+                        const prev_time = state.time.slots.map.get(prev_time_idx)
+                        if(prev_time) {
+                            prev_time.collections.delete(collection_idx)
+                            if(prev_time.collections.size === 0) {
+                                state.time.slots.map.delete(prev_time_idx)
+                                if(prev_time_idx === state.time.slots.last) {
+                                    let new_last = -1
+                                    if(state.time.slots.map.size) {
+                                        new_last = state.time.slots.map.keys().next().value
+                                    }
+                                    state.time.slots.last = new_last
+                                }
+                            }
+                        }
+                    })
+                },
+
+                remove : (collection_idx:number) => {
+                    set((state) => {
+                        const prev_time_idx = state.time.binder.get(collection_idx)
+                        if (!prev_time_idx) {
+                            return
+                        }
+                        state.time.binder.delete(collection_idx)
+                        const prev_time = state.time.slots.map.get(prev_time_idx)
+                        if(prev_time) {
+                            prev_time.collections.delete(collection_idx)
+                            if(prev_time.collections.size === 0) {
+                                state.time.slots.map.delete(prev_time_idx)
+                                if(prev_time_idx === state.time.slots.last) {
+                                    let new_last = -1
+                                    if(state.time.slots.map.size) {
+                                        new_last = state.time.slots.map.keys().next().value
+                                    }
+                                    state.time.slots.last = new_last
+                                }
+                            }
+                        }
+                    })
+                },
+
+
+
+                prepare : (idx,frame,callback) => {
+                    set((state) => {
+                        const time = state.time.slots.map.get(idx)
+                        if(!time) { 
+                            return
+                        }
 
                         if(frame.variables.size > 0) {
                             if(time.state === TimeState.zero || time.state === TimeState.stopped) {
@@ -88,11 +167,11 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 play : (idx:number) => {
                     set((state) => {
-                        const size = state.time.slots.length
-                        if (idx < 0 || idx >= size) {
+                        const time = state.time.slots.map.get(idx)
+                        if(!time) { 
                             return
                         }
-                        const time = state.time.slots[idx]
+
                         if (time.state === TimeState.ready || time.state === TimeState.paused) {
                             time.state = TimeState.playing
                         }
@@ -100,11 +179,11 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 pause : (idx:number) => {
                     set((state) => {
-                        const size = state.time.slots.length
-                        if (idx < 0 || idx >= size) {
+                        const time = state.time.slots.map.get(idx)
+                        if(!time) { 
                             return
                         }
-                        const time = state.time.slots[idx]
+
                         if (time.state === TimeState.playing) {
                             time.state = TimeState.paused
                         }
@@ -112,11 +191,11 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 stop : (idx:number) => {
                     set((state) => {
-                        const size = state.time.slots.length
-                        if (idx < 0 || idx >= size) {
+                        const time = state.time.slots.map.get(idx)
+                        if(!time) { 
                             return
                         }
-                        const time = state.time.slots[idx]
+
                         if (time.state === TimeState.playing || time.state === TimeState.paused) {
                             time.state = TimeState.stopped
                         }
@@ -124,7 +203,12 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 set : (idx:number,t:TimeFrame) => {
                     set(state=>{
-                        state.time.slots[idx].current_frame = t
+                        const time = state.time.slots.map.get(idx)
+                        if(!time) { 
+                            return
+                        }
+
+                        time.current_frame = t
                     })
                 },
             }

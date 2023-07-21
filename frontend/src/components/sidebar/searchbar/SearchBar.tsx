@@ -4,52 +4,55 @@ import { searchPublication } from '@/utils/api/api';
 import FilterPublication from './filters/FilterPublication';
 import FilterLabels from './filters/FilterLabels';
 import FilterAdvanced from './filters/FilterAdvanced';
-import {Publication, Publications} from './publication';
+import {Publications} from './publication';
+import { Publication } from "../../../utils/types"
 import { DefaultParameter, SearchPublication } from '@/utils/api/api.types';
 import Image from 'next/image';
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg";
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
-import { FullWidthSeparator, MdSeparator } from '../separators/separators';
+import Cross from "$/assets/icons/cross-small-emerald-300.svg";
+import { FullWidthSeparator, MdSeparator } from '../../separators/separators';
 import { PropsWithChildren } from "react"
 
-function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
-    useEffect(() => {
-        if (ref) {
-            const onClick = ({target}: any) => {
-                if(target.parentNode && target.parentNode.parentNode && !ref.contains(target)) {
-                    !ref.contains(target) && onClickOut?.()
-                }
-            }
-            document.addEventListener("click", onClick);
-            return () => document.removeEventListener("click", onClick);
-        }
-    }, [ref, onClickOut]);
-}
+// function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
+//     useEffect(() => {
+//         if (ref) {
+//             const onClick = ({target}: any) => {
+//                 if(target.parentNode && target.parentNode.parentNode && !ref.contains(target)) {
+//                     !ref.contains(target) && onClickOut?.()
+//                 }
+//             }
+//             document.addEventListener("click", onClick);
+//             return () => document.removeEventListener("click", onClick);
+//         }
+//     }, [ref, onClickOut]);
+// }
 
 type MoreOptionsProps = {
     filters:SearchPublication,
+    setSearchBarVisible:Function,
     setRequestFilters:(filters:SearchPublication) => void,
 }
 
-function MoreOptions({filters,setRequestFilters,children}:PropsWithChildren<MoreOptionsProps>) {
+function MoreOptions({filters,setRequestFilters, setSearchBarVisible,children}:PropsWithChildren<MoreOptionsProps>) {
     return  (
         <div >
 
             <FilterPublication filters={filters} setRequestFilters={setRequestFilters}>{children}</FilterPublication>
             <br />
             {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
-            <FilterAdvanced />
+            <FilterAdvanced setSearchBarVisible={setSearchBarVisible} />
             <br />
         </div>
     )
 }
 
 type Props = {
-    
+    setSearchBarVisible : Function
 }
 
-export default function SearchBar({children}:PropsWithChildren<Props>) {
+export default function SearchBar({setSearchBarVisible, children}:PropsWithChildren<Props>) {
     const [search_panel_visible,setSearchPanelVisible] = useState(false)
     const [searched_content, setSearchContent] = useState<string>("")
     const search_panel_ref = useRef<HTMLDivElement>(null)
@@ -58,10 +61,10 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
 
     const [requestFilters,setRequestFilters] = useState<SearchPublication>({})
 
-    useOutsideClick(search_panel_ref.current!, () => {
-        setSearchPanelVisible(false)
-        setSearchContent("")
-    });
+    // useOutsideClick(search_panel_ref.current!, () => {
+    //     setSearchPanelVisible(false)
+    //     setSearchContent("")
+    // });
 
     useEffect(
         () => {
@@ -92,9 +95,14 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
         absolute top-0 right-0 lg:left-1/2 lg:-translate-x-1/2
         ${search_panel_visible && "max-sm:w-[calc(100%_-_2.5rem)]"}
         `} ref={search_panel_ref}>
-            <div  
-             onClick={() => setSearchPanelVisible(true)}
-             >
+                <Image 
+                    priority
+                    src={Cross}
+                    className={`w-8 h-8 absolute top-0 right-0 cursor-pointer`}
+                    alt="close"
+                    title="close search bar"
+                    onClick={() => setSearchBarVisible(false)}
+                />
                 <Image 
                     priority
                     src={SearchIcon}
@@ -126,7 +134,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                     {search_panel_visible && 
                         <>  
                             <div className='block text-end'>
-                                <p  className='text-right text-emerald-300 inline-flex'
+                                <p  className='text-right text-emerald-300 inline-flex cursor-pointer'
                                     onClick={() => {setDisplayMoreOptions((prev) => !prev)}}
                                 >More options {
                                     display_more_options ?
@@ -148,6 +156,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                             {
                                 display_more_options && 
                                 <MoreOptions   
+                                setSearchBarVisible = {setSearchBarVisible}
                                 filters={requestFilters}
                                 setRequestFilters={(filters:SearchPublication) => {
                                     setRequestFilters((prev) => {
@@ -175,8 +184,7 @@ export default function SearchBar({children}:PropsWithChildren<Props>) {
                         </>
                     }
                 </div>
-            </div>
-            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchPanelVisible = {setSearchPanelVisible}></Publications> }
+            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchBarVisible = {setSearchBarVisible}></Publications> }
         </div>
     )
 }

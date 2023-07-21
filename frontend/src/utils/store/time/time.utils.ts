@@ -1,5 +1,5 @@
 import { texture_provider } from "@/utils/texture_provider/TextureProvider";
-import { Time, TimeDirection, TimeKind, TimeMode, TimeFrame, TimeFrameValue, TimeState } from "./time.type";
+import { Time, TimeDirection, TimeKind, TimeMode, TimeFrame, TimeFrameValue, TimeState, TimeConfig, TimeSpeed } from "./time.type";
 import { VariableName } from "../variables/variable.types";
 import { initMean, initTs, sync } from "./handlers/utils";
 import { nextOnce } from "./handlers/once";
@@ -28,6 +28,34 @@ export async function initFrame(time:Time,active_variable:VariableName[]) {
         case TimeMode.ts:
             return await initTs(time,active_variable)
     }
+}
+
+export function buildTime(config:TimeConfig):Time {
+    const kind = config.kind ?? TimeKind.circular
+    const direction = config.direction ?? TimeDirection.forward
+    const state = TimeState.zero
+    let config_speed = config.speed ?? TimeSpeed.medium
+    let speed = config_speed
+    if (config_speed === TimeSpeed.slow) {
+        speed = 1000
+    }
+    if (config_speed === TimeSpeed.medium) {
+        speed = 500
+    }
+    if (config_speed === TimeSpeed.fast) {
+        speed = 250
+    }
+    const mode =  config.mode ?? TimeMode.mean
+    const time = {
+        mode,
+        kind,
+        direction,
+        speed,
+        state,
+        current_frame: new Map(),
+        collections : new Set(),
+    } as Time
+    return time
 }
 
 // export async function nextCircular(time:Time,current:TimeFrame,  delta:number,active_variable:VariableName[]):Promise<TimeFrame> {

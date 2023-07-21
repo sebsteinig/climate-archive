@@ -44,7 +44,6 @@ export function World({ config, tick } : Props) {
     rotate: false,
   })
 
-  const exps = useClusterStore((state) => state.collections.current)
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
   let texture = new THREE.TextureLoader()
 

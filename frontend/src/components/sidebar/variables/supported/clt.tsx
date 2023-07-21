@@ -10,10 +10,6 @@ type Props = {
 export function Clt(props:Props) {
     const clt = useClusterStore((state) => state.variables.clt)
     return (
-        <Variable title = {"Clt"} toggle={() => clt.toggle()}
-        src = {WindsIcon} active = {clt.active} controls = {false}>
-            <div>
-            </div>
-        </Variable> 
+        <></> 
     )
 }

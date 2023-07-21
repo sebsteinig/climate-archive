@@ -25,12 +25,10 @@ var config = {
   }
 
 export function TimeProvider(props:Props) {
-    const current = useClusterStore((state) => state.collections.current)
-    const addTime = useClusterStore((state)=> state.time.add)
     const prepareTime = useClusterStore((state)=> state.time.prepare)
     const playTime = useClusterStore((state)=> state.time.play)
     const pauseTime = useClusterStore((state)=> state.time.pause)
-    const time_slots = useClusterStore((state) => state.time.slots) 
+    const time_slots = useClusterStore((state) => state.time.slots.map) 
     const tracking = useRef<HTMLDivElement>(null!)
     const [time_ref,setTime] = useTimeSlider()
     const variables = useClusterStore((state) => state.variables)
@@ -39,7 +37,7 @@ export function TimeProvider(props:Props) {
         return Object.values(variables).filter((v)=> v.active).map(e => e.name)
     },[variables])
 
-    let [frames,setFrames] = useState<TimeFrame[]>(time_slots.map(time=>time.current_frame))
+    const saved_frames = useClusterStore(state=> state.time.saved_frames)
 
     const current_canvas = document.createElement("canvas")
     const current_ctx = current_canvas.getContext('2d')
@@ -58,23 +56,13 @@ export function TimeProvider(props:Props) {
 
     useEffect(
         ()=>{
-            if(current) {
-                console.log('ADD NEW TIME');
-                addTime(current.exps,{
-                    mode:TimeMode.ts
-                })
-            }
-        }
-    ,[current])
-    useEffect(
-        ()=>{
             // PREPARE EACH TIME FRAMES
-            Promise.all(time_slots.map(
-                async (time,idx):Promise<[number,TimeFrame]> =>{
+            Promise.all(Array.from(time_slots, (
+                async ([idx,time]):Promise<[number,TimeFrame]> =>{
                     const frame = await initFrame(time,active_variable)
                     return [idx,frame]
                 }
-            )).then(
+            ))).then(
                 (start_frames)=>{
                     start_frames.map(([idx,frame])=>{
                         prepareTime(idx,frame,
@@ -83,7 +71,7 @@ export function TimeProvider(props:Props) {
                                     setFrames(
                                         produce((draft) => {
                                             draft[idx] = frame;
-                                          })
+                                        })
                                     )
                                 }else {
                                     
@@ -109,7 +97,7 @@ export function TimeProvider(props:Props) {
                 }}
                 shadows
             >
-                {time_slots.map((time,idx) => {
+                {Array.from(time_slots, ([idx,time]) => {
                     return (
                         // <View track={tracking} key={idx}>
                             <World key={idx} config={config} tick={tickBuilder(time,frames[idx],active_variable,tree,context)}/>
@@ -117,8 +105,8 @@ export function TimeProvider(props:Props) {
                     )
                 })}
             </Canvas>
-            {time_slots.map(
-                (time,idx) => {
+            {Array.from(time_slots,
+                ([idx,time]) => {
 
                     return (
                         <div key={idx} className="absolute bottom-0 left-1/2 lg:-translate-x-1/2 w-1/2">
@@ -146,7 +134,7 @@ export function TimeProvider(props:Props) {
                                     return true
                                 }}
                             />
-                            <TimeSlider min={0} max={time.exps.length}
+                            <TimeSlider min={0} max={time.collections.size}
                                 className="w-full"
                                 onChange = {
                                     (value) => {

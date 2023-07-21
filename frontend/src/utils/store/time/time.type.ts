@@ -58,12 +58,14 @@ export type TimeFrame = {
     initialized:boolean
 }
 
+export type TimeMultipleFrames = Map<number,TimeFrame>
+
 export type Time = {
     mode : TimeMode
     direction : TimeDirection
     kind : TimeKind
     state : TimeState
     speed : number
-    current_frame : TimeFrame
-    exps : string[]
+    //current_frame : TimeMultipleFrames
+    collections : Set<number>
 }
