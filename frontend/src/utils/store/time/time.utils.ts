@@ -5,6 +5,7 @@ import { initMean, initTs, sync } from "./handlers/utils";
 import { nextOnce } from "./handlers/once";
 import { nextWalk } from "./handlers/walk";
 import { nextCircular } from "./handlers/circular";
+import { Experiment } from "@/utils/types";
 
 export function nextBuilder(time:Time) {
     switch (time.kind) {
@@ -17,16 +18,12 @@ export function nextBuilder(time:Time) {
     }
 }
 
-export async function initFrame(time:Time,active_variable:VariableName[]) {
-    if(time.current_frame.initialized 
-        && (time.state === TimeState.playing || time.state === TimeState.paused)) {
-        return await sync(time,time.current_frame,active_variable)
-    }
+export async function initFrame(time:Time,exps:Experiment[],active_variable:VariableName[]) {
     switch (time.mode) {
         case TimeMode.mean:
-            return await initMean(time,active_variable)
+            return await initMean(time,exps,active_variable)
         case TimeMode.ts:
-            return await initTs(time,active_variable)
+            return await initTs(time,exps,active_variable)
     }
 }
 

@@ -1,5 +1,6 @@
 import { TextureInfo } from "@/utils/database/Texture"
 import { VariableName } from "../variables/variable.types"
+import { Experiment } from "@/utils/types"
 
 export enum TimeKind {
     circular,
@@ -39,14 +40,14 @@ export type TimeConfig = {
 export type TimeFrameValue = {
     current : {
         idx : number
-        exp : string
+        exp : Experiment
         info : TextureInfo
         time_chunk : number
         frame : number
     }
     next : {
         idx : number
-        exp : string
+        exp : Experiment
         info : TextureInfo
         time_chunk : number
         frame : number

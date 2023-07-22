@@ -13,6 +13,7 @@ import { initFrame } from "@/utils/store/time/time.utils";
 import { View } from "@react-three/drei";
 import { CanvasHolder, tickBuilder } from "./tick";
 import { produce } from "immer";
+import { sync } from "@/utils/store/time/handlers/utils";
 
 
 type Props = {
@@ -25,7 +26,8 @@ var config = {
   }
 
 export function TimeProvider(props:Props) {
-    const prepareTime = useClusterStore((state)=> state.time.prepare)
+    const prepareTime = useClusterStore((state)=> state.time.prepareAll)
+    const saveAll = useClusterStore((state)=> state.time.saveAll)
     const playTime = useClusterStore((state)=> state.time.play)
     const pauseTime = useClusterStore((state)=> state.time.pause)
     const time_slots = useClusterStore((state) => state.time.slots.map) 
@@ -33,6 +35,7 @@ export function TimeProvider(props:Props) {
     const [time_ref,setTime] = useTimeSlider()
     const variables = useClusterStore((state) => state.variables)
     const tree = useClusterStore(state => state.texture_tree)
+    const collections = useClusterStore(state => state.collections)
     const active_variable = useMemo(() => {
         return Object.values(variables).filter((v)=> v.active).map(e => e.name)
     },[variables])
@@ -57,30 +60,59 @@ export function TimeProvider(props:Props) {
     useEffect(
         ()=>{
             // PREPARE EACH TIME FRAMES
-            Promise.all(Array.from(time_slots, (
-                async ([idx,time]):Promise<[number,TimeFrame]> =>{
-                    const frame = await initFrame(time,active_variable)
-                    return [idx,frame]
+            async function prepare() {
+                const res : [number,[number,TimeFrame][]][] = []
+                for(let [time_idx,time] of time_slots) {
+                    const row:[number,TimeFrame][] = []
+                    for(let collection_idx of time.collections) {
+                        const collection = collections.get(collection_idx)
+                        if (!collection) {
+                            continue;
+                        }
+                        let frame:TimeFrame;
+                        if(time.state === TimeState.playing || time.state === TimeState.paused) {
+                            frame = await sync(time,collection.exps,saved_frames.get(time_idx)!.get(collection_idx)!,active_variable)
+                        }else {
+                            frame = await initFrame(time,collection.exps,active_variable)
+                        }
+                        row.push([collection_idx,frame])
+                    }
+                    res.push([time_idx,row])
                 }
-            ))).then(
-                (start_frames)=>{
-                    start_frames.map(([idx,frame])=>{
-                        prepareTime(idx,frame,
-                            (is_ready)=>{
-                                if(is_ready) {
-                                    setFrames(
-                                        produce((draft) => {
-                                            draft[idx] = frame;
-                                        })
-                                    )
-                                }else {
-                                    
-                                }
-                            }
-                        )
-                    })
+                return res
+            }
+            prepare().then(
+                (res)=>{
+                    if(res.every((e)=> e[1].length != 0)) {
+                        prepareTime(res.map(e=>e[0]))
+                        saveAll(res)
+                    }
                 }
             )
+            // Promise.all(Array.from(time_slots, (
+            //     async ([idx,time]):Promise<[number,TimeFrame]> =>{
+            //         const frame = await initFrame(time,active_variable)
+            //         return [idx,frame]
+            //     }
+            // ))).then(
+            //     (start_frames)=>{
+            //         start_frames.map(([idx,frame])=>{
+            //             prepareTime(idx,frame,
+            //                 (is_ready)=>{
+            //                     if(is_ready) {
+            //                         setFrames(
+            //                             produce((draft) => {
+            //                                 draft[idx] = frame;
+            //                             })
+            //                         )
+            //                     }else {
+                                    
+            //                     }
+            //                 }
+            //             )
+            //         })
+            //     }
+            // )
         }
     ,[time_slots,active_variable])
     console.log('TIME PROVIDER CALL');
@@ -98,12 +130,15 @@ export function TimeProvider(props:Props) {
                 shadows
             >
                 {Array.from(time_slots, ([idx,time]) => {
-                    return (
-                        // <View track={tracking} key={idx}>
-                            <World key={idx} config={config} tick={tickBuilder(time,frames[idx],active_variable,tree,context)}/>
-                        // </View>
-                    )
-                })}
+                    return Array.from(time.collections, (collection_idx)=> {
+                        const frame = saved_frames.get(idx)!.get(collection_idx)!
+                        return (
+                            // <View track={tracking} key={idx}></View>
+                            <World key={idx} config={config} tick={tickBuilder(time,frame,active_variable,tree,context)}/>
+                            // </View>
+                        )
+                    })
+                }).flat()}
             </Canvas>
             {Array.from(time_slots,
                 ([idx,time]) => {

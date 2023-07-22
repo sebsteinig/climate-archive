@@ -19,11 +19,13 @@ export interface TimeSlice {
 
         remove : (collection_idx:number) => void
 
-        prepare : (idx:number,frame:TimeFrame,callback:(is_ready:boolean,frame:TimeFrame|undefined)=>void) => void
+        prepare : (idx:number) => void
+        prepareAll : (idxs:number[]) => void
         play : (idx:number) => void
         pause : (idx:number) => void
         stop : (idx:number) => void
-        set : (idx:number,t:TimeFrame) => void
+        save : (time_idx:number,collection_idx:number,t:TimeFrame) => void
+        saveAll : (x: [number,[number,TimeFrame][]][]) => void
     }
 }
 
@@ -147,22 +149,43 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
 
 
 
-                prepare : (idx,frame,callback) => {
+                prepare : (idx) => {
                     set((state) => {
                         const time = state.time.slots.map.get(idx)
                         if(!time) { 
                             return
                         }
 
-                        if(frame.variables.size > 0) {
-                            if(time.state === TimeState.zero || time.state === TimeState.stopped) {
-                                time.state = TimeState.ready
-                                time.current_frame = frame
+                        // if(frame.variables.size > 0) {
+                        //     if(time.state === TimeState.zero || time.state === TimeState.stopped) {
+                        //         time.state = TimeState.ready
+                        //         //time.current_frame = frame
+                        //     }
+                        //     callback(true,frame)
+                        // }else {
+                        //     callback(false,undefined)
+                        // }
+                    })
+                },           
+                prepareAll : (idxs:number[]) => {
+                    set((state) => {
+                        for (let idx of idxs) {
+                            const time = state.time.slots.map.get(idx)
+                            if(!time) { 
+                                continue
                             }
-                            callback(true,frame)
-                        }else {
-                            callback(false,undefined)
+                            time.state = TimeState.ready
                         }
+
+                        // if(frame.variables.size > 0) {
+                        //     if(time.state === TimeState.zero || time.state === TimeState.stopped) {
+                        //         time.state = TimeState.ready
+                        //         //time.current_frame = frame
+                        //     }
+                        //     callback(true,frame)
+                        // }else {
+                        //     callback(false,undefined)
+                        // }
                     })
                 },
                 play : (idx:number) => {
@@ -201,16 +224,32 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                         }
                     })
                 },
-                set : (idx:number,t:TimeFrame) => {
+                save : (time_idx:number,collection_idx:number,t:TimeFrame) => {
                     set(state=>{
-                        const time = state.time.slots.map.get(idx)
+                        const time = state.time.slots.map.get(time_idx)
                         if(!time) { 
                             return
                         }
-
-                        time.current_frame = t
+                        if(time.collections.has(collection_idx)) {
+                            const x = state.time.saved_frames.get(time_idx)
+                            if(x) {
+                                x.set(collection_idx,t)
+                            }
+                        } 
                     })
                 },
+                saveAll : (res: [number,[number,TimeFrame][]][]) => {
+                    set(state=> {
+                        for(let [time_idx,frames] of res){
+                            for(let [collection_idx,frame] of frames) {
+                                const x = state.time.saved_frames.get(time_idx)
+                                if(x) {
+                                    x.set(collection_idx,frame)
+                                }
+                            }
+                        }
+                    })
+                }
             }
         }
     }

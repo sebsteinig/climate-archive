@@ -2,6 +2,7 @@ import { texture_provider } from "@/utils/texture_provider/TextureProvider";
 import { VariableName } from "../../variables/variable.types";
 import { Time, TimeDirection, TimeFrame, TimeFrameValue, TimeMode } from "../time.type";
 import { TextureInfo } from "@/utils/database/Texture";
+import { Experiment } from "@/utils/types";
 
 export function chunksDetails(info:TextureInfo):[number,number] {
     const cs = info.paths_ts.paths[0].grid[0].length // number of chunks
@@ -26,13 +27,13 @@ function computeFramePos(ratio:number,timesteps:number,fpc:number):[number,numbe
 }
 
 export async function peekNextTs(
-    exps:string[],
+    exps:Experiment[],
     variable:VariableName,
     nb_c:number,
     fpc:number,
     current_frame:number,
     current_chunk:number,
-    current_idx:number,):Promise<[number,number,number,string,TextureInfo]>{
+    current_idx:number,):Promise<[number,number,number,Experiment,TextureInfo]>{
         let next_idx = current_idx
         let next_chunk = current_chunk
         let next_frame = current_frame + 1
@@ -45,18 +46,18 @@ export async function peekNextTs(
             next_chunk = 0
             next_idx = (next_idx + 1) % exps.length
         }
-        const info = await texture_provider.getInfo(exps[next_idx],variable)
+        const info = await texture_provider.getInfo(exps[next_idx].id,variable)
         return [next_frame,next_chunk,next_idx,exps[next_idx],info]
 }
 
 export async function peekPreviousTs(
-    exps:string[],
+    exps:Experiment[],
     variable:VariableName,
     nb_c:number,
     fpc:number,
     current_frame:number,
     current_chunk:number,
-    current_idx:number,):Promise<[number,number,number,string,TextureInfo]>{
+    current_idx:number,):Promise<[number,number,number,Experiment,TextureInfo]>{
         let next_idx = current_idx
         let next_chunk = current_chunk
         let next_frame = current_frame - 1
@@ -64,10 +65,10 @@ export async function peekPreviousTs(
             next_frame = fpc - 1
             next_chunk -= 1
         }
-        let info = await texture_provider.getInfo(exps[next_idx],variable)
+        let info = await texture_provider.getInfo(exps[next_idx].id,variable)
         if ( current_chunk < 0) {
             next_idx = (exps.length + next_idx - 1) % exps.length
-            info = await texture_provider.getInfo(exps[next_idx],variable)
+            info = await texture_provider.getInfo(exps[next_idx].id,variable)
             const [new_nb_c,new_fpc] = chunksDetails(info) 
             next_chunk = new_nb_c - 1
             next_frame = new_fpc - 1 
@@ -75,13 +76,13 @@ export async function peekPreviousTs(
         return [next_frame,next_chunk,next_idx,exps[next_idx],info]
 }
 
-async function syncMean(time:Time,frame:TimeFrame,active_variable:VariableName[]):Promise<TimeFrame> {
+async function syncMean(time:Time,exps:Experiment[],frame:TimeFrame,active_variable:VariableName[]):Promise<TimeFrame> {
     const sync_frame : TimeFrame = {
         variables : new Map(),
         initialized : true,
     }
     if(frame.variables.size === 0) {
-        return await initMean(time,active_variable)
+        return await initMean(time,exps,active_variable)
     }
     const [_,ref] = frame.variables.entries().next().value as [VariableName, TimeFrameValue]
     
@@ -93,7 +94,7 @@ async function syncMean(time:Time,frame:TimeFrame,active_variable:VariableName[]
             sync_frame.variables.set(variable,res)
             continue;
         }
-        const current_info = await texture_provider.getInfo(ref.current.exp,variable)
+        const current_info = await texture_provider.getInfo(ref.current.exp.id,variable)
         const current = {
             idx : ref.current.idx,
             exp : ref.current.exp,
@@ -102,9 +103,9 @@ async function syncMean(time:Time,frame:TimeFrame,active_variable:VariableName[]
             frame : 0, // same here 
         }
 
-        const next_idx = (ref.current.idx + didx) % time.exps.length
-        const next_exp = time.exps[next_idx]
-        const next_info = await texture_provider.getInfo(next_exp,variable)
+        const next_idx = (ref.current.idx + didx) % exps.length
+        const next_exp = exps[next_idx]
+        const next_info = await texture_provider.getInfo(next_exp.id,variable)
         
         const next = {
             idx : next_idx,
@@ -125,13 +126,13 @@ async function syncMean(time:Time,frame:TimeFrame,active_variable:VariableName[]
     return sync_frame
 }
 
-async function syncTs(time:Time,frame:TimeFrame,active_variable:VariableName[]):Promise<TimeFrame> {
+async function syncTs(time:Time,exps:Experiment[],frame:TimeFrame,active_variable:VariableName[]):Promise<TimeFrame> {
     const sync_frame : TimeFrame = {
         variables : new Map(),
         initialized : true,
     } 
     if(frame.variables.size === 0) {
-        return await initTs(time,active_variable)
+        return await initTs(time,exps,active_variable)
     }
     const [_,ref] = frame.variables.entries().next().value as [VariableName, TimeFrameValue]
     
@@ -141,7 +142,7 @@ async function syncTs(time:Time,frame:TimeFrame,active_variable:VariableName[]):
             sync_frame.variables.set(variable,res)
             continue;
         }
-        const current_info = await texture_provider.getInfo(ref.current.exp,variable)
+        const current_info = await texture_provider.getInfo(ref.current.exp.id,variable)
 
         const ratio = computeRatio(ref)
         const [nb_c,fpc] = chunksDetails(current_info)
@@ -157,9 +158,9 @@ async function syncTs(time:Time,frame:TimeFrame,active_variable:VariableName[]):
         }
         let next_frame,next_chunk,next_idx,next_exp,next_info;
         if (time.direction === TimeDirection.forward ) {
-            [next_frame,next_chunk,next_idx,next_exp,next_info] = await peekNextTs(time.exps,variable,nb_c,fpc,current_frame,current_chunk,ref.current.idx)
+            [next_frame,next_chunk,next_idx,next_exp,next_info] = await peekNextTs(exps,variable,nb_c,fpc,current_frame,current_chunk,ref.current.idx)
         }else {
-            [next_frame,next_chunk,next_idx,next_exp,next_info] = await peekPreviousTs(time.exps,variable,nb_c,fpc,current_frame,current_chunk,ref.current.idx)
+            [next_frame,next_chunk,next_idx,next_exp,next_info] = await peekPreviousTs(exps,variable,nb_c,fpc,current_frame,current_chunk,ref.current.idx)
         }
 
         const next = {
@@ -180,16 +181,16 @@ async function syncTs(time:Time,frame:TimeFrame,active_variable:VariableName[]):
     return sync_frame
 }
 
-export async function sync(time:Time,frame:TimeFrame,active_variable:VariableName[]):Promise<TimeFrame> {
+export async function sync(time:Time,exps:Experiment[],frame:TimeFrame,active_variable:VariableName[]):Promise<TimeFrame> {
     switch (time.mode) {
         case TimeMode.mean:
-            return await syncMean(time,frame,active_variable)
+            return await syncMean(time,exps,frame,active_variable)
         case TimeMode.ts:
-            return await syncTs(time,frame,active_variable)
+            return await syncTs(time,exps,frame,active_variable)
     }
 }
 
-export async function initMean(time:Time,active_variable:VariableName[]):Promise<TimeFrame> {
+export async function initMean(time:Time,exps:Experiment[],active_variable:VariableName[]):Promise<TimeFrame> {
     const frame:TimeFrame = {
         variables: new Map(),
         initialized : true,
@@ -202,16 +203,16 @@ export async function initMean(time:Time,active_variable:VariableName[]):Promise
             idx_one = 1
             break;
         case TimeDirection.backward:
-            idx_zero = time.exps.length - 1
-            idx_one = time.exps.length - 2 
+            idx_zero = exps.length - 1
+            idx_one = exps.length - 2 
             break;
         }
-    let exp_zero = time.exps[idx_zero]
-    let exp_one = time.exps[idx_one]
+    let exp_zero = exps[idx_zero]
+    let exp_one = exps[idx_one]
     for( let variable of active_variable) {
 
-        const info_zero = await texture_provider.getInfo(exp_zero,variable)
-        const info_one = await texture_provider.getInfo(exp_one,variable)
+        const info_zero = await texture_provider.getInfo(exp_zero.id,variable)
+        const info_one = await texture_provider.getInfo(exp_one.id,variable)
 
         const value : TimeFrameValue = {
             current : {
@@ -234,7 +235,7 @@ export async function initMean(time:Time,active_variable:VariableName[]):Promise
     }
             return frame
 }
-export async function initTs(time:Time,active_variable:VariableName[]):Promise<TimeFrame> {
+export async function initTs(time:Time,exps:Experiment[],active_variable:VariableName[]):Promise<TimeFrame> {
     const frame:TimeFrame = {
         variables: new Map(),
         initialized : true,
@@ -246,13 +247,13 @@ export async function initTs(time:Time,active_variable:VariableName[]):Promise<T
             idx = 0
             break;
         case TimeDirection.backward:
-            idx = time.exps.length - 1
+            idx = exps.length - 1
             break;
     }
-    let exp= time.exps[idx]
+    let exp= exps[idx]
 
     for( let variable of active_variable) {
-        const info = await texture_provider.getInfo(exp,variable)
+        const info = await texture_provider.getInfo(exp.id,variable)
         const ts = info.timesteps
         const [cs,fs] = chunksDetails(info)
 
@@ -274,7 +275,7 @@ export async function initTs(time:Time,active_variable:VariableName[]):Promise<T
                 }
                 break;
             case TimeDirection.backward:
-                idx = time.exps.length - 1
+                idx = exps.length - 1
                 if( fs > 1) {
                     frame_zero = fs - 1
                     chunks_zero = cs - 1

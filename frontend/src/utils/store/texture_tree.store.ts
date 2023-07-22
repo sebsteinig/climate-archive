@@ -8,7 +8,8 @@ enableMapSet()
 
 export interface TextureTreeSlice {
     texture_tree : TextureTree,
-    collections :  (Publication | Collection)[]
+    collections :  Map<number,Publication | Collection>,
+    __collections_lookup : Map<Publication | Collection,number>
     displayed_collections : Set<number>,
     addCollection : (collection:(Collection|Publication)) => void
     push : ((branch : TextureBranch) => void),
@@ -44,14 +45,15 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
     (set) => {
         return {
             texture_tree : new Map(),
-            collections : [],
+            collections : new Map(),
+            __collections_lookup : new Map(),
             displayed_collections : new Set(),
             addCollection : (collection : (Collection | Publication)) => {
                 set(state => {
-                    let idx = state.collections.indexOf(collection)
-                    if (idx === -1){
-                        state.collections.push(collection)
-                        idx = state.collections.length -1
+                    let idx  = state.__collections_lookup.get(collection)
+                    if ( ! idx){
+                        idx = state.collections.size
+                        state.collections.set(idx,collection)
                     }
                     state.displayed_collections.add(idx)
                 })
@@ -70,18 +72,16 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
             },
             displayCollection : (idx : number) => {
                 set((state) =>{
-                    if(idx < 0 || idx >= state.collections.length) {
-                        return
+                    if(state.collections.has(idx)) {
+                        state.displayed_collections.add(idx)
                     }
-                    state.displayed_collections.add(idx)
                 })
             },
             hideCollection : (idx : number) => {
                 set((state) =>{
-                    if(idx < 0 || idx >= state.collections.length) {
-                        return
+                    if(state.collections.has(idx)) {
+                        state.displayed_collections.delete(idx)
                     }
-                    state.displayed_collections.delete(idx)
                 })
             }
         }
