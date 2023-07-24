@@ -12,7 +12,7 @@ type Props = {
 
 export function ChangeData({display_details, current_details, hover} : Props){
     const [collections, displayCollection] = useClusterStore((state) => [state.collections, state.displayCollection])
-    const other_data = useMemo(()=>collections.map((e,idx) => {return {idx,collection:e}}).filter((e) => e.idx !== current_details.idx ),[collections])
+    const other_data = useMemo(()=>Array.from(collections,(([idx,e]) => {return {idx,collection:e}})).filter((e) => e.idx !== current_details.idx ),[collections])
     if (other_data.length > 0){
         return(
             <div>

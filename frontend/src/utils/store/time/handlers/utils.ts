@@ -81,7 +81,7 @@ async function syncMean(time:Time,exps:Experiment[],frame:TimeFrame,active_varia
         variables : new Map(),
         initialized : true,
     }
-    if(frame.variables.size === 0) {
+    if(!frame.initialized || frame.variables.size === 0) {
         return await initMean(time,exps,active_variable)
     }
     const [_,ref] = frame.variables.entries().next().value as [VariableName, TimeFrameValue]
@@ -131,7 +131,7 @@ async function syncTs(time:Time,exps:Experiment[],frame:TimeFrame,active_variabl
         variables : new Map(),
         initialized : true,
     } 
-    if(frame.variables.size === 0) {
+    if(!frame.initialized || frame.variables.size === 0) {
         return await initTs(time,exps,active_variable)
     }
     const [_,ref] = frame.variables.entries().next().value as [VariableName, TimeFrameValue]

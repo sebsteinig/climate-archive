@@ -4,6 +4,7 @@ import { nextBuilder } from "@/utils/store/time/time.utils";
 import { VariableName } from "@/utils/store/variables/variable.types";
 import { texture_provider } from "@/utils/texture_provider/TextureProvider";
 import { TextureBranch, TextureTree } from "@/utils/texture_provider/texture_provider.types";
+import { Experiment } from "@/utils/types";
 
 export type CanvasHolder = {
     current : {
@@ -61,21 +62,21 @@ export function crop(canvas:HTMLCanvasElement,
     return canvas.toDataURL("image/png")
 }
 
-export function tickBuilder(time:Time,frame:TimeFrame,active_variable:VariableName[],tree:TextureTree,context:CanvasHolder){
+export function tickBuilder(time:Time,exps:Experiment[],frame:TimeFrame,active_variable:VariableName[],tree:TextureTree,context:CanvasHolder){
     const next = nextBuilder(time)
     return async function tick(delta:number) {
         if (time.state !== TimeState.playing || !frame.initialized) {
             return new Map()
         }
         //console.log('tick');
-        frame = await next(time,frame,delta,active_variable)
+        frame = await next(time,exps,frame,delta,active_variable)
         if(!frame.initialized) {
             return new Map()
         }
         const res = new Map()
         for ( let [variable,data] of frame.variables ) {
-            const current_branch = findInTree(data.current.exp,variable,tree)
-            const next_branch = findInTree(data.next.exp,variable,tree)
+            const current_branch = findInTree(data.current.exp.id,variable,tree)
+            const next_branch = findInTree(data.next.exp.id,variable,tree)
             if(!current_branch || !next_branch) {
                 continue;
             }

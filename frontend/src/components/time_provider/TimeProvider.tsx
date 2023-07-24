@@ -56,16 +56,19 @@ export function TimeProvider(props:Props) {
             ctx : next_ctx,
         }
     } as CanvasHolder
-
+    console.log({time_slots});
+    
     useEffect(
         ()=>{
             // PREPARE EACH TIME FRAMES
             async function prepare() {
                 const res : [number,[number,TimeFrame][]][] = []
+                
                 for(let [time_idx,time] of time_slots) {
                     const row:[number,TimeFrame][] = []
                     for(let collection_idx of time.collections) {
                         const collection = collections.get(collection_idx)
+                        
                         if (!collection) {
                             continue;
                         }
@@ -83,7 +86,7 @@ export function TimeProvider(props:Props) {
             }
             prepare().then(
                 (res)=>{
-                    if(res.every((e)=> e[1].length != 0)) {
+                    if(res.every((e)=> e[1].length > 0)) {
                         prepareTime(res.map(e=>e[0]))
                         saveAll(res)
                     }
@@ -131,12 +134,16 @@ export function TimeProvider(props:Props) {
             >
                 {Array.from(time_slots, ([idx,time]) => {
                     return Array.from(time.collections, (collection_idx)=> {
-                        const frame = saved_frames.get(idx)!.get(collection_idx)!
-                        return (
-                            // <View track={tracking} key={idx}></View>
-                            <World key={idx} config={config} tick={tickBuilder(time,frame,active_variable,tree,context)}/>
-                            // </View>
-                        )
+                        if(saved_frames.has(idx) && saved_frames.get(idx)?.get(collection_idx)) {
+                            const frame = saved_frames.get(idx)!.get(collection_idx)!
+                            return (
+                                // <View track={tracking} key={idx}></View>
+                                <World key={idx} config={config} tick={tickBuilder(time,collections.get(collection_idx)!.exps,frame,active_variable,tree,context)}/>
+                                // </View>
+                            )
+                        }else {
+                            return null
+                        }
                     })
                 }).flat()}
             </Canvas>
@@ -157,6 +164,8 @@ export function TimeProvider(props:Props) {
                                     return false
                                 }}
                                 pause = {() => {
+                                    console.log({state:time.state});
+                                    
                                     if(time.state === TimeState.playing) {
                                         console.log('PAUSE');
                                         

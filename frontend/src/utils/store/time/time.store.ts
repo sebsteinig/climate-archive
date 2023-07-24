@@ -171,10 +171,13 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                     set((state) => {
                         for (let idx of idxs) {
                             const time = state.time.slots.map.get(idx)
+                            
                             if(!time) { 
                                 continue
                             }
-                            time.state = TimeState.ready
+                            if(time.state === TimeState.zero || time.state === TimeState.stopped) {
+                                time.state = TimeState.ready
+                            }
                         }
 
                         // if(frame.variables.size > 0) {
@@ -240,11 +243,16 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 },
                 saveAll : (res: [number,[number,TimeFrame][]][]) => {
                     set(state=> {
+                        
                         for(let [time_idx,frames] of res){
                             for(let [collection_idx,frame] of frames) {
                                 const x = state.time.saved_frames.get(time_idx)
                                 if(x) {
                                     x.set(collection_idx,frame)
+                                }else {
+                                    const map = new Map()
+                                    map.set(collection_idx,frame)
+                                    state.time.saved_frames.set(time_idx,map)
                                 }
                             }
                         }

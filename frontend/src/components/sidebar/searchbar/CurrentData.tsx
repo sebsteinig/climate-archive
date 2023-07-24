@@ -5,6 +5,7 @@ import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg";
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg";
 import { Publication, isPublication, Collection, Experiment } from '../../../utils/types';
 import { ChangeData } from './ChangeData';
+import { TimeMode } from '@/utils/store/time/time.type';
 
 type Props ={
     display_details : boolean
@@ -22,10 +23,21 @@ export function CurrentData({search_bar_visible, display_details, setDisplayDeta
         if(displayed_collections.size !== 0){
             const idx = displayed_collections.values().next().value as number
             setDisplayDetails(false)
-            return {collection:collections[idx],idx}
+            if(collections.has(idx)){
+                return {collection:collections.get(idx)!,idx}
+            }else {
+                return undefined
+            }
         }
     }, [displayed_collections])
-    
+    const addSync = useClusterStore((state) => state.time.addSync)
+    useEffect(
+        ()=>{
+            if(current_details) {
+                addSync(current_details.idx,{mode:TimeMode.ts})
+            }
+        }
+    ,[current_details])
     if (current_details){
         return(
             <div className={`bg-gray-900 max-w-full mt-3 rounded-md ${search_bar_visible?"hidden":""}`} >
