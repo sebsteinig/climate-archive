@@ -1,6 +1,5 @@
 "use client";
 import { Canvas } from "@react-three/fiber"
-import { Leva } from "leva"
 import { World } from "../3D_components/World"
 import { useEffect, useRef, useState, useMemo, RefObject } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
@@ -10,10 +9,12 @@ import { Time, TimeMode, TimeFrame, TimeState } from "@/utils/store/time/time.ty
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { findInTree } from "@/utils/store/texture_tree.store"
 import { initFrame } from "@/utils/store/time/time.utils";
-import { View } from "@react-three/drei";
+import { CameraControls, OrbitControls, PerspectiveCamera, PivotControls, View } from "@react-three/drei";
 import { CanvasHolder, tickBuilder } from "./tick";
 import { produce } from "immer";
 import { sync } from "@/utils/store/time/handlers/utils";
+import { Plane } from "../3D_components/Plane";
+import THREE from "three";
 
 
 type Props = {
@@ -31,7 +32,6 @@ export function TimeProvider(props:Props) {
     const playTime = useClusterStore((state)=> state.time.play)
     const pauseTime = useClusterStore((state)=> state.time.pause)
     const time_slots = useClusterStore((state) => state.time.slots.map) 
-    const tracking = useRef<HTMLDivElement>(null!)
     const [time_ref,setTime] = useTimeSlider()
     const variables = useClusterStore((state) => state.variables)
     const tree = useClusterStore(state => state.texture_tree)
@@ -92,67 +92,26 @@ export function TimeProvider(props:Props) {
                     }
                 }
             )
-            // Promise.all(Array.from(time_slots, (
-            //     async ([idx,time]):Promise<[number,TimeFrame]> =>{
-            //         const frame = await initFrame(time,active_variable)
-            //         return [idx,frame]
-            //     }
-            // ))).then(
-            //     (start_frames)=>{
-            //         start_frames.map(([idx,frame])=>{
-            //             prepareTime(idx,frame,
-            //                 (is_ready)=>{
-            //                     if(is_ready) {
-            //                         setFrames(
-            //                             produce((draft) => {
-            //                                 draft[idx] = frame;
-            //                             })
-            //                         )
-            //                     }else {
-                                    
-            //                     }
-            //                 }
-            //             )
-            //         })
-            //     }
-            // )
         }
     ,[time_slots,active_variable])
     console.log('TIME PROVIDER CALL');
-    
+    const container_ref = useRef<HTMLDivElement>(null!)
+    const view1 = useRef<HTMLDivElement>(null!)
+    const view2 = useRef<HTMLDivElement>(null!)
     return (
-        <>
-        {/* <div ref={tracking} > */}
-            <Canvas
-                camera={{
-                fov: 55,
-                near: 0.1,
-                far: 200,
-                position: [3, 2, 9],
-                }}
-                shadows
-            >
-                {Array.from(time_slots, ([idx,time]) => {
-                    return Array.from(time.collections, (collection_idx)=> {
-                        if(saved_frames.has(idx) && saved_frames.get(idx)?.get(collection_idx)) {
-                            const frame = saved_frames.get(idx)!.get(collection_idx)!
-                            return (
-                                // <View track={tracking} key={idx}></View>
-                                <World key={idx} config={config} tick={tickBuilder(time,collections.get(collection_idx)!.exps,frame,active_variable,tree,context)}/>
-                                // </View>
-                            )
-                        }else {
-                            return null
-                        }
-                    })
-                }).flat()}
-            </Canvas>
-            {Array.from(time_slots,
+        <>        
+        <div ref={container_ref} className="w-full h-full grid grid-cols-2 grid-rows-1 gap-4">
+            <div ref={view1} className="w-full h-full border-2 border-red-500" >
+            </div>
+            <div ref={view2} className="w-full h-full border-2 border-green-500" >
+            </div>
+
+            {/* {Array.from(time_slots,
                 ([idx,time]) => {
 
                     return (
                         <div key={idx} className="absolute bottom-0 left-1/2 lg:-translate-x-1/2 w-1/2">
-                            {/* <div ref={div_ref}></div> */}
+                            {/* <div ref={div_ref}></div> 
                             <TimeController          
                                 play = {() => {
                                     if(time.state !== TimeState.zero) {
@@ -189,8 +148,51 @@ export function TimeProvider(props:Props) {
                         </div>
                     )
                 }
-            )}
-        {/* </div> */}
-        </>
+            )} */}
+
+            <div className="absolute top-0 left-0 w-screen h-screen border-2 border-yellow-300">
+                <Canvas
+                camera={{
+                fov: 55,
+                near: 0.1,
+                far: 200,
+                position: [3, 2, 9],
+                }}
+                frameloop="demand"
+                shadows
+                eventSource={document.getElementById('root')!}
+                >
+                    {/* {Array.from(time_slots, ([idx,time]) => {
+                        return Array.from(time.collections, (collection_idx)=> {
+                            if(saved_frames.has(idx) && saved_frames.get(idx)?.get(collection_idx)) {
+                                const frame = saved_frames.get(idx)!.get(collection_idx)!
+                                return (
+                                    <View index={idx+1} track={tracking} key={idx}>
+                                        <World key={idx} config={config} tick={tickBuilder(time,collections.get(collection_idx)!.exps,frame,active_variable,tree,context)}/>
+                                    </View>
+                                )
+                            }else {
+                                return null
+                            }
+                        })
+                    }).flat()} */}
+                    <View track={view1}>
+                        <World config={config} tick={async (x)=>new Map()}/>
+                        {/* <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} /> */}
+                        {/* <OrbitControls makeDefault /> */}
+                        <CameraControls makeDefault />
+                    </View>
+                    <View track={view2}>
+                        <World config={config} tick={async (x)=>new Map()}/>
+                        {/* <World config={config} tick={async (x)=>new Map()}/> */}
+                        {/* <PerspectiveCamera  position={[3, 2, 9]} fov={55} near={0.1} far={200} /> */}
+                        {/* <OrbitControls makeDefault/> */}
+                        <CameraControls makeDefault />
+                    </View>
+                </Canvas>
+            </div>
+        </div>
+        
+            </>
     )
 }
