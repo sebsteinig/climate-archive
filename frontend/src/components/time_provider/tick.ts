@@ -5,6 +5,7 @@ import { VariableName } from "@/utils/store/variables/variable.types";
 import { texture_provider } from "@/utils/texture_provider/TextureProvider";
 import { TextureBranch, TextureTree } from "@/utils/texture_provider/texture_provider.types";
 import { Experiment } from "@/utils/types";
+import { LRUCache } from "lru-cache";
 
 export type CanvasHolder = {
     current : {
@@ -40,15 +41,25 @@ export function getPath(mode:TimeMode,data:TimeFrameValue,current_branch:Texture
     }
 }
 
+const cache : LRUCache<string,string> = new LRUCache({
+    max:100
+})
+
 export function crop(canvas:HTMLCanvasElement,
     ctx:CanvasRenderingContext2D,
     img:ImageBitmap,
+    path:string,
     frame:number,
     vertical:number,
     xsize:number,
     ysize:number) {
     canvas.width = xsize
     canvas.height = ysize
+    
+    let res = cache.get(JSON.stringify({path,frame,vertical}))
+    if (res) {
+        return res        
+    }
     ctx.drawImage(img,
         frame * xsize,
         vertical * ysize, // TODO VERTICAL
@@ -59,7 +70,9 @@ export function crop(canvas:HTMLCanvasElement,
         xsize,
         ysize
     )
-    return canvas.toDataURL("image/png")
+    res =  canvas.toDataURL("image/png")
+    cache.set(JSON.stringify({path,frame,vertical}),res)
+    return res
 }
 
 export function tickBuilder(time:Time,exps:Experiment[],frame:TimeFrame,active_variable:VariableName[],tree:TextureTree,context:CanvasHolder){
@@ -98,6 +111,7 @@ export function tickBuilder(time:Time,exps:Experiment[],frame:TimeFrame,active_v
             const current_url = crop(
                 context.current.canvas,
                 context.current.ctx,current_bitmap,
+                current_path,
                 data.current.frame ,
                 0,
                 data.current.info.xsize,
@@ -106,6 +120,7 @@ export function tickBuilder(time:Time,exps:Experiment[],frame:TimeFrame,active_v
             const next_url = crop(
                 context.next.canvas,
                 context.next.ctx,current_bitmap,
+                next_path,
                 data.next.frame ,
                 0,
                 data.next.info.xsize,
