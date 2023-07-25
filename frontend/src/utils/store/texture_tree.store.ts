@@ -2,14 +2,17 @@ import { enableMapSet  } from "immer";
 import { StateCreator } from "zustand";
 import { TextureBranch, TextureLeaf, TextureTree } from "../database_provider/database_provider.types";
 import { VariableName } from "./variables/variable.types";
-import { Collection } from "../types";
+import { Publication, Experiments } from "../types";
+import { isPublication } from "../types.utils";
 
 enableMapSet()
+
+type Collection = Publication | Experiments
 
 export interface TextureTreeSlice {
     texture_tree : TextureTree
     collections :  Map<number,Collection>
-    __collections_lookup : Map<Collection,number>
+    __collections_lookup : Map<(string | Experiments),number>
     displayed_collections : Map<number, number>
     addCollection : (collection:Collection) => void
     push : ((branch : TextureBranch) => void)
@@ -50,11 +53,11 @@ export const createTextureTreeSlice : StateCreator<TextureTreeSlice,[["zustand/i
             displayed_collections : new Map(),
             addCollection : (collection : Collection ) => {
                 set(state => {
-                     let idx  = state.__collections_lookup.get(collection)
+                    let idx  = state.__collections_lookup.get(isPublication(collection)?collection.title+collection.authors_short:JSON.stringify(collection))                    
                     if ( ! idx){
                         idx = state.collections.size
-                        state.collections.set(idx,collection)
-                        state.__collections_lookup.set(collection, idx)
+                        state.collections.set(idx,collection)                        
+                        state.__collections_lookup.set(isPublication(collection)?collection.title+collection.authors_short:JSON.stringify(collection), idx)
                     }
                     state.displayed_collections.clear()
                     state.displayed_collections.set(idx, 1)

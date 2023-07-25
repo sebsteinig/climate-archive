@@ -13,8 +13,7 @@ export default function UI({journals}:Props) {
     const addCollection = useClusterStore((state) => state.addCollection)
     useEffect(
         () => {
-            Promise.all([database_provider.loadAllColections()]).then((e) => e[0].map((element) =>{addCollection(element.data)} ))    
-
+            Promise.all([database_provider.loadAllColections()]).then((e) => e[0].map((element) =>{addCollection(element.data)} ))
         },[]
     )
     

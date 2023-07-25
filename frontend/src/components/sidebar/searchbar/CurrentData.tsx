@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Image from 'next/image';
 import Dots from "$/assets/icons/dots-slate-500.svg"
 import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg";
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg";
-import { Publication, Collection, Experiment } from '../../../utils/types';
+import { Publication, Experiment, Experiments } from '../../../utils/types';
 import {isPublication} from '../../../utils/types.utils';
 import { ChangeData } from './ChangeData';
-import Cross from "$/assets/icons/cross-small-emerald-300.svg";
 import { MdSeparator } from '@/components/separators/separators';
 
 type Props ={
@@ -20,20 +19,7 @@ type Props ={
 export function CurrentData({search_bar_visible, display_details, setDisplayDetails, setCurrentVariableControls} : Props){
     const collections = useClusterStore((state) => state.collections)
     const displayed_collections = useClusterStore((state) => state.displayed_collections)
-    const [display_all, setDisplayAll] = useState(false)
-    // const current_details = useMemo(()=>{    
-    //     if(displayed_collections.size !== 0){
-    //         const idx = displayed_collections.values().next().value as number
-    //         setDisplayDetails(false)
-    //         let coll = collections.get(idx)
-    //         if (coll){
-    //             return {collection : coll,idx}
-    //         }
-    //     }
-    //     console.log(displayed_collections);
-        
-    // }, [displayed_collections])
-    
+    const [display_all, setDisplayAll] = useState(false)    
         return(
             <div className={`bg-gray-900 mt-3 rounded-md 
                             ${displayed_collections.size >1 && !display_all?"h-fit w-fit p-2" : ""}
@@ -68,7 +54,10 @@ type DisplayProps = {
     onClick : Function
 }
 
-function OneCollection({current_details, display_details, onClick} :  DisplayProps&{ current_details :{collection : Collection|undefined, idx : number}}){
+type OneCollectioneProps = DisplayProps & {
+    current_details :{collection : (Publication|Experiments)|undefined, idx : number}
+}
+function OneCollection({current_details, display_details, onClick} : OneCollectioneProps){
     const [hover, setHover] = useState(false)
     if(current_details.collection){
         return(
@@ -93,9 +82,10 @@ function OneCollection({current_details, display_details, onClick} :  DisplayPro
     }
 }
 
-
-function CurrentTitle({current_details, display_details, onClick} : DisplayProps & {current_details :{collection : Collection, idx : number}}){
-    const hideCollection = useClusterStore((state) => state.hideCollection)
+type CurrentTitleProps = DisplayProps & {
+    current_details :{collection : (Publication|Experiments), idx : number}
+}
+function CurrentTitle({current_details, display_details, onClick} : CurrentTitleProps){
     return(
         <div onClick={() => onClick()} 
         className={`${display_details?"":" border-s-4 border-sky-300"} m-2 cursor-pointer ${!display_details&&"px-4"}`}>
@@ -115,29 +105,20 @@ function CurrentTitle({current_details, display_details, onClick} : DisplayProps
                 </div>
             </div>}
 
-            {! isPublication(current_details.collection) &&<>
-                {current_details.collection.exps.length>0 && <>
-                    <p className="font-semibold text-sky-200"> 
-                        Collection of {current_details.collection.exps.length}
-                        Experiment{current_details.collection.exps.length>1?"s":""} :
-                        {current_details.collection.exps[0].id}, ...
-                    </p>
-                    <Image 
-                        src = {display_details?ArrowUp:ArrowDown} 
-                        className='w-4 h-4 cursor-pointer' 
-                        priority 
-                        alt=""
-                    />
-                </>}
+            {(!isPublication(current_details.collection) && current_details.collection.exps.length>0 ) &&
+            <>
+                <p className="font-semibold text-sky-200"> 
+                    Collection of {current_details.collection.exps.length}
+                     Experiment{current_details.collection.exps.length>1?"s":""} :
+                     {current_details.collection.exps[0].id}, {current_details.collection.exps.length>1?"...":""}
+                </p>
+                <Image 
+                    src = {display_details?ArrowUp:ArrowDown} 
+                    className='w-4 h-4 cursor-pointer' 
+                    priority 
+                    alt=""
+                />
             </>}
-            {/* <Image 
-                priority
-                src={Cross}
-                className={`w-8 h-8 m-1 cursor-pointer`}
-                alt="close"
-                title="close"
-                onClick={() => hideCollection(current_details.idx)}
-            /> */}
         </div> 
         </div>
     )    

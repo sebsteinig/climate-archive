@@ -6,7 +6,7 @@ import { RequestMultipleTexture, RequestTexture, TextureBranch, TextureLeaf } fr
 import { LRUCache } from 'lru-cache'
 import { VariableName } from "../store/variables/variable.types"
 import { SelectSingleResult } from "../api/api.types"
-import { Experiments, Publication } from "../types"
+import { Experiment, Experiments, Publication } from "../types"
 import { collectionEquals } from "../types.utils"
 
 class TextureNotFound extends Error {
@@ -188,13 +188,25 @@ class DatabaseProvider {
     }
 
     async addCollectionToDb(collection : Publication | Experiments) {
-        const is_already = await this.database.collections.filter((e)=>
-            {return collectionEquals(collection, e.data)}
-        )
-        if (!is_already || (await is_already.toArray()).length === 0) {
-            return this.database.collections.add({data : collection}).then((result) => {return result})
+        const collections_array = await(this.database.collections.filter((e)=>
+        {return collectionEquals(collection, e.data)}
+        )).toArray()
+        
+        if (!collections_array || collections_array.length === 0) {
+            this.database.collections.add({data : collection})
+        } else {
+            const map_experiments = new Map<string,Experiment>()
+            for(let exp of collection.exps) {
+                map_experiments.set(exp.id,exp)
+            }
+            for(let exp of collections_array[0].data.exps){
+                map_experiments.set(exp.id, exp)
+            }
+            
+            this.database.collections.filter((e)=>
+                {return collectionEquals(collection, e.data)}
+            ).modify({"data.exps":Array.from(map_experiments).map((v) => v[1])})
         }
-        return -1
     }
 }
 

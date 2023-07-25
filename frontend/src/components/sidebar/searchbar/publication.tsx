@@ -19,16 +19,19 @@ export function Publications( {publications, more_options, setSearchBarVisible} 
                 {(publications.length > 0 && !display_see_details) && 
                     publications.map((publication: Publication,idx:number) => {
                         return(
-                            <div key={idx} className='border-s-4 border-sky-300 group mb-2 px-4 hover:opacity-100 opacity-80'>
+                            <div key={idx} 
+                            className='border-s-4 border-sky-300 group mb-2 px-4 cursor-pointer 
+                            hover:opacity-100 opacity-80'
+                            onClick={() => {
+                                setDisplaySeeDetails(true)
+                                setDisplayedPublication(publication)
+                                console.log("load")
+                            }}>
                                 <p className="font-semibold text-sky-200">{publication.title}</p>
                                 <p className="italic text-right text-slate-400">{`${publication.authors_short} (${publication.year})`}</p>
                                     <ButtonSecondary 
                                         className="hidden group-hover:block"
-                                        onClick={() => {
-                                        setDisplaySeeDetails(true)
-                                        setDisplayedPublication(publication)
-                                        console.log("load")
-                                    }}>See Details
+                                        onClick={() => {}}>See Details
                                 </ButtonSecondary>
                             </div>
                         )                        

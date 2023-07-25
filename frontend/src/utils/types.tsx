@@ -22,9 +22,3 @@ export type Publication = {
 export type Experiments = {
     exps : Experiment[]
 }
-
-// export type Collection =  {
-//     id : number
-//     collection : Experiments | Publication
-// }
-export type Collection = Experiments | Publication

@@ -23,5 +23,5 @@ export function collectionEquals(c1 : Experiments | Publication, c2 : Experiment
             return equals
         }
     }
-    return true
+    return false
 }

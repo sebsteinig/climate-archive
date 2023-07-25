@@ -65,7 +65,7 @@ export default function PublicationDetails({title,journal,year,authors_full,auth
                         {display_abstract ? "Hide" : "Full abstract"}</p>
                 </div>
             </div>
-            <div><ButtonPrimary onClick={async () => {
+            <ButtonPrimary disabled = {nb_checked=== 0} onClick={async () => {
                     setSearchBarVisible(false)
                     const request = {
                         exp_ids : checked.filter(e => e.checked).map(e => e.exp),
@@ -85,9 +85,9 @@ export default function PublicationDetails({title,journal,year,authors_full,auth
                     } as Publication
                     database_provider.addCollectionToDb(collection)
                     addCollection(collection)
-                }
+                }                
             }> {`Load ${nb_checked === checked.length ? "all ":""} ${nb_checked} experiment${nb_checked >1 ? "s" : ""}`}
-            </ButtonPrimary></div>
+            </ButtonPrimary>
                 <div className="pt-3 pr-5">
                 <div className="overflow-y-visible overflow-x-hidden max-h-52">
                 <table className='w-11/12 table-fixed border-t-0 border' id="exps-table">

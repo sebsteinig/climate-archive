@@ -1,12 +1,12 @@
 import ButtonSecondary from '@/components/buttons/ButtonSecondary';
 import { useMemo } from 'react'
-import { Collection } from '../../../utils/types';
+import { Publication, Experiments } from '../../../utils/types';
 import {isPublication} from '../../../utils/types.utils';
 import { useClusterStore } from '@/utils/store/cluster.store';
 
 type Props = {
     display_details : boolean
-    current_details : {collection : Collection, idx : number}
+    current_details : {collection : Publication|Experiments, idx : number}
     hover : boolean
 }
 
