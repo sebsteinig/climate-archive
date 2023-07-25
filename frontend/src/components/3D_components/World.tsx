@@ -23,23 +23,12 @@ type Props = {
   tick : (delta:number) => Promise<Map<VariableName,{current_url:string,next_url:string,weight:number,current_info:TextureInfo,next_info:TextureInfo}>>
 }
 
-function buildTexture(data:ArrayBuffer,info:TextureInfo) {
-  var blob = new Blob([data], { type: "image/png" });
-  var url = URL.createObjectURL(blob);
-  var texture = new THREE.TextureLoader().load(url);
-  //, THREE.RGBAFormat, THREE.UnsignedByteType
-  // var dataView = new DataView(data);
-  // let texture = new THREE.DataTexture(dataView, info.xsize, info.ysize);
-  texture.needsUpdate = true;
-  return texture;
-}
-
 export function World({ config, tick } : Props) {
   // for Leva debug GUI (there must be a better way for this ...)
-  const { usePerformance, useTitle } = useControls('global', {
-    usePerformance: true,
-    useTitle: true,
-  })
+  // const { usePerformance, useTitle } = useControls('global', {
+  //   usePerformance: true,
+  //   useTitle: true,
+  // })
   const { rotate } = useControls('Globe', {
     rotate: false,
   })
@@ -67,7 +56,7 @@ export function World({ config, tick } : Props) {
   
   return (
     <>
-      {usePerformance && <Perf position='bottom-right' />}
+      {<Perf position='bottom-right' />}
       {/* {useTitle && <Title config={config}/>} */}
       <Controls />
       <Lights />

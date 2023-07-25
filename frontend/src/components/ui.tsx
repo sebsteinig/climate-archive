@@ -13,7 +13,7 @@ export default function UI({journals}:Props) {
         <>        
             <TimeProvider />
             {/* <TestImage/> */}
-            <SideBar journals={journals}/>
+            {/* <SideBar journals={journals}/> */}
         </>
     )
   }
