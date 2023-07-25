@@ -98,14 +98,63 @@ export function TimeProvider(props:Props) {
     const container_ref = useRef<HTMLDivElement>(null!)
     const view1 = useRef<HTMLDivElement>(null!)
     const view2 = useRef<HTMLDivElement>(null!)
+    const view3 = useRef<HTMLDivElement>(null!)
     return (
         <>        
-        <div ref={container_ref} className="w-full h-full grid grid-cols-2 grid-rows-1 gap-4">
+        <div ref={container_ref} className="relative w-full h-full grid grid-cols-3 grid-rows-1 gap-4">
+            <div className="fixed top-0 left-0 -z-10 w-screen h-screen border-2 border-yellow-300">
+                <Canvas
+                camera={{
+                fov: 55,
+                near: 0.1,
+                far: 200,
+                position: [3, 2, 9],
+                }}
+                //frameloop="demand"
+                shadows
+                eventSource={container_ref}
+                >
+                    {/* {Array.from(time_slots, ([idx,time]) => {
+                        return Array.from(time.collections, (collection_idx)=> {
+                            if(saved_frames.has(idx) && saved_frames.get(idx)?.get(collection_idx)) {
+                                const frame = saved_frames.get(idx)!.get(collection_idx)!
+                                return (
+                                    <View index={idx+1} track={tracking} key={idx}>
+                                        <World key={idx} config={config} tick={tickBuilder(time,collections.get(collection_idx)!.exps,frame,active_variable,tree,context)}/>
+                                    </View>
+                                )
+                            }else {
+                                return null
+                            }
+                        })
+                    }).flat()} */}
+                    <View track={view1}>
+                        <World config={config} tick={async (x)=>new Map()}/>
+                        {/* <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} /> */}
+                        {/* <OrbitControls makeDefault /> */}
+                        {/* <OrbitControls  makeDefault enableZoom={true} enableRotate={true} /> */}
+                    </View>
+                    <View track={view2}>
+                        <World config={config} tick={async (x)=>new Map()}/>
+                        {/* <World config={config} tick={async (x)=>new Map()}/> */}
+                        {/* <PerspectiveCamera  makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
+                        <OrbitControls makeDefault/> */}
+                    </View>
+                    <View track={view3}>
+                        <World config={config} tick={async (x)=>new Map()}/>
+                        {/* <World config={config} tick={async (x)=>new Map()}/> */}
+                        <PerspectiveCamera  makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
+                        <OrbitControls makeDefault/>
+                    </View>
+                    <OrbitControls  makeDefault enableZoom={true} enableRotate={true}/>
+                </Canvas>
+            </div>
             <div ref={view1} className="w-full h-full border-2 border-red-500" >
             </div>
             <div ref={view2} className="w-full h-full border-2 border-green-500" >
             </div>
-
+            <div ref={view3} className="w-full h-full border-2 border-green-500" >
+            </div>
             {/* {Array.from(time_slots,
                 ([idx,time]) => {
 
@@ -149,48 +198,6 @@ export function TimeProvider(props:Props) {
                     )
                 }
             )} */}
-
-            <div className="absolute top-0 left-0 w-screen h-screen border-2 border-yellow-300">
-                <Canvas
-                camera={{
-                fov: 55,
-                near: 0.1,
-                far: 200,
-                position: [3, 2, 9],
-                }}
-                frameloop="demand"
-                shadows
-                eventSource={document.getElementById('root')!}
-                >
-                    {/* {Array.from(time_slots, ([idx,time]) => {
-                        return Array.from(time.collections, (collection_idx)=> {
-                            if(saved_frames.has(idx) && saved_frames.get(idx)?.get(collection_idx)) {
-                                const frame = saved_frames.get(idx)!.get(collection_idx)!
-                                return (
-                                    <View index={idx+1} track={tracking} key={idx}>
-                                        <World key={idx} config={config} tick={tickBuilder(time,collections.get(collection_idx)!.exps,frame,active_variable,tree,context)}/>
-                                    </View>
-                                )
-                            }else {
-                                return null
-                            }
-                        })
-                    }).flat()} */}
-                    <View track={view1}>
-                        <World config={config} tick={async (x)=>new Map()}/>
-                        {/* <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} /> */}
-                        {/* <OrbitControls makeDefault /> */}
-                        <CameraControls makeDefault />
-                    </View>
-                    <View track={view2}>
-                        <World config={config} tick={async (x)=>new Map()}/>
-                        {/* <World config={config} tick={async (x)=>new Map()}/> */}
-                        {/* <PerspectiveCamera  position={[3, 2, 9]} fov={55} near={0.1} far={200} /> */}
-                        {/* <OrbitControls makeDefault/> */}
-                        <CameraControls makeDefault />
-                    </View>
-                </Canvas>
-            </div>
         </div>
         
             </>
