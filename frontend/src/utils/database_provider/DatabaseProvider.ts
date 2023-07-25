@@ -1,11 +1,13 @@
 'use client'
 import { getImageArrayBuffer, select, selectAll } from "../api/api"
-import {Texture,TextureInfo} from "../database/Texture"
+import {Texture,TextureInfo} from "../database/database.types"
 import {Database} from "@/utils/database/database"
-import { RequestMultipleTexture, RequestTexture, TextureBranch, TextureLeaf } from "./texture_provider.types"
+import { RequestMultipleTexture, RequestTexture, TextureBranch, TextureLeaf } from "./database_provider.types"
 import { LRUCache } from 'lru-cache'
 import { VariableName } from "../store/variables/variable.types"
 import { SelectSingleResult } from "../api/api.types"
+import { Experiments, Publication } from "../types"
+import { collectionEquals } from "../types.utils"
 
 class TextureNotFound extends Error {
     texture!: TextureInfo
@@ -22,7 +24,7 @@ class TextureMustBeLoaded extends Error {
     }
 }
 
-class TextureProvider {
+class DatabaseProvider {
 
     database! : Database
     cache! : LRUCache<string,Texture>
@@ -179,8 +181,23 @@ class TextureProvider {
         }
         return texture!
     }
+
+    async loadAllColections() {
+        const collections = await this.database.collections.toArray()
+        return collections
+    }
+
+    async addCollectionToDb(collection : Publication | Experiments) {
+        const is_already = await this.database.collections.filter((e)=>
+            {return collectionEquals(collection, e.data)}
+        )
+        if (!is_already || (await is_already.toArray()).length === 0) {
+            return this.database.collections.add({data : collection}).then((result) => {return result})
+        }
+        return -1
+    }
 }
 
 
 
-export const texture_provider = new TextureProvider()
+export const database_provider = new DatabaseProvider()

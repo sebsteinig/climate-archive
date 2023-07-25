@@ -6,7 +6,7 @@ import { useClusterStore } from "@/utils/store/cluster.store"
 import { TimeSlider, useTimeSlider } from "./time_controllers/TimeSlider"
 import { TimeController } from "./time_controllers/TimeController"
 import { TimeState } from "@/utils/store/time/time.type"
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { findInTree } from "@/utils/store/texture_tree.store"
 
 
@@ -77,8 +77,8 @@ export function TimeProvider(props:Props) {
                                         if (branch) {
                                             const path = branch.mean.paths[0].grid[0][0]
                             
-                                            Promise.all([texture_provider.getTexture(path),
-                                                texture_provider.getInfo(exps.exps[idx].id, variable.name)]
+                                            Promise.all([database_provider.getTexture(path),
+                                                database_provider.getInfo(exps.exps[idx].id, variable.name)]
                                                 )
                                                 .then(callback)
 

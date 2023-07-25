@@ -1,3 +1,4 @@
+'use client'
 import Image from 'next/image';
 import ArrowLeft from "$/assets/icons/arrow-left-emerald-300.svg"
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg"
@@ -5,7 +6,7 @@ import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg"
 import { useState } from "react"
 import Checkbox from "../../inputs/Checkbox"
 import ButtonPrimary from "../../buttons/ButtonPrimary"
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { Publication, Experiment } from "../../../utils/types"
 
@@ -69,11 +70,11 @@ export default function PublicationDetails({title,journal,year,authors_full,auth
                     const request = {
                         exp_ids : checked.filter(e => e.checked).map(e => e.exp),
                     }
-                    const res = await texture_provider.loadAll({
+                    const res = await database_provider.loadAll({
                         exp_ids:request.exp_ids,
                     })
                     pushAll(res.flat())
-                    addCollection({
+                    const collection = {
                         exps :  exps.filter((exp : Experiment) => request.exp_ids.includes(exp.id)),
                         abstract,
                         authors_full,
@@ -81,7 +82,9 @@ export default function PublicationDetails({title,journal,year,authors_full,auth
                         journal,
                         title,
                         year,
-                    } as Publication)
+                    } as Publication
+                    database_provider.addCollectionToDb(collection)
+                    addCollection(collection)
                 }
             }> {`Load ${nb_checked === checked.length ? "all ":""} ${nb_checked} experiment${nb_checked >1 ? "s" : ""}`}
             </ButtonPrimary></div>

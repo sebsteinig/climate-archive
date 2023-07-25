@@ -109,19 +109,18 @@ export default function SearchBar({setSearchBarVisible, children}:PropsWithChild
                     className={`w-8 h-8 lg:invisible lg:hidden ${search_panel_visible ? "hidden": ""}`}
                     alt="Search a publication"
                 />
-                <div>
 
-                    <input  
-                        className={`${search_panel_visible ?  "max-sm:block":"max-sm:hidden" }
-                            w-full
-                            bg-transparent 
-                            hover:placeholder:opacity-90
-                            placeholder:text-emerald-300 
-                            placeholder:opacity-70 
-                            outline-none 
-                            mb-4
-                            placeholder:tracking-wider`}
-                            
+                <input  
+                    className={`${search_panel_visible ?  "max-sm:block":"max-sm:hidden" }
+                    w-full
+                        bg-transparent 
+                        hover:placeholder:opacity-90
+                        placeholder:text-emerald-300 
+                        placeholder:opacity-70 
+                        outline-none 
+                        mb-4
+                        placeholder:tracking-wider`}
+                        
                         type="text"
                         name="searchbar" 
                         id="searchbar" 
@@ -129,8 +128,9 @@ export default function SearchBar({setSearchBarVisible, children}:PropsWithChild
                         value={searched_content} 
                         onChange={(e) => setSearchContent(e.target.value)}
                         onClick={() => setSearchPanelVisible(true)}
-                    />
-                    <FullWidthSeparator className='mb-2'/>
+                        />
+                <FullWidthSeparator className='mb-2'/>
+                <div className='overflow-y-auto overflow-x-hidden max-h-[64vh]'>
                     {search_panel_visible && 
                         <>  
                             <div className='block text-end'>
@@ -153,6 +153,7 @@ export default function SearchBar({setSearchBarVisible, children}:PropsWithChild
                                 }
                                 </p>
                             </div>
+                            
                             {
                                 display_more_options && 
                                 <MoreOptions   
@@ -172,9 +173,8 @@ export default function SearchBar({setSearchBarVisible, children}:PropsWithChild
                             }
                             { 
                                 publications.length > 0 && 
-                                <>  
-                                    <br />
-                                    {display_more_options && <MdSeparator className='block self-center'/>}
+                                <>
+                                    {display_more_options && <FullWidthSeparator className='my-3'/>}
                                     <p className='text-slate-400'>
                                         {`${publications.length} result${publications.length > 1 ? "s" : ""} ...`}
                                     </p>
@@ -183,8 +183,12 @@ export default function SearchBar({setSearchBarVisible, children}:PropsWithChild
                             }
                         </>
                     }
-                </div>
-            { search_panel_visible && <Publications more_options={display_more_options} publications = {publications} setSearchBarVisible = {setSearchBarVisible}></Publications> }
+                { search_panel_visible && <Publications 
+                    more_options={display_more_options} 
+                    publications = {publications} 
+                    setSearchBarVisible = {setSearchBarVisible}/> 
+                }
+            </div>
         </div>
     )
 }

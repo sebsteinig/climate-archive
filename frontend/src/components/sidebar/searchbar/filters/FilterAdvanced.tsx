@@ -8,10 +8,10 @@ import { useEffect, useState } from "react"
 import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
-import { RequestMultipleTexture } from "@/utils/texture_provider/texture_provider.types"
-import { Collection } from "../../../../utils/types"
+import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
+import { Collection, Experiments } from "../../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 type Exp = {
     id : string,
     display : boolean,
@@ -235,13 +235,13 @@ export default function FilterAdvanced({setSearchBarVisible}:Props) {
                                 y:resolution.y??0,
                             },
                         } 
-                        const res = await texture_provider.loadAll({
+                        const res = await database_provider.loadAll({
                             exp_ids:request.exp_ids,
                         })
                         pushAll(res.flat())
                         addCollection({
                             exps : request.exp_ids.map((exp) => {return {id :exp, metadata : []} }),
-                        } as Collection)
+                        } as Experiments)
 
                     }
                 }>Load</ButtonSecondary>

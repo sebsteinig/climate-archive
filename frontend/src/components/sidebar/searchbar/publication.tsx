@@ -9,20 +9,22 @@ type Props=   {
     more_options : boolean
 }
 
+
 export function Publications( {publications, more_options, setSearchBarVisible} : Props){
     const [display_see_details,setDisplaySeeDetails] = useState(false)
     const [displayed_publication, setDisplayedPublication] = useState<Publication>()
     return (
-        <div className={`${publications.length > 0 && !more_options ?'h-[64vh]':''} 
-            ${more_options ? "h-[8vh]":""} overflow-y-auto overflow-x-hidden max-h-full`} >
+        <div>
             <div>
                 {(publications.length > 0 && !display_see_details) && 
                     publications.map((publication: Publication,idx:number) => {
                         return(
-                            <div key={idx} className='border-s-4 border-sky-300 mt-2 mb-2 px-4 hover:opacity-100 opacity-80'>
+                            <div key={idx} className='border-s-4 border-sky-300 group mb-2 px-4 hover:opacity-100 opacity-80'>
                                 <p className="font-semibold text-sky-200">{publication.title}</p>
                                 <p className="italic text-right text-slate-400">{`${publication.authors_short} (${publication.year})`}</p>
-                                    <ButtonSecondary onClick={() => {
+                                    <ButtonSecondary 
+                                        className="hidden group-hover:block"
+                                        onClick={() => {
                                         setDisplaySeeDetails(true)
                                         setDisplayedPublication(publication)
                                         console.log("load")

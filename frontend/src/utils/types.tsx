@@ -19,10 +19,12 @@ export type Publication = {
     exps: Experiment[],
 }
 
-export type Collection = {
+export type Experiments = {
     exps : Experiment[]
 }
 
-export const isPublication = (obj : Publication | Collection) : obj is Publication =>{
-    return (obj as Publication).title != undefined
-}
+// export type Collection =  {
+//     id : number
+//     collection : Experiments | Publication
+// }
+export type Collection = Experiments | Publication

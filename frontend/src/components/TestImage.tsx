@@ -2,7 +2,7 @@
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
-import { TextureLeaf } from "@/utils/texture_provider/texture_provider.types"
+import { TextureLeaf } from "@/utils/database_provider/texture_provider.types"
 import React, { useEffect, useState } from "react"
 
 

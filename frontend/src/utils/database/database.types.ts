@@ -1,3 +1,4 @@
+import { Experiments, Publication } from "../types"
 
 
 export class TextureInfo  {
@@ -38,4 +39,8 @@ export class TextureInfo  {
 export class Texture {
     path!: string
     image! : ArrayBuffer
+}
+
+export class Collection{
+    data!: Publication | Experiments
 }

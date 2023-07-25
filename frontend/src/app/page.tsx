@@ -4,7 +4,7 @@ import React, { createContext, useState } from 'react'
 import SearchBar from '@/components/sidebar/searchbar/SearchBar'
 import dynamic from 'next/dynamic'
 import TestImage from '@/components/TestImage'
-import { TextureLeaf } from '@/utils/texture_provider/texture_provider.types'
+import { TextureLeaf } from '@/utils/database_provider/database_provider.types'
 import UI from '@/components/ui'
 import SelectJournal from '@/components/sidebar/searchbar/filters/SelectJournals'
 
