@@ -68,5 +68,5 @@ export type Time = {
     state : TimeState
     speed : number
     //current_frame : TimeMultipleFrames
-    collections : Set<number>
+    collections : Map<number,number>
 }

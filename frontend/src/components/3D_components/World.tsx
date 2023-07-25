@@ -29,9 +29,9 @@ export function World({ config, tick } : Props) {
   //   usePerformance: true,
   //   useTitle: true,
   // })
-  const { rotate } = useControls('Globe', {
-    rotate: false,
-  })
+  // const { rotate } = useControls('Globe', {
+  //   rotate: false,
+  // })
 
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
   let texture = new THREE.TextureLoader()
@@ -49,16 +49,16 @@ export function World({ config, tick } : Props) {
       }
     })
     
-    if (rotate) {
-      sphereRef.current!.rotation.y += delta / 3
-    }
+    // if (rotate) {
+    //   sphereRef.current!.rotation.y += delta / 3
+    // }
   })
   
   return (
     <>
-      {<Perf position='bottom-right' />}
-      {/* {useTitle && <Title config={config}/>} */}
-      <Controls />
+      {/* {<Perf position='bottom-right' />}
+      {useTitle && <Title config={config}/>}
+      <Controls /> */}
       <Lights />
       <Surface ref={sphereRef} config={config} />
       {/* <Plane /> */}

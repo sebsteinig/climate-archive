@@ -52,14 +52,14 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                             time = state.time.slots.map.get(state.time.slots.last)!
                             time_idx = state.time.slots.last
                         }
-                        time.collections.add(collection_idx)
+                        time.collections.set(collection_idx,(time.collections.get(collection_idx) ?? 0) + 1)
                         state.time.binder.set(collection_idx,time_idx)
                     })
                 },
                 addUnSync : (collection_idx:number, config : TimeConfig) => {
                     set((state) => {
                         let time = buildTime(config)
-                        time.collections.add(collection_idx)
+                        time.collections.set(collection_idx,(time.collections.get(collection_idx) ?? 0) + 1)
                         let idx = state.time.slots.map.size + 1
                         state.time.slots.map.set(idx,time)
                         state.time.slots.last = idx
@@ -78,7 +78,7 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                             return
                         }
                         state.time.binder.set(collection_idx,time_slots_idx)
-                        new_time.collections.add(collection_idx)
+                        new_time.collections.set(collection_idx,(new_time.collections.get(collection_idx) ?? 0) + 1)
                         const prev_time = state.time.slots.map.get(prev_time_idx)
                         if(prev_time) {
                             prev_time.collections.delete(collection_idx)
@@ -98,7 +98,7 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                 unlink : (collection_idx : number,config : TimeConfig) => {
                     set(state => {
                         let time = buildTime(config)
-                        time.collections.add(collection_idx)
+                        time.collections.set(collection_idx,(time.collections.get(collection_idx) ?? 0) + 1)
                         let idx = state.time.slots.map.size + 1
                         state.time.slots.map.set(idx,time)
                         const prev_time_idx = state.time.binder.get(collection_idx)

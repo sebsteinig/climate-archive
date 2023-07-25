@@ -15,6 +15,7 @@ import { produce } from "immer";
 import { sync } from "@/utils/store/time/handlers/utils";
 import { Plane } from "../3D_components/Plane";
 import THREE from "three";
+import { useTimePanel } from "./useTimePanel";
 
 
 type Props = {
@@ -66,7 +67,7 @@ export function TimeProvider(props:Props) {
                 
                 for(let [time_idx,time] of time_slots) {
                     const row:[number,TimeFrame][] = []
-                    for(let collection_idx of time.collections) {
+                    for(let [collection_idx,_] of time.collections) {
                         const collection = collections.get(collection_idx)
                         
                         if (!collection) {
@@ -96,9 +97,7 @@ export function TimeProvider(props:Props) {
     ,[time_slots,active_variable])
     console.log('TIME PROVIDER CALL');
     const container_ref = useRef<HTMLDivElement>(null!)
-    const view1 = useRef<HTMLDivElement>(null!)
-    const view2 = useRef<HTMLDivElement>(null!)
-    const view3 = useRef<HTMLDivElement>(null!)
+    const [scenes,panels] = useTimePanel(time_slots,saved_frames,collections,active_variable,tree,context)
     return (
         <>        
         <div ref={container_ref} className="relative w-full h-full grid grid-cols-3 grid-rows-1 gap-4">
@@ -114,90 +113,16 @@ export function TimeProvider(props:Props) {
                 shadows
                 eventSource={container_ref}
                 >
-                    {/* {Array.from(time_slots, ([idx,time]) => {
-                        return Array.from(time.collections, (collection_idx)=> {
-                            if(saved_frames.has(idx) && saved_frames.get(idx)?.get(collection_idx)) {
-                                const frame = saved_frames.get(idx)!.get(collection_idx)!
-                                return (
-                                    <View index={idx+1} track={tracking} key={idx}>
-                                        <World key={idx} config={config} tick={tickBuilder(time,collections.get(collection_idx)!.exps,frame,active_variable,tree,context)}/>
-                                    </View>
-                                )
-                            }else {
-                                return null
-                            }
-                        })
-                    }).flat()} */}
-                    <View track={view1}>
+                    {scenes}
+                    {/* <View track={view1}>
                         <World config={config} tick={async (x)=>new Map()}/>
-                        {/* <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} /> */}
-                        {/* <OrbitControls makeDefault /> */}
-                        {/* <OrbitControls  makeDefault enableZoom={true} enableRotate={true} /> */}
-                    </View>
-                    <View track={view2}>
-                        <World config={config} tick={async (x)=>new Map()}/>
-                        {/* <World config={config} tick={async (x)=>new Map()}/> */}
-                        {/* <PerspectiveCamera  makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
-                        <OrbitControls makeDefault/> */}
-                    </View>
-                    <View track={view3}>
-                        <World config={config} tick={async (x)=>new Map()}/>
-                        {/* <World config={config} tick={async (x)=>new Map()}/> */}
-                        <PerspectiveCamera  makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
-                        <OrbitControls makeDefault/>
-                    </View>
+                        <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
+                        <OrbitControls makeDefault />
+                    </View> */}
                     <OrbitControls  makeDefault enableZoom={true} enableRotate={true}/>
                 </Canvas>
             </div>
-            <div ref={view1} className="w-full h-full border-2 border-red-500" >
-            </div>
-            <div ref={view2} className="w-full h-full border-2 border-green-500" >
-            </div>
-            <div ref={view3} className="w-full h-full border-2 border-green-500" >
-            </div>
-            {/* {Array.from(time_slots,
-                ([idx,time]) => {
-
-                    return (
-                        <div key={idx} className="absolute bottom-0 left-1/2 lg:-translate-x-1/2 w-1/2">
-                            {/* <div ref={div_ref}></div> 
-                            <TimeController          
-                                play = {() => {
-                                    if(time.state !== TimeState.zero) {
-                                        console.log('PLAY');
-                                        
-                                        playTime(idx)
-                                        return true
-                                    }
-                                    return false
-                                }}
-                                pause = {() => {
-                                    console.log({state:time.state});
-                                    
-                                    if(time.state === TimeState.playing) {
-                                        console.log('PAUSE');
-                                        
-                                        pauseTime(idx)
-                                        return true
-                                    }
-                                    return false
-                                }}
-                                stop = {() => {
-                                    return true
-                                }}
-                            />
-                            <TimeSlider min={0} max={time.collections.size}
-                                className="w-full"
-                                onChange = {
-                                    (value) => {
-                                    }
-                                }
-                                ref={time_ref}
-                            />
-                        </div>
-                    )
-                }
-            )} */}
+            {panels}
         </div>
         
             </>

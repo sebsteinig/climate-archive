@@ -50,7 +50,7 @@ export function buildTime(config:TimeConfig):Time {
         speed,
         state,
         current_frame: new Map(),
-        collections : new Set(),
+        collections : new Map(),
     } as Time
     return time
 }
