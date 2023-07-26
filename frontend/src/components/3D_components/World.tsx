@@ -61,6 +61,7 @@ export function World({ config, tick } : Props) {
       <Controls /> */}
       <Lights />
       <Surface ref={sphereRef} config={config} />
+      <Perf position='bottom-right' />
       {/* <Plane /> */}
     </>
   )

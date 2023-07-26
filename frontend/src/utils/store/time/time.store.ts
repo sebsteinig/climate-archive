@@ -26,6 +26,7 @@ export interface TimeSlice {
         stop : (idx:number) => void
         save : (time_idx:number,collection_idx:number,t:TimeFrame) => void
         saveAll : (x: [number,[number,TimeFrame][]][]) => void
+        pauseAll : () => void
     }
 }
 
@@ -212,6 +213,13 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
 
                         if (time.state === TimeState.playing) {
                             time.state = TimeState.paused
+                        }
+                    })
+                },
+                pauseAll : () => {
+                    set(state => {
+                        for(let [idx,time] of state.time.slots.map) {
+                            time.state =  TimeState.paused
                         }
                     })
                 },
