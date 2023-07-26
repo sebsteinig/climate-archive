@@ -1,33 +1,28 @@
-"use client";
-import { Canvas } from '@react-three/fiber'
-import { Leva } from 'leva'
-import React, { RefObject } from 'react'
-import ReactDOM from 'react-dom/client'
-import { World } from './World'
+"use client"
+import { Canvas } from "@react-three/fiber"
+import { Leva } from "leva"
+import React, { RefObject } from "react"
+import ReactDOM from "react-dom/client"
+import { World } from "./World"
 
 type modelDesciptor = {
-  model: string,
+  model: string
   heightData: string
 }
 
 var config: modelDesciptor = {
   model: "Dune",
-  heightData: "/assets/textures/tfgzk_height.smoothed.png"
+  heightData: "/assets/textures/tfgzk_height.smoothed.png",
 }
 
 type Props = {
-  tick : (delta:number) => void
+  tick: (delta: number) => void
 }
 
-export default function Main({tick}:Props) {
-
+export default function Main({ tick }: Props) {
   return (
-    <div className='h-screen w-screen absolute top-0 left-0'>
-      <Leva
-        collapsed={false}
-        oneLineLabels={false}
-        flat={true}
-      />
+    <div className="h-screen w-screen absolute top-0 left-0">
+      <Leva collapsed={false} oneLineLabels={false} flat={true} />
       <Canvas
         camera={{
           fov: 55,
@@ -37,7 +32,7 @@ export default function Main({tick}:Props) {
         }}
         shadows
       >
-        <World config={config} tick={tick}/>
+        <World config={config} tick={tick} />
       </Canvas>
     </div>
   )

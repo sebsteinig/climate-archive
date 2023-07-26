@@ -1,39 +1,36 @@
-
-
 export enum TimeKind {
-    circular,
-    walk,
-    once,
-} 
+  circular,
+  walk,
+  once,
+}
 export enum TimeDirection {
-    forward,
-    backward,
-} 
+  forward,
+  backward,
+}
 export enum TimeState {
-    paused,
-    stopped,
-    playing,
-    ready,
-} 
+  paused,
+  stopped,
+  playing,
+  ready,
+}
 
 export enum TimeSpeed {
-    slow,
-    medium,
-    fast
+  slow,
+  medium,
+  fast,
 }
 
 export type TimeConfig = {
-    kind? : TimeKind,
-    direction? : TimeDirection,
-    speed? : TimeSpeed | number
+  kind?: TimeKind
+  direction?: TimeDirection
+  speed?: TimeSpeed | number
 }
 
-
 export type Time = {
-    direction : TimeDirection
-    kind : TimeKind
-    state : TimeState
-    speed : number
-    idx : number
-    exps : string[]
+  direction: TimeDirection
+  kind: TimeKind
+  state: TimeState
+  speed: number
+  idx: number
+  exps: string[]
 }

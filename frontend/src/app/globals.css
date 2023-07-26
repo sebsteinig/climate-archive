@@ -1,26 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @layer base {
   body {
     @apply bg-slate-800 min-w-full min-h-screen
       p-5 antialiased text-slate-300 
-      font-rubik overflow-hidden m-0 tracking-wider
+      font-rubik overflow-hidden m-0 tracking-wider;
   }
   h1 {
-    @apply  text-2xl tracking-[.5em]
+    @apply text-2xl tracking-[.5em];
   }
   h2 {
-    @apply text-emerald-300 text-2xl tracking-widest
+    @apply text-emerald-300 text-2xl tracking-widest;
   }
   h3 {
-    @apply text-emerald-300 text-lg tracking-widest
+    @apply text-emerald-300 text-lg tracking-widest;
   }
   h4 {
-    @apply text-slate-400 text-base capitalize tracking-widest
+    @apply text-slate-400 text-base capitalize tracking-widest;
   }
   h5 {
-    @apply text-sky-300 text-base capitalize tracking-wider
+    @apply text-sky-300 text-base capitalize tracking-wider;
   }
 }
