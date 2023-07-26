@@ -52,10 +52,9 @@ export default function PublicationDetails({
     })
   }
   const nb_checked = checked.reduce((acc, e) => acc + Number(e.checked), 0)
-  const [pushAll, addCollection] = useClusterStore((state) => [
-    state.pushAll,
+  const addCollection = useClusterStore((state) => 
     state.addCollection,
-  ])
+  )
 
   return (
     <>
@@ -103,10 +102,9 @@ export default function PublicationDetails({
             const request = {
               exp_ids: checked.filter((e) => e.checked).map((e) => e.exp),
             }
-            const res = await database_provider.loadAll({
+            await database_provider.loadAll({
               exp_ids: request.exp_ids,
             })
-            pushAll(res.flat())
             const collection = {
               exps: exps.filter((exp: Experiment) =>
                 request.exp_ids.includes(exp.id),
