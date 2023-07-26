@@ -17,7 +17,6 @@ export interface TextureTreeSlice {
   texture_tree: TextureTree
   collections: Map<number, Collection>
   __collections_lookup: Map<string | Experiments, number>
-  displayed_collections: Map<number, number>
   addCollection: (collection: Collection) => void
   push: (branch: TextureBranch) => void
   pushAll: (branches: TextureBranch[]) => void
@@ -80,8 +79,8 @@ export const createTextureTreeSlice: StateCreator<
             idx,
           )
         }
-        state.displayed_collections.clear()
-        state.displayed_collections.set(idx, 1)
+        // state.displayed_collections.clear()
+        // state.displayed_collections.set(idx, 1)
       })
     },
     push: (branch: TextureBranch) => {
@@ -99,24 +98,24 @@ export const createTextureTreeSlice: StateCreator<
     displayCollection: (idx: number) => {
       set((state) => {
         if (state.collections.has(idx)) {
-          const to_increment = state.displayed_collections.get(idx)
-          if (to_increment) {
-            state.displayed_collections.set(idx, to_increment + 1)
-          } else {
-            state.displayed_collections.set(idx, 1)
-          }
+          // const to_increment = state.displayed_collections.get(idx)
+          // if (to_increment) {
+          //   state.displayed_collections.set(idx, to_increment + 1)
+          // } else {
+          //   state.displayed_collections.set(idx, 1)
+          // }
         }
       })
     },
     hideCollection: (idx: number) => {
       set((state) => {
         if (state.collections.has(idx)) {
-          const to_decrement = state.displayed_collections.get(idx)
-          if (to_decrement && to_decrement > 1) {
-            state.displayed_collections.set(idx, to_decrement - 1)
-          } else {
-            state.displayed_collections.delete(idx)
-          }
+          // const to_decrement = state.displayed_collections.get(idx)
+          // if (to_decrement && to_decrement > 1) {
+          //   state.displayed_collections.set(idx, to_decrement - 1)
+          // } else {
+          //   state.displayed_collections.delete(idx)
+          // }
         }
       })
     },

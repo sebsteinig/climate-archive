@@ -26,12 +26,12 @@ export function PreviewCollection({
 }: Props) {
   const collections = useClusterStore((state) => state.collections)
   const displayed_collections = useClusterStore(
-    (state) => state.displayed_collections,
+    (state) => state.time.binder,
   )
   const addUnsync = useClusterStore((state) => state.time.addUnSync)
   const binder = useClusterStore((state) => state.time.binder)
   useEffect(() => {
-    for (let [collection_idx, occurence] of displayed_collections) {
+    for (let [collection_idx, _time_slot_id] of displayed_collections) {
       if (!binder.has(collection_idx)) {
         addUnsync(collection_idx, {
           mode: TimeMode.ts,

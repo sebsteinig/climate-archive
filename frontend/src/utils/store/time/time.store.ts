@@ -14,17 +14,18 @@ import { buildTime } from "./time.utils"
 export interface TimeSlice {
   time: {
     slots: { map: Map<number, Time>; last: number }
-    binder: Map<number, number> // collection => slot
+    binder: Map<number, Set<number>> // collection => slot
 
     saved_frames: Map<number, Map<number, TimeFrame>>
 
     addSync: (collection_idx: number, config: TimeConfig | undefined) => void
     addUnSync: (collection_idx: number, config: TimeConfig) => void
 
-    link: (collection_idx: number, time_slots_idx: number) => void
-    unlink: (collection_idx: number, config: TimeConfig) => void
+    // link: (collection_idx: number, time_slots_idx: number) => void
+    // unlink: (collection_idx: number, config: TimeConfig) => void
 
-    remove: (collection_idx: number) => void
+    remove: (collection_idx: number, time_idx: number, occurrence_idx : number) => void
+    removeAll: (collection_idx: number) => void
 
     prepare: (idx: number) => void
     prepareAll: (idxs: number[]) => void
@@ -66,7 +67,11 @@ export const createTimeSlice: StateCreator<
             collection_idx,
             (time.collections.get(collection_idx) ?? 0) + 1,
           )
-          state.time.binder.set(collection_idx, time_idx)
+          if(state.time.binder.has(collection_idx)){
+              state.time.binder.set(collection_idx, state.time.binder.get(collection_idx)!.add(time_idx))
+          } else{
+            state.time.binder.set(collection_idx, new Set([time_idx]))
+          }
         })
       },
       addUnSync: (collection_idx: number, config: TimeConfig) => {
@@ -79,73 +84,83 @@ export const createTimeSlice: StateCreator<
           let idx = state.time.slots.map.size + 1
           state.time.slots.map.set(idx, time)
           state.time.slots.last = idx
-          state.time.binder.set(collection_idx, idx)
+          if(state.time.binder.has(collection_idx)){
+            state.time.binder.set(collection_idx, state.time.binder.get(collection_idx)!.add(idx))
+        } else{
+          state.time.binder.set(collection_idx, new Set([idx]))
+        }
         })
       },
 
-      link: (collection_idx: number, time_slots_idx: number) => {
-        set((state) => {
-          const new_time = state.time.slots.map.get(time_slots_idx)
-          if (!new_time) {
-            return
-          }
-          const prev_time_idx = state.time.binder.get(collection_idx)
-          if (!prev_time_idx) {
-            return
-          }
-          state.time.binder.set(collection_idx, time_slots_idx)
-          new_time.collections.set(
-            collection_idx,
-            (new_time.collections.get(collection_idx) ?? 0) + 1,
-          )
-          const prev_time = state.time.slots.map.get(prev_time_idx)
-          if (prev_time) {
-            prev_time.collections.delete(collection_idx)
-            if (prev_time.collections.size === 0) {
-              state.time.slots.map.delete(prev_time_idx)
-              if (prev_time_idx === state.time.slots.last) {
-                let new_last = -1
-                if (state.time.slots.map.size) {
-                  new_last = state.time.slots.map.keys().next().value
-                }
-                state.time.slots.last = new_last
-              }
-            }
-          }
-        })
-      },
-      unlink: (collection_idx: number, config: TimeConfig) => {
-        set((state) => {
-          let time = buildTime(config)
-          time.collections.set(
-            collection_idx,
-            (time.collections.get(collection_idx) ?? 0) + 1,
-          )
-          let idx = state.time.slots.map.size + 1
-          state.time.slots.map.set(idx, time)
-          const prev_time_idx = state.time.binder.get(collection_idx)
-          if (!prev_time_idx) {
-            return
-          }
-          state.time.binder.set(collection_idx, idx)
-          const prev_time = state.time.slots.map.get(prev_time_idx)
-          if (prev_time) {
-            prev_time.collections.delete(collection_idx)
-            if (prev_time.collections.size === 0) {
-              state.time.slots.map.delete(prev_time_idx)
-              if (prev_time_idx === state.time.slots.last) {
-                let new_last = -1
-                if (state.time.slots.map.size) {
-                  new_last = state.time.slots.map.keys().next().value
-                }
-                state.time.slots.last = new_last
-              }
-            }
-          }
-        })
-      },
+    //   link: (collection_idx: number, time_slots_idx: number) => {
+    //     set((state) => {
+    //       const new_time = state.time.slots.map.get(time_slots_idx)
+    //       if (!new_time) {
+    //         return
+    //       }
+    //       const prev_time_idx = state.time.binder.get(collection_idx)
+    //       if (!prev_time_idx) {
+    //         return
+    //       } else{
+    //           state.time.binder.set(collection_idx, prev_time_idx.add(time_slots_idx))
+    //       }
+          
+    //       new_time.collections.set(
+    //         collection_idx,
+    //         (new_time.collections.get(collection_idx) ?? 0) + 1,
+    //       )
+          
+          
+    //       const prev_time = state.time.slots.map.get(prev_time_idx)
+    //       if (prev_time) {
+    //         prev_time.collections.delete(collection_idx)
+    //         if (prev_time.collections.size === 0) {
+    //           state.time.slots.map.delete(prev_time_idx)
+    //           if (prev_time_idx === state.time.slots.last) {
+    //             let new_last = -1
+    //             if (state.time.slots.map.size) {
+    //               new_last = state.time.slots.map.keys().next().value
+    //             }
+    //             state.time.slots.last = new_last
+    //           }
+    //         }
+    //       }
 
-      remove: (collection_idx: number) => {
+
+    //     })
+    //   },
+    //   unlink: (collection_idx: number, config: TimeConfig) => {
+    //     set((state) => {
+    //       let time = buildTime(config)
+    //       time.collections.set(
+    //         collection_idx,
+    //         (time.collections.get(collection_idx) ?? 0) + 1,
+    //       )
+    //       let idx = state.time.slots.map.size + 1
+    //       state.time.slots.map.set(idx, time)
+    //       const prev_time_idx = state.time.binder.get(collection_idx)
+    //       if (!prev_time_idx) {
+    //         return
+    //       }
+    //       state.time.binder.set(collection_idx, idx)
+    //       const prev_time = state.time.slots.map.get(prev_time_idx)
+    //       if (prev_time) {
+    //         prev_time.collections.delete(collection_idx)
+    //         if (prev_time.collections.size === 0) {
+    //           state.time.slots.map.delete(prev_time_idx)
+    //           if (prev_time_idx === state.time.slots.last) {
+    //             let new_last = -1
+    //             if (state.time.slots.map.size) {
+    //               new_last = state.time.slots.map.keys().next().value
+    //             }
+    //             state.time.slots.last = new_last
+    //           }
+    //         }
+    //       }
+    //     })
+    //   },
+
+      remove: (collection_idx: number, time_idx : number, occurrence_idx : number) => {
         set((state) => {
           const prev_time_idx = state.time.binder.get(collection_idx)
           if (!prev_time_idx) {
@@ -165,6 +180,32 @@ export const createTimeSlice: StateCreator<
                 state.time.slots.last = new_last
               }
             }
+          }
+        })
+      },
+
+      removeAll: (collection_idx: number) => {
+        set((state) => {
+          const prev_time_idx = state.time.binder.get(collection_idx)
+          if (!prev_time_idx) {
+            return
+          }
+          state.time.binder.delete(collection_idx)
+          for (let t_idx of prev_time_idx){
+              const prev_time = state.time.slots.map.get(t_idx)
+              if (prev_time) {
+                prev_time.collections.delete(collection_idx)
+                if (prev_time.collections.size === 0) {
+                  state.time.slots.map.delete(t_idx)
+                  if (t_idx === state.time.slots.last) {
+                    let new_last = -1
+                    if (state.time.slots.map.size) {
+                      new_last = state.time.slots.map.keys().next().value
+                    }
+                    state.time.slots.last = new_last
+                  }
+                }
+              }
           }
         })
       },
