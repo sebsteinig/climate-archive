@@ -6,7 +6,7 @@ import { isPublication } from "../types.utils"
 
 enableMapSet()
 
-type Collection = Publication | Experiments
+export type Collection = Publication | Experiments
 
 export interface CollectionSlice {
   collections: Map<number, Collection>

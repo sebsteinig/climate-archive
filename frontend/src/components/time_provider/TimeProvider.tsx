@@ -1,10 +1,7 @@
 "use client"
 import { Canvas } from "@react-three/fiber"
-import { World } from "../3D_components/World"
 import { useEffect, useRef, useState, useMemo, RefObject } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { TimeSlider, useTimeSlider } from "./time_controllers/TimeSlider"
-import { TimeController } from "./time_controllers/TimeController"
 import {
   Time,
   TimeMode,
@@ -13,11 +10,7 @@ import {
 } from "@/utils/store/time/time.type"
 import { initFrame } from "@/utils/store/time/time.utils"
 import {
-  CameraControls,
   OrbitControls,
-  PerspectiveCamera,
-  PivotControls,
-  View,
 } from "@react-three/drei"
 import { CanvasHolder, tickBuilder } from "./tick"
 import { produce } from "immer"
@@ -41,7 +34,6 @@ export function TimeProvider(props: Props) {
   const saveAll = useClusterStore((state) => state.time.saveAll)
   const pauseAll = useClusterStore((state) => state.time.pauseAll)
   const time_slots = useClusterStore((state) => state.time.slots.map)
-  const [time_ref, setTime] = useTimeSlider()
   const variables = useClusterStore((state) => state.variables)
   const collections = useClusterStore((state) => state.collections)
   const active_variable = useMemo(() => {

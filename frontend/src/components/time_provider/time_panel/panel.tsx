@@ -133,8 +133,7 @@ export const Panel = forwardRef<Refs, PanelProps>(
         <div className="row-start-5 z-10">
           <TimeController time_idx={time_idx} ref={controller_ref} />
           <TimeSlider
-            min={0}
-            max={time.collections.size}
+            time_idx={time_idx} 
             className="w-full"
             onChange={(value) => {}}
             ref={input_ref}
