@@ -8,25 +8,35 @@ import { World } from "@/components/3D_components/World"
 import { View } from "@react-three/drei"
 
 export type SceneProps = {
-    track : MutableRefObject<HTMLElement>
-    time : Time
-    exps : Experiment[]
-    frame : TimeFrame
-    active_variables : VariableName[]
-    tree : TextureTree
-    context : CanvasHolder
+  track: MutableRefObject<HTMLElement>
+  time: Time
+  exps: Experiment[]
+  frame: TimeFrame
+  active_variables: VariableName[]
+  tree: TextureTree
+  context: CanvasHolder
 }
 
-export function Scene({track,time,exps,frame,active_variables,tree,context}:SceneProps) {
-    
-    var config = {
-        model: "Dune",
-        heightData: "/assets/textures/tfgzk_height.smoothed.png"
-      }
+export function Scene({
+  track,
+  time,
+  exps,
+  frame,
+  active_variables,
+  tree,
+  context,
+}: SceneProps) {
+  var config = {
+    model: "Dune",
+    heightData: "/assets/textures/tfgzk_height.smoothed.png",
+  }
 
-    return (
+  return (
     <View track={track}>
-        <World config={config} tick={tickBuilder(time,exps,frame,active_variables,tree,context)}/>
+      <World
+        config={config}
+        tick={tickBuilder(time, exps, frame, active_variables, tree, context)}
+      />
     </View>
-    )
+  )
 }

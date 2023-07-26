@@ -1,16 +1,16 @@
 export enum VariableName {
-    clt,
-    currents,
-    height,
-    liconc,
-    mlotst,
-    pfts,
-    pr,
-    sic,
-    snc,
-    tas,
-    tos,
-    winds,
+  clt,
+  currents,
+  height,
+  liconc,
+  mlotst,
+  pfts,
+  pr,
+  sic,
+  snc,
+  tas,
+  tos,
+  winds,
 }
 
 type Variable = {
