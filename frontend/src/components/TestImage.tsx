@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { findInTree } from "@/utils/store/texture_tree.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
@@ -6,9 +6,7 @@ import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { TextureLeaf } from "@/utils/texture_provider/texture_provider.types"
 import React, { useEffect, useState, useMemo } from "react"
 
-
-type Props = {
-}
+type Props = {}
 
 export default function TestImage({}:Props) {
     const [image_src,setImage] = useState<string>()

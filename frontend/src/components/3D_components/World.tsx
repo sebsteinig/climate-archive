@@ -1,8 +1,8 @@
-"use client";
-import { useFrame } from '@react-three/fiber'
-import { useControls } from 'leva'
-import { Perf } from 'r3f-perf'
-import { useRef, forwardRef, RefObject } from 'react'
+"use client"
+import { useFrame } from "@react-three/fiber"
+import { useControls } from "leva"
+import { Perf } from "r3f-perf"
+import { useRef, forwardRef, RefObject } from "react"
 
 import * as THREE from 'three';
 import { SphereGeometry, Mesh, MeshStandardMaterial } from 'three'
@@ -12,18 +12,18 @@ import Controls from './Controls'
 import { Plane } from './Plane'
 import { Surface } from './Surface'
 import { useClusterStore } from '@/utils/store/cluster.store';
-import { Texture, TextureInfo } from '@/utils/database/Texture';
 import { VariableName } from '@/utils/store/variables/variable.types';
+import { TextureInfo } from "@/utils/database/database.types"
 
 type Props = {
   config: {
-    model: string,
+    model: string
     heightData: string
   }
   tick : (delta:number) => Promise<Map<VariableName,{current_url:string,next_url:string,weight:number,current_info:TextureInfo,next_info:TextureInfo}>>
 }
 
-export function World({ config, tick } : Props) {
+export function World({ config, tick }: Props) {
   // for Leva debug GUI (there must be a better way for this ...)
   // const { usePerformance, useTitle } = useControls('global', {
   //   usePerformance: true,

@@ -1,4 +1,4 @@
-"use client";
+"use client"
 function Plane() {
   return (
     <mesh
@@ -8,7 +8,7 @@ function Plane() {
       receiveShadow
     >
       <planeGeometry />
-      <meshStandardMaterial color='greenyellow' />
+      <meshStandardMaterial color="greenyellow" />
     </mesh>
   )
 }

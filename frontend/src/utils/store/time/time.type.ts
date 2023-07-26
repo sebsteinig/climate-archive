@@ -1,16 +1,17 @@
-import { TextureInfo } from "@/utils/database/Texture"
+
+import { TextureInfo } from "@/utils/database/database.types"
 import { VariableName } from "../variables/variable.types"
 import { Experiment } from "@/utils/types"
 
 export enum TimeKind {
-    circular,
-    walk,
-    once,
-} 
+  circular,
+  walk,
+  once,
+}
 export enum TimeDirection {
-    forward,
-    backward,
-} 
+  forward,
+  backward,
+}
 export enum TimeState {
     paused,
     stopped,
@@ -20,9 +21,9 @@ export enum TimeState {
 } 
 
 export enum TimeSpeed {
-    slow,
-    medium,
-    fast
+  slow,
+  medium,
+  fast,
 }
 
 export enum TimeMode {

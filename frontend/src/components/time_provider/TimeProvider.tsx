@@ -17,18 +17,15 @@ import { Plane } from "../3D_components/Plane";
 import THREE from "three";
 import { useTimePanel } from "./time_panel/useTimePanel";
 import { VariableName } from "@/utils/store/variables/variable.types";
-import { Collection, Publication } from "@/utils/types";
+import { Experiments, Publication } from "@/utils/types";
 import { Perf } from "r3f-perf";
 
-
-type Props = {
-
-}
+type Props = {}
 
 var config = {
-    model: "Dune",
-    heightData: "/assets/textures/tfgzk_height.smoothed.png"
-  }
+  model: "Dune",
+  heightData: "/assets/textures/tfgzk_height.smoothed.png",
+}
 
 export function TimeProvider(props:Props) {
     const prepareTime = useClusterStore((state)=> state.time.prepareAll)
@@ -117,7 +114,7 @@ export function TimeProvider(props:Props) {
 
 async function prepare(
     time_slots:Map<number,Time>,
-    collections: Map<number, Publication | Collection>,
+    collections: Map<number, Publication | Experiments>,
     saved_frames: Map<number, Map<number, TimeFrame>>,
     active_variables : VariableName[]) {
 

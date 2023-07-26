@@ -76,5 +76,5 @@ export function TimeController({className,time_idx}:Props) {
             }}
         />
     </div>
-    )
+  )
 }
