@@ -9,6 +9,7 @@ import ButtonPrimary from "../../buttons/ButtonPrimary"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { Publication, Experiment } from "../../../utils/types"
+import { TimeMode } from "@/utils/store/time/time.type"
 
 type Props = Publication & {
   setDisplaySeeDetails: Function
@@ -32,6 +33,7 @@ export default function PublicationDetails({
   setSearchBarVisible,
 }: Props) {
   const [display_abstract, setDisplayAbstract] = useState(false)
+  const addUnsync = useClusterStore((state) => state.time.addUnSync)
   const [checked, setChecked] = useState<CheckedExp[]>(
     exps.map((exp) => {
       return {
@@ -117,7 +119,10 @@ export default function PublicationDetails({
               year,
             } as Publication
             database_provider.addCollectionToDb(collection)
-            addCollection(collection)
+            addCollection(collection, (idx)=> console.log(idx))
+            addUnsync(3, {
+              mode: TimeMode.ts,
+            })
           }}
         >
           {" "}

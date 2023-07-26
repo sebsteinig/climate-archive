@@ -11,7 +11,7 @@ type Collection = Publication | Experiments
 export interface CollectionSlice {
   collections: Map<number, Collection>
   __collections_lookup: Map<string | Experiments, number>
-  addCollection: (collection: Collection) => void
+  addCollection: (collection: Collection, callback : (x : number) => void) => void
   displayCollection: (idx: number) => void
   hideCollection: (idx: number) => void
 }
@@ -28,7 +28,7 @@ CollectionSlice,
     collections: new Map(),
     __collections_lookup: new Map(),
     displayed_collections: new Map(),
-    addCollection: (collection: Collection) => {
+    addCollection: (collection: Collection, callback) => {
       set((state) => {
         let idx = state.__collections_lookup.get(
           isPublication(collection)
@@ -45,8 +45,7 @@ CollectionSlice,
             idx,
           )
         }
-        // state.displayed_collections.clear()
-        // state.displayed_collections.set(idx, 1)
+        callback(idx)
       })
     },
     displayCollection: (idx: number) => {

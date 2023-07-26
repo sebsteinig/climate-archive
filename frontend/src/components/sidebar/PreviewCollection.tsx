@@ -25,32 +25,22 @@ export function PreviewCollection({
   setCurrentVariableControls,
 }: Props) {
   const collections = useClusterStore((state) => state.collections)
-  const displayed_collections = useClusterStore(
-    (state) => state.time.binder,
-  )
-  const addUnsync = useClusterStore((state) => state.time.addUnSync)
+  
   const binder = useClusterStore((state) => state.time.binder)
-  useEffect(() => {
-    for (let [collection_idx, _time_slot_id] of displayed_collections) {
-      if (!binder.has(collection_idx)) {
-        addUnsync(collection_idx, {
-          mode: TimeMode.ts,
-        })
-      }
-    }
-  }, [displayed_collections])
+
+  
   const [display_all, displayAll] = useState(false)
   return (
     <div
       className={`bg-gray-900 mt-3 rounded-md 
                             ${
-                              displayed_collections.size > 1 && !display_all
+                              binder.size > 1 && !display_all
                                 ? "h-fit w-fit p-2"
                                 : ""
                             }
                             ${search_bar_visible ? "hidden" : ""}`}
     >
-      {displayed_collections.size > 1 && (
+      {binder.size > 1 && (
         <Image
           onClick={() => displayAll((prev) => !prev)}
           priority
@@ -60,8 +50,8 @@ export function PreviewCollection({
         />
       )}
       <div className="max-w-full overflow-y-auto overflow-x-hidden max-h-[80vh]">
-        {(display_all || displayed_collections.size == 1) &&
-          Array.from(displayed_collections).map((value, idx) => {
+        {(display_all || binder.size == 1) &&
+          Array.from(binder).map((value, idx) => {
             return (
               <div key={idx}>
                 <OneCollection
@@ -77,7 +67,7 @@ export function PreviewCollection({
                   }}
                   display_details={display_details}
                 />
-                {displayed_collections.size > 1 && (
+                {binder.size > 1 && (
                   <MdSeparator className="ml-3 block self-center" />
                 )}
               </div>

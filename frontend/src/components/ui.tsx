@@ -14,7 +14,7 @@ export default function UI({ journals }: Props) {
   useEffect(() => {
     Promise.all([database_provider.loadAllColections()]).then((e) =>
       e[0].map((element) => {
-        addCollection(element.data)
+        addCollection(element.data, (_idx) => {})
       }),
     )
   }, [])

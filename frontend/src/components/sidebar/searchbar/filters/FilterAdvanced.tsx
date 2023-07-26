@@ -13,6 +13,7 @@ import { RequestMultipleTexture } from "@/utils/database_provider/database_provi
 import { Experiments } from "../../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { TimeMode } from "@/utils/store/time/time.type"
 type Exp = {
   id: string
   display: boolean
@@ -74,6 +75,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
   const [lossless, setLossless] = useState(true)
   const [resolution, setResolution] = useState<{ x?: number; y?: number }>({})
   const [variables, setVariables] = useState<string[]>([])
+  const addUnsync = useClusterStore((state) => state.time.addUnSync)
   if (!display) {
     return (
       <>
@@ -333,7 +335,11 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
             }),
           } as Experiments
           database_provider.addCollectionToDb(collection)
-          addCollection(collection)
+          addCollection(collection, (idx)=>{
+            addUnsync(idx, {
+              mode: TimeMode.ts,
+            })
+          })
         }}
       >
         Load
