@@ -18,14 +18,12 @@ import React from "react"
 import { Scene } from "./scene"
 import { Panel, Refs } from "./panel"
 import { Experiments, Publication } from "@/utils/types"
-import { TextureTree } from "@/utils/database_provider/database_provider.types"
 
 export function useTimePanel(
   time_slots: Map<number, Time>,
   saved_frames: Map<number, Map<number, TimeFrame>>,
   collections: Map<number, Publication | Experiments>,
   active_variables: VariableName[],
-  tree: TextureTree,
   context: CanvasHolder,
 ) {
   const scenes: JSX.Element[] = []
@@ -52,13 +50,13 @@ export function useTimePanel(
       const exps = collections.get(collection_idx)!.exps
       let i = 0
       for (let ref of r) {
+        
         scenes.push(
           <Scene
             key={i}
             time={time}
             frame={frame}
             exps={exps}
-            tree={tree}
             context={context}
             active_variables={active_variables}
             track={ref.ref}

@@ -56,17 +56,3 @@ export type RequestMultipleTexture = {
   threshold?: number
 }
 
-export type TextureLeaf = {
-  paths: {
-    grid: string[][]
-  }[]
-}
-
-export type TextureBranch = {
-  exp_id: string
-  variable: VariableName
-  mean: TextureLeaf
-  ts: TextureLeaf
-}
-
-export type TextureTree = Map<string, Map<VariableName, TextureBranch>>

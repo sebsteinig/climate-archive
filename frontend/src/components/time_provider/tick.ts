@@ -1,9 +1,5 @@
+import { TextureInfo } from "@/utils/database/database.types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import {
-  TextureBranch,
-  TextureTree,
-} from "@/utils/database_provider/database_provider.types"
-import { findInTree } from "@/utils/store/texture_tree.store"
 import {
   Time,
   TimeFrame,
@@ -31,20 +27,20 @@ export type CanvasHolder = {
 export function getPath(
   mode: TimeMode,
   data: TimeFrameValue,
-  current_branch: TextureBranch,
-  next_branch: TextureBranch,
+  current_branch: TextureInfo,
+  next_branch: TextureInfo,
 ): [string, string] {
   let current_path: string
   let next_path: string
   switch (mode) {
     case TimeMode.mean:
       current_path =
-        current_branch.mean.paths[0].grid[0][data.current.time_chunk]
-      next_path = next_branch.mean.paths[0].grid[0][data.next.time_chunk]
+        current_branch.paths_mean.paths[0].grid[0][data.current.time_chunk]
+      next_path = next_branch.paths_mean.paths[0].grid[0][data.next.time_chunk]
       return [current_path, next_path]
     case TimeMode.ts:
-      current_path = current_branch.ts.paths[0].grid[0][data.current.time_chunk]
-      next_path = next_branch.ts.paths[0].grid[0][data.next.time_chunk]
+      current_path = current_branch.paths_ts.paths[0].grid[0][data.current.time_chunk]
+      next_path = next_branch.paths_ts.paths[0].grid[0][data.next.time_chunk]
       // console.log(
       //     {
       //         current_path,
@@ -99,7 +95,6 @@ export function tickBuilder(
   exps: Experiment[],
   frame: TimeFrame,
   active_variable: VariableName[],
-  tree: TextureTree,
   context: CanvasHolder,
   onChange : (frame:TimeFrame) => void
 ) {
@@ -115,19 +110,14 @@ export function tickBuilder(
     }
     
     onChange(frame)
-    console.log("here");
     const res = new Map()
+    
     for (let [variable, data] of frame.variables) {
-      const current_branch = findInTree(data.current.exp.id, variable, tree)
-      const next_branch = findInTree(data.next.exp.id, variable, tree)
-      if (!current_branch || !next_branch) {
-        continue
-      }
       const [current_path, next_path] = getPath(
         time.mode,
         data,
-        current_branch,
-        next_branch,
+        data.current.info,
+        data.next.info,
       )
 
       const current_texture = await database_provider.getTexture(current_path)
@@ -157,14 +147,14 @@ export function tickBuilder(
       const next_url = crop(
         context.next.canvas,
         context.next.ctx,
-        current_bitmap,
+        next_bitmap,
         next_path,
         data.next.frame,
         0,
         data.next.info.xsize,
         data.next.info.ysize,
       )
-
+        
       res.set(variable, {
         current_url,
         next_url,
