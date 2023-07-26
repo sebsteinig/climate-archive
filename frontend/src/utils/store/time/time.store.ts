@@ -180,16 +180,6 @@ export const createTimeSlice : StateCreator<TimeSlice,[["zustand/immer",never]],
                                 time.state = TimeState.ready
                             }
                         }
-
-                        // if(frame.variables.size > 0) {
-                        //     if(time.state === TimeState.zero || time.state === TimeState.stopped) {
-                        //         time.state = TimeState.ready
-                        //         //time.current_frame = frame
-                        //     }
-                        //     callback(true,frame)
-                        // }else {
-                        //     callback(false,undefined)
-                        // }
                     })
                 },
                 play : (idx:number) => {

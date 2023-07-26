@@ -85,7 +85,7 @@ export function TimeProvider(props:Props) {
     const [scenes,panels] = useTimePanel(time_slots,saved_frames,collections,active_variable,tree,context)
     return (
         <>        
-        <div className="fixed top-0 left-0 -z-10 w-screen h-screen border-2 border-yellow-300">
+        <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
             <Canvas
             camera={{
             fov: 55,
