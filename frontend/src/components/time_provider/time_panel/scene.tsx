@@ -5,7 +5,6 @@ import { MutableRefObject } from "react"
 import { CanvasHolder, tickBuilder } from "../tick"
 import { World } from "@/components/3D_components/World"
 import { View } from "@react-three/drei"
-import { TextureTree } from "@/utils/database_provider/database_provider.types"
 
 export type SceneProps = {
   track: MutableRefObject<HTMLElement>
@@ -13,7 +12,6 @@ export type SceneProps = {
   exps: Experiment[]
   frame: TimeFrame
   active_variables: VariableName[]
-  tree: TextureTree
   context: CanvasHolder
 }
 
@@ -23,7 +21,6 @@ export function Scene({
   exps,
   frame,
   active_variables,
-  tree,
   context,
 }: SceneProps) {
   var config = {
@@ -35,7 +32,7 @@ export function Scene({
     <View track={track}>
       <World
         config={config}
-        tick={tickBuilder(time, exps, frame, active_variables, tree, context)}
+        tick={tickBuilder(time, exps, frame, active_variables, context)}
       />
     </View>
   )
