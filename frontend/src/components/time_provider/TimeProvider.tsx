@@ -1,13 +1,34 @@
+"use client"
 import { Canvas } from "@react-three/fiber"
-import { Leva } from "leva"
 import { World } from "../3D_components/World"
-import { useEffect, useRef, useState, useMemo } from "react"
+import { useEffect, useRef, useState, useMemo, RefObject } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { TimeSlider, useTimeSlider } from "./time_controllers/TimeSlider"
 import { TimeController } from "./time_controllers/TimeController"
-import { TimeState } from "@/utils/store/time/time.type"
-import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import {
+  Time,
+  TimeMode,
+  TimeFrame,
+  TimeState,
+} from "@/utils/store/time/time.type"
 import { findInTree } from "@/utils/store/texture_tree.store"
+import { initFrame } from "@/utils/store/time/time.utils"
+import {
+  CameraControls,
+  OrbitControls,
+  PerspectiveCamera,
+  PivotControls,
+  View,
+} from "@react-three/drei"
+import { CanvasHolder, tickBuilder } from "./tick"
+import { produce } from "immer"
+import { sync } from "@/utils/store/time/handlers/utils"
+import { Plane } from "../3D_components/Plane"
+import THREE from "three"
+import { useTimePanel } from "./time_panel/useTimePanel"
+import { VariableName } from "@/utils/store/variables/variable.types"
+import { Experiments, Publication } from "@/utils/types"
+import { Perf } from "r3f-perf"
 
 type Props = {}
 
@@ -17,35 +38,65 @@ var config = {
 }
 
 export function TimeProvider(props: Props) {
-  const div_ref = useRef<HTMLDivElement>(null)
-  const exps = useClusterStore((state) => state.collections.current)
-  const time_store = useClusterStore((state) => state.time)
-  const variables = useClusterStore((state) => state.variables)
-  const variable = useMemo(() => {
-    return Object.values(variables).find((v) => v.active)
-  }, [variables])
-  const tree = useClusterStore((state) => state.texture_tree)
-  useEffect(() => {
-    console.log("USE EFFECT TIME PROVIDER")
-    if (exps) {
-      time_store.add(
-        exps.exps.map((exp) => exp.id),
-        {},
-      )
-    }
-  }, [exps])
+  const prepareTime = useClusterStore((state) => state.time.prepareAll)
+  const saveAll = useClusterStore((state) => state.time.saveAll)
+  const pauseAll = useClusterStore((state) => state.time.pauseAll)
+  const time_slots = useClusterStore((state) => state.time.slots.map)
   const [time_ref, setTime] = useTimeSlider()
-  let [t, setT] = useState(time_store.frames[0]?.idx || 0)
-  if (!exps) {
-    return null
-  }
+  const variables = useClusterStore((state) => state.variables)
+  const tree = useClusterStore((state) => state.texture_tree)
+  const collections = useClusterStore((state) => state.collections)
+  const active_variable = useMemo(() => {
+    return Object.values(variables)
+      .filter((v) => v.active)
+      .map((e) => e.name)
+  }, [variables])
+  useEffect(() => {
+    if (active_variable.length === 0) {
+      pauseAll()
+    }
+  }, [active_variable])
+  const saved_frames = useClusterStore((state) => state.time.saved_frames)
 
-  console.log("TIME PROVIDER (CALL)")
+  const current_canvas = document.createElement("canvas")
+  const current_ctx = current_canvas.getContext("2d")
+  const next_canvas = document.createElement("canvas")
+  const next_ctx = next_canvas.getContext("2d")
+  const context = {
+    current: {
+      canvas: current_canvas,
+      ctx: current_ctx,
+    },
+    next: {
+      canvas: next_canvas,
+      ctx: next_ctx,
+    },
+  } as CanvasHolder
 
+  useEffect(() => {
+    // PREPARE EACH TIME FRAMES
+    prepare(time_slots, collections, saved_frames, active_variable).then(
+      (res) => {
+        if (res.every((e) => e[1].length > 0)) {
+          prepareTime(res.map((e) => e[0]))
+          saveAll(res)
+        }
+      },
+    )
+  }, [time_slots, active_variable])
+
+  const container_ref = useRef<HTMLDivElement>(null!)
+  const [scenes, panels] = useTimePanel(
+    time_slots,
+    saved_frames,
+    collections,
+    active_variable,
+    tree,
+    context,
+  )
   return (
     <>
-      <div className="h-screen w-screen absolute top-0 left-0">
-        <Leva collapsed={false} oneLineLabels={false} flat={true} />
+      <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
         <Canvas
           camera={{
             fov: 55,
@@ -54,75 +105,57 @@ export function TimeProvider(props: Props) {
             position: [3, 2, 9],
           }}
           shadows
+          eventSource={container_ref}
         >
-          <World
-            config={config}
-            tick={(delta, callback) => {
-              if (time_store.frames[0] && variable) {
-                if (time_store.frames[0].state === TimeState.playing) {
-                  t = (t + delta) % exps.exps.length
-                  let idx = Math.floor(t)
-                  setTime(idx)
-
-                  if (div_ref.current) {
-                    div_ref.current.textContent = exps.exps[idx].id
-                  }
-                  const branch = findInTree(
-                    exps.exps[idx].id,
-                    variable.name,
-                    tree,
-                  )
-                  if (branch) {
-                    const path = branch.mean.paths[0].grid[0][0]
-
-                    Promise.all([
-                      database_provider.getTexture(path),
-                      database_provider.getInfo(
-                        exps.exps[idx].id,
-                        variable.name,
-                      ),
-                    ]).then(callback)
-                  }
-                }
-              }
-            }}
-          />
+          {scenes}
+          {/* <View track={view1}>
+                    <World config={config} tick={async (x)=>new Map()}/>
+                    <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
+                    <OrbitControls makeDefault />
+                </View> */}
+          <OrbitControls makeDefault enableZoom={true} enableRotate={true} />
         </Canvas>
       </div>
-      <div className="absolute bottom-0 left-1/2 lg:-translate-x-1/2 w-1/2">
-        <div ref={div_ref}></div>
-        <TimeController
-          play={() => {
-            console.log("play")
-            time_store.play(0)
-            return true
-          }}
-          pause={() => {
-            console.log("pause")
-            time_store.pause(0)
-            setT(Math.floor(t))
-            return true
-          }}
-          stop={() => {
-            console.log("stop")
-            time_store.stop(0)
-            setT(Math.floor(t))
-            return true
-          }}
-        />
-        <TimeSlider
-          min={0}
-          max={exps.exps.length}
-          className="w-full"
-          onChange={(value) => {
-            if (div_ref.current) {
-              setT(value)
-              div_ref.current.textContent = exps.exps[value].id
-            }
-          }}
-          ref={time_ref}
-        />
+      <div
+        ref={container_ref}
+        className="relative w-full h-full grid grid-cols-2 grid-rows-1 gap-4"
+      >
+        {panels}
       </div>
     </>
   )
+}
+
+async function prepare(
+  time_slots: Map<number, Time>,
+  collections: Map<number, Publication | Experiments>,
+  saved_frames: Map<number, Map<number, TimeFrame>>,
+  active_variables: VariableName[],
+) {
+  const res: [number, [number, TimeFrame][]][] = []
+
+  for (let [time_idx, time] of time_slots) {
+    const row: [number, TimeFrame][] = []
+    for (let [collection_idx, _] of time.collections) {
+      const collection = collections.get(collection_idx)
+
+      if (!collection) {
+        continue
+      }
+      let frame: TimeFrame
+      if (time.state === TimeState.playing || time.state === TimeState.paused) {
+        frame = await sync(
+          time,
+          collection.exps,
+          saved_frames.get(time_idx)!.get(collection_idx)!,
+          active_variables,
+        )
+      } else {
+        frame = await initFrame(time, collection.exps, active_variables)
+      }
+      row.push([collection_idx, frame])
+    }
+    res.push([time_idx, row])
+  }
+  return res
 }

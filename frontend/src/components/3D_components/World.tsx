@@ -12,68 +12,66 @@ import Controls from "./Controls"
 import { Plane } from "./Plane"
 import { Surface } from "./Surface"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { Texture, TextureInfo } from "@/utils/database/Texture"
+import { VariableName } from "@/utils/store/variables/variable.types"
+import { TextureInfo } from "@/utils/database/database.types"
 
 type Props = {
   config: {
     model: string
     heightData: string
   }
-  tick: (delta: number, callback: (x: [Texture, TextureInfo]) => void) => void
-}
-
-function buildTexture(data: ArrayBuffer, info: TextureInfo) {
-  var blob = new Blob([data], { type: "image/png" })
-  var url = URL.createObjectURL(blob)
-  var texture = new THREE.TextureLoader().load(url)
-  //, THREE.RGBAFormat, THREE.UnsignedByteType
-  // var dataView = new DataView(data);
-  // let texture = new THREE.DataTexture(dataView, info.xsize, info.ysize);
-  texture.needsUpdate = true
-  return texture
+  tick: (delta: number) => Promise<
+    Map<
+      VariableName,
+      {
+        current_url: string
+        next_url: string
+        weight: number
+        current_info: TextureInfo
+        next_info: TextureInfo
+      }
+    >
+  >
 }
 
 export function World({ config, tick }: Props) {
   // for Leva debug GUI (there must be a better way for this ...)
-  const { usePerformance, useTitle } = useControls("global", {
-    usePerformance: true,
-    useTitle: true,
-  })
-  const { rotate } = useControls("Globe", {
-    rotate: false,
-  })
+  // const { usePerformance, useTitle } = useControls('global', {
+  //   usePerformance: true,
+  //   useTitle: true,
+  // })
+  // const { rotate } = useControls('Globe', {
+  //   rotate: false,
+  // })
 
-  const exps = useClusterStore((state) => state.collections.current)
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
   let texture = new THREE.TextureLoader()
 
   useFrame((_, delta) => {
-    // if (input_ref) {
-    //   console.log(input_ref.current?.value);
-    // }
-    tick(delta, ([t, info]) => {
-      //texture = buildTexture(t.image,info)
-      var blob = new Blob([t.image], { type: "image/png" })
-      var url = URL.createObjectURL(blob)
-      texture.load(url, (tt) => {
-        if (sphereRef.current) {
-          sphereRef.current.material.map = tt
-        }
-      })
+    tick(delta).then((res) => {
+      for (let [variable, data] of res) {
+        texture.load(data.current_url, (tt) => {
+          if (sphereRef.current) {
+            sphereRef.current.material.map = tt
+          }
+        })
+        break
+      }
     })
 
-    if (rotate) {
-      sphereRef.current!.rotation.y += delta / 3
-    }
+    // if (rotate) {
+    //   sphereRef.current!.rotation.y += delta / 3
+    // }
   })
 
   return (
     <>
-      {usePerformance && <Perf position="bottom-right" />}
-      {/* {useTitle && <Title config={config}/>} */}
-      <Controls />
+      {/* {<Perf position='bottom-right' />}
+      {useTitle && <Title config={config}/>}
+      <Controls /> */}
       <Lights />
       <Surface ref={sphereRef} config={config} />
+      <Perf position="bottom-right" />
       {/* <Plane /> */}
     </>
   )

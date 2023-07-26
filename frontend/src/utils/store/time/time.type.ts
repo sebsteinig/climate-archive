@@ -1,3 +1,7 @@
+import { TextureInfo } from "@/utils/database/database.types"
+import { VariableName } from "../variables/variable.types"
+import { Experiment } from "@/utils/types"
+
 export enum TimeKind {
   circular,
   walk,
@@ -12,6 +16,7 @@ export enum TimeState {
   stopped,
   playing,
   ready,
+  zero,
 }
 
 export enum TimeSpeed {
@@ -20,17 +25,48 @@ export enum TimeSpeed {
   fast,
 }
 
+export enum TimeMode {
+  ts,
+  mean,
+}
+
 export type TimeConfig = {
   kind?: TimeKind
   direction?: TimeDirection
   speed?: TimeSpeed | number
+  mode?: TimeMode
 }
 
+export type TimeFrameValue = {
+  current: {
+    idx: number
+    exp: Experiment
+    info: TextureInfo
+    time_chunk: number
+    frame: number
+  }
+  next: {
+    idx: number
+    exp: Experiment
+    info: TextureInfo
+    time_chunk: number
+    frame: number
+  }
+  weight: number
+}
+export type TimeFrame = {
+  variables: Map<VariableName, TimeFrameValue>
+  initialized: boolean
+}
+
+export type TimeMultipleFrames = Map<number, TimeFrame>
+
 export type Time = {
+  mode: TimeMode
   direction: TimeDirection
   kind: TimeKind
   state: TimeState
   speed: number
-  idx: number
-  exps: string[]
+  //current_frame : TimeMultipleFrames
+  collections: Map<number, number>
 }

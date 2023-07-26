@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Image from "next/image"
 import Dots from "$/assets/icons/dots-slate-500.svg"
@@ -9,6 +9,7 @@ import { EditCollection } from "./EditCollection"
 import { MdSeparator } from "@/components/separators/separators"
 import { isPublication } from "@/utils/types.utils"
 import { Experiment, Experiments, Publication } from "@/utils/types"
+import { TimeMode } from "@/utils/store/time/time.type"
 
 type Props = {
   display_details: boolean
@@ -27,6 +28,17 @@ export function PreviewCollection({
   const displayed_collections = useClusterStore(
     (state) => state.displayed_collections,
   )
+  const addUnsync = useClusterStore((state) => state.time.addUnSync)
+  const binder = useClusterStore((state) => state.time.binder)
+  useEffect(() => {
+    for (let [collection_idx, occurence] of displayed_collections) {
+      if (!binder.has(collection_idx)) {
+        addUnsync(collection_idx, {
+          mode: TimeMode.ts,
+        })
+      }
+    }
+  }, [displayed_collections])
   const [display_all, displayAll] = useState(false)
   return (
     <div
