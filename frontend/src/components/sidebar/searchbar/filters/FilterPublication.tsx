@@ -85,7 +85,7 @@ export default function FilterPublication({filters, children, setRequestFilters}
     const [author, setAuthor] = useState(filters.authors_short ?? "")
     if (!display_filters){
         return (
-            <span onClick={() => {setDisplayFilters(true)}} className="inline-flex" >
+            <span onClick={() => {setDisplayFilters(true)}} className="inline-flex cursor-pointer" >
                 <h3 >Filter on publication</h3>
                 <Image
                     priority
@@ -98,7 +98,7 @@ export default function FilterPublication({filters, children, setRequestFilters}
     } else {
         return (
             <>
-            <span  onClick={() => {setDisplayFilters(false)}} className="inline-flex" >
+            <span  onClick={() => {setDisplayFilters(false)}} className="inline-flex cursor-pointer" >
                 <h3 >Filter on publication</h3>
                 <Image
                     priority

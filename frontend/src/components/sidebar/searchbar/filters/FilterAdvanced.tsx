@@ -7,9 +7,10 @@ import { DefaultParameter } from "@/utils/api/api.types"
 import { useEffect, useState } from "react"
 import Image from 'next/image';
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg";
+import Cross from "$/assets/icons/cross-small-emerald-300.svg";
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg";
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
-import { Collection, Experiments } from "../../../../utils/types"
+import { Experiments } from "../../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 type Exp = {
@@ -23,13 +24,19 @@ const SUPPORTED_VARIABLES = ["clt", "height", "mlotst", "pr", "sic", "tas", "cur
     "liconc", "pfts", "snc", "tos", "winds",]
 
 function ExpButton({exp,remove}:{exp:Exp,remove:Function}) {
-    return (
-        <div className="label">
-            <p>{exp.id}</p>
-            <h4 onClick={() => remove()}></h4>
-        </div>
-    )
+    if(exp.display){
+        return (
+            <div className="label mt-2 bg-slate-600 w-fit p-2 border-x-4 border-x-slate-500 
+                grid grid-cols-2 gap-1 items-center">
+                <p>{exp.id}</p>
+                <Image src={Cross} priority alt="delete"
+                    onClick={() => remove()}
+                    className={`w-6 h-6 cursor-pointer`} />
+            </div>
+            )
+    }
 }
+
 type Props = {
     setSearchBarVisible:Function
 }
@@ -47,7 +54,7 @@ export default function FilterAdvanced({setSearchBarVisible}:Props) {
         return (
             <>
                 <span onClick={() => setDisplay(true)}
-                    className="inline-flex" >
+                    className="inline-flex cursor-pointer" >
 
                     <h3>Advanced filters</h3>
                     <Image 
@@ -67,7 +74,7 @@ export default function FilterAdvanced({setSearchBarVisible}:Props) {
             <span onClick={() => {
                 setDisplay(false)
             }}
-            className="inline-flex"
+            className="inline-flex cursor-pointer"
             >
                 <h3>Advanced filters</h3>
                 <Image
@@ -77,12 +84,13 @@ export default function FilterAdvanced({setSearchBarVisible}:Props) {
                     src={ArrowUp} 
                 />
             </span>
-            <span >
+            <span className="flex flex-wrap gap-2">
                 {exp_ids.exp_ids?.map((exp,idx) => {
                     return <ExpButton exp={exp} key={idx} remove={()=> {
                         setExpIds((prev) => {
                             prev.exp_ids[idx].display = false
-                            return {...prev,exp_ids:prev.exp_ids}
+                            prev.exp_ids.splice(idx, 1)                            
+                            return {search : prev.search, exp_ids:prev.exp_ids} 
                         })
                     }}/>
                 })}
@@ -106,7 +114,6 @@ export default function FilterAdvanced({setSearchBarVisible}:Props) {
                             if (e.key === 'Enter') {
                                 setExpIds((prev) => {
                                     return {
-                                        ...prev,
                                         search:"",
                                         exp_ids : [...prev.exp_ids
                                             ,...prev.search
@@ -239,9 +246,11 @@ export default function FilterAdvanced({setSearchBarVisible}:Props) {
                             exp_ids:request.exp_ids,
                         })
                         pushAll(res.flat())
-                        addCollection({
+                        const collection = {
                             exps : request.exp_ids.map((exp) => {return {id :exp, metadata : []} }),
-                        } as Experiments)
+                        } as Experiments
+                        database_provider.addCollectionToDb(collection)
+                        addCollection(collection)
 
                     }
                 }>Load</ButtonSecondary>

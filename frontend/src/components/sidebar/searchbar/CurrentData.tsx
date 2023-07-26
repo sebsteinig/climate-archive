@@ -108,9 +108,9 @@ function CurrentTitle({current_details, display_details, onClick} : CurrentTitle
             {(!isPublication(current_details.collection) && current_details.collection.exps.length>0 ) &&
             <>
                 <p className="font-semibold text-sky-200"> 
-                    Collection of {current_details.collection.exps.length}
-                     Experiment{current_details.collection.exps.length>1?"s":""} :
-                     {current_details.collection.exps[0].id}, {current_details.collection.exps.length>1?"...":""}
+                    Collection of {current_details.collection.exps.length} Experiment
+                    {current_details.collection.exps.length>1?"s":""} : {current_details.collection.exps[0].id}
+                    {current_details.collection.exps.length>1?", ...":""}
                 </p>
                 <Image 
                     src = {display_details?ArrowUp:ArrowDown} 

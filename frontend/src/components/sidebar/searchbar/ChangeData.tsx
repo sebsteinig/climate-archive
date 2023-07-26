@@ -21,7 +21,7 @@ export function ChangeData({display_details, current_details, hover} : Props){
                     {other_data.map(([key, collection])=> {
                             return(
                                 <div key={key} className='border-s-4 border-sky-300 hover:opacity-100 m-2 p-2 group opacity-80'>
-                                    <p className="font-semibold text-sky-200">{isPublication(collection) ? collection.title:"Collection"}</p>
+                                    <p className="font-semibold text-sky-200">{collectionTitle(collection)}</p>
                                     {isPublication(collection) &&
                                         <p className="italic text-right text-slate-400">{`${collection.authors_short} (${collection.year})`}</p>}                                    
                                     <div className='flex flex-wrap gap-2'>
@@ -41,4 +41,14 @@ export function ChangeData({display_details, current_details, hover} : Props){
         )
     }
     return null
+}
+
+function collectionTitle(collection : Publication|Experiments){
+    if(isPublication(collection)){
+        return collection.title
+    } else {
+        return `Collection of ${collection.exps.length} Experiment
+        ${collection.exps.length>1?"s":""} : ${collection.exps[0].id}
+        ${collection.exps.length>1?", ...":""}`
+    }
 }
