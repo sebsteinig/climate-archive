@@ -4,11 +4,13 @@ import {
   RefAttributes,
   RefObject,
   forwardRef,
+  useImperativeHandle,
   useRef,
   useState,
 } from "react"
 import Main from "../../3D_components/Main"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
+import { TimeFrame } from "@/utils/store/time/time.type"
 
 type Props = {
   onChange: (value: number) => void
@@ -17,12 +19,25 @@ type Props = {
   className?: string
 }
 
-export const TimeSlider = forwardRef<HTMLInputElement, Props>(
+export type InputRef = {
+  onChange:(frame:TimeFrame) => void
+}
+
+export const TimeSlider = forwardRef<InputRef, Props>(
   function TimeSlider({ min, max, className, onChange }: Props, ref) {
+    useImperativeHandle(ref,
+      ()=>{
+        return {
+          onChange : (frame:TimeFrame) => {
+
+          }
+        }
+      }
+    )
     return (
       <div className={className}>
         <input
-          ref={ref}
+          //ref={ref}
           type="range"
           className="w-full"
           min={min}

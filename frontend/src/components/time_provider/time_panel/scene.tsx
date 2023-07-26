@@ -14,7 +14,8 @@ export type SceneProps = {
   frame: TimeFrame
   active_variables: VariableName[]
   tree: TextureTree
-  context: CanvasHolder
+  context: CanvasHolder,
+  onChange: (frame:TimeFrame) => void
 }
 
 export function Scene({
@@ -25,6 +26,7 @@ export function Scene({
   active_variables,
   tree,
   context,
+  onChange,
 }: SceneProps) {
   var config = {
     model: "Dune",
@@ -35,7 +37,7 @@ export function Scene({
     <View track={track}>
       <World
         config={config}
-        tick={tickBuilder(time, exps, frame, active_variables, tree, context)}
+        tick={tickBuilder(time, exps, frame, active_variables, tree, context,onChange)}
       />
     </View>
   )

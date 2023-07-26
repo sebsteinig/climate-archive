@@ -101,6 +101,7 @@ export function tickBuilder(
   active_variable: VariableName[],
   tree: TextureTree,
   context: CanvasHolder,
+  onChange : (frame:TimeFrame) => void
 ) {
   const next = nextBuilder(time)
   return async function tick(delta: number) {
@@ -112,6 +113,9 @@ export function tickBuilder(
     if (!frame.initialized) {
       return new Map()
     }
+    
+    onChange(frame)
+    console.log("here");
     const res = new Map()
     for (let [variable, data] of frame.variables) {
       const current_branch = findInTree(data.current.exp.id, variable, tree)

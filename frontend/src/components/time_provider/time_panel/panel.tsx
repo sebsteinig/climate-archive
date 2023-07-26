@@ -1,4 +1,4 @@
-import { Time } from "@/utils/store/time/time.type"
+import { Time, TimeFrame } from "@/utils/store/time/time.type"
 import {
   MutableRefObject,
   RefObject,
@@ -6,8 +6,8 @@ import {
   useImperativeHandle,
   useRef,
 } from "react"
-import { TimeController } from "../time_controllers/TimeController"
-import { TimeSlider } from "../time_controllers/TimeSlider"
+import { ControllerRef, TimeController } from "../time_controllers/TimeController"
+import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
 import { Container } from "./container"
 
 export type PanelProps = {
@@ -15,9 +15,14 @@ export type PanelProps = {
   time: Time
 }
 
+export type ContainerRef = {
+  ref : MutableRefObject<HTMLDivElement>,
+  onChange : (frame:TimeFrame) => void
+}
+
 export type Refs = {
-  input_ref: RefObject<HTMLInputElement>
-  container_refs: RefObject<Map<number, MutableRefObject<HTMLDivElement>[]>>
+  //input_ref: RefObject<HTMLInputElement>
+  container_refs: RefObject<Map<number, ContainerRef[]>>
 }
 function range(start: number, end: number) {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
@@ -32,9 +37,10 @@ export const Panel = forwardRef<Refs, PanelProps>(
       time.collections.size === 1 &&
       first_collection &&
       first_collection[1] === 1
-    const input_ref = useRef<HTMLInputElement>(null)
+    const input_ref = useRef<InputRef>(null)
+    const controller_ref = useRef<ControllerRef>(null)
     const container_refs = useRef<
-      Map<number, MutableRefObject<HTMLDivElement>[]>
+      Map<number, ContainerRef[]>
     >(new Map())
 
     const elementsRef = useRef(
@@ -49,7 +55,7 @@ export const Panel = forwardRef<Refs, PanelProps>(
 
     useImperativeHandle(refs, () => {
       return {
-        input_ref,
+        //input_ref,
         container_refs: container_refs,
       }
     })
@@ -62,7 +68,13 @@ export const Panel = forwardRef<Refs, PanelProps>(
               ref={(el: HTMLDivElement) => {
                 elementsRef.current[0].current = el
                 container_refs.current.set(first_collection![0], [
-                  elementsRef.current[0],
+                  {
+                    ref : elementsRef.current[0],
+                    onChange : (frame) => {
+                      input_ref.current?.onChange(frame)
+                      controller_ref.current?.onChange(frame)
+                    }
+                  }
                 ])
                 return el
               }}
@@ -81,10 +93,28 @@ export const Panel = forwardRef<Refs, PanelProps>(
                         ref={(el: HTMLDivElement) => {
                           elementsRef.current[i].current = el
                           const tmp = container_refs.current.get(i)
-                          tmp?.push(elementsRef.current[i])
+                          tmp?.push(                  
+                            {
+                              ref : elementsRef.current[0],
+                              onChange : (frame) => {
+                                input_ref.current?.onChange(frame)
+                                controller_ref.current?.onChange(frame)
+                                
+                              }
+                            }
+                          )
                           container_refs.current.set(
                             collection_idx,
-                            tmp ?? [elementsRef.current[i]],
+                            tmp ?? [                          
+                              {
+                                ref : elementsRef.current[0],
+                                onChange : (frame) => {
+                                  input_ref.current?.onChange(frame)
+                                  controller_ref.current?.onChange(frame)
+                                  
+                                }
+                              }
+                            ],
                           )
                           return el
                         }}

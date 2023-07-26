@@ -61,7 +61,8 @@ export function useTimePanel(
             tree={tree}
             context={context}
             active_variables={active_variables}
-            track={ref}
+            track={ref.ref}
+            onChange={ref.onChange}
           />,
         )
         i += 1
