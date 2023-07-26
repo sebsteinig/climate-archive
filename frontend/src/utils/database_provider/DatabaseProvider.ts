@@ -5,8 +5,6 @@ import { Database } from "@/utils/database/database"
 import {
   RequestMultipleTexture,
   RequestTexture,
-  TextureBranch,
-  TextureLeaf,
 } from "./database_provider.types"
 import { LRUCache } from "lru-cache"
 import { VariableName } from "../store/variables/variable.types"
@@ -93,7 +91,7 @@ class DatabaseProvider {
 
     const leaf_ts = {
       paths: info.paths_ts.paths,
-    } as TextureLeaf
+    }
     const leaf_mean = {
       paths: info.paths_mean.paths,
     }
@@ -102,7 +100,7 @@ class DatabaseProvider {
       variable: VariableName[info.variable as keyof typeof VariableName],
       mean: leaf_mean,
       ts: leaf_ts,
-    } as TextureBranch
+    }
   }
   async load(requested_texture: RequestTexture) {
     const response = await select(requested_texture.exp_id, {

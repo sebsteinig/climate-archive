@@ -11,7 +11,6 @@ import {
   TimeFrame,
   TimeState,
 } from "@/utils/store/time/time.type"
-import { findInTree } from "@/utils/store/texture_tree.store"
 import { initFrame } from "@/utils/store/time/time.utils"
 import {
   CameraControls,
@@ -44,7 +43,6 @@ export function TimeProvider(props: Props) {
   const time_slots = useClusterStore((state) => state.time.slots.map)
   const [time_ref, setTime] = useTimeSlider()
   const variables = useClusterStore((state) => state.variables)
-  const tree = useClusterStore((state) => state.texture_tree)
   const collections = useClusterStore((state) => state.collections)
   const active_variable = useMemo(() => {
     return Object.values(variables)
@@ -91,7 +89,6 @@ export function TimeProvider(props: Props) {
     saved_frames,
     collections,
     active_variable,
-    tree,
     context,
   )
   return (

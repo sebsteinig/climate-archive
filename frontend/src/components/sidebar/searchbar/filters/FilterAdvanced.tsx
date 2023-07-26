@@ -53,6 +53,7 @@ function ExpButton({ exp, remove }: { exp: Exp; remove: Function }) {
       </div>
     )
   }
+  return null
 }
 
 type Props = {
@@ -60,10 +61,9 @@ type Props = {
 }
 
 export default function FilterAdvanced({ setSearchBarVisible }: Props) {
-  const [pushAll, addCollection] = useClusterStore((state) => [
-    state.pushAll,
+  const addCollection = useClusterStore((state) => 
     state.addCollection,
-  ])
+  )
   const [display, setDisplay] = useState(false)
   const [exp_ids, setExpIds] = useState<{ exp_ids: Exp[]; search: string }>({
     exp_ids: [],
@@ -324,10 +324,9 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
               y: resolution.y ?? 0,
             },
           }
-          const res = await database_provider.loadAll({
+          await database_provider.loadAll({
             exp_ids: request.exp_ids,
           })
-          pushAll(res.flat())
           const collection = {
             exps: request.exp_ids.map((exp) => {
               return { id: exp, metadata: [] }
