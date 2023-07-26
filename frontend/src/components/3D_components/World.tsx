@@ -1,45 +1,45 @@
-"use client";
-import { useFrame } from '@react-three/fiber'
-import { useControls } from 'leva'
-import { Perf } from 'r3f-perf'
-import { useRef, forwardRef, RefObject } from 'react'
+"use client"
+import { useFrame } from "@react-three/fiber"
+import { useControls } from "leva"
+import { Perf } from "r3f-perf"
+import { useRef, forwardRef, RefObject } from "react"
 
-import * as THREE from 'three';
-import { SphereGeometry, Mesh, MeshStandardMaterial } from 'three'
-import { Title } from './Title'
-import Lights from './Lights'
-import Controls from './Controls'
-import { Plane } from './Plane'
-import { Surface } from './Surface'
-import { useClusterStore } from '@/utils/store/cluster.store';
-import { Texture, TextureInfo } from '@/utils/database/Texture';
+import * as THREE from "three"
+import { SphereGeometry, Mesh, MeshStandardMaterial } from "three"
+import { Title } from "./Title"
+import Lights from "./Lights"
+import Controls from "./Controls"
+import { Plane } from "./Plane"
+import { Surface } from "./Surface"
+import { useClusterStore } from "@/utils/store/cluster.store"
+import { Texture, TextureInfo } from "@/utils/database/Texture"
 
 type Props = {
   config: {
-    model: string,
+    model: string
     heightData: string
   }
-  tick : (delta:number, callback:((x:[Texture,TextureInfo]) => void)) => void
+  tick: (delta: number, callback: (x: [Texture, TextureInfo]) => void) => void
 }
 
-function buildTexture(data:ArrayBuffer,info:TextureInfo) {
-  var blob = new Blob([data], { type: "image/png" });
-  var url = URL.createObjectURL(blob);
-  var texture = new THREE.TextureLoader().load(url);
+function buildTexture(data: ArrayBuffer, info: TextureInfo) {
+  var blob = new Blob([data], { type: "image/png" })
+  var url = URL.createObjectURL(blob)
+  var texture = new THREE.TextureLoader().load(url)
   //, THREE.RGBAFormat, THREE.UnsignedByteType
   // var dataView = new DataView(data);
   // let texture = new THREE.DataTexture(dataView, info.xsize, info.ysize);
-  texture.needsUpdate = true;
-  return texture;
+  texture.needsUpdate = true
+  return texture
 }
 
-export function World({ config, tick } : Props) {
+export function World({ config, tick }: Props) {
   // for Leva debug GUI (there must be a better way for this ...)
-  const { usePerformance, useTitle } = useControls('global', {
+  const { usePerformance, useTitle } = useControls("global", {
     usePerformance: true,
     useTitle: true,
   })
-  const { rotate } = useControls('Globe', {
+  const { rotate } = useControls("Globe", {
     rotate: false,
   })
 
@@ -51,17 +51,17 @@ export function World({ config, tick } : Props) {
     // if (input_ref) {
     //   console.log(input_ref.current?.value);
     // }
-    tick(delta, ([t,info]) => {
+    tick(delta, ([t, info]) => {
       //texture = buildTexture(t.image,info)
-      var blob = new Blob([t.image], { type: "image/png" });
-        var url = URL.createObjectURL(blob);
-        texture.load(url,(tt) => {
-          if (sphereRef.current){
-            sphereRef.current.material.map = tt
-          }
-        })
+      var blob = new Blob([t.image], { type: "image/png" })
+      var url = URL.createObjectURL(blob)
+      texture.load(url, (tt) => {
+        if (sphereRef.current) {
+          sphereRef.current.material.map = tt
+        }
+      })
     })
-    
+
     if (rotate) {
       sphereRef.current!.rotation.y += delta / 3
     }
@@ -69,7 +69,7 @@ export function World({ config, tick } : Props) {
 
   return (
     <>
-      {usePerformance && <Perf position='bottom-right' />}
+      {usePerformance && <Perf position="bottom-right" />}
       {/* {useTitle && <Title config={config}/>} */}
       <Controls />
       <Lights />

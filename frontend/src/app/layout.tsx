@@ -1,9 +1,9 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
+import "./globals.css"
+import { Inter } from "next/font/google"
 
 export const metadata = {
-  title: 'Climate Archive',
-  description: 'Climate Archive',
+  title: "Climate Archive",
+  description: "Climate Archive",
 }
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body >{children}</body>
+      <body>{children}</body>
     </html>
   )
 }
