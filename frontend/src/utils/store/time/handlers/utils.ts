@@ -1,4 +1,4 @@
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
+import { TextureInfo } from "@/utils/database/database.types"
 import { VariableName } from "../../variables/variable.types"
 import {
   Time,
@@ -7,8 +7,8 @@ import {
   TimeFrameValue,
   TimeMode,
 } from "../time.type"
-import { TextureInfo } from "@/utils/database/Texture"
 import { Experiment } from "@/utils/types"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 
 export function chunksDetails(info: TextureInfo): [number, number] {
   const cs = info.paths_ts.paths[0].grid[0].length // number of chunks
@@ -57,7 +57,7 @@ export async function peekNextTs(
     next_chunk = 0
     next_idx = (next_idx + 1) % exps.length
   }
-  const info = await texture_provider.getInfo(exps[next_idx].id, variable)
+  const info = await database_provider.getInfo(exps[next_idx].id, variable)
   return [next_frame, next_chunk, next_idx, exps[next_idx], info]
 }
 
@@ -77,10 +77,10 @@ export async function peekPreviousTs(
     next_frame = fpc - 1
     next_chunk -= 1
   }
-  let info = await texture_provider.getInfo(exps[next_idx].id, variable)
+  let info = await database_provider.getInfo(exps[next_idx].id, variable)
   if (current_chunk < 0) {
     next_idx = (exps.length + next_idx - 1) % exps.length
-    info = await texture_provider.getInfo(exps[next_idx].id, variable)
+    info = await database_provider.getInfo(exps[next_idx].id, variable)
     const [new_nb_c, new_fpc] = chunksDetails(info)
     next_chunk = new_nb_c - 1
     next_frame = new_fpc - 1
@@ -114,7 +114,7 @@ async function syncMean(
       sync_frame.variables.set(variable, res)
       continue
     }
-    const current_info = await texture_provider.getInfo(
+    const current_info = await database_provider.getInfo(
       ref.current.exp.id,
       variable,
     )
@@ -128,7 +128,7 @@ async function syncMean(
 
     const next_idx = (ref.current.idx + didx) % exps.length
     const next_exp = exps[next_idx]
-    const next_info = await texture_provider.getInfo(next_exp.id, variable)
+    const next_info = await database_provider.getInfo(next_exp.id, variable)
 
     const next = {
       idx: next_idx,
@@ -170,7 +170,7 @@ async function syncTs(
       sync_frame.variables.set(variable, res)
       continue
     }
-    const current_info = await texture_provider.getInfo(
+    const current_info = await database_provider.getInfo(
       ref.current.exp.id,
       variable,
     )
@@ -270,8 +270,8 @@ export async function initMean(
   let exp_zero = exps[idx_zero]
   let exp_one = exps[idx_one]
   for (let variable of active_variable) {
-    const info_zero = await texture_provider.getInfo(exp_zero.id, variable)
-    const info_one = await texture_provider.getInfo(exp_one.id, variable)
+    const info_zero = await database_provider.getInfo(exp_zero.id, variable)
+    const info_one = await database_provider.getInfo(exp_one.id, variable)
 
     const value: TimeFrameValue = {
       current: {
@@ -316,7 +316,7 @@ export async function initTs(
   let exp = exps[idx]
 
   for (let variable of active_variable) {
-    const info = await texture_provider.getInfo(exp.id, variable)
+    const info = await database_provider.getInfo(exp.id, variable)
     const ts = info.timesteps
     const [cs, fs] = chunksDetails(info)
 

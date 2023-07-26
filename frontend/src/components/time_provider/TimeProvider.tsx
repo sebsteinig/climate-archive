@@ -11,7 +11,6 @@ import {
   TimeFrame,
   TimeState,
 } from "@/utils/store/time/time.type"
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { findInTree } from "@/utils/store/texture_tree.store"
 import { initFrame } from "@/utils/store/time/time.utils"
 import {
@@ -86,7 +85,6 @@ export function TimeProvider(props: Props) {
     )
   }, [time_slots, active_variable])
 
-  console.log("TIME PROVIDER CALL")
   const container_ref = useRef<HTMLDivElement>(null!)
   const [scenes, panels] = useTimePanel(
     time_slots,

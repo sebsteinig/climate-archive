@@ -24,7 +24,7 @@ function range(start: number, end: number) {
 }
 
 export const Panel = forwardRef<Refs, PanelProps>(
-  ({ time, time_idx }, refs) => {
+  function Panel({ time, time_idx }, refs) {
     const first_collection = time.collections.entries().next().value as
       | [number, number]
       | undefined
@@ -74,9 +74,10 @@ export const Panel = forwardRef<Refs, PanelProps>(
               {Array.from(
                 time.collections,
                 ([collection_idx, occurence], i) => {
-                  return range(0, occurence).map(() => {
+                  return range(0, occurence).map((i) => {
                     return (
                       <Container
+                        key={2 * i + 3 * collection_idx}
                         ref={(el: HTMLDivElement) => {
                           elementsRef.current[i].current = el
                           const tmp = container_refs.current.get(i)

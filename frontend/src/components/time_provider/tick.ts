@@ -1,3 +1,8 @@
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import {
+  TextureBranch,
+  TextureTree,
+} from "@/utils/database_provider/database_provider.types"
 import { findInTree } from "@/utils/store/texture_tree.store"
 import {
   Time,
@@ -8,11 +13,7 @@ import {
 } from "@/utils/store/time/time.type"
 import { nextBuilder } from "@/utils/store/time/time.utils"
 import { VariableName } from "@/utils/store/variables/variable.types"
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
-import {
-  TextureBranch,
-  TextureTree,
-} from "@/utils/texture_provider/texture_provider.types"
+
 import { Experiment } from "@/utils/types"
 import { LRUCache } from "lru-cache"
 
@@ -125,8 +126,8 @@ export function tickBuilder(
         next_branch,
       )
 
-      const current_texture = await texture_provider.getTexture(current_path)
-      const next_texture = await texture_provider.getTexture(next_path)
+      const current_texture = await database_provider.getTexture(current_path)
+      const next_texture = await database_provider.getTexture(next_path)
 
       const current_blob = new Blob([current_texture.image], {
         type: "image/png",

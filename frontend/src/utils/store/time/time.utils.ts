@@ -1,4 +1,3 @@
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import {
   Time,
   TimeDirection,

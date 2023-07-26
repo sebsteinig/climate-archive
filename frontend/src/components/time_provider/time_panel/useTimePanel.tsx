@@ -1,7 +1,5 @@
 import { Time, TimeFrame, TimeState } from "@/utils/store/time/time.type"
 import { VariableName } from "@/utils/store/variables/variable.types"
-import { TextureTree } from "@/utils/texture_provider/texture_provider.types"
-import { Collection, Experiment, Publication } from "@/utils/types"
 import {
   MutableRefObject,
   RefObject,
@@ -19,11 +17,13 @@ import { TimeSlider } from "../time_controllers/TimeSlider"
 import React from "react"
 import { Scene } from "./scene"
 import { Panel, Refs } from "./panel"
+import { Experiments, Publication } from "@/utils/types"
+import { TextureTree } from "@/utils/database_provider/database_provider.types"
 
 export function useTimePanel(
   time_slots: Map<number, Time>,
   saved_frames: Map<number, Map<number, TimeFrame>>,
-  collections: Map<number, Publication | Collection>,
+  collections: Map<number, Publication | Experiments>,
   active_variables: VariableName[],
   tree: TextureTree,
   context: CanvasHolder,
@@ -34,6 +34,7 @@ export function useTimePanel(
   for (let [time_idx, time] of time_slots) {
     panels.push(
       <Panel
+        key={time_idx}
         time={time}
         time_idx={time_idx}
         ref={(el: Refs) => {
@@ -49,9 +50,11 @@ export function useTimePanel(
       if (!r) continue
       const frame = saved_frames.get(time_idx)!.get(collection_idx)!
       const exps = collections.get(collection_idx)!.exps
+      let i = 0
       for (let ref of r) {
         scenes.push(
           <Scene
+            key={i}
             time={time}
             frame={frame}
             exps={exps}
@@ -61,6 +64,7 @@ export function useTimePanel(
             track={ref}
           />,
         )
+        i += 1
       }
     }
   }

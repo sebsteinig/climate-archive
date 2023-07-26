@@ -20,9 +20,7 @@ type Props = {
     model: string
     heightData: string
   }
-  tick: (
-    delta: number,
-  ) => Promise<
+  tick: (delta: number) => Promise<
     Map<
       VariableName,
       {

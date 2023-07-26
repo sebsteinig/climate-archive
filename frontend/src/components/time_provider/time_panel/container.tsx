@@ -9,7 +9,7 @@ type Props = {
 }
 
 export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  ({ time_idx, collection_idx, className, children }, ref) => {
+  function Container({ time_idx, collection_idx, className, children }, ref) {
     const pauseAll = useClusterStore((state) => state.time.pauseAll)
     const addUnsync = useClusterStore((state) => state.time.addUnSync)
     const time = useClusterStore((state) => state.time.slots.map.get(time_idx))

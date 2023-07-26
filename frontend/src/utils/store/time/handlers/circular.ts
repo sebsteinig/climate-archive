@@ -1,4 +1,4 @@
-import { texture_provider } from "@/utils/texture_provider/TextureProvider"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { VariableName } from "../../variables/variable.types"
 import { Time, TimeDirection, TimeFrame, TimeMode } from "../time.type"
 import { chunksDetails, peekNextTs, peekPreviousTs, sync } from "./utils"
@@ -29,7 +29,7 @@ async function nextCircularMean(
 
     const new_idx = (exps.length + new_current.idx + didx) % exps.length
     const new_exp = exps[new_idx]
-    const new_info = await texture_provider.getInfo(new_exp.id, variable)
+    const new_info = await database_provider.getInfo(new_exp.id, variable)
 
     const new_next = {
       idx: new_idx,
