@@ -7,9 +7,9 @@ import {
   useRef,
   useState,
 } from "react"
-import { TimeFrame, TimeFrameValue, TimeMode } from "@/utils/store/time/time.type"
+import { TimeFrame, TimeFrameValue, TimeMode, TimeState } from "@/utils/store/time/time.type"
 import { Collection } from "@/utils/store/texture_tree.store"
-import { chunksDetails } from "@/utils/store/time/handlers/utils"
+import { chunksDetails, getCurrentPos } from "@/utils/store/time/handlers/utils"
 
 type Props = {
   onChange: (value: number) => void
@@ -26,7 +26,10 @@ export const TimeSlider = forwardRef<InputRef, Props>(
 
   const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
   const collections = useClusterStore((state) => state.collections)
-  const save = useClusterStore(state => state.time.saveSome)
+  const surf = useClusterStore(state => state.time.surf)
+  const try_surfing = useClusterStore(state => state.time.try_surfing)
+  const updateSurfingDestination = useClusterStore(state => state.time.updateSurfingDestination)
+  const pin = useClusterStore(state => state.time.pin)
   const input_ref = useRef<HTMLInputElement>(null)
   const own_collections = useMemo(
     () => {
@@ -54,12 +57,19 @@ export const TimeSlider = forwardRef<InputRef, Props>(
     }
   ,[time?.mode])
   const snap_frames = useRef<Map<number,TimeFrame>>(new Map())
+
   useImperativeHandle(ref,
     ()=>{
       return {
         onChange : (collection_idx:number,frame:TimeFrame) => {
           if(!time) {
             return 
+          }
+          if(time.state === TimeState.paused
+            || time.state === TimeState.stopped
+            || time.state === TimeState.zero
+            || time.state === TimeState.ready){
+            return
           }
           if(!input_ref.current) {
             return
@@ -69,6 +79,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(
             return
           }
           snap_frames.current.set(collection_idx,frame)
+          
+          if(time.state === TimeState.surfing) {
+            return
+          }
+          // UPDATE SLIDER
           if (time.mode === TimeMode.ts) {
             const s = first.current.info.timesteps
             const f = first.current.frame 
@@ -76,6 +91,10 @@ export const TimeSlider = forwardRef<InputRef, Props>(
             const [cs,fpc] = chunksDetails(first.current.info)
             const t = f + c*fpc
 
+            const w = Math.floor(first.weight*10)
+            input_ref.current.value = `${t*10 + w}`
+          }else {
+            const t = first.current.idx
             const w = Math.floor(first.weight*10)
             input_ref.current.value = `${t*10 + w}`
           }
@@ -90,9 +109,29 @@ export const TimeSlider = forwardRef<InputRef, Props>(
           className="w-full"
           min={0}
           max={max}
+
           onChange={(e) => {
-            save(time_idx,snap_frames.current)
-            onChange(parseInt(e.target.value))
+            const idx = parseInt(e.target.value)
+            const unweighted_idx = Math.floor(idx/10)
+            if(time?.state === TimeState.playing) {
+              pin(time_idx)
+              const frame = snap_frames.current.values().next().value as TimeFrame | undefined
+              if(!frame) {
+                return
+              }
+              const [pos,_] = getCurrentPos(time,frame)
+              try_surfing(time_idx,pos)
+            }else if(time?.state === TimeState.paused) {
+                const frame = snap_frames.current.values().next().value as TimeFrame | undefined
+                if(!frame) {
+                  return
+                }
+                const [pos,_] = getCurrentPos(time,frame)
+                try_surfing(time_idx,pos)
+                surf(time_idx,unweighted_idx)
+            }else if(time?.state === TimeState.surfing) {
+              updateSurfingDestination(time_idx,unweighted_idx)
+            }
           }}
         />
       </div>

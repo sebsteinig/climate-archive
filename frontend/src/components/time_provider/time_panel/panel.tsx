@@ -18,6 +18,7 @@ export type PanelProps = {
 
 export type ContainerRef = {
   ref : MutableRefObject<HTMLDivElement>,
+  
   onChange : (frame:TimeFrame) => void
 }
 

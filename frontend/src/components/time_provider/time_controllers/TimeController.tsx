@@ -23,11 +23,13 @@ export const TimeController = forwardRef<ControllerRef,Props>(
   const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
   const playTime = useClusterStore((state) => state.time.play)
   const pauseTime = useClusterStore((state) => state.time.pause)
+  const pin = useClusterStore((state) => state.time.pin)
   const variables = useClusterStore((state) => state.variables)
   const save = useClusterStore(state => state.time.saveSome)
 
 
   const snap_frames = useRef<Map<number,TimeFrame>>(new Map())
+  //const snap_frames = new Map()
 
   const active_variable = useMemo(() => {
     return Object.values(variables)
@@ -50,26 +52,55 @@ export const TimeController = forwardRef<ControllerRef,Props>(
           if(!time) {
             return
           }
-          if ( div_ref.current) {
-            const first = frame.variables.values().next().value as TimeFrameValue | undefined
-            if(!first) {
-              return
-            }
-            snap_frames.current.set(collection_idx,frame)
-            const exp = first.current.exp.id
-            const metadata = first.current.exp.metadata[0].metadata.text ?? ""
-            if (time.mode === TimeMode.ts) {
-              const s = first.current.info.timesteps
-              const f = first.current.frame 
-              const c = first.current.time_chunk
-              const [cs,fpc] = chunksDetails(first.current.info)
-              const t = f + c*fpc
-              const time_title = titleOf(t,s) ?? t.toString()
-              div_ref.current.innerText = `${exp} ${metadata} : ${time_title}`
-            }else {
-              div_ref.current.innerText = `${exp} ${metadata}`
+          if(time.state === TimeState.paused
+            || time.state === TimeState.stopped
+            || time.state === TimeState.zero
+            || time.state === TimeState.ready){
+            return
+          }
+          const first = frame.variables.values().next().value as TimeFrameValue | undefined
+          if(!first) {
+            return
+          }
+          console.log('TIME CONTROLLER ########');
+          console.log(first);
+          snap_frames.current.set(collection_idx,frame)
+          console.log(snap_frames);
+          
+          console.log();
+          
+          if(time.state === TimeState.pinning) {
+            if(first.weight === 0) {
+              console.log('PINNED');
+              
+              pauseTime(time_idx)
+              console.log(snap_frames.current);
+              
+              save(time_idx,snap_frames.current)
+              //return
             }
           }
+
+          console.log(TimeState[time.state]);
+          console.log('###################');
+          
+          if ( !div_ref.current) {
+            return
+          }
+          const exp = first.current.exp.id
+          const metadata = first.current.exp.metadata[0].metadata.text ?? ""
+          if (time.mode === TimeMode.ts) {
+            const s = first.current.info.timesteps
+            const f = first.current.frame 
+            const c = first.current.time_chunk
+            const [cs,fpc] = chunksDetails(first.current.info)
+            const t = f + c*fpc
+            const time_title = titleOf(t,s) ?? t.toString()
+            div_ref.current.innerText = `${exp} ${metadata} : ${time_title}`
+          }else {
+            div_ref.current.innerText = `${exp} ${metadata}`
+          }
+          
         }
       }
     }
@@ -80,7 +111,6 @@ export const TimeController = forwardRef<ControllerRef,Props>(
   }
   return (
     <div className={className + "align-middle flex"}>
-      <div ref={div_ref}></div>
       {is_playing ? (
         // PAUSE BUTTON
         <Image
@@ -91,7 +121,7 @@ export const TimeController = forwardRef<ControllerRef,Props>(
           onClick={() => {
             if (time.state === TimeState.playing) {
               console.log("PAUSE")
-              pauseTime(time_idx)
+              pin(time_idx)
               save(time_idx,snap_frames.current)
             }
           }}
@@ -122,6 +152,7 @@ export const TimeController = forwardRef<ControllerRef,Props>(
           // }
         }}
       />
+      <div ref={div_ref}></div>
     </div>
   )
 })

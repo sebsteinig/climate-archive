@@ -65,6 +65,7 @@ export function TimeProvider(props: Props) {
 
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
+
     prepare(time_slots, collections, saved_frames, active_variable).then(
       (res) => {
         if (res.every((e) => e[1].length > 0)) {
@@ -125,6 +126,9 @@ async function prepare(
 
   for (let [time_idx, time] of time_slots) {
     const row: [number, TimeFrame][] = []
+    if(time.state !== TimeState.zero && time.state !== TimeState.stopped) {
+      continue;
+    }
     for (let [collection_idx, _] of time.collections) {
       const collection = collections.get(collection_idx)
 
@@ -132,16 +136,16 @@ async function prepare(
         continue
       }
       let frame: TimeFrame
-      if (time.state === TimeState.playing || time.state === TimeState.paused) {
-        frame = await sync(
-          time,
-          collection.exps,
-          saved_frames.get(time_idx)!.get(collection_idx)!,
-          active_variables,
-        )
-      } else {
+      // if (time.state === TimeState.playing || time.state === TimeState.paused) {
+      //   frame = await sync(
+      //     time,
+      //     collection.exps,
+      //     saved_frames.get(time_idx)!.get(collection_idx)!,
+      //     active_variables,
+      //   )
+      // } else {
         frame = await initFrame(time, collection.exps, active_variables)
-      }
+      //}
       row.push([collection_idx, frame])
     }
     res.push([time_idx, row])

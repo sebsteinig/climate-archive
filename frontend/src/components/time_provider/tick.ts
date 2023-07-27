@@ -1,5 +1,6 @@
 import { TextureInfo } from "@/utils/database/database.types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { getCurrentPos } from "@/utils/store/time/handlers/utils"
 import {
   Time,
   TimeFrame,
@@ -90,6 +91,11 @@ export function crop(
   return res
 }
 
+function surf(departure:number,current:number,weight:number,destination:number):number {
+  
+  return 0
+}
+
 export function tickBuilder(
   time: Time,
   exps: Experiment[],
@@ -100,16 +106,32 @@ export function tickBuilder(
 ) {
   const next = nextBuilder(time)
   return async function tick(delta: number) {
-    if (time.state !== TimeState.playing || !frame.initialized) {
+    if (!frame.initialized
+      || time.state === TimeState.paused
+      || time.state === TimeState.stopped
+      || time.state === TimeState.zero
+      || time.state === TimeState.ready
+    ) {
       return new Map()
     }
-    //console.log('tick');
-    frame = await next(time, exps, frame, delta, active_variable)
-    if (!frame.initialized) {
-      return new Map()
+    if ( time.state === TimeState.pinning) {
+      const first = frame.variables.values().next().value as TimeFrameValue | undefined
+      console.log(`ACTIVELY PINNING ${first?.weight}`);
+      console.log(frame);
+      console.log('-------------');
+      
+      
+      //if(first?.weight !== 0) {
+        frame = await next(time, exps, frame, delta, active_variable)
+      //}
+    }else if(time.state === TimeState.surfing) {
+      const [current_pos,weight] = getCurrentPos(time,frame)
+      const surfing_rate = surf(time.surfing_departure,current_pos,weight,time.surfing_destination)
+      frame = await next(time, exps, frame, surfing_rate, active_variable)
+    }else if(time.state === TimeState.playing) {
+      frame = await next(time, exps, frame, delta, active_variable)
     }
-    
-    onChange(frame)
+  
     const res = new Map()
     
     for (let [variable, data] of frame.variables) {
@@ -163,6 +185,7 @@ export function tickBuilder(
         next_info: data.next.info,
       })
     }
+    onChange(frame)
     return res
   }
 }

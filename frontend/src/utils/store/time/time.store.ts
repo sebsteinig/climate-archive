@@ -17,7 +17,6 @@ export interface TimeSlice {
     binder: Map<number, number> // collection => slot
 
     saved_frames: Map<number, Map<number, TimeFrame>>
-
     addSync: (collection_idx: number, config: TimeConfig | undefined) => void
     addUnSync: (collection_idx: number, config: TimeConfig) => void
 
@@ -30,6 +29,10 @@ export interface TimeSlice {
     prepareAll: (idxs: number[]) => void
     play: (idx: number) => void
     pause: (idx: number) => void
+    pin: (idx: number) => void
+    try_surfing: (idx: number,departure:number) => void
+    surf: (idx: number,destination:number) => void
+    updateSurfingDestination : (idx: number,destination:number) => void
     stop: (idx: number) => void
     save: (time_idx: number, collection_idx: number, t: TimeFrame) => void
     saveSome: (time_idx: number, snapshot : Map<number,TimeFrame>) => void
@@ -227,8 +230,60 @@ export const createTimeSlice: StateCreator<
             return
           }
 
-          if (time.state === TimeState.playing) {
+          if (time.state === TimeState.pinning) {
             time.state = TimeState.paused
+          }
+        })
+      },
+      pin: (idx: number) => {
+        set((state) => {
+          const time = state.time.slots.map.get(idx)
+          if (!time) {
+            return
+          }
+
+          if (time.state === TimeState.playing) {
+            time.state = TimeState.pinning
+          }
+        })
+      },
+      try_surfing : (idx:number,departure) => {
+        set((state) => {
+          const time = state.time.slots.map.get(idx)
+          if (!time) {
+            return
+          }
+
+            time.surfing_departure = departure
+          }
+        )
+      },
+      surf: (idx: number,destination) => {
+        set((state) => {
+          const time = state.time.slots.map.get(idx)
+          if (!time) {
+            return
+          }
+
+          if (time.state === TimeState.playing 
+            || time.state === TimeState.paused 
+            || time.state === TimeState.ready
+          ) {
+            time.state = TimeState.surfing
+            time.surfing_destination = destination
+          }
+        })
+      },
+      updateSurfingDestination: (idx: number,destination) => {
+        set((state) => {
+          const time = state.time.slots.map.get(idx)
+          if (!time) {
+            return
+          }
+
+          if (time.state === TimeState.surfing
+          ) {
+            time.surfing_destination = destination
           }
         })
       },
@@ -255,6 +310,8 @@ export const createTimeSlice: StateCreator<
         })
       },
       save: (time_idx: number, collection_idx: number, t: TimeFrame) => {
+        console.log('SAVE');
+        
         set((state) => {
           const time = state.time.slots.map.get(time_idx)
           if (!time) {
@@ -270,6 +327,10 @@ export const createTimeSlice: StateCreator<
       },
 
     saveSome: (time_idx: number, snapshot : Map<number,TimeFrame>) => {
+      console.log('SAVE SOME');
+      console.log(snapshot);
+      console.log('----------------');
+      
       set((state) => {
         const time = state.time.slots.map.get(time_idx)
         if (!time) {
@@ -286,6 +347,10 @@ export const createTimeSlice: StateCreator<
       })
     },
       saveAll: (res: [number, [number, TimeFrame][]][]) => {
+        console.log('SAVE ALL');
+        console.log(res);
+        console.log('-----------');
+        
         set((state) => {
           for (let [time_idx, frames] of res) {
             for (let [collection_idx, frame] of frames) {

@@ -15,6 +15,8 @@ export enum TimeState {
   paused,
   stopped,
   playing,
+  pinning,
+  surfing,
   ready,
   zero,
 }
@@ -67,6 +69,8 @@ export type Time = {
   kind: TimeKind
   state: TimeState
   speed: number
+  surfing_departure : number
+  surfing_destination :number
   //current_frame : TimeMultipleFrames
   collections: Map<number, number>
 }
