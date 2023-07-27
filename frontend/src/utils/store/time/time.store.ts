@@ -15,8 +15,10 @@ export interface TimeSlice {
   time: {
     slots: { map: Map<number, Time>; last: number }
     binder: Map<number, Set<number>> // collection => slot
-
+    cameras_state : Map<number, Map<number, Map<number, boolean>>>
     saved_frames: Map<number, Map<number, TimeFrame>>
+
+    linkCamera: (time_idx: number, collection_idx: number, panel_idx: number, linked : boolean) => void
 
     addSync: (collection_idx: number, config: TimeConfig | undefined) => void
     addUnSync: (collection_idx: number, config: TimeConfig) => void
@@ -49,6 +51,18 @@ export const createTimeSlice: StateCreator<
       slots: { map: new Map(), last: -1 },
       binder: new Map(),
       saved_frames: new Map(),
+      cameras_state : new Map(),
+      
+      linkCamera:(time_idx: number, collection_idx: number, panel_idx: number, linked : boolean) =>{
+        set((state) => {
+          const time = state.time.cameras_state.get(time_idx)
+          if(! time) return;
+          const collection = time.get(collection_idx)
+          if (!collection) return;
+          collection.set(panel_idx, linked)
+        })
+      },
+
       addSync: (collection_idx: number, config: TimeConfig | undefined) => {
         set((state) => {
           const slots_size = state.time.slots.map.size

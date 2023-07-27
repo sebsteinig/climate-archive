@@ -1,6 +1,6 @@
 "use client"
-import Image from "next/image"
-import ArrowLeft from "$/assets/icons/arrow-left-emerald-300.svg"
+
+import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg"
 import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg"
 import { useState } from "react"
@@ -61,14 +61,9 @@ export default function PublicationDetails({
   return (
     <>
       <div className="border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4">
-        <Image
-          priority
-          alt="back"
-          title="back"
-          className="w-4 h-4 cursor-pointer"
-          src={ArrowLeft}
+        <ArrowLeft className="w-4 h-4 cursor-pointer text-emerald-400"
           onClick={() => setDisplaySeeDetails(false)}
-        />
+        />       
 
         <p className="font-semibold tracking-widest text-center pr-4 text-sky-200">
           {title}
@@ -86,12 +81,12 @@ export default function PublicationDetails({
               setDisplayAbstract((prev) => !prev)
             }}
           >
-            <Image
-              src={display_abstract ? ArrowUp : ArrowDown}
-              priority
-              alt="up"
-              className="w-3 h-3"
-            />
+            {display_abstract?
+              <ArrowUp className="w-3 h-3 text-gray-50"/>
+            :
+              <ArrowDown className="w-3 h-3 text-gray-50"/>
+            }
+            
             <p className="hover:underline text-right">
               {display_abstract ? "Hide" : "Full abstract"}
             </p>

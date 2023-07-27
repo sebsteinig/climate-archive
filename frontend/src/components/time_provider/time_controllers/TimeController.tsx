@@ -1,4 +1,3 @@
-import Image from "next/image"
 import Play from "$/assets/icons/play-slate-400.svg"
 import Pause from "$/assets/icons/pause-slate-400.svg"
 import Stop from "$/assets/icons/stop-slate-400.svg"
@@ -36,11 +35,8 @@ export function TimeController({ className, time_idx }: Props) {
     <div className={className + "align-middle flex"}>
       {is_playing ? (
         // PAUSE BUTTON
-        <Image
-          priority
-          src={Pause}
-          className={`w-8 h-8 inline-block`}
-          alt="pause"
+        <Pause 
+          className={`w-8 h-8 inline-block text-slate-500`}
           onClick={() => {
             if (time.state === TimeState.playing) {
               console.log("PAUSE")
@@ -48,13 +44,11 @@ export function TimeController({ className, time_idx }: Props) {
             }
           }}
         />
+        
       ) : (
         // PLAY BUTTON
-        <Image
-          priority
-          src={Play}
-          className={`w-8 h-8 inline-block`}
-          alt="play"
+        <Play 
+          className={`w-8 h-8 inline-block text-slate-500`}
           onClick={() => {
             if (active_variable.length > 0 && time.state !== TimeState.zero) {
               console.log("PLAY")
@@ -63,11 +57,8 @@ export function TimeController({ className, time_idx }: Props) {
           }}
         />
       )}
-      <Image
-        priority
-        src={Stop}
-        className={`w-8 h-8 block`}
-        alt="stop"
+      <Stop
+        className={`w-8 h-8 block text-slate-500`}
         onClick={() => {
           // if(stop()) {
           //     setPlaying(false)

@@ -1,6 +1,4 @@
 import { Variable, VariableProps } from "../utils"
-import TemperatureIcon from "$/assets/icons/temperature-slate-500.svg"
-import TemperatureGreenIcon from "$/assets/icons/temperature-emerald-300.svg"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -17,7 +15,6 @@ export function Tos({
       toggle={() => tos.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      src={tos.active ? TemperatureGreenIcon : TemperatureIcon}
       active={tos.active}
       controls={true}
     >

@@ -28,11 +28,12 @@
   }
   svg {
     stroke : currentColor;
-    fill : currentColor
+    /* fill : currentColor; */
+    
   }
   path {
     stroke : currentColor;
-    fill : currentColor
+    /* fill : currentColor */
   }
 
 }
