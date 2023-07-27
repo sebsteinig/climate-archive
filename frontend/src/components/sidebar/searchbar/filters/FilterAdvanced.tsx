@@ -318,11 +318,10 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
               return { id: exp, metadata: [] }
             }),
           } as Experiments
-          database_provider.addCollectionToDb(collection)
-          addCollection(collection, (idx) => {
-            addUnsync(idx, {
-              mode: TimeMode.ts,
-            })
+          const idx = await database_provider.addCollectionToDb(collection)
+          addCollection(idx, collection)
+          addUnsync(idx, {
+            mode: TimeMode.ts,
           })
         }}
       >
