@@ -1,6 +1,4 @@
 import { Variable, VariableProps } from "../utils"
-import MountainGreeIcon from "$/assets/icons/mountain-emerald-300.svg"
-import MountainIcon from "$/assets/icons/mountain-slate-500.svg"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -16,7 +14,6 @@ export function Height({
       toggle={() => height.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      src={height.active ? MountainGreeIcon : MountainIcon}
       active={height.active}
       controls={true}
     >

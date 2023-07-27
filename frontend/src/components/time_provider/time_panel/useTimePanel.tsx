@@ -52,6 +52,9 @@ export function useTimePanel(
       for (let ref of r) {
         scenes.push(
           <Scene
+            time_idx={time_idx}
+            collection_idx={collection_idx}
+            panel_idx={ref.panel_idx}
             key={i}
             time={time}
             frame={frame}

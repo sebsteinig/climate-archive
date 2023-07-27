@@ -3,7 +3,6 @@ import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import InputField from "@/components/inputs/InputField"
 import Select from "@/components/inputs/Select"
 import { SearchPublication } from "@/utils/api/api.types"
-import Image from "next/image"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
 
@@ -172,12 +171,7 @@ export default function FilterPublication({
         className="inline-flex cursor-pointer"
       >
         <h3>Filter on publication</h3>
-        <Image
-          priority
-          alt="open"
-          className={`w-4 h-4 self-center ml-4`}
-          src={ArrowDown}
-        />
+          <ArrowDown className={`w-4 h-4 text-emerald-400 self-center ml-4`}/>
       </span>
     )
   } else {
@@ -190,12 +184,8 @@ export default function FilterPublication({
           className="inline-flex cursor-pointer"
         >
           <h3>Filter on publication</h3>
-          <Image
-            priority
-            alt="open"
-            className={`w-4 h-4 self-center ml-4`}
-            src={ArrowUp}
-          />
+          <ArrowUp className={`w-4 h-4 self-center  text-emerald-400 ml-4`}/>
+
         </span>
 
         <Period

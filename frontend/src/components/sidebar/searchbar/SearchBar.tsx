@@ -7,11 +7,10 @@ import FilterAdvanced from "./filters/FilterAdvanced"
 import { Publications } from "./publication"
 import { Publication } from "../../../utils/types"
 import { DefaultParameter, SearchPublication } from "@/utils/api/api.types"
-import Image from "next/image"
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
-import Cross from "$/assets/icons/cross-small-emerald-300.svg"
+import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import { FullWidthSeparator, MdSeparator } from "../../separators/separators"
 import { PropsWithChildren } from "react"
 
@@ -106,21 +105,11 @@ export default function SearchBar({
         `}
       ref={search_panel_ref}
     >
-      <Image
-        priority
-        src={Cross}
-        className={`w-8 h-8 absolute top-0 right-0 cursor-pointer`}
-        alt="close"
-        title="close search bar"
+      <CrossIcon className={`w-8 h-8 absolute top-0 right-0 text-emerald-400 cursor-pointer`}
         onClick={() => setSearchBarVisible(false)}
       />
-      <Image
-        priority
-        src={SearchIcon}
-        className={`w-8 h-8 lg:invisible lg:hidden ${
-          search_panel_visible ? "hidden" : ""
-        }`}
-        alt="Search a publication"
+      <SearchIcon className={`w-8 h-8 lg:invisible text-emerald-400 lg:hidden ${
+          search_panel_visible ? "hidden" : ""}`}
       />
 
       <input
@@ -154,19 +143,9 @@ export default function SearchBar({
               >
                 More options{" "}
                 {display_more_options ? (
-                  <Image
-                    priority
-                    alt="close"
-                    className={`w-4 h-4 self-center ml-4`}
-                    src={ArrowUp}
-                  />
+                  <ArrowUp className={`w-4 h-4 self-center ml-4 text-emerald-400`}/>
                 ) : (
-                  <Image
-                    priority
-                    alt="open"
-                    className={`w-4 h-4 self-center ml-4`}
-                    src={ArrowDown}
-                  />
+                  <ArrowDown className={`w-4 h-4 self-center ml-4 text-emerald-400`}/>
                 )}
               </p>
             </div>

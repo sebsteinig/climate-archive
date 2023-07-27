@@ -1,6 +1,4 @@
 import { Variable, VariableProps } from "../utils"
-import WindsIcon from "$/assets/icons/winds-slate-500.svg"
-import WindsGreenIcon from "$/assets/icons/winds-emerald-300.svg"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import InputNumber from "@/components/inputs/InputNumber"
 import Slider from "@/components/inputs/Slider"
@@ -17,7 +15,6 @@ export function Winds({
       toggle={() => winds.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      src={winds.active ? WindsGreenIcon : WindsIcon}
       active={winds.active}
       controls={true}
     >

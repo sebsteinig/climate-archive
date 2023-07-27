@@ -41,6 +41,7 @@ export function TimeProvider(props: Props) {
   const saveAll = useClusterStore((state) => state.time.saveAll)
   const pauseAll = useClusterStore((state) => state.time.pauseAll)
   const time_slots = useClusterStore((state) => state.time.slots.map)
+  
   const [time_ref, setTime] = useTimeSlider()
   const variables = useClusterStore((state) => state.variables)
   const collections = useClusterStore((state) => state.collections)
