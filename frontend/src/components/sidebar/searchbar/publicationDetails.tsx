@@ -54,16 +54,15 @@ export default function PublicationDetails({
     })
   }
   const nb_checked = checked.reduce((acc, e) => acc + Number(e.checked), 0)
-  const addCollection = useClusterStore((state) => 
-    state.addCollection,
-  )
+  const addCollection = useClusterStore((state) => state.addCollection)
 
   return (
     <>
       <div className="border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4">
-        <ArrowLeft className="w-4 h-4 cursor-pointer text-emerald-400"
+        <ArrowLeft
+          className="w-4 h-4 cursor-pointer text-emerald-400"
           onClick={() => setDisplaySeeDetails(false)}
-        />       
+        />
 
         <p className="font-semibold tracking-widest text-center pr-4 text-sky-200">
           {title}
@@ -81,12 +80,12 @@ export default function PublicationDetails({
               setDisplayAbstract((prev) => !prev)
             }}
           >
-            {display_abstract?
-              <ArrowUp className="w-3 h-3 text-gray-50"/>
-            :
-              <ArrowDown className="w-3 h-3 text-gray-50"/>
-            }
-            
+            {display_abstract ? (
+              <ArrowUp className="w-3 h-3 text-gray-50" />
+            ) : (
+              <ArrowDown className="w-3 h-3 text-gray-50" />
+            )}
+
             <p className="hover:underline text-right">
               {display_abstract ? "Hide" : "Full abstract"}
             </p>
@@ -113,9 +112,9 @@ export default function PublicationDetails({
               title,
               year,
             } as Publication
-            database_provider.addCollectionToDb(collection)
-            addCollection(collection, (idx)=> console.log(idx))
-            addUnsync(3, {
+            const idx = await database_provider.addCollectionToDb(collection)
+            addCollection(idx, collection)
+            addUnsync(idx, {
               mode: TimeMode.ts,
             })
           }}

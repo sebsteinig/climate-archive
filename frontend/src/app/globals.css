@@ -27,13 +27,11 @@
     @apply text-sky-300 text-base capitalize tracking-wider;
   }
   svg {
-    stroke : currentColor;
+    stroke: currentColor;
     /* fill : currentColor; */
-    
   }
   path {
-    stroke : currentColor;
+    stroke: currentColor;
     /* fill : currentColor */
   }
-
 }

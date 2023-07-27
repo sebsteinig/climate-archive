@@ -1,5 +1,6 @@
 import { TextureInfo } from "@/utils/database/database.types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { getCurrentPos } from "@/utils/store/time/handlers/utils"
 import {
   Time,
   TimeFrame,
@@ -39,7 +40,8 @@ export function getPath(
       next_path = next_branch.paths_mean.paths[0].grid[0][data.next.time_chunk]
       return [current_path, next_path]
     case TimeMode.ts:
-      current_path = current_branch.paths_ts.paths[0].grid[0][data.current.time_chunk]
+      current_path =
+        current_branch.paths_ts.paths[0].grid[0][data.current.time_chunk]
       next_path = next_branch.paths_ts.paths[0].grid[0][data.next.time_chunk]
       // console.log(
       //     {
@@ -90,25 +92,57 @@ export function crop(
   return res
 }
 
+function surf(
+  departure: number,
+  current: number,
+  weight: number,
+  destination: number,
+): number {
+  return 0
+}
+
 export function tickBuilder(
   time: Time,
   exps: Experiment[],
   frame: TimeFrame,
   active_variable: VariableName[],
   context: CanvasHolder,
+  onChange: (frame: TimeFrame) => void,
 ) {
   const next = nextBuilder(time)
   return async function tick(delta: number) {
-    if (time.state !== TimeState.playing || !frame.initialized) {
+    if (
+      !frame.initialized ||
+      time.state === TimeState.paused ||
+      time.state === TimeState.stopped ||
+      time.state === TimeState.zero ||
+      time.state === TimeState.ready
+    ) {
       return new Map()
     }
-    //console.log('tick');
-    frame = await next(time, exps, frame, delta, active_variable)
-    if (!frame.initialized) {
-      return new Map()
+    if (time.state === TimeState.pinning) {
+      const first = frame.variables.values().next().value as
+        | TimeFrameValue
+        | undefined
+
+      //if(first?.weight !== 0) {
+      frame = await next(time, exps, frame, delta, active_variable)
+      //}
+    } else if (time.state === TimeState.surfing) {
+      const [current_pos, weight] = getCurrentPos(time, frame)
+      const surfing_rate = surf(
+        time.surfing_departure,
+        current_pos,
+        weight,
+        time.surfing_destination,
+      )
+      frame = await next(time, exps, frame, surfing_rate, active_variable)
+    } else if (time.state === TimeState.playing) {
+      frame = await next(time, exps, frame, delta, active_variable)
     }
+
     const res = new Map()
-    
+
     for (let [variable, data] of frame.variables) {
       const [current_path, next_path] = getPath(
         time.mode,
@@ -151,7 +185,7 @@ export function tickBuilder(
         data.next.info.xsize,
         data.next.info.ysize,
       )
-        
+
       res.set(variable, {
         current_url,
         next_url,
@@ -160,6 +194,7 @@ export function tickBuilder(
         next_info: data.next.info,
       })
     }
+    onChange(frame)
     return res
   }
 }

@@ -171,7 +171,7 @@ export default function FilterPublication({
         className="inline-flex cursor-pointer"
       >
         <h3>Filter on publication</h3>
-          <ArrowDown className={`w-4 h-4 text-emerald-400 self-center ml-4`}/>
+        <ArrowDown className={`w-4 h-4 text-emerald-400 self-center ml-4`} />
       </span>
     )
   } else {
@@ -184,8 +184,7 @@ export default function FilterPublication({
           className="inline-flex cursor-pointer"
         >
           <h3>Filter on publication</h3>
-          <ArrowUp className={`w-4 h-4 self-center  text-emerald-400 ml-4`}/>
-
+          <ArrowUp className={`w-4 h-4 self-center  text-emerald-400 ml-4`} />
         </span>
 
         <Period

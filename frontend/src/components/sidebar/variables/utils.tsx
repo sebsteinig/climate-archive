@@ -42,24 +42,76 @@ function titleOf(name: VariableName) {
   }
 }
 
-
-function IconOf( {name, toggle, active} : {name: VariableName, toggle : Function, active: boolean}) {
+function IconOf({
+  name,
+  toggle,
+  active,
+}: {
+  name: VariableName
+  toggle: Function
+  active: boolean
+}) {
   switch (name) {
     case VariableName.currents:
-      return <WaveIcon onClick={() => toggle()} className = {`w-12 h-12 px-2 ${active ? "text-emerald-400":"text-slate-500"}`}/>
+      return (
+        <WaveIcon
+          onClick={() => toggle()}
+          className={`w-12 h-12 px-2 ${
+            active ? "text-emerald-400" : "text-slate-500"
+          }`}
+        />
+      )
     case VariableName.pr:
-      return <RainIcon onClick={() => toggle()} className = {`w-12 h-12 px-2 ${active ? "text-emerald-400":"text-slate-500"}`}/>
+      return (
+        <RainIcon
+          onClick={() => toggle()}
+          className={`w-12 h-12 px-2 ${
+            active ? "text-emerald-400" : "text-slate-500"
+          }`}
+        />
+      )
     case VariableName.height:
-      return <MountainIcon onClick={() => toggle()} className = {`w-12 h-12 px-2 ${active ? "text-emerald-400":"text-slate-500"}`}/>
+      return (
+        <MountainIcon
+          onClick={() => toggle()}
+          className={`w-12 h-12 px-2 ${
+            active ? "text-emerald-400" : "text-slate-500"
+          }`}
+        />
+      )
     case VariableName.winds:
-      return <WindsIcon onClick={() => toggle()} 
-          className = {`w-12 h-12 px-2 ${active ? "text-emerald-400 child:fill-emerald-400":"text-slate-500 child:fill-slate-500"}`}/>
+      return (
+        <WindsIcon
+          onClick={() => toggle()}
+          className={`w-12 h-12 px-2 ${
+            active
+              ? "text-emerald-400 child:fill-emerald-400"
+              : "text-slate-500 child:fill-slate-500"
+          }`}
+        />
+      )
     case VariableName.tos:
-      return <TemperatureIcon onClick={() => toggle()} 
-          className = {`w-12 h-12 px-2 ${active ? "text-emerald-400 child:fill-emerald-400":"text-slate-500 child:fill-slate-500"}`}/>
+      return (
+        <TemperatureIcon
+          onClick={() => toggle()}
+          className={`w-12 h-12 px-2 ${
+            active
+              ? "text-emerald-400 child:fill-emerald-400"
+              : "text-slate-500 child:fill-slate-500"
+          }`}
+        />
+      )
     case VariableName.pfts:
-      return <TreesIcon onClick={() => toggle()} 
-          className = {`w-12 h-12 px-2 ${active ? "text-emerald-400 child:fill-emerald-400":"text-slate-500 child:fill-slate-500"}`}/>
+      return (
+        <TreesIcon
+          onClick={() => toggle()}
+          className={`w-12 h-12 px-2 ${
+            active
+              ? "text-emerald-400 child:fill-emerald-400"
+              : "text-slate-500 child:fill-slate-500"
+          }`}
+        />
+      )
     default:
       return ""
   }
@@ -81,7 +133,7 @@ export function Variable({
            active ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""
          }`}
     >
-      <IconOf name={title} active={active} toggle={toggle}/>
+      <IconOf name={title} active={active} toggle={toggle} />
       <div
         className={
           current_variable_controls === title ? "" : "hidden group-hover:block"
@@ -89,10 +141,11 @@ export function Variable({
       >
         <div onClick={() => toggle()} className="flex flex-wrap items-center">
           <h3>{titleOf(title)} </h3>
-          {active ? <EyeClosed className="w-8 text-slate-500 px-1 ml-2 h-8"/> 
-          :<Eye className="w-8 text-slate-500 px-1 ml-2 h-8"/>
-          }
-          
+          {active ? (
+            <EyeClosed className="w-8 text-slate-500 px-1 ml-2 h-8" />
+          ) : (
+            <Eye className="w-8 text-slate-500 px-1 ml-2 h-8" />
+          )}
         </div>
         {controls && (
           <div className="flex flex-wrap">
@@ -107,11 +160,15 @@ export function Variable({
               {current_variable_controls === title
                 ? "Close controls"
                 : "Open controls"}
-              {current_variable_controls === title ?
-                <ArrowUp className={`text-emerald-400 w-4 h-4 self-center ml-4 child:fill-emerald-400`}/>
-              : <ArrowDown className={`text-emerald-400 w-4 h-4 self-center ml-4 child:fill-emerald-400`}/>
-              }
-              
+              {current_variable_controls === title ? (
+                <ArrowUp
+                  className={`text-emerald-400 w-4 h-4 self-center ml-4 child:fill-emerald-400`}
+                />
+              ) : (
+                <ArrowDown
+                  className={`text-emerald-400 w-4 h-4 self-center ml-4 child:fill-emerald-400`}
+                />
+              )}
             </h4>
           </div>
         )}

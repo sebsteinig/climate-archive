@@ -66,7 +66,6 @@ async function getData(url: string) {
     let data = await axios.get(url)
     return data.data
   } catch (error) {
-    console.log(error)
     return {}
   }
 }

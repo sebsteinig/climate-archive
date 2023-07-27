@@ -105,11 +105,14 @@ export default function SearchBar({
         `}
       ref={search_panel_ref}
     >
-      <CrossIcon className={`w-8 h-8 absolute top-0 right-0 text-emerald-400 cursor-pointer`}
+      <CrossIcon
+        className={`w-8 h-8 absolute top-0 right-0 text-emerald-400 cursor-pointer`}
         onClick={() => setSearchBarVisible(false)}
       />
-      <SearchIcon className={`w-8 h-8 lg:invisible text-emerald-400 lg:hidden ${
-          search_panel_visible ? "hidden" : ""}`}
+      <SearchIcon
+        className={`w-8 h-8 lg:invisible text-emerald-400 lg:hidden ${
+          search_panel_visible ? "hidden" : ""
+        }`}
       />
 
       <input
@@ -143,9 +146,13 @@ export default function SearchBar({
               >
                 More options{" "}
                 {display_more_options ? (
-                  <ArrowUp className={`w-4 h-4 self-center ml-4 text-emerald-400`}/>
+                  <ArrowUp
+                    className={`w-4 h-4 self-center ml-4 text-emerald-400`}
+                  />
                 ) : (
-                  <ArrowDown className={`w-4 h-4 self-center ml-4 text-emerald-400`}/>
+                  <ArrowDown
+                    className={`w-4 h-4 self-center ml-4 text-emerald-400`}
+                  />
                 )}
               </p>
             </div>

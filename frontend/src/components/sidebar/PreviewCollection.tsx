@@ -24,10 +24,8 @@ export function PreviewCollection({
   setCurrentVariableControls,
 }: Props) {
   const collections = useClusterStore((state) => state.collections)
-  
   const binder = useClusterStore((state) => state.time.binder)
 
-  
   const [display_all, displayAll] = useState(false)
   return (
     <div
@@ -40,7 +38,8 @@ export function PreviewCollection({
                             ${search_bar_visible ? "hidden" : ""}`}
     >
       {binder.size > 1 && (
-        <DotsIcon onClick={() => displayAll((prev) => !prev)}
+        <DotsIcon
+          onClick={() => displayAll((prev) => !prev)}
           className="w-12 h-12 cursor-pointer px-2 text-slate-500"
         />
       )}
@@ -158,11 +157,11 @@ function CurrentTitle({
               display_details ? "" : "flex place-content-between items-center"
             }
           >
-            {display_details ? 
-              <ArrowUp className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500"/>
-            :
-              <ArrowDown className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500"/>
-            }
+            {display_details ? (
+              <ArrowUp className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            ) : (
+              <ArrowDown className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            )}
 
             {!display_details && (
               <p className="py-2 italic text-right text-slate-400">
@@ -177,18 +176,16 @@ function CurrentTitle({
         current_details.collection.exps.length > 0 && (
           <>
             <p className="font-semibold text-sky-200">
-              Collection of {current_details.collection.exps.length}{" "}
-              Experiment
+              Collection of {current_details.collection.exps.length} Experiment
               {current_details.collection.exps.length > 1 ? "s" : ""} :{" "}
               {current_details.collection.exps[0].id}
               {current_details.collection.exps.length > 1 ? ", ..." : ""}
             </p>
-            {display_details ? 
-              <ArrowUp className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500"/>
-            :
-              <ArrowDown className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500"/>
-            }
-            
+            {display_details ? (
+              <ArrowUp className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            ) : (
+              <ArrowDown className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            )}
           </>
         )}
     </div>

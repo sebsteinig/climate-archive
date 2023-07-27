@@ -43,7 +43,10 @@ function ExpButton({ exp, remove }: { exp: Exp; remove: Function }) {
                 grid grid-cols-2 gap-1 items-center"
       >
         <p>{exp.id}</p>
-        <Cross className={`w-6 h-6 text-slate-500 cursor-pointer`} onClick={() => remove()}/>
+        <Cross
+          className={`w-6 h-6 text-slate-500 cursor-pointer`}
+          onClick={() => remove()}
+        />
       </div>
     )
   }
@@ -55,9 +58,7 @@ type Props = {
 }
 
 export default function FilterAdvanced({ setSearchBarVisible }: Props) {
-  const addCollection = useClusterStore((state) => 
-    state.addCollection,
-  )
+  const addCollection = useClusterStore((state) => state.addCollection)
   const [display, setDisplay] = useState(false)
   const [exp_ids, setExpIds] = useState<{ exp_ids: Exp[]; search: string }>({
     exp_ids: [],
@@ -77,8 +78,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
           className="inline-flex cursor-pointer"
         >
           <h3>Advanced filters</h3>
-          <ArrowDown className={`w-4 h-4 self-center ml-4 text-emerald-400`}/>
-          
+          <ArrowDown className={`w-4 h-4 self-center ml-4 text-emerald-400`} />
         </span>
       </>
     )
@@ -93,8 +93,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
         className="inline-flex cursor-pointer"
       >
         <h3>Advanced filters</h3>
-        <ArrowUp className={`w-4 h-4 self-center ml-4  text-emerald-400`}/>
-        
+        <ArrowUp className={`w-4 h-4 self-center ml-4  text-emerald-400`} />
       </span>
       <span className="flex flex-wrap gap-2">
         {exp_ids.exp_ids?.map((exp, idx) => {
@@ -320,7 +319,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
             }),
           } as Experiments
           database_provider.addCollectionToDb(collection)
-          addCollection(collection, (idx)=>{
+          addCollection(collection, (idx) => {
             addUnsync(idx, {
               mode: TimeMode.ts,
             })

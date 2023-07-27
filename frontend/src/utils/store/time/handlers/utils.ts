@@ -36,6 +36,29 @@ function computeFramePos(
   return [frame, time_chunk]
 }
 
+export function getCurrentPos(time: Time, frame: TimeFrame): [number, number] {
+  const departure = time.surfing_departure
+  const first = frame.variables.values().next().value as
+    | TimeFrameValue
+    | undefined
+  if (!first) {
+    return [0, 0]
+  }
+  const weight = first.weight
+  switch (time.mode) {
+    case TimeMode.mean:
+      const idx = first.current.idx
+      return [idx - departure, weight]
+    case TimeMode.ts:
+      const s = first.current.info.timesteps
+      const f = first.current.frame
+      const c = first.current.time_chunk
+      const [cs, fpc] = chunksDetails(first.current.info)
+      const t = f + c * fpc
+      return [t - departure, weight]
+  }
+}
+
 export async function peekNextTs(
   exps: Experiment[],
   variable: VariableName,

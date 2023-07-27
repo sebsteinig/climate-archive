@@ -42,4 +42,5 @@ export class Texture {
 
 export class Collection {
   data!: Publication | Experiments
+  id?: number
 }

@@ -8,7 +8,7 @@ import { OrbitControls, PerspectiveCamera, View } from "@react-three/drei"
 import { useClusterStore } from "@/utils/store/cluster.store"
 
 export type SceneProps = {
-  time_idx : number
+  time_idx: number
   collection_idx: number
   panel_idx: number
   track: MutableRefObject<HTMLElement>
@@ -17,6 +17,7 @@ export type SceneProps = {
   frame: TimeFrame
   active_variables: VariableName[]
   context: CanvasHolder
+  onChange: (frame: TimeFrame) => void
 }
 
 export function Scene({
@@ -29,23 +30,46 @@ export function Scene({
   frame,
   active_variables,
   context,
+  onChange,
 }: SceneProps) {
   var config = {
     model: "Dune",
     heightData: "/assets/textures/tfgzk_height.smoothed.png",
   }
-  const linked = useClusterStore(state => state.time.cameras_state.get(time_idx)?.get(collection_idx)?.get(panel_idx))
+  const linked = useClusterStore(
+    (state) =>
+      state.time.cameras_state
+        .get(time_idx)
+        ?.get(collection_idx)
+        ?.get(panel_idx),
+  )
+  console.log({ linked })
+
   return (
     <View track={track}>
       <World
         config={config}
-        tick={tickBuilder(time, exps, frame, active_variables, context)}
+        tick={tickBuilder(
+          time,
+          exps,
+          frame,
+          active_variables,
+          context,
+          onChange,
+        )}
       />
-      {linked && 
-      <>
-      <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
+      {linked && (
+        <>
+          <PerspectiveCamera
+            makeDefault
+            position={[3, 2, 9]}
+            fov={55}
+            near={0.1}
+            far={200}
+          />
           <OrbitControls makeDefault />
-      </>  }
+        </>
+      )}
     </View>
   )
 }

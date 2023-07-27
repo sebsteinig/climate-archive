@@ -63,8 +63,7 @@ export default function FilterLabels({
       <>
         <span onClick={() => setDisplay(true)} className="inline-flex">
           <h3>Filter with labels</h3>
-          <ArrowDown  className={`w-4 h-4 self-center  text-emerald-400 ml-4`}/>
-          
+          <ArrowDown className={`w-4 h-4 self-center  text-emerald-400 ml-4`} />
         </span>
       </>
     )
@@ -86,8 +85,7 @@ export default function FilterLabels({
         className="inline-flex"
       >
         <h3>Filter with labels</h3>
-          <ArrowUp  className={`w-4 h-4  text-emerald-400 self-center ml-4`}/>
-          
+        <ArrowUp className={`w-4 h-4  text-emerald-400 self-center ml-4`} />
       </span>
       <span>
         {labels.selected?.map((label, idx) => {

@@ -47,7 +47,7 @@ export function World({ config, tick }: Props) {
   const sphereRef = useRef<Mesh<SphereGeometry, MeshStandardMaterial>>(null)
   let texture = new THREE.TextureLoader()
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     tick(delta).then((res) => {
       for (let [variable, data] of res) {
         texture.load(data.current_url, (tt) => {
