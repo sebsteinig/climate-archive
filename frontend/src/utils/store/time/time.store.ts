@@ -14,28 +14,41 @@ import { buildTime } from "./time.utils"
 export interface TimeSlice {
   time: {
     slots: { map: Map<number, Time>; last: number }
-    binder: Map<number, number> // collection => slot
-
+    binder: Map<number, Set<number>> // collection => slot
+    cameras_state: Map<number, Map<number, Map<number, boolean>>>
     saved_frames: Map<number, Map<number, TimeFrame>>
+
+    linkCamera: (
+      time_idx: number,
+      collection_idx: number,
+      panel_idx: number,
+      linked: boolean,
+    ) => void
+
     addSync: (collection_idx: number, config: TimeConfig | undefined) => void
     addUnSync: (collection_idx: number, config: TimeConfig) => void
 
-    link: (collection_idx: number, time_slots_idx: number) => void
-    unlink: (collection_idx: number, config: TimeConfig) => void
+    // link: (collection_idx: number, time_slots_idx: number) => void
+    // unlink: (collection_idx: number, config: TimeConfig) => void
 
-    remove: (collection_idx: number) => void
+    remove: (
+      collection_idx: number,
+      time_idx: number,
+      occurrence_idx: number,
+    ) => void
+    removeAll: (collection_idx: number) => void
 
     prepare: (idx: number) => void
     prepareAll: (idxs: number[]) => void
     play: (idx: number) => void
     pause: (idx: number) => void
     pin: (idx: number) => void
-    try_surfing: (idx: number,departure:number) => void
-    surf: (idx: number,destination:number) => void
-    updateSurfingDestination : (idx: number,destination:number) => void
+    try_surfing: (idx: number, departure: number) => void
+    surf: (idx: number, destination: number) => void
+    updateSurfingDestination: (idx: number, destination: number) => void
     stop: (idx: number) => void
     save: (time_idx: number, collection_idx: number, t: TimeFrame) => void
-    saveSome: (time_idx: number, snapshot : Map<number,TimeFrame>) => void
+    saveSome: (time_idx: number, snapshot: Map<number, TimeFrame>) => void
     saveAll: (x: [number, [number, TimeFrame][]][]) => void
     pauseAll: () => void
   }
@@ -52,6 +65,29 @@ export const createTimeSlice: StateCreator<
       slots: { map: new Map(), last: -1 },
       binder: new Map(),
       saved_frames: new Map(),
+      cameras_state: new Map(),
+
+      linkCamera: (
+        time_idx: number,
+        collection_idx: number,
+        panel_idx: number,
+        linked: boolean,
+      ) => {
+        set((state) => {
+          let time = state.time.cameras_state.get(time_idx)
+          if (!time) {
+            state.time.cameras_state.set(time_idx, new Map())
+            time = state.time.cameras_state.get(time_idx)!
+          }
+          let collection = time.get(collection_idx)
+          if (!collection) {
+            time.set(collection_idx, new Map())
+            collection = time.get(collection_idx)!
+          }
+          collection.set(panel_idx, linked)
+        })
+      },
+
       addSync: (collection_idx: number, config: TimeConfig | undefined) => {
         set((state) => {
           const slots_size = state.time.slots.map.size
@@ -70,7 +106,14 @@ export const createTimeSlice: StateCreator<
             collection_idx,
             (time.collections.get(collection_idx) ?? 0) + 1,
           )
-          state.time.binder.set(collection_idx, time_idx)
+          if (state.time.binder.has(collection_idx)) {
+            state.time.binder.set(
+              collection_idx,
+              state.time.binder.get(collection_idx)!.add(time_idx),
+            )
+          } else {
+            state.time.binder.set(collection_idx, new Set([time_idx]))
+          }
         })
       },
       addUnSync: (collection_idx: number, config: TimeConfig) => {
@@ -83,93 +126,140 @@ export const createTimeSlice: StateCreator<
           let idx = state.time.slots.map.size + 1
           state.time.slots.map.set(idx, time)
           state.time.slots.last = idx
-          state.time.binder.set(collection_idx, idx)
-        })
-      },
-
-      link: (collection_idx: number, time_slots_idx: number) => {
-        set((state) => {
-          const new_time = state.time.slots.map.get(time_slots_idx)
-          if (!new_time) {
-            return
-          }
-          const prev_time_idx = state.time.binder.get(collection_idx)
-          if (!prev_time_idx) {
-            return
-          }
-          state.time.binder.set(collection_idx, time_slots_idx)
-          new_time.collections.set(
-            collection_idx,
-            (new_time.collections.get(collection_idx) ?? 0) + 1,
-          )
-          const prev_time = state.time.slots.map.get(prev_time_idx)
-          if (prev_time) {
-            prev_time.collections.delete(collection_idx)
-            if (prev_time.collections.size === 0) {
-              state.time.slots.map.delete(prev_time_idx)
-              if (prev_time_idx === state.time.slots.last) {
-                let new_last = -1
-                if (state.time.slots.map.size) {
-                  new_last = state.time.slots.map.keys().next().value
-                }
-                state.time.slots.last = new_last
-              }
-            }
-          }
-        })
-      },
-      unlink: (collection_idx: number, config: TimeConfig) => {
-        set((state) => {
-          let time = buildTime(config)
-          time.collections.set(
-            collection_idx,
-            (time.collections.get(collection_idx) ?? 0) + 1,
-          )
-          let idx = state.time.slots.map.size + 1
-          state.time.slots.map.set(idx, time)
-          const prev_time_idx = state.time.binder.get(collection_idx)
-          if (!prev_time_idx) {
-            return
-          }
-          state.time.binder.set(collection_idx, idx)
-          const prev_time = state.time.slots.map.get(prev_time_idx)
-          if (prev_time) {
-            prev_time.collections.delete(collection_idx)
-            if (prev_time.collections.size === 0) {
-              state.time.slots.map.delete(prev_time_idx)
-              if (prev_time_idx === state.time.slots.last) {
-                let new_last = -1
-                if (state.time.slots.map.size) {
-                  new_last = state.time.slots.map.keys().next().value
-                }
-                state.time.slots.last = new_last
-              }
-            }
+          if (state.time.binder.has(collection_idx)) {
+            state.time.binder.set(
+              collection_idx,
+              state.time.binder.get(collection_idx)!.add(idx),
+            )
+          } else {
+            state.time.binder.set(collection_idx, new Set([idx]))
           }
         })
       },
 
-      remove: (collection_idx: number) => {
+      //   link: (collection_idx: number, time_slots_idx: number) => {
+      //     set((state) => {
+      //       const new_time = state.time.slots.map.get(time_slots_idx)
+      //       if (!new_time) {
+      //         return
+      //       }
+      //       const prev_time_idx = state.time.binder.get(collection_idx)
+      //       if (!prev_time_idx) {
+      //         return
+      //       } else{
+      //           state.time.binder.set(collection_idx, prev_time_idx.add(time_slots_idx))
+      //       }
+
+      //       new_time.collections.set(
+      //         collection_idx,
+      //         (new_time.collections.get(collection_idx) ?? 0) + 1,
+      //       )
+
+      //       const prev_time = state.time.slots.map.get(prev_time_idx)
+      //       if (prev_time) {
+      //         prev_time.collections.delete(collection_idx)
+      //         if (prev_time.collections.size === 0) {
+      //           state.time.slots.map.delete(prev_time_idx)
+      //           if (prev_time_idx === state.time.slots.last) {
+      //             let new_last = -1
+      //             if (state.time.slots.map.size) {
+      //               new_last = state.time.slots.map.keys().next().value
+      //             }
+      //             state.time.slots.last = new_last
+      //           }
+      //         }
+      //       }
+
+      //     })
+      //   },
+      //   unlink: (collection_idx: number, config: TimeConfig) => {
+      //     set((state) => {
+      //       let time = buildTime(config)
+      //       time.collections.set(
+      //         collection_idx,
+      //         (time.collections.get(collection_idx) ?? 0) + 1,
+      //       )
+      //       let idx = state.time.slots.map.size + 1
+      //       state.time.slots.map.set(idx, time)
+      //       const prev_time_idx = state.time.binder.get(collection_idx)
+      //       if (!prev_time_idx) {
+      //         return
+      //       }
+      //       state.time.binder.set(collection_idx, idx)
+      //       const prev_time = state.time.slots.map.get(prev_time_idx)
+      //       if (prev_time) {
+      //         prev_time.collections.delete(collection_idx)
+      //         if (prev_time.collections.size === 0) {
+      //           state.time.slots.map.delete(prev_time_idx)
+      //           if (prev_time_idx === state.time.slots.last) {
+      //             let new_last = -1
+      //             if (state.time.slots.map.size) {
+      //               new_last = state.time.slots.map.keys().next().value
+      //             }
+      //             state.time.slots.last = new_last
+      //           }
+      //         }
+      //       }
+      //     })
+      //   },
+
+      remove: (t_idx: number, collection_idx: number) => {
+        set((state) => {
+          const prev_time_idx = state.time.binder.get(collection_idx)
+          if (!prev_time_idx || !prev_time_idx.has(t_idx)) {
+            return
+          }
+          const prev_time = state.time.slots.map.get(t_idx)
+          if (!prev_time) {
+            return
+          }
+          const occurences = prev_time.collections.get(collection_idx)
+          if (occurences && occurences > 1) {
+            prev_time.collections.set(collection_idx, occurences - 1)
+          } else {
+            prev_time.collections.delete(collection_idx)
+          }
+          if (prev_time.collections.size !== 0) {
+            return
+          }
+          state.time.slots.map.delete(t_idx)
+          if (t_idx !== state.time.slots.last) {
+            return
+          }
+          let new_last = -1
+          if (state.time.slots.map.size) {
+            new_last = state.time.slots.map.keys().next().value
+          }
+          state.time.slots.last = new_last
+        })
+      },
+
+      removeAll: (collection_idx: number) => {
         set((state) => {
           const prev_time_idx = state.time.binder.get(collection_idx)
           if (!prev_time_idx) {
             return
+          }
+          for (let t_idx of prev_time_idx) {
+            const prev_time = state.time.slots.map.get(t_idx)
+            if (!prev_time) {
+              continue
+            }
+            prev_time.collections.delete(collection_idx)
+            if (prev_time.collections.size !== 0) {
+              continue
+            }
+            state.time.slots.map.delete(t_idx)
+            if (t_idx !== state.time.slots.last) {
+              continue
+            }
+            let new_last = -1
+            if (state.time.slots.map.size) {
+              new_last = state.time.slots.map.keys().next().value
+            }
+            state.time.slots.last = new_last
           }
           state.time.binder.delete(collection_idx)
-          const prev_time = state.time.slots.map.get(prev_time_idx)
-          if (prev_time) {
-            prev_time.collections.delete(collection_idx)
-            if (prev_time.collections.size === 0) {
-              state.time.slots.map.delete(prev_time_idx)
-              if (prev_time_idx === state.time.slots.last) {
-                let new_last = -1
-                if (state.time.slots.map.size) {
-                  new_last = state.time.slots.map.keys().next().value
-                }
-                state.time.slots.last = new_last
-              }
-            }
-          }
         })
       },
 
@@ -247,42 +337,41 @@ export const createTimeSlice: StateCreator<
           }
         })
       },
-      try_surfing : (idx:number,departure) => {
+      try_surfing: (idx: number, departure) => {
         set((state) => {
           const time = state.time.slots.map.get(idx)
           if (!time) {
             return
           }
 
-            time.surfing_departure = departure
-          }
-        )
+          time.surfing_departure = departure
+        })
       },
-      surf: (idx: number,destination) => {
+      surf: (idx: number, destination) => {
         set((state) => {
           const time = state.time.slots.map.get(idx)
           if (!time) {
             return
           }
 
-          if (time.state === TimeState.playing 
-            || time.state === TimeState.paused 
-            || time.state === TimeState.ready
+          if (
+            time.state === TimeState.playing ||
+            time.state === TimeState.paused ||
+            time.state === TimeState.ready
           ) {
             time.state = TimeState.surfing
             time.surfing_destination = destination
           }
         })
       },
-      updateSurfingDestination: (idx: number,destination) => {
+      updateSurfingDestination: (idx: number, destination) => {
         set((state) => {
           const time = state.time.slots.map.get(idx)
           if (!time) {
             return
           }
 
-          if (time.state === TimeState.surfing
-          ) {
+          if (time.state === TimeState.surfing) {
             time.surfing_destination = destination
           }
         })
@@ -310,8 +399,6 @@ export const createTimeSlice: StateCreator<
         })
       },
       save: (time_idx: number, collection_idx: number, t: TimeFrame) => {
-        console.log('SAVE');
-        
         set((state) => {
           const time = state.time.slots.map.get(time_idx)
           if (!time) {
@@ -326,31 +413,23 @@ export const createTimeSlice: StateCreator<
         })
       },
 
-    saveSome: (time_idx: number, snapshot : Map<number,TimeFrame>) => {
-      console.log('SAVE SOME');
-      console.log(snapshot);
-      console.log('----------------');
-      
-      set((state) => {
-        const time = state.time.slots.map.get(time_idx)
-        if (!time) {
-          return
-        }
-        for (let [collection_idx,frame] of snapshot) {
-          if (time.collections.has(collection_idx)) {
-            const x = state.time.saved_frames.get(time_idx)
-            if (x) {
-              x.set(collection_idx, frame)
+      saveSome: (time_idx: number, snapshot: Map<number, TimeFrame>) => {
+        set((state) => {
+          const time = state.time.slots.map.get(time_idx)
+          if (!time) {
+            return
+          }
+          for (let [collection_idx, frame] of snapshot) {
+            if (time.collections.has(collection_idx)) {
+              const x = state.time.saved_frames.get(time_idx)
+              if (x) {
+                x.set(collection_idx, frame)
+              }
             }
           }
-        }
-      })
-    },
+        })
+      },
       saveAll: (res: [number, [number, TimeFrame][]][]) => {
-        console.log('SAVE ALL');
-        console.log(res);
-        console.log('-----------');
-        
         set((state) => {
           for (let [time_idx, frames] of res) {
             for (let [collection_idx, frame] of frames) {

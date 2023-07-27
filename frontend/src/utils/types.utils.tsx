@@ -35,6 +35,6 @@ export function collectionEquals(
   return false
 }
 
-export function uniqueIdx(x:number,y:number,z:number) {
-  return Math.pow(2,x)*Math.pow(5,y)*Math.pow(7,z)
+export function uniqueIdx(x: number, y: number, z: number) {
+  return Math.pow(2, x) * Math.pow(5, y) * Math.pow(7, z)
 }

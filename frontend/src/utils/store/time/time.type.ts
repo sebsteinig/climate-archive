@@ -69,8 +69,8 @@ export type Time = {
   kind: TimeKind
   state: TimeState
   speed: number
-  surfing_departure : number
-  surfing_destination :number
+  surfing_departure: number
+  surfing_destination: number
   //current_frame : TimeMultipleFrames
   collections: Map<number, number>
 }

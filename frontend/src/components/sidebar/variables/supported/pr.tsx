@@ -1,6 +1,4 @@
 import { Variable, VariableProps } from "../utils"
-import RainIcon from "$/assets/icons/cloud-rain-slate-500.svg"
-import RainGreenIcon from "$/assets/icons/cloud-rain-emerald-300.svg"
 import { useClusterStore } from "@/utils/store/cluster.store"
 
 import Slider from "@/components/inputs/Slider"
@@ -17,7 +15,6 @@ export function Pr({
       toggle={() => pr.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      src={pr.active ? RainGreenIcon : RainIcon}
       active={pr.active}
       controls={true}
     >

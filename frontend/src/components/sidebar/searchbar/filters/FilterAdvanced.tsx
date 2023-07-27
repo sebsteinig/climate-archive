@@ -5,7 +5,6 @@ import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
 import { DefaultParameter } from "@/utils/api/api.types"
 import { useEffect, useState } from "react"
-import Image from "next/image"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import Cross from "$/assets/icons/cross-small-emerald-300.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
@@ -13,6 +12,7 @@ import { RequestMultipleTexture } from "@/utils/database_provider/database_provi
 import { Experiments } from "../../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { TimeMode } from "@/utils/store/time/time.type"
 type Exp = {
   id: string
   display: boolean
@@ -43,12 +43,9 @@ function ExpButton({ exp, remove }: { exp: Exp; remove: Function }) {
                 grid grid-cols-2 gap-1 items-center"
       >
         <p>{exp.id}</p>
-        <Image
-          src={Cross}
-          priority
-          alt="delete"
+        <Cross
+          className={`w-6 h-6 text-slate-500 cursor-pointer`}
           onClick={() => remove()}
-          className={`w-6 h-6 cursor-pointer`}
         />
       </div>
     )
@@ -61,9 +58,7 @@ type Props = {
 }
 
 export default function FilterAdvanced({ setSearchBarVisible }: Props) {
-  const addCollection = useClusterStore((state) => 
-    state.addCollection,
-  )
+  const addCollection = useClusterStore((state) => state.addCollection)
   const [display, setDisplay] = useState(false)
   const [exp_ids, setExpIds] = useState<{ exp_ids: Exp[]; search: string }>({
     exp_ids: [],
@@ -74,6 +69,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
   const [lossless, setLossless] = useState(true)
   const [resolution, setResolution] = useState<{ x?: number; y?: number }>({})
   const [variables, setVariables] = useState<string[]>([])
+  const addUnsync = useClusterStore((state) => state.time.addUnSync)
   if (!display) {
     return (
       <>
@@ -82,12 +78,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
           className="inline-flex cursor-pointer"
         >
           <h3>Advanced filters</h3>
-          <Image
-            priority
-            alt="close"
-            className={`w-4 h-4 self-center ml-4`}
-            src={ArrowDown}
-          />
+          <ArrowDown className={`w-4 h-4 self-center ml-4 text-emerald-400`} />
         </span>
       </>
     )
@@ -102,12 +93,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
         className="inline-flex cursor-pointer"
       >
         <h3>Advanced filters</h3>
-        <Image
-          priority
-          alt="open"
-          className={`w-4 h-4 self-center ml-4`}
-          src={ArrowUp}
-        />
+        <ArrowUp className={`w-4 h-4 self-center ml-4  text-emerald-400`} />
       </span>
       <span className="flex flex-wrap gap-2">
         {exp_ids.exp_ids?.map((exp, idx) => {
@@ -333,7 +319,11 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
             }),
           } as Experiments
           database_provider.addCollectionToDb(collection)
-          addCollection(collection)
+          addCollection(collection, (idx) => {
+            addUnsync(idx, {
+              mode: TimeMode.ts,
+            })
+          })
         }}
       >
         Load

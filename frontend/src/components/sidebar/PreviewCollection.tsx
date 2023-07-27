@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import Image from "next/image"
-import Dots from "$/assets/icons/dots-slate-500.svg"
+import DotsIcon from "$/assets/icons/dots-slate-500.svg"
 import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg"
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg"
 
@@ -25,43 +24,28 @@ export function PreviewCollection({
   setCurrentVariableControls,
 }: Props) {
   const collections = useClusterStore((state) => state.collections)
-  const displayed_collections = useClusterStore(
-    (state) => state.displayed_collections,
-  )
-  const addUnsync = useClusterStore((state) => state.time.addUnSync)
   const binder = useClusterStore((state) => state.time.binder)
-  useEffect(() => {
-    for (let [collection_idx, occurence] of displayed_collections) {
-      if (!binder.has(collection_idx)) {
-        addUnsync(collection_idx, {
-          mode: TimeMode.ts,
-        })
-      }
-    }
-  }, [displayed_collections])
+
   const [display_all, displayAll] = useState(false)
   return (
     <div
       className={`bg-gray-900 mt-3 rounded-md 
                             ${
-                              displayed_collections.size > 1 && !display_all
+                              binder.size > 1 && !display_all
                                 ? "h-fit w-fit p-2"
                                 : ""
                             }
                             ${search_bar_visible ? "hidden" : ""}`}
     >
-      {displayed_collections.size > 1 && (
-        <Image
+      {binder.size > 1 && (
+        <DotsIcon
           onClick={() => displayAll((prev) => !prev)}
-          priority
-          src={Dots}
-          className="w-12 h-12 cursor-pointer px-2"
-          alt={"details"}
+          className="w-12 h-12 cursor-pointer px-2 text-slate-500"
         />
       )}
       <div className="max-w-full overflow-y-auto overflow-x-hidden max-h-[80vh]">
-        {(display_all || displayed_collections.size == 1) &&
-          Array.from(displayed_collections).map((value, idx) => {
+        {(display_all || binder.size == 1) &&
+          Array.from(binder).map((value, idx) => {
             return (
               <div key={idx}>
                 <OneCollection
@@ -77,7 +61,7 @@ export function PreviewCollection({
                   }}
                   display_details={display_details}
                 />
-                {displayed_collections.size > 1 && (
+                {binder.size > 1 && (
                   <MdSeparator className="ml-3 block self-center" />
                 )}
               </div>
@@ -163,51 +147,47 @@ function CurrentTitle({
         display_details ? "" : " border-s-4 border-sky-300"
       } m-2 cursor-pointer ${!display_details && "px-4"}`}
     >
-      <div className="">
-        {isPublication(current_details.collection) && (
-          <div>
-            <p className="py-2 font-semibold text-sky-200">
-              {current_details.collection.title}
-            </p>
-            <div
-              className={
-                display_details ? "" : "flex place-content-between items-center"
-              }
-            >
-              <Image
-                src={display_details ? ArrowUp : ArrowDown}
-                className="w-4 h-4 cursor-pointer"
-                priority
-                alt=""
-              />
-              {!display_details && (
-                <p className="py-2 italic text-right text-slate-400">
-                  {`${current_details.collection.authors_short} (${current_details.collection.year})`}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+      {isPublication(current_details.collection) && (
+        <div>
+          <p className="py-2 font-semibold text-sky-200">
+            {current_details.collection.title}
+          </p>
+          <div
+            className={
+              display_details ? "" : "flex place-content-between items-center"
+            }
+          >
+            {display_details ? (
+              <ArrowUp className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            ) : (
+              <ArrowDown className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            )}
 
-        {!isPublication(current_details.collection) &&
-          current_details.collection.exps.length > 0 && (
-            <>
-              <p className="font-semibold text-sky-200">
-                Collection of {current_details.collection.exps.length}{" "}
-                Experiment
-                {current_details.collection.exps.length > 1 ? "s" : ""} :{" "}
-                {current_details.collection.exps[0].id}
-                {current_details.collection.exps.length > 1 ? ", ..." : ""}
+            {!display_details && (
+              <p className="py-2 italic text-right text-slate-400">
+                {`${current_details.collection.authors_short} (${current_details.collection.year})`}
               </p>
-              <Image
-                src={display_details ? ArrowUp : ArrowDown}
-                className="w-4 h-4 cursor-pointer"
-                priority
-                alt=""
-              />
-            </>
-          )}
-      </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!isPublication(current_details.collection) &&
+        current_details.collection.exps.length > 0 && (
+          <>
+            <p className="font-semibold text-sky-200">
+              Collection of {current_details.collection.exps.length} Experiment
+              {current_details.collection.exps.length > 1 ? "s" : ""} :{" "}
+              {current_details.collection.exps[0].id}
+              {current_details.collection.exps.length > 1 ? ", ..." : ""}
+            </p>
+            {display_details ? (
+              <ArrowUp className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            ) : (
+              <ArrowDown className="w-4 h-4 cursor-pointer text-slate-500 child:fill-slate-500" />
+            )}
+          </>
+        )}
     </div>
   )
 }

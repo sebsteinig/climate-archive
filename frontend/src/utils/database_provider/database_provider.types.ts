@@ -55,4 +55,3 @@ export type RequestMultipleTexture = {
   nan_value_encoding?: number
   threshold?: number
 }
-

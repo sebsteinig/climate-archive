@@ -1,11 +1,8 @@
 import { Variable, VariableProps } from "../utils"
-import WaveIcon from "$/assets/icons/water-slate-500.svg"
-import WaveGreenIcon from "$/assets/icons/water-emerald-300.svg"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
 import Checkbox from "@/components/inputs/Checkbox"
-import { VariableName } from "@/utils/store/variables/variable.types"
 
 export function Currents({
   current_variable_controls,
@@ -18,7 +15,6 @@ export function Currents({
       toggle={() => currents.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      src={currents.active ? WaveGreenIcon : WaveIcon}
       active={currents.active}
       controls={true}
     >

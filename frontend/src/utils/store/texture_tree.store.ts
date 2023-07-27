@@ -11,15 +11,13 @@ export type Collection = Publication | Experiments
 export interface CollectionSlice {
   collections: Map<number, Collection>
   __collections_lookup: Map<string | Experiments, number>
-  displayed_collections: Map<number, number>
-  addCollection: (collection: Collection) => void
+  addCollection: (idx: number, collection: Collection) => void
   displayCollection: (idx: number) => void
   hideCollection: (idx: number) => void
 }
 
-
 export const createTextureTreeSlice: StateCreator<
-CollectionSlice,
+  CollectionSlice,
   [["zustand/immer", never]],
   [],
   CollectionSlice
@@ -29,48 +27,47 @@ CollectionSlice,
     collections: new Map(),
     __collections_lookup: new Map(),
     displayed_collections: new Map(),
-    addCollection: (collection: Collection) => {
+    addCollection: (collection_idx, collection: Collection) => {
       set((state) => {
-        let idx = state.__collections_lookup.get(
-          isPublication(collection)
-            ? collection.title + collection.authors_short
-            : JSON.stringify(collection),
-        )
-        if (!idx) {
-          idx = state.collections.size
-          state.collections.set(idx, collection)
-          state.__collections_lookup.set(
-            isPublication(collection)
-              ? collection.title + collection.authors_short
-              : JSON.stringify(collection),
-            idx,
-          )
-        }
-        state.displayed_collections.clear()
-        state.displayed_collections.set(idx, 1)
+        // let idx = state.__collections_lookup.get(
+        //   isPublication(collection)
+        //     ? collection.title + collection.authors_short
+        //     : JSON.stringify(collection),
+        // )
+        state.collections.set(collection_idx, collection)
+        // if (!idx) {
+        //   idx = state.collections.size
+        //   state.collections.set(idx, collection)
+        //   state.__collections_lookup.set(
+        //     isPublication(collection)
+        //       ? collection.title + collection.authors_short
+        //       : JSON.stringify(collection),
+        //     idx,
+        //   )
+        // }
       })
     },
     displayCollection: (idx: number) => {
       set((state) => {
         if (state.collections.has(idx)) {
-          const to_increment = state.displayed_collections.get(idx)
-          if (to_increment) {
-            state.displayed_collections.set(idx, to_increment + 1)
-          } else {
-            state.displayed_collections.set(idx, 1)
-          }
+          // const to_increment = state.displayed_collections.get(idx)
+          // if (to_increment) {
+          //   state.displayed_collections.set(idx, to_increment + 1)
+          // } else {
+          //   state.displayed_collections.set(idx, 1)
+          // }
         }
       })
     },
     hideCollection: (idx: number) => {
       set((state) => {
         if (state.collections.has(idx)) {
-          const to_decrement = state.displayed_collections.get(idx)
-          if (to_decrement && to_decrement > 1) {
-            state.displayed_collections.set(idx, to_decrement - 1)
-          } else {
-            state.displayed_collections.delete(idx)
-          }
+          // const to_decrement = state.displayed_collections.get(idx)
+          // if (to_decrement && to_decrement > 1) {
+          //   state.displayed_collections.set(idx, to_decrement - 1)
+          // } else {
+          //   state.displayed_collections.delete(idx)
+          // }
         }
       })
     },

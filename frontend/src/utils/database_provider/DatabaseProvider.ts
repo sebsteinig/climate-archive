@@ -197,6 +197,8 @@ class DatabaseProvider {
 
   async loadAllColections() {
     const collections = await this.database.collections.toArray()
+    console.log(collections)
+
     return collections
   }
 
@@ -208,7 +210,7 @@ class DatabaseProvider {
       .toArray()
 
     if (!collections_array || collections_array.length === 0) {
-      this.database.collections.add({ data: collection })
+      return await this.database.collections.add({ data: collection })
     } else {
       const map_experiments = new Map<string, Experiment>()
       for (let exp of collection.exps) {
@@ -218,7 +220,7 @@ class DatabaseProvider {
         map_experiments.set(exp.id, exp)
       }
 
-      this.database.collections
+      return await this.database.collections
         .filter((e) => {
           return collectionEquals(collection, e.data)
         })

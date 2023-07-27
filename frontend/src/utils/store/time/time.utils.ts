@@ -62,8 +62,8 @@ export function buildTime(config: TimeConfig): Time {
     direction,
     speed,
     state,
-    surfing_departure:0,
-    surfing_destination:0,
+    surfing_departure: 0,
+    surfing_destination: 0,
     current_frame: new Map(),
     collections: new Map(),
   } as Time

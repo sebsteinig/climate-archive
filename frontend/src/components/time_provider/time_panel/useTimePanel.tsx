@@ -53,7 +53,10 @@ export function useTimePanel(
       for (let ref of r) {
         scenes.push(
           <Scene
-            key={uniqueIdx(time_idx,collection_idx,i)}
+            key={uniqueIdx(time_idx, collection_idx, i)}
+            time_idx={time_idx}
+            collection_idx={collection_idx}
+            panel_idx={ref.panel_idx}
             time={time}
             frame={frame}
             exps={exps}
@@ -69,5 +72,3 @@ export function useTimePanel(
   }
   return [scenes, panels]
 }
-
-
