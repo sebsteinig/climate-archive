@@ -9,6 +9,7 @@ import {
 import { ControllerRef, TimeController } from "../time_controllers/TimeController"
 import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
 import { Container } from "./container"
+import { uniqueIdx } from "@/utils/types.utils"
 
 export type PanelProps = {
   time_idx: number
@@ -69,12 +70,12 @@ export const Panel = forwardRef<Refs, PanelProps>(
             <Container
               ref={(el: HTMLDivElement) => {
                 elementsRef.current[0].current = el
-                container_refs.current.set(first_collection![0], [
+                container_refs.current.set(first_collection[0], [
                   {
                     ref : elementsRef.current[0],
                     onChange : (frame) => {
-                      input_ref.current?.onChange(frame)
-                      controller_ref.current?.onChange(frame)
+                      input_ref.current?.onChange(first_collection[0],frame)
+                      controller_ref.current?.onChange(first_collection[0],frame)
                     }
                   }
                 ])
@@ -91,7 +92,7 @@ export const Panel = forwardRef<Refs, PanelProps>(
                   return range(0, occurence).map((i) => {
                     return (
                       <Container
-                        key={2 * i + 3 * collection_idx}
+                        key={uniqueIdx(i,collection_idx,0)}
                         ref={(el: HTMLDivElement) => {
                           elementsRef.current[i].current = el
                           const tmp = container_refs.current.get(i)
@@ -99,8 +100,8 @@ export const Panel = forwardRef<Refs, PanelProps>(
                             {
                               ref : elementsRef.current[0],
                               onChange : (frame) => {
-                                input_ref.current?.onChange(frame)
-                                controller_ref.current?.onChange(frame)
+                                input_ref.current?.onChange(collection_idx,frame)
+                                controller_ref.current?.onChange(collection_idx,frame)
                                 
                               }
                             }
@@ -111,8 +112,8 @@ export const Panel = forwardRef<Refs, PanelProps>(
                               {
                                 ref : elementsRef.current[0],
                                 onChange : (frame) => {
-                                  input_ref.current?.onChange(frame)
-                                  controller_ref.current?.onChange(frame)
+                                  input_ref.current?.onChange(collection_idx,frame)
+                                  controller_ref.current?.onChange(collection_idx,frame)
                                   
                                 }
                               }

@@ -18,6 +18,7 @@ import React from "react"
 import { Scene } from "./scene"
 import { Panel, Refs } from "./panel"
 import { Experiments, Publication } from "@/utils/types"
+import { uniqueIdx } from "@/utils/types.utils"
 
 export function useTimePanel(
   time_slots: Map<number, Time>,
@@ -50,10 +51,9 @@ export function useTimePanel(
       const exps = collections.get(collection_idx)!.exps
       let i = 0
       for (let ref of r) {
-        
         scenes.push(
           <Scene
-            key={i}
+            key={uniqueIdx(time_idx,collection_idx,i)}
             time={time}
             frame={frame}
             exps={exps}
@@ -69,3 +69,5 @@ export function useTimePanel(
   }
   return [scenes, panels]
 }
+
+

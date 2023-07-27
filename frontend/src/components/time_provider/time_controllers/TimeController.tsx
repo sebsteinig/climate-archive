@@ -12,39 +12,7 @@ type Props = {
   time_idx: number
 }
 export type ControllerRef = {
-  onChange:(frame:TimeFrame) => void
-}
-
-function titleOf(t:number,size:number) {
-  if (size === 12) {
-    switch (t) {
-      case 0:
-        return "January" 
-      case 1:
-        return "February" 
-      case 2:
-        return "March" 
-      case 3:
-        return "April" 
-      case 4:
-        return "May" 
-      case 5:
-        return "June" 
-      case 6:
-        return "July" 
-      case 7:
-        return "August" 
-      case 8:
-        return "September" 
-      case 9:
-        return "October" 
-      case 10:
-        return "November"  
-      case 11:
-        return "December"
-    }
-  }
-  return undefined
+  onChange:(collection_idx:number,frame:TimeFrame) => void
 }
 
 export const TimeController = forwardRef<ControllerRef,Props>(
@@ -56,8 +24,10 @@ export const TimeController = forwardRef<ControllerRef,Props>(
   const playTime = useClusterStore((state) => state.time.play)
   const pauseTime = useClusterStore((state) => state.time.pause)
   const variables = useClusterStore((state) => state.variables)
+  const save = useClusterStore(state => state.time.saveSome)
 
 
+  const snap_frames = useRef<Map<number,TimeFrame>>(new Map())
 
   const active_variable = useMemo(() => {
     return Object.values(variables)
@@ -76,7 +46,7 @@ export const TimeController = forwardRef<ControllerRef,Props>(
   useImperativeHandle(ref,
     ()=>{
       return {
-        onChange : (frame:TimeFrame) => {
+        onChange : (collection_idx:number,frame:TimeFrame) => {
           if(!time) {
             return
           }
@@ -85,6 +55,7 @@ export const TimeController = forwardRef<ControllerRef,Props>(
             if(!first) {
               return
             }
+            snap_frames.current.set(collection_idx,frame)
             const exp = first.current.exp.id
             const metadata = first.current.exp.metadata[0].metadata.text ?? ""
             if (time.mode === TimeMode.ts) {
@@ -121,6 +92,7 @@ export const TimeController = forwardRef<ControllerRef,Props>(
             if (time.state === TimeState.playing) {
               console.log("PAUSE")
               pauseTime(time_idx)
+              save(time_idx,snap_frames.current)
             }
           }}
         />
@@ -153,3 +125,12 @@ export const TimeController = forwardRef<ControllerRef,Props>(
     </div>
   )
 })
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"] as const
+
+function titleOf(t:number,size:number) {
+  if (size === 12) {
+    return MONTHS[t]
+  }
+  return undefined
+}

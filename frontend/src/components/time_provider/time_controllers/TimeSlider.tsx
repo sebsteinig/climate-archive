@@ -18,7 +18,7 @@ type Props = {
 }
 
 export type InputRef = {
-  onChange:(frame:TimeFrame) => void
+  onChange:(collection_idx:number,frame:TimeFrame) => void
 }
 
 export const TimeSlider = forwardRef<InputRef, Props>(
@@ -26,6 +26,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(
 
   const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
   const collections = useClusterStore((state) => state.collections)
+  const save = useClusterStore(state => state.time.saveSome)
   const input_ref = useRef<HTMLInputElement>(null)
   const own_collections = useMemo(
     () => {
@@ -52,11 +53,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(
       return own_collections[0].exps.length * 10
     }
   ,[time?.mode])
-
+  const snap_frames = useRef<Map<number,TimeFrame>>(new Map())
   useImperativeHandle(ref,
     ()=>{
       return {
-        onChange : (frame:TimeFrame) => {
+        onChange : (collection_idx:number,frame:TimeFrame) => {
           if(!time) {
             return 
           }
@@ -67,6 +68,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(
           if(!first) {
             return
           }
+          snap_frames.current.set(collection_idx,frame)
           if (time.mode === TimeMode.ts) {
             const s = first.current.info.timesteps
             const f = first.current.frame 
@@ -89,6 +91,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(
           min={0}
           max={max}
           onChange={(e) => {
+            save(time_idx,snap_frames.current)
             onChange(parseInt(e.target.value))
           }}
         />

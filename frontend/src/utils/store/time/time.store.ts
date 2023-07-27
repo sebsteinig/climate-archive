@@ -32,6 +32,7 @@ export interface TimeSlice {
     pause: (idx: number) => void
     stop: (idx: number) => void
     save: (time_idx: number, collection_idx: number, t: TimeFrame) => void
+    saveSome: (time_idx: number, snapshot : Map<number,TimeFrame>) => void
     saveAll: (x: [number, [number, TimeFrame][]][]) => void
     pauseAll: () => void
   }
@@ -267,6 +268,23 @@ export const createTimeSlice: StateCreator<
           }
         })
       },
+
+    saveSome: (time_idx: number, snapshot : Map<number,TimeFrame>) => {
+      set((state) => {
+        const time = state.time.slots.map.get(time_idx)
+        if (!time) {
+          return
+        }
+        for (let [collection_idx,frame] of snapshot) {
+          if (time.collections.has(collection_idx)) {
+            const x = state.time.saved_frames.get(time_idx)
+            if (x) {
+              x.set(collection_idx, frame)
+            }
+          }
+        }
+      })
+    },
       saveAll: (res: [number, [number, TimeFrame][]][]) => {
         set((state) => {
           for (let [time_idx, frames] of res) {
