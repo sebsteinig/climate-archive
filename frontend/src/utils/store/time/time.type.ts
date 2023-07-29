@@ -72,7 +72,6 @@ export type TimeFrameRef =  MutableRefObject<TimeFrameHolder>
 
 export type TimeID = number
 export type CollectionID = number
-export type ContainerID = number
 
 export type Time = {
   mode: TimeMode
@@ -82,7 +81,7 @@ export type Time = {
   speed: number
   surfing_departure: number
   surfing_destination: number
-  collections: Map<CollectionID,Map<ContainerID,ContainerConf>>
+  collections: Map<CollectionID,ContainerConf>
 }
 
 
@@ -92,3 +91,8 @@ export type ContainerConf = {
   }
 }
 
+export type TimeMap = {
+  map : Map<TimeID,Time>
+  lookup : Map<CollectionID,Set<TimeID>>
+  auto_increment : number
+}

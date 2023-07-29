@@ -17,12 +17,11 @@ type Props = {
   className?: string
   time_idx: number
   collection_idx: number
-  panel_idx: number
 }
 
 export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
   function Container(
-    { time_idx, collection_idx, panel_idx, className, children },
+    { time_idx, collection_idx, className, children },
     ref,
   ) {
     const pauseAll = useClusterStore((state) => state.time.pauseAll)
@@ -41,7 +40,6 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
             <PanelConfiguration
               time_idx={time_idx}
               collection_idx={collection_idx}
-              panel_idx={panel_idx}
               displayButtons={displayButtons}
             />
           )}
@@ -70,20 +68,19 @@ type ConfProps = {
   displayButtons: (bool: boolean) => void
   time_idx: number
   collection_idx: number
-  panel_idx: number
 }
 
 function PanelConfiguration({
   time_idx,
   collection_idx,
-  panel_idx,
   displayButtons,
 }: ConfProps) {
   const [as_planet, setAsPlanet] = useState(true)
   const [is_not_linked, link] = useState<boolean>(false)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
   return (
-    <div className="grid grid-cols-1 gap-1 justify-items-center ">
+    <div className="grid grid-cols-1 gap-1 justify-items-center " onClick={()=>{console.log("CLICKED ON CONF");
+    }}>
       <ArrowDownIcon
         className="p-2 w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500"
         onClick={() => displayButtons(false)}
@@ -98,7 +95,7 @@ function PanelConfiguration({
       <CameraIcon
         className="cursor-pointer w-5 h-5 my-2 text-slate-500"
         onClick={() => {
-          linkCamera(time_idx, collection_idx, panel_idx, !is_not_linked)
+          linkCamera(time_idx, collection_idx, !is_not_linked)
           link((prev) => !prev)
         }}
       />

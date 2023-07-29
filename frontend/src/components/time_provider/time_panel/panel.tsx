@@ -1,4 +1,4 @@
-import { Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
+import { CollectionID, Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
 import {
   MutableRefObject,
   RefObject,
@@ -22,85 +22,52 @@ export type PanelProps = {
 
 export type ContainerRef = {
   ref: MutableRefObject<HTMLDivElement>
-  panel_idx: number
   onChange: (frame: TimeFrame) => void
 }
 
 export type Refs = {
   //input_ref: RefObject<HTMLInputElement>
-  container_refs: RefObject<Map<number, ContainerRef[]>>
+  container_refs: RefObject<Map<CollectionID, ContainerRef>>
 }
-function range(start: number, end: number) {
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+
+function buildDivHolder(time:Time) {
+  const res = new Map<CollectionID,MutableRefObject<HTMLDivElement>>()
+  for ( let collection_id of time.collections.keys()) {
+    res.set(collection_id,useRef<HTMLDivElement>(null!))
+  }
+  return res
 }
 
 export const Panel = forwardRef<Refs, PanelProps>(function Panel(
   { time, time_idx , current_frame },
   refs,
 ) {
-  const first_collection = time.collections.entries().next().value as
-    | [number, number]
-    | undefined
-  const is_alone =
-    time.collections.size === 1 && first_collection && first_collection[1] === 1
   const input_ref = useRef<InputRef>(null)
   const controller_ref = useRef<ControllerRef>(null)
-  const container_refs = useRef<Map<number, ContainerRef[]>>(new Map())
+  const container_refs = useRef<Map<CollectionID, ContainerRef>>(new Map())
 
-  const elementsRef = useRef(
-    range(
-      0,
-      Array.from(time.collections, ([_, occ]) => occ).reduce(
-        (acc, e) => acc + e,
-        0,
-      ),
-    ).map(() => useRef<HTMLDivElement>(null!)),
-  )
+  const divs_holder = useRef(buildDivHolder(time))
 
   useImperativeHandle(refs, () => {
     return {
-      //input_ref,
       container_refs: container_refs,
     }
   })
-  const controllers = <></>
+  
   return (
     <div className="grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-        {is_alone ? (
-          <Container
-            ref={(el: HTMLDivElement) => {
-              elementsRef.current[0].current = el
-              container_refs.current.set(first_collection[0], [
-                {
-                  ref: elementsRef.current[0],
-                  panel_idx: 0,
-                  onChange: (frame) => {
-                    input_ref.current?.onChange(first_collection[0], frame)
-                    controller_ref.current?.onChange(first_collection[0], frame)
-                  },
-                },
-              ])
-              return el
-            }}
-            time_idx={time_idx}
-            collection_idx={first_collection[0]}
-            panel_idx={0}
-          ></Container>
-        ) : (
-          <div>
-            {Array.from(time.collections, ([collection_idx, occurence], i) => {
-              return range(0, occurence).map((i) => {
+          <div className="w-full h-full">
+            {Array.from(time.collections, ([collection_idx, _]) => {
                 return (
                   <Container
-                    key={uniqueIdx(i, collection_idx, 0)}
-                    panel_idx={i}
+                    key={collection_idx}
                     ref={(el: HTMLDivElement) => {
-                      elementsRef.current[i].current = el
-                      const tmp = container_refs.current.get(i)
-                      tmp?.push({
-                        ref: elementsRef.current[0],
-                        panel_idx: i,
+                      const div_ref = divs_holder.current.get(collection_idx)!
+                      div_ref.current = el
+
+                      const container_ref : ContainerRef = {
+                        ref : div_ref,
                         onChange: (frame) => {
                           input_ref.current?.onChange(collection_idx, frame)
                           controller_ref.current?.onChange(
@@ -108,33 +75,16 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
                             frame,
                           )
                         },
-                      })
-                      container_refs.current.set(
-                        collection_idx,
-                        tmp ?? [
-                          {
-                            ref: elementsRef.current[0],
-                            panel_idx: i,
-                            onChange: (frame) => {
-                              input_ref.current?.onChange(collection_idx, frame)
-                              controller_ref.current?.onChange(
-                                collection_idx,
-                                frame,
-                              )
-                            },
-                          },
-                        ],
-                      )
+                      }
+                      container_refs.current.set(collection_idx,container_ref)
                       return el
                     }}
                     time_idx={time_idx}
                     collection_idx={collection_idx}
-                  ></Container>
+                  />
                 )
-              })
-            }).flat()}
+            })}
           </div>
-        )}
       </div>
       <div className="row-start-5 z-10">
         <TimeController current_frame={current_frame} time_idx={time_idx} ref={controller_ref} />

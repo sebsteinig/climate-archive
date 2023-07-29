@@ -8,6 +8,10 @@ import {
   TimeState,
   TimeConfig,
   TimeSpeed,
+  ContainerConf,
+  TimeID,
+  CollectionID,
+  TimeMap,
 } from "./time.type"
 import { VariableName } from "../variables/variable.types"
 import { initMean, initTs, sync } from "./handlers/utils"
@@ -70,292 +74,73 @@ export function buildTime(config: TimeConfig): Time {
   return time
 }
 
-// export async function nextCircular(time:Time,current:TimeFrame,  delta:number,active_variable:VariableName[]):Promise<TimeFrame> {
-//     if(time.mode === TimeMode.mean) {
-//         const new_res = new Map<VariableName,TimeFrameValue>()
-//         for (let variable of active_variable) {
-//             const res = current.get(variable)
-//             if (!res) {
-//                 // newly selected variable
-//                 const [_,tr] = current.entries().next().value as [VariableName, TimeFrameValue]
+export function buildContainerConfig(config ?: ContainerConf) : ContainerConf{
+  return {
+    camera : config?.camera ?? {
+      is_linked : true
+    }
+  }
+}
 
-//                 const current_info = await texture_provider.getInfo(tr.current.exp,variable)
-//                 const new_current = {
-//                     idx : tr.current.idx,
-//                     exp : tr.current.exp,
-//                     info : current_info,
-//                     time_chunk : 0, // because mean => no chunks
-//                     frame : 0, // same here
-//                 }
+export function genID(slots:TimeMap) {
+  slots.auto_increment += 1
+  return slots.auto_increment
+}
 
-//                 const didx = time.direction === TimeDirection.forward ? 1 : -1
-//                 const new_idx = (tr.current.idx + didx) % time.exps.length
-//                 const new_exp = time.exps[new_idx]
-//                 const new_info = await texture_provider.getInfo(new_exp,variable)
+export function setTime(slots:TimeMap,time:Time) : TimeID {
+  const id = genID(slots)
+  slots.map.set(id,time)
 
-//                 const new_next = {
-//                     idx : new_idx,
-//                     exp: new_exp,
-//                     info : new_info,
-//                     time_chunk : 0,
-//                     frame : 0,
-//                 }
-//                 new_res.set(variable,
-//                     {
-//                         current:new_current,
-//                         next:new_next,
-//                         weight:tr.weight
-//                     }
-//                 )
-//                 continue;
-//             }
+  for(let collection_id of time.collections.keys()) {
+    const times = slots.lookup.get(collection_id) ?? new Set()
+    times.add(id)
+    slots.lookup.set(collection_id,times)
+  }
+  return id
+}
 
-//             let new_weight = (res.weight + delta)
-//             if (new_weight < 1) {
-//                 new_res.set(variable,
-//                     {
-//                         current : res.current,
-//                         next : res.next,
-//                         weight : new_weight,
-//                     }
-//                 )
-//                 continue;
-//             }
-//             new_weight = 0
-//             let new_current
-//             if(!res.next) {
+export function lastID(slots:TimeMap):TimeID|undefined {
+  return Array.from(slots.map.keys()).pop()
+}
 
-//                 const didx = time.direction === TimeDirection.forward ? 1 : -1
-//                 const new_idx = (res.current.idx + didx) % time.exps.length
-//                 const new_exp = time.exps[new_idx]
-//                 const new_info = await texture_provider.getInfo(new_exp,variable)
+export function get(slots:TimeMap,time_id:TimeID):Time|undefined {
+  return slots.map.get(time_id)
+}
 
-//                 new_current = {
-//                     idx : new_idx,
-//                     exp: new_exp,
-//                     info : new_info,
-//                     time_chunk : 0,
-//                     frame : 0,
-//                 }
-//             }else {
-//                 new_current = res.next
-//             }
+export function getConf(slots:TimeMap,time_id:TimeID,collection_id:CollectionID):ContainerConf|undefined {
+  const time = slots.map.get(time_id)
+  if(!time) return
+  return time.collections.get(collection_id)
+}
 
-//             const didx = time.direction === TimeDirection.forward ? 1 : -1
+export function getTimesOf(slots:TimeMap,collection_id:CollectionID) {
+  return slots.lookup.get(collection_id)
+}
 
-//             const new_idx = (new_current.idx + didx) % time.exps.length
-//             const new_exp = time.exps[new_idx]
-//             const new_info = await texture_provider.getInfo(new_exp,variable)
+export function timeCloseAll(slots:TimeMap,collection_id:CollectionID) {
+  const times = slots.lookup.get(collection_id)
+  if(!times) return
+  for(let time_id of times) {
+    const time = slots.map.get(time_id)
+    if(!time) continue
+    time.collections.delete(collection_id)
+    if(time.collections.size === 0) {
+      slots.map.delete(time_id)
+    }
+  }
+  slots.lookup.delete(collection_id)
+}
 
-//             const new_next = {
-//                 idx : new_idx,
-//                 exp : new_exp,
-//                 info : new_info,
-//                 frame : res.current.frame, // only in mean => takes the first and only frame of each texture
-//                 time_chunk : res.current.time_chunk, // only in mean => takes the first and only chunks of each texture
-//             }
-//             new_res.set(variable,
-//                 {
-//                     current : new_current,
-//                     next : new_next,
-//                     weight : new_weight,
-//                 }
-//             )
-//         }
-//         return new_res;
-//     }else { // mode ts
-//         const new_res = new Map<VariableName,TimeFrameValue>()
-//         for (let variable of active_variable) {
-//             const res = current.get(variable)
-//             if (!res) {
-//                 // newly selected variable
-//                 const [_,tr] = current.entries().next().value as [VariableName, TimeFrameValue]
-
-//                 const current_info = await texture_provider.getInfo(tr.current.exp,variable)
-
-//                 const tr_ts_chunks_size = tr.current.info.paths_ts.paths[0].grid[0].length
-//                 const tr_frames_size = tr.current.info.timesteps / tr_ts_chunks_size
-
-//                 const tr_ratio = (tr.current.frame+tr.current.time_chunk*tr_frames_size) / tr.current.info.timesteps
-
-//                 const ts_chunks_size = current_info.paths_ts.paths[0].grid[0].length
-//                 const frames_size = current_info.timesteps / ts_chunks_size
-
-//                 const tmp_frame = Math.floor(current_info.timesteps * tr_ratio)
-//                 const time_chunk = Math.floor(tmp_frame / frames_size)
-//                 const frame = tmp_frame % frames_size
-
-//                 const new_current = {
-//                     idx : tr.current.idx,
-//                     exp : tr.current.exp,
-//                     info : current_info,
-//                     time_chunk : time_chunk,
-//                     frame :frame,
-//                 }
-
-//                 const didx = time.direction === TimeDirection.forward ? 1 : -1
-//                 let new_frame = frame + didx
-//                 let new_time_chunk = time_chunk
-
-//                 let new_idx = tr.current.idx
-//                 let new_exp = time.exps[new_idx]
-//                 let new_info = current_info
-
-//                 if (new_frame >= frames_size) {
-//                     new_frame = 0
-//                     new_time_chunk += 1
-//                     if ( new_time_chunk === ts_chunks_size) {
-//                         // end of the ts for the current exp
-//                         new_idx = (new_idx + 1) % time.exps.length
-//                         new_exp = time.exps[new_idx]
-//                         new_info = await texture_provider.getInfo(new_exp,variable)
-//                         new_time_chunk = 0
-//                     }
-//                 }else if( new_frame < 0) {
-//                     new_frame = frames_size - 1
-//                     new_time_chunk -= 1
-//                     if ( new_time_chunk < 0) {
-//                         new_idx = (new_idx - 1) % time.exps.length
-//                         new_exp = time.exps[new_idx]
-//                         new_info = await texture_provider.getInfo(new_exp,variable)
-
-//                         const new_ts_chunks_size = new_info.paths_ts.paths[0].grid[0].length
-//                         new_time_chunk = new_ts_chunks_size - 1
-//                     }
-//                 }
-
-//                 const new_next = {
-//                     idx : new_idx,
-//                     exp: new_exp,
-//                     info : new_info,
-//                     time_chunk : new_time_chunk,
-//                     frame : new_frame,
-//                 }
-//                 new_res.set(variable,
-//                     {
-//                         current:new_current,
-//                         next:new_next,
-//                         weight:tr.weight
-//                     }
-//                 )
-//                 continue;
-//             }
-
-//             let new_weight = (res.weight + delta)
-//             if (new_weight < 1) {
-//                 new_res.set(variable,
-//                     {
-//                         current : res.current,
-//                         next : res.next,
-//                         weight : new_weight,
-//                     }
-//                 )
-//                 continue;
-//             }
-//             new_weight = 0
-
-//             const ts_chunks_size = res.current.info.paths_ts.paths[0].grid[0].length
-//             const frames_size = res.current.info.timesteps / ts_chunks_size
-//             let new_current
-//             if(!res.next) {
-
-//                 const didx = time.direction === TimeDirection.forward ? 1 : -1
-//                 let new_frame = res.current.frame + didx
-//                 let new_time_chunk = res.current.time_chunk
-
-//                 let new_idx = res.current.idx
-//                 let new_exp = time.exps[new_idx]
-//                 let new_info = res.current.info
-
-//                 if (new_frame >= frames_size) {
-//                     new_frame = 0
-//                     new_time_chunk += 1
-//                     if ( new_time_chunk === ts_chunks_size) {
-//                         // end of the ts for the current exp
-//                         new_idx = (res.current.idx + 1) % time.exps.length
-//                         new_exp = time.exps[new_idx]
-//                         new_info = await texture_provider.getInfo(new_exp,variable)
-//                         new_time_chunk = 0
-//                     }
-//                 }else if( new_frame < 0) {
-//                     new_frame = frames_size - 1
-//                     new_time_chunk -= 1
-//                     if ( new_time_chunk < 0) {
-//                         new_idx = (res.current.idx - 1) % time.exps.length
-//                         new_exp = time.exps[new_idx]
-//                         new_info = await texture_provider.getInfo(new_exp,variable)
-
-//                         const new_ts_chunks_size = new_info.paths_ts.paths[0].grid[0].length
-//                         new_time_chunk = new_ts_chunks_size - 1
-//                     }
-//                 }
-
-//                 new_current = {
-//                     idx : new_idx,
-//                     exp : new_exp,
-//                     info : new_info,
-//                     frame : new_frame,
-//                     time_chunk : new_time_chunk,
-//                 }
-//             }else {
-//                 new_current = res.next
-//             }
-
-//             const didx = time.direction === TimeDirection.forward ? 1 : -1
-
-//             let new_frame = new_current.frame + didx
-//             let new_time_chunk = new_current.time_chunk
-
-//             let new_idx = new_current.idx
-//             let new_exp = time.exps[new_idx]
-//             let new_info = new_current.info
-
-//             if (new_frame >= frames_size) {
-//                 new_frame = 0
-//                 new_time_chunk += 1
-//                 if ( new_time_chunk === ts_chunks_size) {
-//                     // end of the ts for the current exp
-//                     new_idx = (new_current.idx + 1) % time.exps.length
-//                     new_exp = time.exps[new_idx]
-//                     new_info = await texture_provider.getInfo(new_exp,variable)
-//                     new_time_chunk = 0
-//                 }
-//             }else if( new_frame < 0) {
-//                 new_frame = frames_size - 1
-//                 new_time_chunk -= 1
-//                 if ( new_time_chunk < 0) {
-//                     new_idx = (new_current.idx - 1) % time.exps.length
-//                     new_exp = time.exps[new_idx]
-//                     new_info = await texture_provider.getInfo(new_exp,variable)
-
-//                     const new_ts_chunks_size = new_info.paths_ts.paths[0].grid[0].length
-//                     new_time_chunk = new_ts_chunks_size - 1
-//                 }
-//             }
-
-//             const new_next = {
-//                 idx : new_idx,
-//                 exp : new_exp,
-//                 info : new_info,
-//                 frame : new_frame,
-//                 time_chunk : new_time_chunk,
-//             }
-//             new_res.set(variable,
-//                 {
-//                     current : new_current,
-//                     next : new_next,
-//                     weight : new_weight,
-//                 }
-//             )
-//         }
-//         return new_res;
-//     }
-// }
-
-// // export function nextWalk(time:Time,current:TimeFrame,  delta:number,active_variable:VariableName[]):TimeFrame {
-
-// // }
-
-// // export function nextOnce(time:Time,current:TimeFrame,  delta:number,active_variable:VariableName[]):TimeFrame {
-
-// // }
+export function timeClose(slots:TimeMap,time_id:TimeID,collection_id:CollectionID) {
+    const time = slots.map.get(time_id)
+    if(!time) return
+    time.collections.delete(collection_id)
+    if(time.collections.size === 0) {
+      slots.map.delete(time_id)
+    }
+    const times =  slots.lookup.get(collection_id)
+    times?.delete(time_id)
+    if(times?.size === 0) {
+      slots.lookup.delete(collection_id)
+    }
+}

@@ -1,7 +1,7 @@
 import { Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { Experiment } from "@/utils/types"
-import { MutableRefObject } from "react"
+import { MutableRefObject, useMemo } from "react"
 import { CanvasHolder, tickBuilder } from "../tick"
 import { World } from "@/components/3D_components/World"
 import { OrbitControls, PerspectiveCamera, View } from "@react-three/drei"
@@ -10,7 +10,6 @@ import { useClusterStore } from "@/utils/store/cluster.store"
 export type SceneProps = {
   time_idx: number
   collection_idx: number
-  panel_idx: number
   track: MutableRefObject<HTMLElement>
   time: Time
   exps: Experiment[]
@@ -23,7 +22,6 @@ export type SceneProps = {
 export function Scene({
   time_idx,
   collection_idx,
-  panel_idx,
   track,
   time,
   exps,
@@ -36,14 +34,15 @@ export function Scene({
     model: "Dune",
     heightData: "/assets/textures/tfgzk_height.smoothed.png",
   }
-  const linked = useClusterStore(
+  const time_slots = useClusterStore(
     (state) =>
-      state.time.cameras_state
-        .get(time_idx)
-        ?.get(collection_idx)
-        ?.get(panel_idx),
+      state.time.slots.map
   )
-
+  const conf = useMemo(
+    ()=> {
+      return time_slots.get(time_idx)!.collections.get(collection_idx)!
+    },[time_slots]
+  )
   return (
     <View track={track}>
       <World
@@ -59,7 +58,7 @@ export function Scene({
           onChange,
         )}
       />
-      {linked && (
+      {!conf.camera.is_linked && (
         <>
           <PerspectiveCamera
             makeDefault
