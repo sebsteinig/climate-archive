@@ -22,6 +22,7 @@ import { useTimePanel } from "./time_panel/useTimePanel"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { Experiments, Publication } from "@/utils/types"
 import { Perf } from "r3f-perf"
+import { cssGrid } from "@/utils/types.utils"
 
 type Props = {}
 
@@ -103,7 +104,7 @@ export function TimeProvider(props: Props) {
     <>
       <div
         ref={container_ref}
-        className="relative w-full h-full grid grid-cols-2 grid-rows-1 gap-4"
+        className={`relative w-full h-full grid ${cssGrid(time_slots.size)} gap-4`}
       >
         <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
           <Canvas

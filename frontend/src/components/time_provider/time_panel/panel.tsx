@@ -17,7 +17,7 @@ import {
 } from "../time_controllers/TimeController"
 import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
 import { Container } from "./container"
-import { uniqueIdx } from "@/utils/types.utils"
+import { cssGrid, uniqueIdx } from "@/utils/types.utils"
 
 export type PanelProps = {
   time_idx: number
@@ -60,9 +60,9 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
   })
 
   return (
-    <div className="z-10 grid grid-cols-1 grid-rows-2 gap-2">
+    <div className="w-full h-full grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-        <div className="w-full h-full">
+        <div className={`w-full h-full grid ${cssGrid(time.collections.size)} gap-4`}>
           {Array.from(time.collections, ([collection_idx, _]) => {
             return (
               <Container
