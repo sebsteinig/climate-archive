@@ -7,6 +7,9 @@ import {
   TimeMode,
   TimeFrame,
   TimeState,
+  TimeFrameValue,
+  TimeFrameRef,
+  TimeFrameHolder,
 } from "@/utils/store/time/time.type"
 import { initFrame } from "@/utils/store/time/time.utils"
 import { OrbitControls } from "@react-three/drei"
@@ -29,7 +32,7 @@ var config = {
 
 export function TimeProvider(props: Props) {
   const prepareTime = useClusterStore((state) => state.time.prepareAll)
-  const saveAll = useClusterStore((state) => state.time.saveAll)
+  //const saveAll = useClusterStore((state) => state.time.saveAll)
   const pauseAll = useClusterStore((state) => state.time.pauseAll)
   const time_slots = useClusterStore((state) => state.time.slots.map)
   const variables = useClusterStore((state) => state.variables)
@@ -44,8 +47,24 @@ export function TimeProvider(props: Props) {
       pauseAll()
     }
   }, [active_variable])
-  const saved_frames = useClusterStore((state) => state.time.saved_frames)
-
+  //const saved_frames = useClusterStore((state) => state.time.saved_frames)
+  const current_frame = useRef<TimeFrameHolder>({
+    map : new Map(),
+    update(frame, time_id, collection_id) {
+        const time = this.map.get(time_id)
+        if(!time) {
+          const collection = new Map()
+          collection.set(collection_id,frame)
+          this.map.set(time_id,collection)
+          return 
+        };
+        time.set(collection_id,frame)
+    },
+    get(time_id, collection_id) {
+        return this.map.get(time_id)?.get(collection_id)
+    },
+  })
+  
   const current_canvas = document.createElement("canvas")
   const current_ctx = current_canvas.getContext("2d")
   const next_canvas = document.createElement("canvas")
@@ -64,12 +83,9 @@ export function TimeProvider(props: Props) {
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
 
-    prepare(time_slots, collections, saved_frames, active_variable).then(
+    init(time_slots, collections,current_frame, active_variable).then(
       (res) => {
-        if (res.every((e) => e[1].length > 0)) {
-          prepareTime(res.map((e) => e[0]))
-          saveAll(res)
-        }
+          prepareTime(res)
       },
     )
   }, [time_slots, active_variable])
@@ -77,7 +93,7 @@ export function TimeProvider(props: Props) {
   const container_ref = useRef<HTMLDivElement>(null!)
   const [scenes, panels] = useTimePanel(
     time_slots,
-    saved_frames,
+    current_frame,
     collections,
     active_variable,
     context,
@@ -114,39 +130,27 @@ export function TimeProvider(props: Props) {
   )
 }
 
-async function prepare(
+async function init(
   time_slots: Map<number, Time>,
   collections: Map<number, Publication | Experiments>,
-  saved_frames: Map<number, Map<number, TimeFrame>>,
+  current_frame : TimeFrameRef,
   active_variables: VariableName[],
 ) {
-  const res: [number, [number, TimeFrame][]][] = []
-
+  const res = []
   for (let [time_idx, time] of time_slots) {
-    const row: [number, TimeFrame][] = []
     if (time.state !== TimeState.zero && time.state !== TimeState.stopped) {
       continue
     }
+    res.push(time_idx)
     for (let [collection_idx, _] of time.collections) {
       const collection = collections.get(collection_idx)
-
       if (!collection) {
         continue
       }
-      let frame: TimeFrame
-      // if (time.state === TimeState.playing || time.state === TimeState.paused) {
-      //   frame = await sync(
-      //     time,
-      //     collection.exps,
-      //     saved_frames.get(time_idx)!.get(collection_idx)!,
-      //     active_variables,
-      //   )
-      // } else {
-      frame = await initFrame(time, collection.exps, active_variables)
-      //}
-      row.push([collection_idx, frame])
+      let frame= await initFrame(time, collection.exps, active_variables)
+      console.log('INIT');
+      current_frame.current.update(frame,time_idx,collection_idx)
     }
-    res.push([time_idx, row])
   }
   return res
 }

@@ -9,6 +9,7 @@ import {
 } from "react"
 import {
   TimeFrame,
+  TimeFrameRef,
   TimeFrameValue,
   TimeMode,
   TimeState,
@@ -20,6 +21,7 @@ type Props = {
   onChange: (value: number) => void
   className?: string
   time_idx: number
+  current_frame : TimeFrameRef
 }
 
 export type InputRef = {
@@ -27,7 +29,7 @@ export type InputRef = {
 }
 
 export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
-  { time_idx, className, onChange }: Props,
+  { time_idx, className, current_frame, onChange }: Props,
   ref,
 ) {
   const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
@@ -60,7 +62,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
     }
     return own_collections[0].exps.length * 10
   }, [time?.mode])
-  const snap_frames = useRef<Map<number, TimeFrame>>(new Map())
+  //const snap_frames = useRef<Map<number, TimeFrame>>(new Map())
 
   useImperativeHandle(ref, () => {
     return {
@@ -85,7 +87,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         if (!first) {
           return
         }
-        snap_frames.current.set(collection_idx, frame)
+        //snap_frames.current.set(collection_idx, frame)
 
         if (time.state === TimeState.surfing) {
           return
@@ -121,7 +123,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           const unweighted_idx = Math.floor(idx / 10)
           if (time?.state === TimeState.playing) {
             pin(time_idx)
-            const frame = snap_frames.current.values().next().value as
+            const frame = current_frame.current.map.get(time_idx)!.values().next().value as
               | TimeFrame
               | undefined
             if (!frame) {
@@ -130,7 +132,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
             const [pos, _] = getCurrentPos(time, frame)
             try_surfing(time_idx, pos)
           } else if (time?.state === TimeState.paused) {
-            const frame = snap_frames.current.values().next().value as
+            const frame = current_frame.current.map.get(time_idx)!.values().next().value as
               | TimeFrame
               | undefined
             if (!frame) {

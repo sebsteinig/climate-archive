@@ -1,4 +1,4 @@
-import { Time, TimeFrame } from "@/utils/store/time/time.type"
+import { Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { Experiment } from "@/utils/types"
 import { MutableRefObject } from "react"
@@ -14,7 +14,7 @@ export type SceneProps = {
   track: MutableRefObject<HTMLElement>
   time: Time
   exps: Experiment[]
-  frame: TimeFrame
+  current_frame:TimeFrameRef,
   active_variables: VariableName[]
   context: CanvasHolder
   onChange: (frame: TimeFrame) => void
@@ -27,7 +27,7 @@ export function Scene({
   track,
   time,
   exps,
-  frame,
+  current_frame,
   active_variables,
   context,
   onChange,
@@ -43,7 +43,6 @@ export function Scene({
         ?.get(collection_idx)
         ?.get(panel_idx),
   )
-  console.log({ linked })
 
   return (
     <View track={track}>
@@ -51,8 +50,10 @@ export function Scene({
         config={config}
         tick={tickBuilder(
           time,
+          time_idx,
+          collection_idx,
           exps,
-          frame,
+          current_frame,
           active_variables,
           context,
           onChange,

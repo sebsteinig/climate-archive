@@ -4,6 +4,7 @@ import { getCurrentPos } from "@/utils/store/time/handlers/utils"
 import {
   Time,
   TimeFrame,
+  TimeFrameRef,
   TimeFrameValue,
   TimeMode,
   TimeState,
@@ -103,15 +104,19 @@ function surf(
 
 export function tickBuilder(
   time: Time,
+  time_id : number,
+  collection_id : number,
   exps: Experiment[],
-  frame: TimeFrame,
+  current_frame:TimeFrameRef,
   active_variable: VariableName[],
   context: CanvasHolder,
   onChange: (frame: TimeFrame) => void,
 ) {
   const next = nextBuilder(time)
   return async function tick(delta: number) {
+    const frame = current_frame.current.get(time_id,collection_id)
     if (
+      !frame ||
       !frame.initialized ||
       time.state === TimeState.paused ||
       time.state === TimeState.stopped ||
@@ -120,15 +125,7 @@ export function tickBuilder(
     ) {
       return new Map()
     }
-    if (time.state === TimeState.pinning) {
-      const first = frame.variables.values().next().value as
-        | TimeFrameValue
-        | undefined
-
-      //if(first?.weight !== 0) {
-      frame = await next(time, exps, frame, delta, active_variable)
-      //}
-    } else if (time.state === TimeState.surfing) {
+    if (time.state === TimeState.surfing) {
       const [current_pos, weight] = getCurrentPos(time, frame)
       const surfing_rate = surf(
         time.surfing_departure,
@@ -136,11 +133,20 @@ export function tickBuilder(
         weight,
         time.surfing_destination,
       )
-      frame = await next(time, exps, frame, surfing_rate, active_variable)
-    } else if (time.state === TimeState.playing) {
-      frame = await next(time, exps, frame, delta, active_variable)
+      current_frame.current.update(
+        await next(time, exps, frame, surfing_rate, active_variable),
+        time_id,
+        collection_id,
+      )
+    } else if (time.state === TimeState.playing || time.state === TimeState.pinning) {
+      current_frame.current.update(
+        await next(time, exps, frame, delta, active_variable),
+        time_id,
+        collection_id,
+      )
     }
-
+    console.log(frame);
+    
     const res = new Map()
 
     for (let [variable, data] of frame.variables) {
