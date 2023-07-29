@@ -1,4 +1,4 @@
-import { Time, TimeFrame } from "@/utils/store/time/time.type"
+import { Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
 import {
   MutableRefObject,
   RefObject,
@@ -17,6 +17,7 @@ import { uniqueIdx } from "@/utils/types.utils"
 export type PanelProps = {
   time_idx: number
   time: Time
+  current_frame : TimeFrameRef
 }
 
 export type ContainerRef = {
@@ -34,7 +35,7 @@ function range(start: number, end: number) {
 }
 
 export const Panel = forwardRef<Refs, PanelProps>(function Panel(
-  { time, time_idx },
+  { time, time_idx , current_frame },
   refs,
 ) {
   const first_collection = time.collections.entries().next().value as
@@ -136,8 +137,9 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
         )}
       </div>
       <div className="row-start-5 z-10">
-        <TimeController time_idx={time_idx} ref={controller_ref} />
+        <TimeController current_frame={current_frame} time_idx={time_idx} ref={controller_ref} />
         <TimeSlider
+          current_frame={current_frame}
           time_idx={time_idx}
           className="w-full"
           onChange={(value) => {}}

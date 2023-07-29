@@ -1,6 +1,7 @@
 import { TextureInfo } from "@/utils/database/database.types"
 import { VariableName } from "../variables/variable.types"
 import { Experiment } from "@/utils/types"
+import { MutableRefObject } from "react"
 
 export enum TimeKind {
   circular,
@@ -61,7 +62,13 @@ export type TimeFrame = {
   initialized: boolean
 }
 
-export type TimeMultipleFrames = Map<number, TimeFrame>
+export type TimeFrameHolder = {
+  map : Map<number, Map<number, TimeFrame>>,
+  update : (frame:TimeFrame,time_id:number,collection_id:number) => void
+  get : (time_id:number,collection_id:number) => TimeFrame | undefined
+}
+
+export type TimeFrameRef =  MutableRefObject<TimeFrameHolder>
 
 export type Time = {
   mode: TimeMode
