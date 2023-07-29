@@ -1,4 +1,9 @@
-import { Time, TimeFrame, TimeFrameRef, TimeState } from "@/utils/store/time/time.type"
+import {
+  Time,
+  TimeFrame,
+  TimeFrameRef,
+  TimeState,
+} from "@/utils/store/time/time.type"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import {
   MutableRefObject,
@@ -22,13 +27,13 @@ import { uniqueIdx } from "@/utils/types.utils"
 
 export function useTimePanel(
   time_slots: Map<number, Time>,
-  current_frame:TimeFrameRef,
+  current_frame: TimeFrameRef,
   collections: Map<number, Publication | Experiments>,
   active_variables: VariableName[],
   context: CanvasHolder,
 ) {
-  if(!current_frame.current) {
-    return [[],[]]
+  if (!current_frame.current) {
+    return [[], []]
   }
   const scenes: JSX.Element[] = []
   const panels: JSX.Element[] = []
@@ -36,7 +41,7 @@ export function useTimePanel(
   for (let [time_idx, time] of time_slots) {
     panels.push(
       <Panel
-      current_frame={current_frame}
+        current_frame={current_frame}
         key={time_idx}
         time={time}
         time_idx={time_idx}
@@ -54,7 +59,7 @@ export function useTimePanel(
       const exps = collections.get(collection_idx)!.exps
       scenes.push(
         <Scene
-          key={uniqueIdx(time_idx, collection_idx,0)}
+          key={uniqueIdx(time_idx, collection_idx, 0)}
           time_idx={time_idx}
           collection_idx={collection_idx}
           time={time}
@@ -66,7 +71,6 @@ export function useTimePanel(
           onChange={container_ref.onChange}
         />,
       )
-      
     }
   }
   return [scenes, panels]

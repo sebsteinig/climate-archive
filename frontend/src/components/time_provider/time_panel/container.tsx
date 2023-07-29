@@ -20,10 +20,7 @@ type Props = {
 }
 
 export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  function Container(
-    { time_idx, collection_idx, className, children },
-    ref,
-  ) {
+  function Container({ time_idx, collection_idx, className, children }, ref) {
     const pauseAll = useClusterStore((state) => state.time.pauseAll)
     const addUnsync = useClusterStore((state) => state.time.addUnSync)
     const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
@@ -79,8 +76,12 @@ function PanelConfiguration({
   const [is_not_linked, link] = useState<boolean>(false)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
   return (
-    <div className="grid grid-cols-1 gap-1 justify-items-center " onClick={()=>{console.log("CLICKED ON CONF");
-    }}>
+    <div
+      className="grid grid-cols-1 gap-1 justify-items-center "
+      onClick={() => {
+        console.log("CLICKED ON CONF")
+      }}
+    >
       <ArrowDownIcon
         className="p-2 w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500"
         onClick={() => displayButtons(false)}

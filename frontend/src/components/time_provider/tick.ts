@@ -104,17 +104,17 @@ function surf(
 
 export function tickBuilder(
   time: Time,
-  time_id : number,
-  collection_id : number,
+  time_id: number,
+  collection_id: number,
   exps: Experiment[],
-  current_frame:TimeFrameRef,
+  current_frame: TimeFrameRef,
   active_variable: VariableName[],
   context: CanvasHolder,
   onChange: (frame: TimeFrame) => void,
 ) {
   const next = nextBuilder(time)
   return async function tick(delta: number) {
-    const frame = current_frame.current.get(time_id,collection_id)
+    const frame = current_frame.current.get(time_id, collection_id)
     if (
       !frame ||
       !frame.initialized ||
@@ -138,15 +138,18 @@ export function tickBuilder(
         time_id,
         collection_id,
       )
-    } else if (time.state === TimeState.playing || time.state === TimeState.pinning) {
+    } else if (
+      time.state === TimeState.playing ||
+      time.state === TimeState.pinning
+    ) {
       current_frame.current.update(
         await next(time, exps, frame, delta, active_variable),
         time_id,
         collection_id,
       )
     }
-    console.log(frame);
-    
+    console.log(frame)
+
     const res = new Map()
 
     for (let [variable, data] of frame.variables) {

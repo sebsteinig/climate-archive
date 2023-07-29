@@ -1,6 +1,6 @@
 "use client"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { findInTree } from "@/utils/store/texture_tree.store"
+import { findInTree } from "@/utils/store/collection.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { texture_provider } from "@/utils/texture_provider/TextureProvider"
 import { TextureLeaf } from "@/utils/texture_provider/texture_provider.types"

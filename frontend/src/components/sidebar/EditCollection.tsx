@@ -15,10 +15,7 @@ export function EditCollection({
   current_details,
   hover,
 }: Props) {
-  const collections = useClusterStore(
-    (state) => 
-      state.collections
-  )
+  const collections = useClusterStore((state) => state.collections)
   const other_collections = useMemo(
     () =>
       Array.from(collections).filter(([k, _v]) => k !== current_details.idx),
@@ -46,9 +43,7 @@ export function EditCollection({
                 )}
                 <div className="flex flex-wrap gap-2">
                   <ButtonSecondary
-                    onClick={() => {
-                        
-                    }}
+                    onClick={() => {}}
                     className="hidden group-hover:block"
                   >
                     LOAD

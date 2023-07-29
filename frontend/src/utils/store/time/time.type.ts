@@ -63,12 +63,12 @@ export type TimeFrame = {
 }
 
 export type TimeFrameHolder = {
-  map : Map<number, Map<number, TimeFrame>>,
-  update : (frame:TimeFrame,time_id:number,collection_id:number) => void
-  get : (time_id:number,collection_id:number) => TimeFrame | undefined
+  map: Map<number, Map<number, TimeFrame>>
+  update: (frame: TimeFrame, time_id: number, collection_id: number) => void
+  get: (time_id: number, collection_id: number) => TimeFrame | undefined
 }
 
-export type TimeFrameRef =  MutableRefObject<TimeFrameHolder>
+export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
 
 export type TimeID = number
 export type CollectionID = number
@@ -81,18 +81,17 @@ export type Time = {
   speed: number
   surfing_departure: number
   surfing_destination: number
-  collections: Map<CollectionID,ContainerConf>
+  collections: Map<CollectionID, ContainerConf>
 }
 
-
 export type ContainerConf = {
-  camera : {
-    is_linked : boolean
+  camera: {
+    is_linked: boolean
   }
 }
 
 export type TimeMap = {
-  map : Map<TimeID,Time>
-  lookup : Map<CollectionID,Set<TimeID>>
-  auto_increment : number
+  map: Map<TimeID, Time>
+  lookup: Map<CollectionID, Set<TimeID>>
+  auto_increment: number
 }

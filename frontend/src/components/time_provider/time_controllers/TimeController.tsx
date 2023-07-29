@@ -23,7 +23,7 @@ import { chunksDetails } from "@/utils/store/time/handlers/utils"
 type Props = {
   className?: string
   time_idx: number
-  current_frame : TimeFrameRef
+  current_frame: TimeFrameRef
 }
 export type ControllerRef = {
   onChange: (collection_idx: number, frame: TimeFrame) => void
@@ -81,13 +81,13 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           //snap_frames.current.set(collection_idx, frame)
 
           if (time.state === TimeState.pinning) {
-            console.log('PINNING');
-            
-            console.log(first);
-            
+            console.log("PINNING")
+
+            console.log(first)
+
             if (first.weight === 0) {
-              console.log('REAL PAUSE ####');
-              
+              console.log("REAL PAUSE ####")
+
               pauseTime(time_idx)
               //save(time_idx, snap_frames.current)
               //return

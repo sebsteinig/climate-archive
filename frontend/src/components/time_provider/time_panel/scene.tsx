@@ -13,7 +13,7 @@ export type SceneProps = {
   track: MutableRefObject<HTMLElement>
   time: Time
   exps: Experiment[]
-  current_frame:TimeFrameRef,
+  current_frame: TimeFrameRef
   active_variables: VariableName[]
   context: CanvasHolder
   onChange: (frame: TimeFrame) => void
@@ -34,15 +34,10 @@ export function Scene({
     model: "Dune",
     heightData: "/assets/textures/tfgzk_height.smoothed.png",
   }
-  const time_slots = useClusterStore(
-    (state) =>
-      state.time.slots.map
-  )
-  const conf = useMemo(
-    ()=> {
-      return time_slots.get(time_idx)!.collections.get(collection_idx)!
-    },[time_slots]
-  )
+  const time_slots = useClusterStore((state) => state.time.slots.map)
+  const conf = useMemo(() => {
+    return time_slots.get(time_idx)!.collections.get(collection_idx)!
+  }, [time_slots])
   return (
     <View track={track}>
       <World

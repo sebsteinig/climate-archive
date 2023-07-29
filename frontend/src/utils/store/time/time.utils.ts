@@ -74,73 +74,81 @@ export function buildTime(config: TimeConfig): Time {
   return time
 }
 
-export function buildContainerConfig(config ?: ContainerConf) : ContainerConf{
+export function buildContainerConfig(config?: ContainerConf): ContainerConf {
   return {
-    camera : config?.camera ?? {
-      is_linked : true
-    }
+    camera: config?.camera ?? {
+      is_linked: true,
+    },
   }
 }
 
-export function genID(slots:TimeMap) {
+export function genID(slots: TimeMap) {
   slots.auto_increment += 1
   return slots.auto_increment
 }
 
-export function setTime(slots:TimeMap,time:Time) : TimeID {
+export function setTime(slots: TimeMap, time: Time): TimeID {
   const id = genID(slots)
-  slots.map.set(id,time)
+  slots.map.set(id, time)
 
-  for(let collection_id of time.collections.keys()) {
+  for (let collection_id of time.collections.keys()) {
     const times = slots.lookup.get(collection_id) ?? new Set()
     times.add(id)
-    slots.lookup.set(collection_id,times)
+    slots.lookup.set(collection_id, times)
   }
   return id
 }
 
-export function lastID(slots:TimeMap):TimeID|undefined {
+export function lastID(slots: TimeMap): TimeID | undefined {
   return Array.from(slots.map.keys()).pop()
 }
 
-export function get(slots:TimeMap,time_id:TimeID):Time|undefined {
+export function get(slots: TimeMap, time_id: TimeID): Time | undefined {
   return slots.map.get(time_id)
 }
 
-export function getConf(slots:TimeMap,time_id:TimeID,collection_id:CollectionID):ContainerConf|undefined {
+export function getConf(
+  slots: TimeMap,
+  time_id: TimeID,
+  collection_id: CollectionID,
+): ContainerConf | undefined {
   const time = slots.map.get(time_id)
-  if(!time) return
+  if (!time) return
   return time.collections.get(collection_id)
 }
 
-export function getTimesOf(slots:TimeMap,collection_id:CollectionID) {
+export function getTimesOf(slots: TimeMap, collection_id: CollectionID) {
   return slots.lookup.get(collection_id)
 }
 
-export function timeCloseAll(slots:TimeMap,collection_id:CollectionID) {
+export function timeCloseAll(slots: TimeMap, collection_id: CollectionID) {
   const times = slots.lookup.get(collection_id)
-  if(!times) return
-  for(let time_id of times) {
+  if (!times) return
+  for (let time_id of times) {
     const time = slots.map.get(time_id)
-    if(!time) continue
+    if (!time) continue
     time.collections.delete(collection_id)
-    if(time.collections.size === 0) {
+    if (time.collections.size === 0) {
       slots.map.delete(time_id)
     }
   }
   slots.lookup.delete(collection_id)
 }
 
-export function timeClose(slots:TimeMap,time_id:TimeID,collection_id:CollectionID) {
-    const time = slots.map.get(time_id)
-    if(!time) return
-    time.collections.delete(collection_id)
-    if(time.collections.size === 0) {
-      slots.map.delete(time_id)
-    }
-    const times =  slots.lookup.get(collection_id)
-    times?.delete(time_id)
-    if(times?.size === 0) {
-      slots.lookup.delete(collection_id)
-    }
+export function timeClose(
+  slots: TimeMap,
+  time_id: TimeID,
+  collection_id: CollectionID,
+) {
+  const time = slots.map.get(time_id)
+  if (!time) return
+  time.collections.delete(collection_id)
+  if (time.collections.size === 0) {
+    slots.map.delete(time_id)
+  }
+  const times = slots.lookup.get(collection_id)
+  times?.delete(time_id)
+  if (times?.size === 0) {
+    slots.lookup.delete(collection_id)
+  }
 }

@@ -49,22 +49,22 @@ export function TimeProvider(props: Props) {
   }, [active_variable])
   //const saved_frames = useClusterStore((state) => state.time.saved_frames)
   const current_frame = useRef<TimeFrameHolder>({
-    map : new Map(),
+    map: new Map(),
     update(frame, time_id, collection_id) {
-        const time = this.map.get(time_id)
-        if(!time) {
-          const collection = new Map()
-          collection.set(collection_id,frame)
-          this.map.set(time_id,collection)
-          return 
-        };
-        time.set(collection_id,frame)
+      const time = this.map.get(time_id)
+      if (!time) {
+        const collection = new Map()
+        collection.set(collection_id, frame)
+        this.map.set(time_id, collection)
+        return
+      }
+      time.set(collection_id, frame)
     },
     get(time_id, collection_id) {
-        return this.map.get(time_id)?.get(collection_id)
+      return this.map.get(time_id)?.get(collection_id)
     },
   })
-  
+
   const current_canvas = document.createElement("canvas")
   const current_ctx = current_canvas.getContext("2d")
   const next_canvas = document.createElement("canvas")
@@ -83,9 +83,9 @@ export function TimeProvider(props: Props) {
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
 
-    init(time_slots, collections,current_frame, active_variable).then(
+    init(time_slots, collections, current_frame, active_variable).then(
       (res) => {
-          prepareTime(res)
+        prepareTime(res)
       },
     )
   }, [time_slots, active_variable])
@@ -133,7 +133,7 @@ export function TimeProvider(props: Props) {
 async function init(
   time_slots: Map<number, Time>,
   collections: Map<number, Publication | Experiments>,
-  current_frame : TimeFrameRef,
+  current_frame: TimeFrameRef,
   active_variables: VariableName[],
 ) {
   const res = []
@@ -147,9 +147,9 @@ async function init(
       if (!collection) {
         continue
       }
-      let frame= await initFrame(time, collection.exps, active_variables)
-      console.log('INIT');
-      current_frame.current.update(frame,time_idx,collection_idx)
+      let frame = await initFrame(time, collection.exps, active_variables)
+      console.log("INIT")
+      current_frame.current.update(frame, time_idx, collection_idx)
     }
   }
   return res

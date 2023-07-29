@@ -1,4 +1,9 @@
-import { CollectionID, Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
+import {
+  CollectionID,
+  Time,
+  TimeFrame,
+  TimeFrameRef,
+} from "@/utils/store/time/time.type"
 import {
   MutableRefObject,
   RefObject,
@@ -17,7 +22,7 @@ import { uniqueIdx } from "@/utils/types.utils"
 export type PanelProps = {
   time_idx: number
   time: Time
-  current_frame : TimeFrameRef
+  current_frame: TimeFrameRef
 }
 
 export type ContainerRef = {
@@ -30,16 +35,16 @@ export type Refs = {
   container_refs: RefObject<Map<CollectionID, ContainerRef>>
 }
 
-function buildDivHolder(time:Time) {
-  const res = new Map<CollectionID,MutableRefObject<HTMLDivElement>>()
-  for ( let collection_id of time.collections.keys()) {
-    res.set(collection_id,useRef<HTMLDivElement>(null!))
+function buildDivHolder(time: Time) {
+  const res = new Map<CollectionID, MutableRefObject<HTMLDivElement>>()
+  for (let collection_id of time.collections.keys()) {
+    res.set(collection_id, useRef<HTMLDivElement>(null!))
   }
   return res
 }
 
 export const Panel = forwardRef<Refs, PanelProps>(function Panel(
-  { time, time_idx , current_frame },
+  { time, time_idx, current_frame },
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)
@@ -53,41 +58,42 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
       container_refs: container_refs,
     }
   })
-  
+
   return (
     <div className="grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-          <div className="w-full h-full">
-            {Array.from(time.collections, ([collection_idx, _]) => {
-                return (
-                  <Container
-                    key={collection_idx}
-                    ref={(el: HTMLDivElement) => {
-                      const div_ref = divs_holder.current.get(collection_idx)!
-                      div_ref.current = el
+        <div className="w-full h-full">
+          {Array.from(time.collections, ([collection_idx, _]) => {
+            return (
+              <Container
+                key={collection_idx}
+                ref={(el: HTMLDivElement) => {
+                  const div_ref = divs_holder.current.get(collection_idx)!
+                  div_ref.current = el
 
-                      const container_ref : ContainerRef = {
-                        ref : div_ref,
-                        onChange: (frame) => {
-                          input_ref.current?.onChange(collection_idx, frame)
-                          controller_ref.current?.onChange(
-                            collection_idx,
-                            frame,
-                          )
-                        },
-                      }
-                      container_refs.current.set(collection_idx,container_ref)
-                      return el
-                    }}
-                    time_idx={time_idx}
-                    collection_idx={collection_idx}
-                  />
-                )
-            })}
-          </div>
+                  const container_ref: ContainerRef = {
+                    ref: div_ref,
+                    onChange: (frame) => {
+                      input_ref.current?.onChange(collection_idx, frame)
+                      controller_ref.current?.onChange(collection_idx, frame)
+                    },
+                  }
+                  container_refs.current.set(collection_idx, container_ref)
+                  return el
+                }}
+                time_idx={time_idx}
+                collection_idx={collection_idx}
+              />
+            )
+          })}
+        </div>
       </div>
       <div className="row-start-5 z-10">
-        <TimeController current_frame={current_frame} time_idx={time_idx} ref={controller_ref} />
+        <TimeController
+          current_frame={current_frame}
+          time_idx={time_idx}
+          ref={controller_ref}
+        />
         <TimeSlider
           current_frame={current_frame}
           time_idx={time_idx}

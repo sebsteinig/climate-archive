@@ -14,14 +14,14 @@ import {
   TimeMode,
   TimeState,
 } from "@/utils/store/time/time.type"
-import { Collection } from "@/utils/store/texture_tree.store"
+import { Collection } from "@/utils/store/collection.store"
 import { chunksDetails, getCurrentPos } from "@/utils/store/time/handlers/utils"
 
 type Props = {
   onChange: (value: number) => void
   className?: string
   time_idx: number
-  current_frame : TimeFrameRef
+  current_frame: TimeFrameRef
 }
 
 export type InputRef = {
@@ -123,18 +123,20 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           const unweighted_idx = Math.floor(idx / 10)
           if (time?.state === TimeState.playing) {
             pin(time_idx)
-            const frame = current_frame.current.map.get(time_idx)!.values().next().value as
-              | TimeFrame
-              | undefined
+            const frame = current_frame.current.map
+              .get(time_idx)!
+              .values()
+              .next().value as TimeFrame | undefined
             if (!frame) {
               return
             }
             const [pos, _] = getCurrentPos(time, frame)
             try_surfing(time_idx, pos)
           } else if (time?.state === TimeState.paused) {
-            const frame = current_frame.current.map.get(time_idx)!.values().next().value as
-              | TimeFrame
-              | undefined
+            const frame = current_frame.current.map
+              .get(time_idx)!
+              .values()
+              .next().value as TimeFrame | undefined
             if (!frame) {
               return
             }

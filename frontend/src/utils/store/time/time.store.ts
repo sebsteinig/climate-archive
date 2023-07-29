@@ -7,7 +7,16 @@ import {
   TimeID,
   CollectionID,
 } from "./time.type"
-import { buildContainerConfig, buildTime, get, getConf, lastID, setTime, timeClose, timeCloseAll } from "./time.utils"
+import {
+  buildContainerConfig,
+  buildTime,
+  get,
+  getConf,
+  lastID,
+  setTime,
+  timeClose,
+  timeCloseAll,
+} from "./time.utils"
 
 export interface TimeSlice {
   time: {
@@ -19,14 +28,13 @@ export interface TimeSlice {
       linked: boolean,
     ) => void
 
-    addSync: (collection_idx: CollectionID, config: TimeConfig | undefined) => void
+    addSync: (
+      collection_idx: CollectionID,
+      config: TimeConfig | undefined,
+    ) => void
     addUnSync: (collection_idx: CollectionID, config: TimeConfig) => void
 
-
-    remove: (
-      collection_idx: CollectionID,
-      time_idx: TimeID,
-    ) => void
+    remove: (collection_idx: CollectionID, time_idx: TimeID) => void
     removeAll: (collection_idx: CollectionID) => void
 
     prepare: (idx: TimeID) => void
@@ -51,9 +59,9 @@ export const createTimeSlice: StateCreator<
   return {
     time: {
       slots: {
-        map : new Map(),
-        lookup : new Map(),
-        auto_increment : 0,
+        map: new Map(),
+        lookup: new Map(),
+        auto_increment: 0,
       },
 
       linkCamera: (
@@ -62,8 +70,8 @@ export const createTimeSlice: StateCreator<
         linked: boolean,
       ) => {
         set((state) => {
-          const conf = getConf(state.time.slots,time_idx,collection_idx)
-          if(conf) {
+          const conf = getConf(state.time.slots, time_idx, collection_idx)
+          if (conf) {
             conf.camera.is_linked = linked
           }
         })
@@ -72,33 +80,33 @@ export const createTimeSlice: StateCreator<
       addSync: (collection_idx: CollectionID, config?: TimeConfig) => {
         set((state) => {
           const id = lastID(state.time.slots)
-          if(id) {
-            const time = get(state.time.slots,id)!
-            time.collections.set(collection_idx,buildContainerConfig())
-          }else {
+          if (id) {
+            const time = get(state.time.slots, id)!
+            time.collections.set(collection_idx, buildContainerConfig())
+          } else {
             const time = buildTime(config ?? {})
-            time.collections.set(collection_idx,buildContainerConfig())
-            setTime(state.time.slots,time)
+            time.collections.set(collection_idx, buildContainerConfig())
+            setTime(state.time.slots, time)
           }
         })
       },
       addUnSync: (collection_idx: CollectionID, config: TimeConfig) => {
         set((state) => {
           const time = buildTime(config)
-          time.collections.set(collection_idx,buildContainerConfig())
-          setTime(state.time.slots,time)
+          time.collections.set(collection_idx, buildContainerConfig())
+          setTime(state.time.slots, time)
         })
       },
 
       remove: (time_idx: TimeID, collection_idx: CollectionID) => {
         set((state) => {
-          timeClose(state.time.slots,time_idx,collection_idx)
+          timeClose(state.time.slots, time_idx, collection_idx)
         })
       },
 
       removeAll: (collection_idx: CollectionID) => {
         set((state) => {
-          timeCloseAll(state.time.slots,collection_idx)
+          timeCloseAll(state.time.slots, collection_idx)
         })
       },
 
@@ -123,7 +131,7 @@ export const createTimeSlice: StateCreator<
       prepareAll: (idxs: TimeID[]) => {
         set((state) => {
           for (let idx of idxs) {
-            const time = get(state.time.slots,idx)
+            const time = get(state.time.slots, idx)
 
             if (!time) {
               continue
@@ -139,7 +147,7 @@ export const createTimeSlice: StateCreator<
       },
       play: (idx: TimeID) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -154,7 +162,7 @@ export const createTimeSlice: StateCreator<
       },
       pause: (idx: TimeID) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -166,7 +174,7 @@ export const createTimeSlice: StateCreator<
       },
       pin: (idx: TimeID) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -178,7 +186,7 @@ export const createTimeSlice: StateCreator<
       },
       try_surfing: (idx: TimeID, departure) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -188,7 +196,7 @@ export const createTimeSlice: StateCreator<
       },
       surf: (idx: TimeID, destination) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -205,7 +213,7 @@ export const createTimeSlice: StateCreator<
       },
       updateSurfingDestination: (idx: TimeID, destination) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -224,7 +232,7 @@ export const createTimeSlice: StateCreator<
       },
       stop: (idx: TimeID) => {
         set((state) => {
-          const time = get(state.time.slots,idx)
+          const time = get(state.time.slots, idx)
           if (!time) {
             return
           }
@@ -237,6 +245,6 @@ export const createTimeSlice: StateCreator<
           }
         })
       },
-     },
+    },
   }
 }

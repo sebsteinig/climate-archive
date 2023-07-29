@@ -26,6 +26,5 @@ export const createTextureTreeSlice: StateCreator<
         state.collections.set(collection_idx, collection)
       })
     },
-    
   }
 }
