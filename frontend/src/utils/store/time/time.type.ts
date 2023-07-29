@@ -70,6 +70,10 @@ export type TimeFrameHolder = {
 
 export type TimeFrameRef =  MutableRefObject<TimeFrameHolder>
 
+export type TimeID = number
+export type CollectionID = number
+export type ContainerID = number
+
 export type Time = {
   mode: TimeMode
   direction: TimeDirection
@@ -78,6 +82,13 @@ export type Time = {
   speed: number
   surfing_departure: number
   surfing_destination: number
-  //current_frame : TimeMultipleFrames
-  collections: Map<number, number>
+  collections: Map<CollectionID,Map<ContainerID,ContainerConf>>
 }
+
+
+export type ContainerConf = {
+  camera : {
+    is_linked : boolean
+  }
+}
+
