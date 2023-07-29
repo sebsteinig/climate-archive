@@ -14,14 +14,14 @@ import {
   TimeMode,
   TimeState,
 } from "@/utils/store/time/time.type"
-import { Collection } from "@/utils/store/texture_tree.store"
+import { Collection } from "@/utils/store/collection.store"
 import { chunksDetails, getCurrentPos } from "@/utils/store/time/handlers/utils"
 
 type Props = {
   onChange: (value: number) => void
   className?: string
   time_idx: number
-  current_frame : TimeFrameRef
+  current_frame: TimeFrameRef
 }
 
 export type InputRef = {
@@ -87,8 +87,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         if (!first) {
           return
         }
-        //snap_frames.current.set(collection_idx, frame)
-
+        
         if (time.state === TimeState.surfing) {
           return
         }
@@ -100,11 +99,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           const [cs, fpc] = chunksDetails(first.current.info)
           const t = f + c * fpc
 
-          const w = Math.floor(first.weight * 10)
+          const w = Math.floor(frame.weight * 10)
           input_ref.current.value = `${t * 10 + w}`
         } else {
           const t = first.current.idx
-          const w = Math.floor(first.weight * 10)
+          const w = Math.floor(frame.weight * 10)
           input_ref.current.value = `${t * 10 + w}`
         }
       },
@@ -123,18 +122,20 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           const unweighted_idx = Math.floor(idx / 10)
           if (time?.state === TimeState.playing) {
             pin(time_idx)
-            const frame = current_frame.current.map.get(time_idx)!.values().next().value as
-              | TimeFrame
-              | undefined
+            const frame = current_frame.current.map
+              .get(time_idx)!
+              .values()
+              .next().value as TimeFrame | undefined
             if (!frame) {
               return
             }
             const [pos, _] = getCurrentPos(time, frame)
             try_surfing(time_idx, pos)
           } else if (time?.state === TimeState.paused) {
-            const frame = current_frame.current.map.get(time_idx)!.values().next().value as
-              | TimeFrame
-              | undefined
+            const frame = current_frame.current.map
+              .get(time_idx)!
+              .values()
+              .next().value as TimeFrame | undefined
             if (!frame) {
               return
             }

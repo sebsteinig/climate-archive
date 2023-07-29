@@ -11,20 +11,16 @@ import GridIcon from "$/assets/icons/grid.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
-import { PropsWithChildren, forwardRef, useState } from "react"
+import { PropsWithChildren, forwardRef, useMemo, useState } from "react"
 
 type Props = {
   className?: string
   time_idx: number
   collection_idx: number
-  panel_idx: number
 }
 
 export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  function Container(
-    { time_idx, collection_idx, panel_idx, className, children },
-    ref,
-  ) {
+  function Container({ time_idx, collection_idx, className, children }, ref) {
     const pauseAll = useClusterStore((state) => state.time.pauseAll)
     const addUnsync = useClusterStore((state) => state.time.addUnSync)
     const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
@@ -41,7 +37,6 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
             <PanelConfiguration
               time_idx={time_idx}
               collection_idx={collection_idx}
-              panel_idx={panel_idx}
               displayButtons={displayButtons}
             />
           )}
@@ -70,20 +65,23 @@ type ConfProps = {
   displayButtons: (bool: boolean) => void
   time_idx: number
   collection_idx: number
-  panel_idx: number
 }
 
 function PanelConfiguration({
   time_idx,
   collection_idx,
-  panel_idx,
   displayButtons,
 }: ConfProps) {
+  const time_slots = useClusterStore((state) => state.time.slots.map)
+  const conf = useMemo(() => {
+    return time_slots.get(time_idx)!.collections.get(collection_idx)!
+  }, [time_slots])
   const [as_planet, setAsPlanet] = useState(true)
-  const [is_not_linked, link] = useState<boolean>(false)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
   return (
-    <div className="grid grid-cols-1 gap-1 justify-items-center ">
+    <div
+      className="grid grid-cols-1 gap-1 justify-items-center "
+    >
       <ArrowDownIcon
         className="p-2 w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500"
         onClick={() => displayButtons(false)}
@@ -94,12 +92,12 @@ function PanelConfiguration({
           onClick={() => null}
           /> */}
       {/* </div> */}
-
+        
+      
       <CameraIcon
-        className="cursor-pointer w-5 h-5 my-2 text-slate-500"
+        className={`cursor-pointer w-5 h-5 my-2 ${conf.camera.is_linked ? "text-slate-500":"text-slate-300"}`}
         onClick={() => {
-          linkCamera(time_idx, collection_idx, panel_idx, !is_not_linked)
-          link((prev) => !prev)
+          linkCamera(time_idx, collection_idx, !conf.camera.is_linked)
         }}
       />
 

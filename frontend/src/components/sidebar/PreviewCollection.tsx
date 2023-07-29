@@ -24,7 +24,7 @@ export function PreviewCollection({
   setCurrentVariableControls,
 }: Props) {
   const collections = useClusterStore((state) => state.collections)
-  const binder = useClusterStore((state) => state.time.binder)
+  const binder = useClusterStore((state) => state.time.slots.lookup)
 
   const [display_all, displayAll] = useState(false)
   return (

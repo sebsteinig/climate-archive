@@ -23,7 +23,7 @@ import { chunksDetails } from "@/utils/store/time/handlers/utils"
 type Props = {
   className?: string
   time_idx: number
-  current_frame : TimeFrameRef
+  current_frame: TimeFrameRef
 }
 export type ControllerRef = {
   onChange: (collection_idx: number, frame: TimeFrame) => void
@@ -38,10 +38,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const pauseTime = useClusterStore((state) => state.time.pause)
     const pin = useClusterStore((state) => state.time.pin)
     const variables = useClusterStore((state) => state.variables)
-    //const save = useClusterStore((state) => state.time.saveSome)
 
-    //const snap_frames = useRef<Map<number, TimeFrame>>(new Map())
-    //const snap_frames = new Map()
 
     const active_variable = useMemo(() => {
       return Object.values(variables)
@@ -78,22 +75,6 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             return
           }
 
-          //snap_frames.current.set(collection_idx, frame)
-
-          if (time.state === TimeState.pinning) {
-            console.log('PINNING');
-            
-            console.log(first);
-            
-            if (first.weight === 0) {
-              console.log('REAL PAUSE ####');
-              
-              pauseTime(time_idx)
-              //save(time_idx, snap_frames.current)
-              //return
-            }
-          }
-
           if (!div_ref.current) {
             return
           }
@@ -126,8 +107,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             onClick={() => {
               if (time.state === TimeState.playing) {
                 console.log("PAUSE")
-                pin(time_idx)
-                //save(time_idx, snap_frames.current)
+                pauseTime(time_idx)
               }
             }}
           />

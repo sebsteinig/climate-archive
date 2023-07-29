@@ -55,20 +55,24 @@ export type TimeFrameValue = {
     time_chunk: number
     frame: number
   }
-  weight: number
 }
 export type TimeFrame = {
   variables: Map<VariableName, TimeFrameValue>
   initialized: boolean
+  weight: number
+  swap_flag : boolean
 }
 
 export type TimeFrameHolder = {
-  map : Map<number, Map<number, TimeFrame>>,
-  update : (frame:TimeFrame,time_id:number,collection_id:number) => void
-  get : (time_id:number,collection_id:number) => TimeFrame | undefined
+  map: Map<number, Map<number, TimeFrame>>
+  update: (frame: TimeFrame, time_id: number, collection_id: number) => TimeFrame
+  get: (time_id: number, collection_id: number) => TimeFrame | undefined
 }
 
-export type TimeFrameRef =  MutableRefObject<TimeFrameHolder>
+export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
+
+export type TimeID = number
+export type CollectionID = number
 
 export type Time = {
   mode: TimeMode
@@ -78,6 +82,17 @@ export type Time = {
   speed: number
   surfing_departure: number
   surfing_destination: number
-  //current_frame : TimeMultipleFrames
-  collections: Map<number, number>
+  collections: Map<CollectionID, ContainerConf>
+}
+
+export type ContainerConf = {
+  camera: {
+    is_linked: boolean
+  }
+}
+
+export type TimeMap = {
+  map: Map<TimeID, Time>
+  lookup: Map<CollectionID, Set<TimeID>>
+  auto_increment: number
 }

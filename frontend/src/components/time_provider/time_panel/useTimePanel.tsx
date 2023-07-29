@@ -1,4 +1,9 @@
-import { Time, TimeFrame, TimeFrameRef, TimeState } from "@/utils/store/time/time.type"
+import {
+  Time,
+  TimeFrame,
+  TimeFrameRef,
+  TimeState,
+} from "@/utils/store/time/time.type"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import {
   MutableRefObject,
@@ -22,13 +27,13 @@ import { uniqueIdx } from "@/utils/types.utils"
 
 export function useTimePanel(
   time_slots: Map<number, Time>,
-  current_frame:TimeFrameRef,
+  current_frame: TimeFrameRef,
   collections: Map<number, Publication | Experiments>,
   active_variables: VariableName[],
   context: CanvasHolder,
 ) {
-  if(!current_frame.current) {
-    return [[],[]]
+  if (!current_frame.current) {
+    return [[], []]
   }
   const scenes: JSX.Element[] = []
   const panels: JSX.Element[] = []
@@ -36,7 +41,7 @@ export function useTimePanel(
   for (let [time_idx, time] of time_slots) {
     panels.push(
       <Panel
-      current_frame={current_frame}
+        current_frame={current_frame}
         key={time_idx}
         time={time}
         time_idx={time_idx}
@@ -46,31 +51,26 @@ export function useTimePanel(
         }}
       />,
     )
-    for (let [collection_idx, occurence] of time.collections) {
+    for (let [collection_idx, _] of time.collections) {
       const refs = container_refs.current.get(time_idx)
       if (!refs) continue
-      const r = refs.container_refs.current?.get(collection_idx)
-      if (!r) continue
+      const container_ref = refs.container_refs.current?.get(collection_idx)
+      if (!container_ref) continue
       const exps = collections.get(collection_idx)!.exps
-      let i = 0
-      for (let ref of r) {
-        scenes.push(
-          <Scene
-            key={uniqueIdx(time_idx, collection_idx, i)}
-            time_idx={time_idx}
-            collection_idx={collection_idx}
-            panel_idx={ref.panel_idx}
-            time={time}
-            current_frame={current_frame}
-            exps={exps}
-            context={context}
-            active_variables={active_variables}
-            track={ref.ref}
-            onChange={ref.onChange}
-          />,
-        )
-        i += 1
-      }
+      scenes.push(
+        <Scene
+          key={uniqueIdx(time_idx, collection_idx, 0)}
+          time_idx={time_idx}
+          collection_idx={collection_idx}
+          time={time}
+          current_frame={current_frame}
+          exps={exps}
+          context={context}
+          active_variables={active_variables}
+          track={container_ref.ref}
+          onChange={container_ref.onChange}
+        />,
+      )
     }
   }
   return [scenes, panels]
