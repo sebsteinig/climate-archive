@@ -1,5 +1,6 @@
 import { TextureInfo } from "@/utils/database/database.types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { useClusterStore } from "@/utils/store/cluster.store"
 import { getCurrentPos } from "@/utils/store/time/handlers/utils"
 import {
   Time,
@@ -112,9 +113,10 @@ export function tickBuilder(
   context: CanvasHolder,
   onChange: (frame: TimeFrame) => void,
 ) {
+  const pauseTime = useClusterStore(state => state.time.pause)
   const next = nextBuilder(time)
   return async function tick(delta: number) {
-    const frame = current_frame.current.get(time_id, collection_id)
+    let frame = current_frame.current.get(time_id, collection_id)
     if (
       !frame ||
       !frame.initialized ||
@@ -142,15 +144,22 @@ export function tickBuilder(
       time.state === TimeState.playing ||
       time.state === TimeState.pinning
     ) {
-      current_frame.current.update(
+      frame = current_frame.current.update(
         await next(time, exps, frame, delta, active_variable),
         time_id,
         collection_id,
       )
+      if (time.state === TimeState.pinning && frame.weight === 0) {
+          pauseTime(time_id)
+      }
     }
-    console.log(frame)
 
     const res = new Map()
+
+    if ( !frame.swap_flag) {
+      onChange(frame)
+      return res
+    }
 
     for (let [variable, data] of frame.variables) {
       const [current_path, next_path] = getPath(
@@ -198,7 +207,7 @@ export function tickBuilder(
       res.set(variable, {
         current_url,
         next_url,
-        weight: data.weight,
+        weight: frame.weight,
         current_info: data.current.info,
         next_info: data.next.info,
       })

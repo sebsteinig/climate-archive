@@ -12,17 +12,16 @@ async function nextCircularMean(
   active_variable: VariableName[],
 ): Promise<TimeFrame> {
   const sync_frame = await sync(time, exps, frame, active_variable)
+  const new_weight = frame.weight + delta
+  const swap_flag = new_weight >= 1
   for (let [variable, data] of sync_frame.variables) {
-    let new_weight = data.weight + delta
     if (new_weight < 1) {
       sync_frame.variables.set(variable, {
         current: data.current,
         next: data.next,
-        weight: new_weight,
       })
       continue
     }
-    new_weight = 0
     const didx = time.direction === TimeDirection.forward ? 1 : -1
 
     const new_current = data.next
@@ -41,9 +40,10 @@ async function nextCircularMean(
     sync_frame.variables.set(variable, {
       current: new_current,
       next: new_next,
-      weight: new_weight,
     })
   }
+  sync_frame.weight = swap_flag ? 0 : new_weight
+  sync_frame.swap_flag = swap_flag
   return sync_frame
 }
 
@@ -55,17 +55,16 @@ async function nextCircularTs(
   active_variable: VariableName[],
 ): Promise<TimeFrame> {
   const sync_frame = await sync(time, exps, frame, active_variable)
+  const new_weight = frame.weight + delta
+  const swap_flag = new_weight >= 1
   for (let [variable, data] of sync_frame.variables) {
-    let new_weight = data.weight + delta
     if (new_weight < 1) {
       sync_frame.variables.set(variable, {
         current: data.current,
         next: data.next,
-        weight: new_weight,
       })
       continue
     }
-    new_weight = 0
     const new_current = data.next
 
     const [nb_c, fpc] = chunksDetails(new_current.info)
@@ -105,9 +104,10 @@ async function nextCircularTs(
     sync_frame.variables.set(variable, {
       current: new_current,
       next,
-      weight: new_weight,
     })
   }
+  sync_frame.weight = swap_flag ? 0 : new_weight
+  sync_frame.swap_flag = swap_flag
   return sync_frame
 }
 

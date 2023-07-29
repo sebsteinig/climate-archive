@@ -87,8 +87,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         if (!first) {
           return
         }
-        //snap_frames.current.set(collection_idx, frame)
-
+        
         if (time.state === TimeState.surfing) {
           return
         }
@@ -100,11 +99,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           const [cs, fpc] = chunksDetails(first.current.info)
           const t = f + c * fpc
 
-          const w = Math.floor(first.weight * 10)
+          const w = Math.floor(frame.weight * 10)
           input_ref.current.value = `${t * 10 + w}`
         } else {
           const t = first.current.idx
-          const w = Math.floor(first.weight * 10)
+          const w = Math.floor(frame.weight * 10)
           input_ref.current.value = `${t * 10 + w}`
         }
       },

@@ -166,8 +166,9 @@ export const createTimeSlice: StateCreator<
           if (!time) {
             return
           }
-
-          if (time.state === TimeState.pinning) {
+          if(time.state === TimeState.playing) {
+            time.state = TimeState.pinning
+          }else if (time.state === TimeState.pinning) {
             time.state = TimeState.paused
           }
         })

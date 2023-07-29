@@ -55,16 +55,17 @@ export type TimeFrameValue = {
     time_chunk: number
     frame: number
   }
-  weight: number
 }
 export type TimeFrame = {
   variables: Map<VariableName, TimeFrameValue>
   initialized: boolean
+  weight: number
+  swap_flag : boolean
 }
 
 export type TimeFrameHolder = {
   map: Map<number, Map<number, TimeFrame>>
-  update: (frame: TimeFrame, time_id: number, collection_id: number) => void
+  update: (frame: TimeFrame, time_id: number, collection_id: number) => TimeFrame
   get: (time_id: number, collection_id: number) => TimeFrame | undefined
 }
 

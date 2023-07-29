@@ -56,9 +56,10 @@ export function TimeProvider(props: Props) {
         const collection = new Map()
         collection.set(collection_id, frame)
         this.map.set(time_id, collection)
-        return
+        return frame
       }
       time.set(collection_id, frame)
+      return frame
     },
     get(time_id, collection_id) {
       return this.map.get(time_id)?.get(collection_id)

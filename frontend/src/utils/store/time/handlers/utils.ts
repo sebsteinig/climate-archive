@@ -44,7 +44,7 @@ export function getCurrentPos(time: Time, frame: TimeFrame): [number, number] {
   if (!first) {
     return [0, 0]
   }
-  const weight = first.weight
+  const weight = frame.weight
   switch (time.mode) {
     case TimeMode.mean:
       const idx = first.current.idx
@@ -120,6 +120,8 @@ async function syncMean(
   const sync_frame: TimeFrame = {
     variables: new Map(),
     initialized: true,
+    weight : frame.weight,
+    swap_flag : frame.swap_flag
   }
   if (!frame.initialized || frame.variables.size === 0) {
     return await initMean(time, exps, active_variable)
@@ -163,7 +165,6 @@ async function syncMean(
     sync_frame.variables.set(variable, {
       current,
       next,
-      weight: ref.weight,
     })
   }
   return sync_frame
@@ -178,6 +179,8 @@ async function syncTs(
   const sync_frame: TimeFrame = {
     variables: new Map(),
     initialized: true,
+    weight : frame.weight,
+    swap_flag : frame.swap_flag
   }
   if (!frame.initialized || frame.variables.size === 0) {
     return await initTs(time, exps, active_variable)
@@ -249,7 +252,6 @@ async function syncTs(
     sync_frame.variables.set(variable, {
       current,
       next,
-      weight: ref.weight,
     })
   }
   return sync_frame
@@ -277,6 +279,8 @@ export async function initMean(
   const frame: TimeFrame = {
     variables: new Map(),
     initialized: true,
+    weight : 0,
+    swap_flag : true
   }
   let idx_zero: number
   let idx_one: number
@@ -310,8 +314,7 @@ export async function initMean(
         info: info_one,
         frame: 0,
         time_chunk: 0,
-      },
-      weight: 0,
+      }
     }
     frame.variables.set(variable, value)
   }
@@ -325,6 +328,8 @@ export async function initTs(
   const frame: TimeFrame = {
     variables: new Map(),
     initialized: true,
+    weight : 0,
+    swap_flag : true
   }
   let idx: number
 
@@ -391,7 +396,6 @@ export async function initTs(
         frame: frame_one,
         time_chunk: chunks_one,
       },
-      weight: 0,
     }
     frame.variables.set(variable, value)
   }
