@@ -60,7 +60,7 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
   })
 
   return (
-    <div className="grid grid-cols-1 grid-rows-2 gap-2">
+    <div className="z-10 grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
         <div className="w-full h-full">
           {Array.from(time.collections, ([collection_idx, _]) => {

@@ -122,7 +122,7 @@ export function TimeProvider(props: Props) {
                     <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
                     <OrbitControls makeDefault />
                 </View> */}
-            <OrbitControls makeDefault enableZoom={true} enableRotate={true} />
+            {/* <OrbitControls /> */}
           </Canvas>
         </div>
         {panels}

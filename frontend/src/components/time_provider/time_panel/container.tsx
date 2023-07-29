@@ -11,7 +11,7 @@ import GridIcon from "$/assets/icons/grid.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
-import { PropsWithChildren, forwardRef, useState } from "react"
+import { PropsWithChildren, forwardRef, useMemo, useState } from "react"
 
 type Props = {
   className?: string
@@ -72,15 +72,15 @@ function PanelConfiguration({
   collection_idx,
   displayButtons,
 }: ConfProps) {
+  const time_slots = useClusterStore((state) => state.time.slots.map)
+  const conf = useMemo(() => {
+    return time_slots.get(time_idx)!.collections.get(collection_idx)!
+  }, [time_slots])
   const [as_planet, setAsPlanet] = useState(true)
-  const [is_not_linked, link] = useState<boolean>(false)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
   return (
     <div
       className="grid grid-cols-1 gap-1 justify-items-center "
-      onClick={() => {
-        console.log("CLICKED ON CONF")
-      }}
     >
       <ArrowDownIcon
         className="p-2 w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500"
@@ -92,12 +92,12 @@ function PanelConfiguration({
           onClick={() => null}
           /> */}
       {/* </div> */}
-
+        
+      
       <CameraIcon
-        className="cursor-pointer w-5 h-5 my-2 text-slate-500"
+        className={`cursor-pointer w-5 h-5 my-2 ${conf.camera.is_linked ? "text-slate-500":"text-slate-300"}`}
         onClick={() => {
-          linkCamera(time_idx, collection_idx, !is_not_linked)
-          link((prev) => !prev)
+          linkCamera(time_idx, collection_idx, !conf.camera.is_linked)
         }}
       />
 

@@ -1,11 +1,12 @@
 import { Time, TimeFrame, TimeFrameRef } from "@/utils/store/time/time.type"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { Experiment } from "@/utils/types"
-import { MutableRefObject, useMemo } from "react"
+import { MutableRefObject, useMemo, useRef } from "react"
 import { CanvasHolder, tickBuilder } from "../tick"
 import { World } from "@/components/3D_components/World"
 import { OrbitControls, PerspectiveCamera, View } from "@react-three/drei"
 import { useClusterStore } from "@/utils/store/cluster.store"
+import THREE from "three"
 
 export type SceneProps = {
   time_idx: number
@@ -38,6 +39,7 @@ export function Scene({
   const conf = useMemo(() => {
     return time_slots.get(time_idx)!.collections.get(collection_idx)!
   }, [time_slots])
+  const camera = useRef()
   return (
     <View track={track}>
       <World
@@ -53,8 +55,24 @@ export function Scene({
           onChange,
         )}
       />
-      {!conf.camera.is_linked && (
+      {conf.camera.is_linked ? 
         <>
+          <OrbitControls  />
+        </>
+        : 
+        <>
+          <PerspectiveCamera
+            makeDefault
+            ref={camera}
+            position={[3, 2, 9]}
+            fov={55}
+            near={0.1}
+            far={200}
+          />
+          <OrbitControls  camera={camera.current}/>
+        </>
+      }
+      {/* <>
           <PerspectiveCamera
             makeDefault
             position={[3, 2, 9]}
@@ -63,8 +81,7 @@ export function Scene({
             far={200}
           />
           <OrbitControls makeDefault />
-        </>
-      )}
+        </> */}
     </View>
   )
 }
