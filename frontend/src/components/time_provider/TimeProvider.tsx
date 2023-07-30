@@ -22,7 +22,7 @@ import { useTimePanel } from "./time_panel/useTimePanel"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { Experiments, Publication } from "@/utils/types"
 import { Perf } from "r3f-perf"
-import { cssGrid } from "@/utils/types.utils"
+import { gridOf } from "@/utils/types.utils"
 
 type Props = {}
 
@@ -101,13 +101,12 @@ export function TimeProvider(props: Props) {
     context,
     )
 
-  const css_grid = useCallback((size:number) => {
-    const grid = cssGrid(size)
-    return `w-full h-full grid gap-4 ${grid.cols} ${grid.rows}`
-
-  },[time_slots.size])
-  console.log(css_grid(time_slots.size));
+  const grid = useMemo(()=> {
+    return gridOf(time_slots.size)
+  },[gridOf(time_slots.size)])
   
+
+
   return (
     <>
         <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
@@ -132,7 +131,13 @@ export function TimeProvider(props: Props) {
         </div>
       <div
         ref={container_ref}
-        className={css_grid(time_slots.size)}
+        className={`w-full h-full grid gap-4 `}
+        style={
+          {
+            gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
+            gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+          }
+        }
       >
         {panels}
       </div>

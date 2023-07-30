@@ -9,6 +9,7 @@ import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
 import LinkIcon from "$/assets/icons/link.svg"
+import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import { PropsWithChildren, forwardRef, useMemo, useState } from "react"
@@ -23,12 +24,17 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
   function Container({ time_idx, collection_idx, className, children }, ref) {
     const pauseAll = useClusterStore((state) => state.time.pauseAll)
     const addUnsync = useClusterStore((state) => state.time.addUnSync)
+    const remove = useClusterStore((state) => state.time.remove)
     const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
     const [display_buttons, displayButtons] = useState(false)
 
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={ref}>
         {children}
+        <CrossIcon
+          className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+          onClick={() => remove(time_idx,collection_idx)}
+        />
         <div
           className={`absolute group bottom-0 right-0 bg-gray-900
          rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}

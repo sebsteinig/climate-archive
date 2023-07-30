@@ -39,8 +39,9 @@ export function uniqueIdx(x: number, y: number, z: number) {
   return Math.pow(2, x) * Math.pow(5, y) * Math.pow(7, z)
 }
 
-export function cssGrid(n:number) {
-  let {width,height} = gridOf(n)
+
+export function gridOf(n:number) {
+  let {width,height} = _gridOf(n)
   if(width === 0) {
     width = 1
   }
@@ -48,20 +49,13 @@ export function cssGrid(n:number) {
     height = 1
   }
   
-  const css_width = Math.floor(width).toString()
-  const css_height = Math.floor(height).toString()
-  //return `grid-cols-${4} grid-rows-${4}`
-  //return `grid-cols-${'4'} grid-rows-${'4'}`
-
-  //return `grid-cols-4 grid-rows-4`
   return {
-    cols : "grid-cols-"+css_width,
-    rows : "grid-rows-"+css_height,
+    cols : width,
+    rows : height,
   }
   //return `grid-cols-${css_width} grid-rows-${css_height}`
 }
-
-function gridOf(n:number):{width:number,height:number}{
+function _gridOf(n:number):{width:number,height:number}{
   let factors = primeFactors(n)
   
   if(factors.length === 1 && factors[0] === 2){

@@ -10,6 +10,7 @@ import {
   forwardRef,
   useCallback,
   useImperativeHandle,
+  useMemo,
   useRef,
 } from "react"
 import {
@@ -18,7 +19,7 @@ import {
 } from "../time_controllers/TimeController"
 import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
 import { Container } from "./container"
-import { cssGrid, uniqueIdx } from "@/utils/types.utils"
+import { gridOf } from "@/utils/types.utils"
 
 export type PanelProps = {
   time_idx: number
@@ -59,15 +60,20 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
       container_refs: container_refs,
     }
   })
-  const css_grid = useCallback((size:number) => {
-    const grid = cssGrid(size)
-    return `w-full h-full grid gap-4 ${grid.cols} ${grid.rows}`
-
-  },[time.collections.size])
+  const grid = useMemo(()=> {
+    return gridOf(time.collections.size)
+  },[gridOf(time.collections.size)])
   return (
     <div className="w-full h-full grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-        <div className={css_grid(time.collections.size)}>
+        <div         
+        className={`w-full h-full grid gap-4 `}
+        style={
+          {
+            gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
+            gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+          }
+        }>
         
           {Array.from(time.collections, ([collection_idx, _]) => {
             return (
