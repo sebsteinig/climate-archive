@@ -1,6 +1,6 @@
 "use client"
 import { Canvas } from "@react-three/fiber"
-import { useEffect, useRef, useState, useMemo, RefObject } from "react"
+import { useEffect, useRef, useState, useMemo, RefObject, useCallback } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import {
   Time,
@@ -99,13 +99,17 @@ export function TimeProvider(props: Props) {
     collections,
     active_variable,
     context,
-  )
+    )
+
+  const css_grid = useCallback((size:number) => {
+    const grid = cssGrid(size)
+    return `w-full h-full grid gap-4 ${grid.cols} ${grid.rows}`
+
+  },[time_slots.size])
+  console.log(css_grid(time_slots.size));
+  
   return (
     <>
-      <div
-        ref={container_ref}
-        className={`relative w-full h-full grid ${cssGrid(time_slots.size)} gap-4`}
-      >
         <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
           <Canvas
             camera={{
@@ -126,6 +130,10 @@ export function TimeProvider(props: Props) {
             {/* <OrbitControls /> */}
           </Canvas>
         </div>
+      <div
+        ref={container_ref}
+        className={css_grid(time_slots.size)}
+      >
         {panels}
       </div>
     </>

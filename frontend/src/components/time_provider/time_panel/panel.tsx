@@ -8,6 +8,7 @@ import {
   MutableRefObject,
   RefObject,
   forwardRef,
+  useCallback,
   useImperativeHandle,
   useRef,
 } from "react"
@@ -58,11 +59,16 @@ export const Panel = forwardRef<Refs, PanelProps>(function Panel(
       container_refs: container_refs,
     }
   })
+  const css_grid = useCallback((size:number) => {
+    const grid = cssGrid(size)
+    return `w-full h-full grid gap-4 ${grid.cols} ${grid.rows}`
 
+  },[time.collections.size])
   return (
     <div className="w-full h-full grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-        <div className={`w-full h-full grid ${cssGrid(time.collections.size)} gap-4`}>
+        <div className={css_grid(time.collections.size)}>
+        
           {Array.from(time.collections, ([collection_idx, _]) => {
             return (
               <Container

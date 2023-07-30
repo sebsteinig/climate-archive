@@ -50,8 +50,15 @@ export function cssGrid(n:number) {
   
   const css_width = Math.floor(width).toString()
   const css_height = Math.floor(height).toString()
+  //return `grid-cols-${4} grid-rows-${4}`
+  //return `grid-cols-${'4'} grid-rows-${'4'}`
 
-  return `grid-cols-${css_width} grid-rows-${css_height}`
+  //return `grid-cols-4 grid-rows-4`
+  return {
+    cols : "grid-cols-"+css_width,
+    rows : "grid-rows-"+css_height,
+  }
+  //return `grid-cols-${css_width} grid-rows-${css_height}`
 }
 
 function gridOf(n:number):{width:number,height:number}{
