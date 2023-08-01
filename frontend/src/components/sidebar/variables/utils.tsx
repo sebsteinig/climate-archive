@@ -51,65 +51,49 @@ function IconOf({
   toggle: Function
   active: boolean
 }) {
+  const className = `w-10 h-10 px-1 ${active ? "text-emerald-400" : "text-slate-500"}`
+  const classNameWithChild = `w-10 h-10 px-1 ${active ? "text-emerald-400 child:fill-emerald-400" : "text-slate-500 child:fill-slate-500"}`
   switch (name) {
     case VariableName.currents:
       return (
         <WaveIcon
           onClick={() => toggle()}
-          className={`w-12 h-12 px-2 ${
-            active ? "text-emerald-400" : "text-slate-500"
-          }`}
+          className={className}
         />
       )
     case VariableName.pr:
       return (
         <RainIcon
           onClick={() => toggle()}
-          className={`w-12 h-12 px-2 ${
-            active ? "text-emerald-400" : "text-slate-500"
-          }`}
+          className={className}
         />
       )
     case VariableName.height:
       return (
         <MountainIcon
           onClick={() => toggle()}
-          className={`w-12 h-12 px-2 ${
-            active ? "text-emerald-400" : "text-slate-500"
-          }`}
+          className={className}
         />
       )
     case VariableName.winds:
       return (
         <WindsIcon
           onClick={() => toggle()}
-          className={`w-12 h-12 px-2 ${
-            active
-              ? "text-emerald-400 child:fill-emerald-400"
-              : "text-slate-500 child:fill-slate-500"
-          }`}
+          className={classNameWithChild}
         />
       )
     case VariableName.tos:
       return (
         <TemperatureIcon
           onClick={() => toggle()}
-          className={`w-12 h-12 px-2 ${
-            active
-              ? "text-emerald-400 child:fill-emerald-400"
-              : "text-slate-500 child:fill-slate-500"
-          }`}
+          className={classNameWithChild}
         />
       )
     case VariableName.pfts:
       return (
         <TreesIcon
           onClick={() => toggle()}
-          className={`w-12 h-12 px-2 ${
-            active
-              ? "text-emerald-400 child:fill-emerald-400"
-              : "text-slate-500 child:fill-slate-500"
-          }`}
+          className={classNameWithChild}
         />
       )
     default:
@@ -128,8 +112,9 @@ export function Variable({
 }: PropsWithChildren<Props>) {
   return (
     <div
-      className={`group flex flex-row bg-gray-900 cursor-pointer
-         rounded-lg p-2 h-fit w-fit ${
+      className={`group flex flex-row 
+       bg-gray-900 cursor-pointer
+         rounded-lg p-2 h-fit w-fit z-30 ${
            active ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""
          }`}
     >

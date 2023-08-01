@@ -29,7 +29,9 @@ export function Scene({
     heightData: "/assets/textures/tfgzk_height.smoothed.png",
   }
   const camera = useRef()
-
+  if(!panel_ref.current?.container_ref.current){
+    return null
+  }
   return (
     <View track={panel_ref.current!.container_ref.current!.track}>
       <World

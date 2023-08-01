@@ -8,12 +8,17 @@ import RotateIcon from "$/assets/icons/rotate.svg"
 import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
+import ChangeExpIcon from "$/assets/icons/change-exp.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import { MutableRefObject, PropsWithChildren, forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react"
 import { TimeID, WorldData } from "@/utils/store/time/time.type"
+import { ViewCollection } from "@/components/sidebar/utils/CollectionDetails"
+import InfoIcon from "$/assets/icons/info.svg"
+import { isPublication } from "@/utils/types.utils"
+import Select from "@/components/inputs/Select"
 
 type Props = {
   className?: string
@@ -29,7 +34,6 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
   function Container({ time_id, data, className, children }, ref) {
     const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
-    const [display_buttons, displayButtons] = useState(false)
 
     const div_ref= useRef<HTMLDivElement>(null!)
 
@@ -38,22 +42,35 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         track:div_ref
       }
     })
-
+    const [display_collection_details, displayCollectionDetails] = useState(false)
+    const [display_buttons, displayButtons] = useState(false)
+    const [display_exps, displayExps] = useState(false)
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={div_ref}>
         {children}
+
+        {display_collection_details && <ViewCollection displayCollectionDetails={displayCollectionDetails} collection={data.collection}/>}
+        {(data.collection && isPublication(data.collection)) && <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
+            {data.collection.authors_short}, {data.collection.year}
+        </p>}
         <CrossIcon
-          className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+          className="absolute top-0 left-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
           onClick={() => remove(time_id)}
         />
+        {display_exps && <div className="absolute z-30 bottom-3 right-24">
+          <Select onChange={() => {displayExps(false)} }>
+            {data.collection?.exps.map((e) => <option key={e.id}>{e.id}</option>)}
+          </Select>
+        </div>}
         <div
-          className={`absolute group bottom-0 right-0 bg-gray-900
+          className={`absolute z-30 group bottom-0 right-0 bg-gray-900
          rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}
         >
           {display_buttons && (
             <PanelConfiguration
               time_id={time_id}
               data={data}
+              displayExps={displayExps}
               displayButtons={displayButtons}
             />
           )}
@@ -71,6 +88,12 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
               dup(time_id)
             }}
           />
+
+          <InfoIcon
+            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
+            onClick={() => displayCollectionDetails((prev) => !prev)}
+          />
+
         </div>
       </div>
     )
@@ -81,12 +104,14 @@ type ConfProps = {
   displayButtons: (bool: boolean) => void
   time_id: TimeID
   data: WorldData
+  displayExps: Function
 }
 
 function PanelConfiguration({
   time_id,
   data,
   displayButtons,
+  displayExps
 }: ConfProps) {
   const [as_planet, setAsPlanet] = useState(true)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
@@ -144,6 +169,11 @@ function PanelConfiguration({
 
       <PinIcon
         className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500`}
+      />
+
+      <ChangeExpIcon 
+        className={`cursor-pointer w-8 h-8 my-2`} 
+        onClick={()=> displayExps((prev:boolean) => !prev)}
       />
     </div>
   )

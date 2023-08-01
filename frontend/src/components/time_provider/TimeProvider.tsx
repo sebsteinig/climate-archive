@@ -70,16 +70,19 @@ export function TimeProvider(props: Props) {
 
   return (
     <>
-      <div
-        ref={container_ref}
-        className={`w-full h-full grid gap-4 `}
-        style={
-          {
-            gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
-            gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+
+
+      <div className="flex flex-grow h-full">
+        <div
+          ref={container_ref}
+          className={`ml-20 w-full h-full grid gap-4 `}
+          style={
+            {
+              gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
+              gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+            }
           }
-        }
-      >
+        >
           {
             Array.from(time_slots,
               ([time_id,data]) => {
@@ -94,6 +97,7 @@ export function TimeProvider(props: Props) {
               }
             )
           }
+          </div>
       </div>
       <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
         <Canvas
@@ -134,8 +138,6 @@ async function init(
   current_frame: TimeFrameRef,
   active_variables: VariableName[],
 ) {
-  console.log('INIT');
-  
   for (let [time_id, data] of slots) {
     const frame = {
       exp:data.collection.exps[0],

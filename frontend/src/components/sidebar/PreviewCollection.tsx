@@ -9,71 +9,70 @@ import { MdSeparator } from "@/components/separators/separators"
 import { isPublication } from "@/utils/types.utils"
 import { Experiment, Experiments, Publication } from "@/utils/types"
 import { TimeMode } from "@/utils/store/time/time.type"
+import { CollectionDetails } from "./utils/CollectionDetails"
 
-type Props = {
-  display_details: boolean
-  setDisplayDetails: Function
-  setCurrentVariableControls: Function
-  search_bar_visible: boolean
-}
 
-export function PreviewCollection({
-  search_bar_visible,
-  display_details,
-  setDisplayDetails,
-  setCurrentVariableControls,
-}: Props) {
-  const collections = useClusterStore((state) => state.collections)
-  const slots = useClusterStore((state) => state.time.slots)
+// type Props = {
+//   display_details: boolean
+//   setDisplayDetails: Function
+//   setCurrentVariableControls: Function
+//   search_bar_visible: boolean
+// }
 
-  const [display_all, displayAll] = useState(false)
-  return (
-    <div
-      className={`bg-gray-900 mt-3 rounded-md 
-                            ${
-                              slots.size > 1 && !display_all
-                                ? "h-fit w-fit p-2"
-                                : ""
-                            }
-                            ${search_bar_visible ? "hidden" : ""}`}
-    >
-      {slots.size > 1 && (
-        <DotsIcon
-          onClick={() => displayAll((prev) => !prev)}
-          className="w-12 h-12 cursor-pointer px-2 text-slate-500"
-        />
-      )}
-      <div className="max-w-full overflow-y-auto overflow-x-hidden max-h-[80vh]">
-        {(display_all || slots.size == 1) &&
-          Array.from(slots).map(([time_id,data], _) => {
-            return (
-              <div key={time_id}>
-                <OneCollection
-                  onClick={() =>
-                    setDisplayDetails((prev: boolean) => {
-                      setCurrentVariableControls(undefined)
-                      return !prev
-                    })
-                  }
-                  current_details={{
-                    collection: data.collection,
-                    idx: time_id,
-                  }}
-                  display_details={display_details}
-                />
-                {slots.size > 1 && (
-                  <MdSeparator className="ml-3 block self-center" />
-                )}
-              </div>
-            )
-          })}
-      </div>
-    </div>
-  )
+// export function PreviewCollection({
+//   search_bar_visible,
+//   display_details,
+//   setDisplayDetails,
+//   setCurrentVariableControls,
+// }: Props) {
+//   const collections = useClusterStore((state) => state.collections)
+//   const binder = useClusterStore((state) => state.time.slots.lookup)
 
-  //no current publication or collection yet
-  return <></>
-}
+//   const [display_all, displayAll] = useState(false)
+//   return (
+//     <div
+//       className={`bg-gray-900 mt-3 rounded-md 
+//                             ${ !display_all
+//                                 ? "h-fit w-fit p-2"
+//                                 : ""
+//                             }
+//                             ${search_bar_visible ? "hidden" : ""}`}
+//     >
+//      {!display_all && <DotsIcon
+//         onClick={() => displayAll((prev) => !prev)}
+//         className="w-12 h-12 cursor-pointer px-2 text-slate-500"
+//         />}
+//       <div className="max-w-full overflow-y-auto overflow-x-hidden max-h-[80vh]">
+//         {display_all &&
+//           Array.from(binder).map((value, idx) => {
+//             return (
+//               <div key={idx}>
+//                 <OneCollection
+//                   onClick={() =>
+//                     setDisplayDetails((prev: boolean) => {
+//                       setCurrentVariableControls(undefined)
+//                       return !prev
+//                     })
+//                   }
+//                   current_details={{
+//                     collection: collections.get(value[0]),
+//                     idx: value[0],
+//                   }}
+//                   display_details={display_details}
+//                 />
+//                 {binder.size > 1 && (
+//                   <MdSeparator className="ml-3 block self-center" />
+//                 )}
+//               </div>
+//             )
+//           })}
+//       </div>
+//     </div>
+//   )
+
+//   //no current publication or collection yet
+//   return <></>
+// }
 
 type DisplayProps = {
   display_details: boolean
@@ -108,15 +107,7 @@ function OneCollection({
           }}
         />
 
-        {display_details && (
-          <>
-            {isPublication(current_details.collection) ? (
-              <CurrentPublication publication={current_details.collection} />
-            ) : (
-              <ExperimentsTab exps={current_details.collection.exps} />
-            )}
-          </>
-        )}
+        {display_details && <CollectionDetails collection={current_details.collection}/>}
 
         <EditCollection
           display_details={display_details}
@@ -188,79 +179,6 @@ function CurrentTitle({
             )}
           </>
         )}
-    </div>
-  )
-}
-
-function CurrentPublication({ publication }: { publication: Publication }) {
-  const [display_abstract, setDisplayAbstract] = useState(false)
-  return (
-    <div className={`p-2`}>
-      <p className="italic py-2 text-slate-400 text-sm">
-        {publication.journal}, {publication.year}
-      </p>
-      <p className="font-medium tracking-wide">{publication.authors_full}</p>
-      <div className="pt-2 pr-4">
-        <p className="pb-1 font-semibold">Abstract : </p>
-        <p>
-          {display_abstract
-            ? publication.abstract
-            : publication.abstract.slice(0, 90) + " ..."}
-        </p>
-        <div
-          className="cursor-pointer hover:underline text-right"
-          onClick={() => {
-            setDisplayAbstract((prev) => !prev)
-          }}
-        >
-          {display_abstract ? "Hide" : "Full abstract"}
-        </div>
-      </div>
-      <ExperimentsTab exps={publication.exps} />
-    </div>
-  )
-}
-
-function ExperimentsTab({ exps }: { exps: Experiment[] }) {
-  return (
-    <div className="py-3 pr-5">
-      <div className="overflow-y-visible overflow-x-hidden max-h-52">
-        <table
-          className="w-11/12 table-fixed border-t-0 border"
-          id="exps-table"
-        >
-          <thead className="border-b  text-left font-medium border-neutral-500 bg-slate-600 sticky top-0">
-            <tr className="">
-              <th scope="col" className="border-r px-6 py-2 border-neutral-500">
-                Experiments
-              </th>
-              <th scope="col" className="border-r px-6 py-2 border-neutral-500">
-                Age
-              </th>
-            </tr>
-          </thead>
-          <tbody className="">
-            {exps.length > 0 &&
-              exps.map((exp) => {
-                let label =
-                  exp.metadata.length > 0 ? exp.metadata[0].metadata.text : ""
-                return (
-                  <tr
-                    className="w-full border-b dark:border-neutral-500"
-                    key={exp.id}
-                  >
-                    <td className="border px-6 py-2 font-medium dark:border-neutral-500">
-                      {exp.id}
-                    </td>
-                    <td className="border px-6 py-2 font-medium dark:border-neutral-500">
-                      {label}
-                    </td>
-                  </tr>
-                )
-              })}
-          </tbody>
-        </table>
-      </div>
     </div>
   )
 }

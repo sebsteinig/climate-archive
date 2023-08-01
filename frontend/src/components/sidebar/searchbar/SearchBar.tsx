@@ -64,7 +64,7 @@ export default function SearchBar({
   setSearchBarVisible,
   children,
 }: PropsWithChildren<Props>) {
-  const [search_panel_visible, setSearchPanelVisible] = useState(false)
+  const [search_panel_visible, setSearchPanelVisible] = useState(true)
   const [searched_content, setSearchContent] = useState<string>("")
   const search_panel_ref = useRef<HTMLDivElement>(null)
   const [publications, setPublications] = useState<Publication[]>([])
@@ -97,9 +97,10 @@ export default function SearchBar({
   return (
     <div
       className={`bg-slate-700 
+        z-30
         p-5 m-5 
         rounded-md 
-        lg:w-1/3 
+        lg:w-1/2
         absolute top-0 right-0 lg:left-1/2 lg:-translate-x-1/2
         ${search_panel_visible && "max-sm:w-[calc(100%_-_2.5rem)]"}
         `}
@@ -126,6 +127,7 @@ export default function SearchBar({
                         mb-4
                         placeholder:tracking-wider`}
         type="text"
+        autoFocus
         name="searchbar"
         id="searchbar"
         placeholder="Search a publication ..."

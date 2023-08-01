@@ -42,15 +42,11 @@ export function tickBuilder(
       weight:0,
       variables:res
     }
-    console.log(frame.weight);
     if(frame.swap_flag) {
       if(!frame.swapping) {
-        console.log("MUST SWAP");
         frame.swapping = true
-        console.log(active_variables);
         
         await update(frame,active_variables)
-        console.log(frame.variables);
         
         for(let [variable,state] of frame.variables) {
           const data = await compute(state,canvas)
@@ -59,7 +55,6 @@ export function tickBuilder(
           }
         }
         panel_ref.current?.controller_ref.current?.onChange(frame)
-        console.log("SWP FALSE #######");
         frame.swapping = false
         frame.swap_flag = false
       }
