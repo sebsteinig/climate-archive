@@ -10,7 +10,7 @@ export class Database extends Dexie {
   constructor() {
     super("ClimateArchiveDB")
 
-    this.version(8).stores({
+    this.version(9).stores({
       textures: "path",
       textures_info: "[exp_id+variable]",
       collections: "++id",

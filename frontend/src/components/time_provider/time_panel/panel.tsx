@@ -50,6 +50,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
 
           <Container
+            current_frame={current_frame}
             ref={container_ref}
             time_id={time_id}
             data={data}
