@@ -1,10 +1,7 @@
 "use client"
 import { forwardRef, useImperativeHandle, useRef, useEffect } from "react"
 import { memo } from 'react';
-import { useTexture, shaderMaterial } from "@react-three/drei"
-import { extend, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useControls } from 'leva'
 import vertexShader from '../../shaders/precipitationVert.glsl'
 import fragmentShader from '../../shaders/precipitationFrag.glsl'
 import { createColormapTexture } from '../../utils/three/colormapTexture.js'
@@ -45,10 +42,14 @@ const material = new THREE.ShaderMaterial( {
 const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
 
   console.log('creating AtmosphereLayer compnent')
+
   const materialRef = useRef(material)
 
+  // use hook because we want to use the store state, 
+  // but not re-render component when it changes
   const prRef = useRef();
   useEffect(() => {
+    console.log("subscribe")
     // Subscribe to store updates and update prRef.current whenever variables.pr changes
     const unsubscribe = useClusterStore.subscribe(
       (state) => {
@@ -59,39 +60,30 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
   
     // Cleanup the subscription on unmount
     return () => {
+      console.log("unsubscribe")
       unsubscribe();
     };
   }, []);
   
-  // const pr = useClusterStore(state => state.variables.pr)
-
-  // material.uniforms.uUserMinValue.value = parseFloat(pr.min)
-  // material.uniforms.uUserMaxValue.value = parseFloat(pr.max)
-
   function tick(weight) {
     
-    materialRef.current.uniforms.uFrameWeight.value = weight
+    materialRef.current.uniforms.uFrameWeight.value = weight % 1
 
   }
 
-  function updateTextures(data) {
+  function updateTextures(data, weight) {
     
-    // console.log(prRef)
-    // materialRef.current.uniforms.uFrameWeight.value = Math.random()
+    console.log(prRef.current)
+
     materialRef.current.uniforms.thisDataFrame.value = loader.load(data.current_url)
     materialRef.current.uniforms.nextDataFrame.value = loader.load(data.next_url) 
-    materialRef.current.uniforms.thisDataMin.value = data.current_info.metadata.metadata[12].bounds_matrix[0][0].min * 86400.
-    materialRef.current.uniforms.thisDataMax.value = data.current_info.metadata.metadata[12].bounds_matrix[0][0].max * 86400 * 5.
-    materialRef.current.uniforms.nextDataMin.value = data.next_info.metadata.metadata[12].bounds_matrix[0][0].min * 86400.
-    materialRef.current.uniforms.nextDataMax.value = data.next_info.metadata.metadata[12].bounds_matrix[0][0].max * 86400 * 5.
+    materialRef.current.uniforms.thisDataMin.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight)].min * 86400.
+    materialRef.current.uniforms.thisDataMax.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight)].max * 86400.
+    materialRef.current.uniforms.nextDataMin.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight+1)].min * 86400.
+    materialRef.current.uniforms.nextDataMax.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight+1)].max * 86400.
     materialRef.current.uniforms.uUserMinValue.value = parseFloat(prRef.current.min)
     materialRef.current.uniforms.uUserMaxValue.value = parseFloat(prRef.current.max)
 
-    console.log(prRef.current.min)
-    // console.log(materialRef.current.uniforms.thisDataMax.value)
-
-    // console.log(data.current_info.metadata.metadata[12].bounds_matrix[0][5].max)
-    // console.log(data.current_info.metadata)
   }
 
   useImperativeHandle(ref,()=> 
@@ -101,16 +93,6 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
       updateTextures
     }
   })
-
-  const { uSphereWrap } = useControls({ 
-    uSphereWrap: {
-      value: 0., 
-      min: 0,
-      max: 1,
-      step: 0.0001
-    },
-  })
-
 
   return (
     <mesh 

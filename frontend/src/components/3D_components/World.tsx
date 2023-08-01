@@ -36,19 +36,7 @@ export function World({ tick }: Props) {
 
   console.log('creating World component')
 
-  // for Leva debug GUI (there must be a better way for this ...)
-  // const { usePerformance, useTitle } = useControls('global', {
-  //   usePerformance: true,
-  //   useTitle: true,
-  // })
-  // const { rotate } = useControls('Globe', {
-  //   rotate: false,
-  // })
   const atm2DRef = useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null)
-
-  let texture = new THREE.TextureLoader()
-
-  // const state = useClusterStore(state => state.variables)
 
   useFrame((state, delta) => {
 
@@ -57,11 +45,10 @@ export function World({ tick }: Props) {
       atm2DRef.current.tick(res.weight)
 
       if (res.variables.size != 0) {
-        console.log(res.variables)
-        for (let [variable, data] of res) {
+        for (let [variable, data] of res.variables) {
           switch (variable) {
             case VariableName.pr : { 
-              atm2DRef.current.updateTextures(data) 
+              atm2DRef.current.updateTextures(data, res.weight) 
               break
             }
           }
