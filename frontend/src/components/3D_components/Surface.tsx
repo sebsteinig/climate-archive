@@ -1,5 +1,5 @@
 "use client"
-import { forwardRef } from "react"
+import { forwardRef, useImperativeHandle } from "react"
 import { useTexture } from "@react-three/drei"
 import {
   Mesh,
@@ -19,11 +19,22 @@ type SphereProps = {
   config: config
 }
 
+function update(params:type) {
+  console.log('update')
+}
+
 const Surface = forwardRef<SphereType, SphereProps>(({ config }, ref) => {
   const texture = useTexture(config.heightData)
   // Apply nearest neighbor filtering
   texture.minFilter = NearestFilter
   texture.magFilter = NearestFilter
+
+  useImperativeHandle(ref,()=> 
+  {
+    return {
+      update
+    }
+  })
 
   return (
     <mesh ref={ref} castShadow>
