@@ -4,9 +4,7 @@
 #define M_PI 3.14159265
 
 uniform float uSphereWrapAmount;
-uniform float uFrameWeight;
-uniform float uHeightDisplacement;
-uniform float uHeightPrecipitation;
+uniform float uLayerHeight;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // varying for fragment shader
@@ -33,16 +31,17 @@ vec3 anglesToSphereCoord(vec2 a, float r) {
 
 void main()	{
 
+    // standard plane position
     vec3 modPosition = position;
 
-    modPosition.z += uHeightPrecipitation;
-
-    vec2 angles = M_PI * vec2(2. * uv.x, uv.y - 1.);
+    // move layer vertically
+    modPosition.z += uLayerHeight;
 
     // calculate sphere position with radius increased by calculated z displacement
-    vec3 sphPos = anglesToSphereCoord(angles, 1.0 + uHeightPrecipitation );
+    vec2 angles = M_PI * vec2(2. * uv.x, uv.y - 1.);
+    vec3 sphPos = anglesToSphereCoord(angles, 1.0 + uLayerHeight );
 
-    // mix plane and sphere position 
+    // mix plane and sphere position based on chosen projection weight
     vec3 wrapPos = mix(modPosition, sphPos, uSphereWrapAmount);
     
     gl_Position = projectionMatrix * modelViewMatrix * vec4( wrapPos, 1.0 );

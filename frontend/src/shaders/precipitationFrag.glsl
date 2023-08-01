@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // define uniforms
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uniform float uOpacityPrecipitation;
+uniform float uLayerOpacity;
 uniform float uFrameWeight;
-uniform float uPrecipitationMinValue;
-uniform float uPrecipitationMaxValue;
 uniform float thisDataMin;
 uniform float thisDataMax;
+uniform float nextDataMin;
+uniform float nextDataMax;
+uniform float uUserMinValue;
+uniform float uUserMaxValue;
 uniform float numLon;
 uniform float numLat;
 
@@ -24,18 +26,16 @@ varying vec2 vUv;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // define functions
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // convert float to color via colormap
 vec4 applyColormap(float t, sampler2D colormap){
     return(texture2D(colormap,vec2(t,0.5)));
 }
 
-    // remap color range
-    float remap(float value, float inMin, float inMax, float outMin, float outMax) {
-
-        return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
-
-    }
-
+// remap color range
+float remap(float value, float inMin, float inMax, float outMin, float outMax) {
+    return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
 
 // custom bicubic texture filtering as an alternative to the standard nearest neighbor and bilinear resampling
 // more expensive, needs 4 bilinear lookups
@@ -43,7 +43,6 @@ vec4 applyColormap(float t, sampler2D colormap){
 // from https://stackoverflow.com/questions/13501081/efficient-bicubic-filtering-code-in-glsl
 
 vec4 cubic(float v) {
-
     vec4 n = vec4(1.0, 2.0, 3.0, 4.0) - v;
     vec4 s = n * n * n;
     float x = s.x;
@@ -52,11 +51,9 @@ vec4 cubic(float v) {
     float w = 6.0 - x - y - z;
 
     return vec4(x, y, z, w) * (1.0/6.0);
-
 }
 
 vec4 textureBicubic(sampler2D sampler, vec2 texCoords, float numLon, float numLat) {
-
     vec2 texSize = vec2(numLon, numLat);
 
     vec2 invTexSize = 1.0 / texSize;
@@ -87,9 +84,7 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords, float numLon, float numLa
         return mix(
         mix(sample3, sample2, sx), mix(sample1, sample0, sx)
         , sy);
-
     }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // main program
@@ -97,58 +92,49 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords, float numLon, float numLa
 
 void main()	{
 
-// interpolate model data between two time steps
-vec4 precipitationValueInt;
+// convert relative bitmap value to absolute value for both frames
+float thisFrameData = remap( 
+    textureBicubic(
+        thisDataFrame, 
+        vUv, 
+        numLon, 
+        numLat
+        ).r, 
+    0.0, 
+    1.0, 
+    thisDataMin, 
+    thisDataMax);
 
-vec2 coord = vUv;
-if (uCMIP6Mode) {
-    coord.x -= 0.25;
-} else {
-    coord.x += 0.00725;
+float nextFrameData = remap( 
+    textureBicubic(
+        nextDataFrame, 
+        vUv, 
+        numLon, 
+        numLat
+        ).r, 
+    0.0, 
+    1.0, 
+    nextDataMin, 
+    nextDataMax);
+
+// interpolate between absolute values of both frames
+float intData = mix(thisFrameData, nextFrameData, uFrameWeight);
+
+// apply user scaling to data
+float dataRemapped = remap( 
+    intData, 
+    uUserMinValue, 
+    uUserMaxValue, 
+    0.0, 
+    1.0 );
+
+// apply colormap to data
+vec4 dataColor = applyColormap( dataRemapped, colorMap );
+
+// send pixel color to screen
+if(dataRemapped > 0.0) {
+    gl_FragColor = dataColor;
+    gl_FragColor.a *= uLayerOpacity;
 }
-
-
-// standard bilinear interpolation
-
-if (uCMIP6Mode) {
-
-    precipitationValueInt = mix(textureBicubic(thisDataFrame,coord, numLon, numLat),textureBicubic(nextDataFrame,coord, numLon, numLat),uFrameWeight);
-
-    vec4 precipitationColor = applyColormap( precipitationValueInt.r, colorMap );
-
-    if(precipitationValueInt.r < 0.4 || precipitationValueInt.r > 0.6) {
-
-        gl_FragColor = precipitationColor;
-        gl_FragColor.a *= uOpacityPrecipitation;
-    
-    }
-    
-} else {
-
-    // precipitationValueInt = mix(texture2D(thisDataFrame,coord),texture2D(nextDataFrame,coord),uFrameWeight);
-    precipitationValueInt = mix(textureBicubic(thisDataFrame,coord, numLon, numLat),textureBicubic(nextDataFrame,coord, numLon, numLat),uFrameWeight);
-
-    float precipitationValueExpanded = remap( precipitationValueInt.r, 0.0, 1.0, thisDataMin, thisDataMax );
-    float precipitationValueRemapped = remap( precipitationValueExpanded, uPrecipitationMinValue, uPrecipitationMaxValue, 0.0, 1.0 );
-
-    vec4 precipitationColor = applyColormap( precipitationValueRemapped, colorMap );
-
-    // if(precipitationValueRemapped > 0.0) {
-
-    //     gl_FragColor = precipitationColor;
-    //     gl_FragColor.a *= uOpacityPrecipitation;
-
-    // }
-
-    gl_FragColor = precipitationColor;
-
-}
-
-// gl_FragColor = texture2D(thisDataFrame,vUv);
-
-// vec4 color1 = vec4(1.0, 0.0, 0.0, 1.0);
-// vec4 color2 = vec4(0.0, 0.0, 1.0, 1.0);
-
-// gl_FragColor = mix(color1, color2, uFrameWeight);
 
 }
