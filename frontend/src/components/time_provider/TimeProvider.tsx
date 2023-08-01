@@ -123,18 +123,7 @@ async function init(
   active_variables: VariableName[],
 ) {
   for (let [time_id, data] of slots) {
-    const frame = {
-      exp:data.collection.exps[0],
-      swap_flag:true,
-      swapping:false,
-      //ts_idx:0,
-      weight:0,
-      variables:new Map()
-    }
-    const variables = new Map()
-    for (let variable of active_variables) {
-      variables.set(variable,await sync(frame,variable))
-    }
-    current_frame.current.update(frame,time_id)
+    const exp = current_frame.current.get(time_id)?.exp ?? data.collection.exps[0]
+    await current_frame.current.init(time_id,exp,active_variables)
   }
 }

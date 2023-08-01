@@ -58,6 +58,7 @@ export type TimeFrameHolder = {
   map: Map<TimeID, TimeFrame>
   update: (frame: TimeFrame, time_id: TimeID) => TimeFrame
   get: (time_id: TimeID) => TimeFrame | undefined
+  init: (time_id: TimeID,exp:Experiment,active_variables:VariableName[]) => Promise<void>
 }
 
 export type TimeFrameRef = MutableRefObject<TimeFrameHolder>

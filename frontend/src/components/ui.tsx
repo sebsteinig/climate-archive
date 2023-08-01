@@ -11,11 +11,17 @@ type Props = {
 
 export default function UI({ journals }: Props) {
   const addCollection = useClusterStore((state) => state.addCollection)
+  const add = useClusterStore((state) => state.time.add)
   useEffect(() => {
-    Promise.all([database_provider.loadAllColections()]).then((e) =>
-      e[0].map((element) => {
+    Promise.all([database_provider.loadAllColections()]).then(([e]) => {
+      e.map((element) => {
         addCollection(element.id!, element.data)
-      }),
+      })
+      const most_recent = e.sort((a,b) => Date.parse(a.date) - Date.parse(b.date))[0]
+      if(most_recent){
+        add(most_recent.data)
+      }
+    }
     )
   }, [])
 
