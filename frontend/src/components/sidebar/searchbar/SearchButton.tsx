@@ -14,8 +14,8 @@ export function SearchButton({
       <div className="h-1/6 px-2 py-2 mt-3 flex flex-row mb-16 gap-5">
         <div className={` bg-gray-900 rounded-lg p-2 h-fit w-fit`}>
           <SearchIcon
-            className={`w-12 h-12 cursor-pointer px-2 ${
-              search_bar_visible ? "text-emerald-400" : "text-slate-500"
+            className={`w-10 h-10 cursor-pointer px-1 ${
+              search_bar_visible ? "text-emerald-400 child:fill-emerald-400" : "text-slate-500 child:fill-slate-500"
             }`}
             onClick={() => setSearchBarVisible((prev: boolean) => !prev)}
           />

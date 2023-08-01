@@ -3,7 +3,7 @@ import { SearchButton } from "./searchbar/SearchButton"
 import { Variables } from "./variables/Variables"
 import SearchBar from "./searchbar/SearchBar"
 import { VariableName } from "@/utils/store/variables/variable.types"
-import { PreviewCollection } from "./PreviewCollection"
+//import { PreviewCollection } from "./PreviewCollection"
 
 type Props = {
   journals: JSX.Element
@@ -16,7 +16,7 @@ export default function SideBar({ journals }: Props) {
     useState<VariableName>()
   return (
     <div>
-      <div className="absolute top-0 left-0 ml-5 h-full">
+      <div className="absolute top-0 left-0 h-full">
         <SearchButton
           search_bar_visible={search_bar_visible}
           setSearchBarVisible={setSearchBarVisible}
@@ -28,12 +28,12 @@ export default function SideBar({ journals }: Props) {
         />
       </div>
       <div className="absolute top-0 py-2 left-28 w-5/12">
-        <PreviewCollection
+        {/* <PreviewCollection
           display_details={current_data_details}
           setCurrentVariableControls={setCurrentVariableControls}
           setDisplayDetails={setCurrentDataDetails}
           search_bar_visible={search_bar_visible}
-        />
+        /> */}
       </div>
       {search_bar_visible && (
         <SearchBar setSearchBarVisible={setSearchBarVisible}>

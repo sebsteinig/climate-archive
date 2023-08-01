@@ -51,13 +51,7 @@ export function Publications({
           <PublicationDetails
             setSearchBarVisible={setSearchBarVisible}
             setDisplaySeeDetails={setDisplaySeeDetails}
-            title={displayed_publication.title}
-            abstract={displayed_publication.abstract}
-            authors_short={displayed_publication.authors_short}
-            year={displayed_publication.year}
-            authors_full={displayed_publication.authors_full}
-            exps={displayed_publication.exps}
-            journal={displayed_publication.journal}
+            publication={displayed_publication}
           />
         )}
       </div>
