@@ -15,6 +15,7 @@ import { AtmosphereLayer } from "./AtmosphereLayer"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
+import { TickFn } from "../time_provider/tick"
 
 type Props = {
   tick: (delta: number) => Promise<

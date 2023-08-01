@@ -47,7 +47,7 @@ export function Winds({
             max={100}
             value={winds.min_speed}
             onChange={(event: any) => {
-              return winds.updateMinSpeed(event?.target.value)
+              return winds.updateMinSpeed(parseFloat(event?.target.value))
             }}
             step={1}
           ></Slider>
@@ -56,7 +56,7 @@ export function Winds({
             min={1}
             max={100}
             onChange={(event: any) => {
-              return winds.updateMinSpeed(event?.target.value)
+              return winds.updateMinSpeed(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -68,7 +68,7 @@ export function Winds({
             max={100}
             value={winds.reference_speed}
             onChange={(event: any) => {
-              return winds.updateReferenceSpeed(event?.target.value)
+              return winds.updateReferenceSpeed(parseFloat(event?.target.value))
             }}
             step={0.1}
           ></Slider>
@@ -77,7 +77,7 @@ export function Winds({
             min={1}
             max={100}
             onChange={(event: any) => {
-              return winds.updateReferenceSpeed(event?.target.value)
+              return winds.updateReferenceSpeed(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -89,7 +89,7 @@ export function Winds({
             max={100000}
             value={winds.arrows}
             onChange={(event: any) => {
-              return winds.updateArrows(event?.target.value)
+              return winds.updateArrows(parseFloat(event?.target.value))
             }}
             step={100}
           ></Slider>
@@ -98,7 +98,7 @@ export function Winds({
             min={0}
             max={100000}
             onChange={(event: any) => {
-              return winds.updateArrows(event?.target.value)
+              return winds.updateArrows(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -110,7 +110,7 @@ export function Winds({
             max={5}
             value={winds.arrows_size}
             onChange={(event: any) => {
-              return winds.updateArrowsSize(event?.target.value)
+              return winds.updateArrowsSize(parseFloat(event?.target.value))
             }}
             step={0.01}
           ></Slider>
@@ -119,7 +119,7 @@ export function Winds({
             min={0}
             max={5}
             onChange={(event: any) => {
-              return winds.updateArrowsSize(event?.target.value)
+              return winds.updateArrowsSize(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>

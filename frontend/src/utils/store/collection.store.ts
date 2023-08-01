@@ -13,7 +13,7 @@ export interface CollectionSlice {
   addCollection: (idx: number, collection: Collection) => void
 }
 
-export const createTextureTreeSlice: StateCreator<
+export const createCollectionSlice: StateCreator<
   CollectionSlice,
   [["zustand/immer", never]],
   [],

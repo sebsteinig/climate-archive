@@ -1,0 +1,18 @@
+<svg viewBox="-21.61 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="">
+<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="SVGRepo_iconCarrier"> 
+    <defs> <style>.cls-1{fill:none;stroke:#64748b;stroke-linecap:round;stroke-linejoin:round;stroke-width:20px;}</style> </defs> 
+    <g data-name="Layer 2" id="Layer_2"> 
+        <g data-name="E460, Change, data, swap" id="E460_Change_data_swap"> 
+            <rect class="cls-1" height="492" width="166.87" x="10" y="10"></rect> 
+            <rect class="cls-1" height="213.91" width="166.87" x="10" y="149.04"></rect> 
+            <polyline class="cls-1" points="341.35 300.96 341.35 362.95 341.35 502 176.87 502 176.87 362.95 176.87 149.04 176.87 10 341.35 10 341.35 80.51"></polyline> 
+            <polyline class="cls-1" points="246.03 149.04 176.87 149.04 176.87 362.95 341.35 362.95 341.35 300.96"></polyline> 
+            <circle class="cls-1" cx="348.33" cy="190.73" r="110.45"></circle> 
+            <path class="cls-1"  d="M353.35,145.55h20.08a30.13,30.13,0,0,1,30.13,30.12h0a30.13,30.13,0,0,1-30.13,30.13H293.11"></path> 
+            <polyline class="cls-1" points="323.23 175.67 293.11 205.8 323.23 235.92"></polyline> 
+        </g> 
+    </g> 
+</g>
+</svg>

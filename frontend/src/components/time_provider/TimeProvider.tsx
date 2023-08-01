@@ -1,166 +1,140 @@
 "use client"
 import { Canvas } from "@react-three/fiber"
-import { useEffect, useRef, useState, useMemo, RefObject, useCallback } from "react"
+import { useEffect, useRef, useState, useMemo, RefObject, useCallback, MutableRefObject } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import {
-  Time,
-  TimeMode,
-  TimeFrame,
-  TimeState,
-  TimeFrameValue,
   TimeFrameRef,
-  TimeFrameHolder,
+  Slots,
+  TimeID,
 } from "@/utils/store/time/time.type"
-import { initFrame } from "@/utils/store/time/time.utils"
-import { OrbitControls } from "@react-three/drei"
-import { CanvasHolder, tickBuilder } from "./tick"
-import { produce } from "immer"
-import { sync } from "@/utils/store/time/handlers/utils"
-import { Plane } from "../3D_components/Plane"
-import THREE from "three"
-import { useTimePanel } from "./time_panel/useTimePanel"
 import { VariableName } from "@/utils/store/variables/variable.types"
-import { Experiments, Publication } from "@/utils/types"
-import { Perf } from "r3f-perf"
 import { gridOf } from "@/utils/types.utils"
+import { useFrameRef } from "./useFrameRef"
+import { useCanvas } from "./useCanvas"
+import { Panel, PanelRef } from "./time_panel/panel"
+import React from "react"
+import { Scene } from "./time_panel/scene"
+import { sync } from "@/utils/store/time/time.utils"
 
 type Props = {}
 
 export function TimeProvider(props: Props) {
-  const prepareTime = useClusterStore((state) => state.time.prepareAll)
-  //const saveAll = useClusterStore((state) => state.time.saveAll)
-  const pauseAll = useClusterStore((state) => state.time.pauseAll)
-  const time_slots = useClusterStore((state) => state.time.slots.map)
+  const time_slots = useClusterStore((state) => state.time.slots)
   const variables = useClusterStore((state) => state.variables)
-  const collections = useClusterStore((state) => state.collections)
-  const active_variable = useMemo(() => {
+  const active_variables = useMemo(() => {
     return Object.values(variables)
       .filter((v) => v.active)
       .map((e) => e.name)
   }, [variables])
-  useEffect(() => {
-    if (active_variable.length === 0) {
-      pauseAll()
-    }
-  }, [active_variable])
-  //const saved_frames = useClusterStore((state) => state.time.saved_frames)
-  const current_frame = useRef<TimeFrameHolder>({
-    map: new Map(),
-    update(frame, time_id, collection_id) {
-      const time = this.map.get(time_id)
-      if (!time) {
-        const collection = new Map()
-        collection.set(collection_id, frame)
-        this.map.set(time_id, collection)
-        return frame
-      }
-      time.set(collection_id, frame)
-      return frame
-    },
-    get(time_id, collection_id) {
-      return this.map.get(time_id)?.get(collection_id)
-    },
-  })
 
-  const current_canvas = document.createElement("canvas")
-  const current_ctx = current_canvas.getContext("2d")
-  const next_canvas = document.createElement("canvas")
-  const next_ctx = next_canvas.getContext("2d")
-  const context = {
-    current: {
-      canvas: current_canvas,
-      ctx: current_ctx,
-    },
-    next: {
-      canvas: next_canvas,
-      ctx: next_ctx,
-    },
-  } as CanvasHolder
+  // useEffect(() => {
+  //   if (active_variable.length === 0) {
+  //     pauseAll()
+  //   }
+  // }, [active_variable])
+  
+  const current_frame = useFrameRef()
+  const canvas = useCanvas()
 
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
+    init(time_slots, current_frame, active_variables)
 
-    init(time_slots, collections, current_frame, active_variable).then(
-      (res) => {
-        prepareTime(res)
-      },
-    )
-  }, [time_slots, active_variable])
-
-  const container_ref = useRef<HTMLDivElement>(null!)
-  const [scenes, panels] = useTimePanel(
-    time_slots,
-    current_frame,
-    collections,
-    active_variable,
-    context,
-    )
-
+  }, [time_slots, active_variables])
+  
   const grid = useMemo(()=> {
     return gridOf(time_slots.size)
   },[gridOf(time_slots.size)])
   
-
+  const container_ref = useRef<HTMLDivElement>(null!)
+  const panel_refs = useRef<RefObject<PanelRef>[]>([])
+  for(let time_id of time_slots.keys()){
+    panel_refs.current[time_id] = React.createRef<PanelRef>()
+  }
 
   return (
     <>
-        <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
-          <Canvas
-            camera={{
-              fov: 55,
-              near: 0.1,
-              far: 200,
-              position: [3, 2, 9],
-            }}
-            shadows
-            eventSource={container_ref}
-          >
-            {scenes}
-            {/* <View track={view1}>
-                    <World config={config} tick={async (x)=>new Map()}/>
-                    <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
-                    <OrbitControls makeDefault />
-                </View> */}
-            {/* <OrbitControls /> */}
-          </Canvas>
-        </div>
-      <div
-        ref={container_ref}
-        className={`w-full h-full grid gap-4 `}
-        style={
-          {
-            gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
-            gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+
+
+      <div className="flex flex-grow h-full">
+        <div
+          ref={container_ref}
+          className={`ml-20 w-full h-full grid gap-4 `}
+          style={
+            {
+              gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
+              gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+            }
           }
-        }
-      >
-        {panels}
+        >
+          {
+            Array.from(time_slots,
+              ([time_id,data]) => {
+
+                return <Panel
+                  current_frame={current_frame}
+                  key={time_id}
+                  data={data}
+                  time_id={time_id}
+                  ref={panel_refs.current[time_id]!}
+                />
+              }
+            )
+          }
+          </div>
       </div>
+      <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
+        <Canvas
+          camera={{
+            fov: 55,
+            near: 0.1,
+            far: 200,
+            position: [3, 2, 9],
+          }}
+          shadows
+          eventSource={container_ref}
+        >
+          {
+            Array.from(time_slots,
+              ([time_id,data]) => {
+                
+                return <Scene
+                key={time_id}
+                time_id={time_id}
+                data={data}
+                current_frame={current_frame}
+                canvas={canvas}
+                active_variables={active_variables}
+                panel_ref={panel_refs.current[time_id]}
+                />
+              }
+            )
+          }
+        </Canvas>
+      </div>
+
     </>
   )
 }
 
 async function init(
-  time_slots: Map<number, Time>,
-  collections: Map<number, Publication | Experiments>,
+  slots: Slots,
   current_frame: TimeFrameRef,
   active_variables: VariableName[],
 ) {
-  const res = []
-  for (let [time_idx, time] of time_slots) {
-    if (time.state !== TimeState.zero && time.state !== TimeState.stopped) {
-      continue
+  for (let [time_id, data] of slots) {
+    const frame = {
+      exp:data.collection.exps[0],
+      swap_flag:true,
+      swapping:false,
+      //ts_idx:0,
+      weight:0,
+      variables:new Map()
     }
-    res.push(time_idx)
-    for (let [collection_idx, _] of time.collections) {
-      const collection = collections.get(collection_idx)
-      if (!collection) {
-        continue
-      }
-      let frame = await initFrame(time, collection.exps, active_variables)
-      console.log("INIT")
-      current_frame.current.update(frame, time_idx, collection_idx)
+    const variables = new Map()
+    for (let variable of active_variables) {
+      variables.set(variable,await sync(frame,variable))
     }
+    current_frame.current.update(frame,time_id)
   }
-  return res
 }

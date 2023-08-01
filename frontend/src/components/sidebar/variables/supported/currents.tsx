@@ -26,7 +26,7 @@ export function Currents({
             max={0.1}
             value={currents.animation_speed}
             onChange={(event: any) => {
-              return currents.updateAnimationSpeed(event?.target.value)
+              return currents.updateAnimationSpeed(parseFloat(event?.target.value))
             }}
             step={0.0001}
           ></Slider>
@@ -35,7 +35,7 @@ export function Currents({
             min={0}
             max={0.1}
             onChange={(event: any) => {
-              return currents.updateAnimationSpeed(event?.target.value)
+              return currents.updateAnimationSpeed(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -47,7 +47,7 @@ export function Currents({
             max={100}
             value={currents.reference_speed}
             onChange={(event: any) => {
-              return currents.updateReferenceSpeed(event?.target.value)
+              return currents.updateReferenceSpeed(parseFloat(event?.target.value))
             }}
             step={0.1}
           ></Slider>
@@ -56,7 +56,7 @@ export function Currents({
             min={1}
             max={100}
             onChange={(event: any) => {
-              return currents.updateReferenceSpeed(event?.target.value)
+              return currents.updateReferenceSpeed(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -68,7 +68,7 @@ export function Currents({
             max={5}
             value={currents.arrows}
             onChange={(event: any) => {
-              return currents.updateArrows(event?.target.value)
+              return currents.updateArrows(parseFloat(event?.target.value))
             }}
             step={0.01}
           ></Slider>
@@ -77,7 +77,7 @@ export function Currents({
             min={0}
             max={5}
             onChange={(event: any) => {
-              return currents.updateArrows(event?.target.value)
+              return currents.updateArrows(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -89,7 +89,7 @@ export function Currents({
             max={5}
             value={currents.arrows_size}
             onChange={(event: any) => {
-              return currents.updateArrowsSize(event?.target.value)
+              return currents.updateArrowsSize(parseFloat(event?.target.value))
             }}
             step={0.01}
           ></Slider>
@@ -98,7 +98,7 @@ export function Currents({
             min={0}
             max={5}
             onChange={(event: any) => {
-              return currents.updateArrowsSize(event?.target.value)
+              return currents.updateArrowsSize(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>

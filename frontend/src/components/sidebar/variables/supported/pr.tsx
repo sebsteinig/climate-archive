@@ -26,7 +26,7 @@ export function Pr({
             max={20}
             value={pr.min}
             onChange={(event: any) => {
-              return pr.updateMin(event?.target.value)
+              return pr.updateMin(parseFloat(event?.target.value))
             }}
             step={0.1}
           ></Slider>
@@ -35,7 +35,7 @@ export function Pr({
             min={0}
             max={20}
             onChange={(event: any) => {
-              return pr.updateMin(event?.target.value)
+              return pr.updateMin(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
@@ -47,7 +47,7 @@ export function Pr({
             max={20}
             value={pr.max}
             onChange={(event: any) => {
-              return pr.updateMax(event?.target.value)
+              return pr.updateMax(parseFloat(event?.target.value))
             }}
             step={0.1}
           ></Slider>
@@ -56,7 +56,7 @@ export function Pr({
             min={0}
             max={20}
             onChange={(event: any) => {
-              return pr.updateMax(event?.target.value)
+              return pr.updateMax(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>
