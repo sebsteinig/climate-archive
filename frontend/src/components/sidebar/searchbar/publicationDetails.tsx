@@ -33,7 +33,7 @@ export default function PublicationDetails({
   setSearchBarVisible,
 }: Props) {
   const [display_abstract, setDisplayAbstract] = useState(false)
-  const addUnsync = useClusterStore((state) => state.time.addUnSync)
+  const addWorld = useClusterStore((state) => state.time.add)
   const [checked, setChecked] = useState<CheckedExp[]>(
     exps.map((exp) => {
       return {
@@ -114,9 +114,7 @@ export default function PublicationDetails({
             } as Publication
             const idx = await database_provider.addCollectionToDb(collection)
             addCollection(idx, collection)
-            addUnsync(idx, {
-              mode: TimeMode.ts,
-            })
+            addWorld(collection)
           }}
         >
           {" "}

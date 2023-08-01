@@ -41,14 +41,46 @@ export function uniqueIdx(x: number, y: number, z: number) {
 
 
 export function gridOf(n:number) {
-  let {width,height} = _gridOf(n)
-  if(width === 0) {
-    width = 1
+  let width : number;
+  let height : number;
+  switch (n) {
+    case 1:
+      width = 1
+      height = 1
+      break;
+    case 2:
+      width = 2
+      height = 1
+      break;
+    case 3:
+      width = 3
+      height = 1
+      break;
+    case 4:
+      width = 2
+      height = 2
+      break;
+    case 5:
+    case 6:
+      width = 3
+      height = 2
+      break;
+    case 7:
+    case 8:
+      width = 4
+      height = 2
+      break;
+    case 9:
+      width = 3
+      height = 3
+      break;
+    default:
+      let grid = _gridOf(n)
+      width = grid.width
+      height = grid.height
+      break;
   }
-  if(height === 0) {
-    height = 1
-  }
-  
+
   return {
     cols : width,
     rows : height,

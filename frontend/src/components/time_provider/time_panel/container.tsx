@@ -12,28 +12,39 @@ import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
-import { PropsWithChildren, forwardRef, useMemo, useState } from "react"
+import { MutableRefObject, PropsWithChildren, forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react"
+import { TimeID, WorldData } from "@/utils/store/time/time.type"
 
 type Props = {
   className?: string
-  time_idx: number
-  collection_idx: number
+  time_id: TimeID,
+  data:WorldData,
 }
 
-export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  function Container({ time_idx, collection_idx, className, children }, ref) {
-    const pauseAll = useClusterStore((state) => state.time.pauseAll)
-    const addUnsync = useClusterStore((state) => state.time.addUnSync)
+export type ContainerRef = {
+  track : MutableRefObject<HTMLDivElement>
+}
+
+export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
+  function Container({ time_id, data, className, children }, ref) {
+    const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
-    const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
     const [display_buttons, displayButtons] = useState(false)
 
+    const div_ref= useRef<HTMLDivElement>(null!)
+
+    useImperativeHandle(ref,()=>{
+      return {
+        track:div_ref
+      }
+    })
+
     return (
-      <div className={`relative w-full h-full ${className ?? ""}`} ref={ref}>
+      <div className={`relative w-full h-full ${className ?? ""}`} ref={div_ref}>
         {children}
         <CrossIcon
           className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
-          onClick={() => remove(time_idx,collection_idx)}
+          onClick={() => remove(time_id)}
         />
         <div
           className={`absolute group bottom-0 right-0 bg-gray-900
@@ -41,8 +52,8 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
         >
           {display_buttons && (
             <PanelConfiguration
-              time_idx={time_idx}
-              collection_idx={collection_idx}
+              time_id={time_id}
+              data={data}
               displayButtons={displayButtons}
             />
           )}
@@ -57,8 +68,7 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
           <DuplicateIcon
             className="w-10 h-10 cursor-pointer p-2 text-slate-500"
             onClick={() => {
-              pauseAll()
-              addUnsync(collection_idx, { ...time })
+              dup(time_id)
             }}
           />
         </div>
@@ -69,19 +79,15 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
 
 type ConfProps = {
   displayButtons: (bool: boolean) => void
-  time_idx: number
-  collection_idx: number
+  time_id: TimeID
+  data: WorldData
 }
 
 function PanelConfiguration({
-  time_idx,
-  collection_idx,
+  time_id,
+  data,
   displayButtons,
 }: ConfProps) {
-  const time_slots = useClusterStore((state) => state.time.slots.map)
-  const conf = useMemo(() => {
-    return time_slots.get(time_idx)!.collections.get(collection_idx)!
-  }, [time_slots])
   const [as_planet, setAsPlanet] = useState(true)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
   return (
@@ -101,9 +107,9 @@ function PanelConfiguration({
         
       
       <CameraIcon
-        className={`cursor-pointer w-5 h-5 my-2 ${conf.camera.is_linked ? "text-slate-500":"text-slate-300"}`}
+        className={`cursor-pointer w-5 h-5 my-2 ${data.conf.camera.is_linked ? "text-slate-500":"text-slate-300"}`}
         onClick={() => {
-          linkCamera(time_idx, collection_idx, !conf.camera.is_linked)
+          linkCamera(time_id,!data.conf.camera.is_linked)
         }}
       />
 

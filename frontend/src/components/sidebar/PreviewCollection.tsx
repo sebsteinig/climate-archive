@@ -24,30 +24,30 @@ export function PreviewCollection({
   setCurrentVariableControls,
 }: Props) {
   const collections = useClusterStore((state) => state.collections)
-  const binder = useClusterStore((state) => state.time.slots.lookup)
+  const slots = useClusterStore((state) => state.time.slots)
 
   const [display_all, displayAll] = useState(false)
   return (
     <div
       className={`bg-gray-900 mt-3 rounded-md 
                             ${
-                              binder.size > 1 && !display_all
+                              slots.size > 1 && !display_all
                                 ? "h-fit w-fit p-2"
                                 : ""
                             }
                             ${search_bar_visible ? "hidden" : ""}`}
     >
-      {binder.size > 1 && (
+      {slots.size > 1 && (
         <DotsIcon
           onClick={() => displayAll((prev) => !prev)}
           className="w-12 h-12 cursor-pointer px-2 text-slate-500"
         />
       )}
       <div className="max-w-full overflow-y-auto overflow-x-hidden max-h-[80vh]">
-        {(display_all || binder.size == 1) &&
-          Array.from(binder).map((value, idx) => {
+        {(display_all || slots.size == 1) &&
+          Array.from(slots).map(([time_id,data], _) => {
             return (
-              <div key={idx}>
+              <div key={time_id}>
                 <OneCollection
                   onClick={() =>
                     setDisplayDetails((prev: boolean) => {
@@ -56,12 +56,12 @@ export function PreviewCollection({
                     })
                   }
                   current_details={{
-                    collection: collections.get(value[0]),
-                    idx: value[0],
+                    collection: data.collection,
+                    idx: time_id,
                   }}
                   display_details={display_details}
                 />
-                {binder.size > 1 && (
+                {slots.size > 1 && (
                   <MdSeparator className="ml-3 block self-center" />
                 )}
               </div>

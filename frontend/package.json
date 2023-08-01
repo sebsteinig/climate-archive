@@ -21,6 +21,7 @@
     "dexie-react-hooks": "^1.1.6",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.6",
+    "gsap": "^3.12.2",
     "immer": "^10.0.2",
     "leva": "^0.9.35",
     "lru-cache": "^10.0.0",
