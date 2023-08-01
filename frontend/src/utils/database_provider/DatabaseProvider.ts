@@ -103,6 +103,12 @@ class DatabaseProvider {
     }
   }
   async load(requested_texture: RequestTexture) {
+    const texture_infos = await this.database.textures_info.where('exp_id').equals(requested_texture.exp_id).toArray()
+
+    if(texture_infos.length === Object.keys(VariableName).length / 2){
+      return undefined
+    }
+    
     const response = await select(requested_texture.exp_id, {
       vars: requested_texture.variables,
       /** TODO : resolutions */
@@ -188,16 +194,13 @@ class DatabaseProvider {
       this.cache.set(path, texture)
     }
     if (!texture) {
-      console.log("GET TEXTURE ERROR ")
-      console.log({ path })
-      throw new TextureMustBeLoaded(path)
+      texture = await this.loadFromServer(path)
     }
     return texture!
   }
 
   async loadAllColections() {
     const collections = await this.database.collections.toArray()
-    console.log(collections)
 
     return collections
   }
@@ -210,7 +213,7 @@ class DatabaseProvider {
       .toArray()
 
     if (!collections_array || collections_array.length === 0) {
-      return await this.database.collections.add({ data: collection })
+      return await this.database.collections.add({ data: collection,date:new Date().toISOString() })
     } else {
       const map_experiments = new Map<string, Experiment>()
       for (let exp of collection.exps) {

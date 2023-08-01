@@ -33,11 +33,11 @@ export default function PublicationDetails({
         <ButtonPrimary
           onClick={async () => {
             setSearchBarVisible(false)
-            const request = {
-              exp_ids: publication.exps.map((e) => e.id),
-            }
-            await database_provider.loadAll({
-              exp_ids: request.exp_ids,
+            // const request = {
+            //   exp_ids: publication.exps.map((e) => e.id),
+            // }
+            await database_provider.load({
+              exp_id: publication.exps[0].id,
             })
             const idx = await database_provider.addCollectionToDb(publication)
             addCollection(idx, publication)
