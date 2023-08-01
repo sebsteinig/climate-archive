@@ -2,6 +2,7 @@ import { TextureInfo } from "@/utils/database/database.types"
 import { VariableName } from "../variables/variable.types"
 import { Experiment } from "@/utils/types"
 import { MutableRefObject } from "react"
+import { Collection } from "../collection.store"
 
 export enum TimeKind {
   circular,
@@ -33,40 +34,30 @@ export enum TimeMode {
   mean,
 }
 
-export type TimeConfig = {
-  kind?: TimeKind
-  direction?: TimeDirection
-  speed?: TimeSpeed | number
-  mode?: TimeMode
-}
-
-export type TimeFrameValue = {
+export type TimeFrameState = {
   current: {
-    idx: number
-    exp: Experiment
-    info: TextureInfo
     time_chunk: number
     frame: number
   }
   next: {
-    idx: number
-    exp: Experiment
-    info: TextureInfo
     time_chunk: number
     frame: number
   }
+  info: TextureInfo
 }
 export type TimeFrame = {
-  variables: Map<VariableName, TimeFrameValue>
-  initialized: boolean
+  exp: Experiment
+  //ts_idx : number
+  variables: Map<VariableName, TimeFrameState>
   weight: number
   swap_flag : boolean
+  swapping : boolean
 }
 
 export type TimeFrameHolder = {
-  map: Map<number, Map<number, TimeFrame>>
-  update: (frame: TimeFrame, time_id: number, collection_id: number) => TimeFrame
-  get: (time_id: number, collection_id: number) => TimeFrame | undefined
+  map: Map<TimeID, TimeFrame>
+  update: (frame: TimeFrame, time_id: TimeID) => TimeFrame
+  get: (time_id: TimeID) => TimeFrame | undefined
 }
 
 export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
@@ -74,25 +65,22 @@ export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
 export type TimeID = number
 export type CollectionID = number
 
-export type Time = {
-  mode: TimeMode
+export type TimeConf = {
   direction: TimeDirection
   kind: TimeKind
-  state: TimeState
   speed: number
-  surfing_departure: number
-  surfing_destination: number
-  collections: Map<CollectionID, ContainerConf>
 }
 
-export type ContainerConf = {
+export type WorldConf = {
   camera: {
     is_linked: boolean
   }
 }
 
-export type TimeMap = {
-  map: Map<TimeID, Time>
-  lookup: Map<CollectionID, Set<TimeID>>
-  auto_increment: number
+export type WorldData = {
+  conf : WorldConf,
+  collection : Collection
+  time : TimeConf
 }
+
+export type Slots = Map<TimeID,WorldData>

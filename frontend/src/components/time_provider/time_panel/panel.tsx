@@ -1,16 +1,12 @@
 import {
-  CollectionID,
-  Time,
-  TimeFrame,
   TimeFrameRef,
+  TimeID,
+  WorldData,
 } from "@/utils/store/time/time.type"
 import {
-  MutableRefObject,
   RefObject,
   forwardRef,
-  useCallback,
   useImperativeHandle,
-  useMemo,
   useRef,
 } from "react"
 import {
@@ -18,99 +14,59 @@ import {
   TimeController,
 } from "../time_controllers/TimeController"
 import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
-import { Container } from "./container"
+import { Container, ContainerRef } from "./container"
 import { gridOf } from "@/utils/types.utils"
 
 export type PanelProps = {
-  time_idx: number
-  time: Time
+  time_id:TimeID
+  data: WorldData
   current_frame: TimeFrameRef
 }
 
-export type ContainerRef = {
-  ref: MutableRefObject<HTMLDivElement>
-  onChange: (frame: TimeFrame) => void
+export type PanelRef = {
+  container_ref : RefObject<ContainerRef>,
+  controller_ref : RefObject<ControllerRef>,
+  input_ref : RefObject<InputRef>,
 }
 
-export type Refs = {
-  //input_ref: RefObject<HTMLInputElement>
-  container_refs: RefObject<Map<CollectionID, ContainerRef>>
-}
-
-function buildDivHolder(time: Time) {
-  const res = new Map<CollectionID, MutableRefObject<HTMLDivElement>>()
-  for (let collection_id of time.collections.keys()) {
-    res.set(collection_id, useRef<HTMLDivElement>(null!))
-  }
-  return res
-}
-
-export const Panel = forwardRef<Refs, PanelProps>(function Panel(
-  { time, time_idx, current_frame },
+export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
+  { data , time_id , current_frame },
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)
   const controller_ref = useRef<ControllerRef>(null)
-  const container_refs = useRef<Map<CollectionID, ContainerRef>>(new Map())
-
-  const divs_holder = useRef(buildDivHolder(time))
+  const container_ref = useRef<ContainerRef>(null)
 
   useImperativeHandle(refs, () => {
     return {
-      container_refs: container_refs,
+      input_ref,
+      controller_ref,
+      container_ref,
     }
-  })
-  const grid = useMemo(()=> {
-    return gridOf(time.collections.size)
-  },[gridOf(time.collections.size)])
+  }) 
+
   return (
     <div className="w-full h-full grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-        <div         
-        className={`w-full h-full grid gap-4 `}
-        style={
-          {
-            gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
-            gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
-          }
-        }>
-        
-          {Array.from(time.collections, ([collection_idx, _]) => {
-            return (
-              <Container
-                key={collection_idx}
-                ref={(el: HTMLDivElement) => {
-                  const div_ref = divs_holder.current.get(collection_idx)!
-                  div_ref.current = el
 
-                  const container_ref: ContainerRef = {
-                    ref: div_ref,
-                    onChange: (frame) => {
-                      input_ref.current?.onChange(collection_idx, frame)
-                      controller_ref.current?.onChange(collection_idx, frame)
-                    },
-                  }
-                  container_refs.current.set(collection_idx, container_ref)
-                  return el
-                }}
-                time_idx={time_idx}
-                collection_idx={collection_idx}
-              />
-            )
-          })}
-        </div>
+          <Container
+            ref={container_ref}
+            time_id={time_id}
+            data={data}
+          />
       </div>
       <div className="row-start-5 z-10">
         <TimeController
           current_frame={current_frame}
-          time_idx={time_idx}
+          time_id={time_id}
+          data={data}
           ref={controller_ref}
         />
         <TimeSlider
           current_frame={current_frame}
-          time_idx={time_idx}
+          data={data}
+          time_id={time_id}
           className="w-full"
-          onChange={(value) => {}}
           ref={input_ref}
         />
       </div>

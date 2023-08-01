@@ -16,7 +16,7 @@ export default function SideBar({ journals }: Props) {
     useState<VariableName>()
   return (
     <div>
-      <div className="absolute top-0 left-0 h-full">
+      <div className="absolute top-0 left-0 m-5 h-full">
         <SearchButton
           search_bar_visible={search_bar_visible}
           setSearchBarVisible={setSearchBarVisible}

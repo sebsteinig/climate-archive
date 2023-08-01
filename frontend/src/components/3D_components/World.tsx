@@ -14,24 +14,14 @@ import { Surface } from "./Surface"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
+import { TickFn } from "../time_provider/tick"
 
 type Props = {
   config: {
     model: string
     heightData: string
   }
-  tick: (delta: number) => Promise<
-    Map<
-      VariableName,
-      {
-        current_url: string
-        next_url: string
-        weight: number
-        current_info: TextureInfo
-        next_info: TextureInfo
-      }
-    >
-  >
+  tick: TickFn
 }
 
 export function World({ config, tick }: Props) {
@@ -48,8 +38,10 @@ export function World({ config, tick }: Props) {
   let texture = new THREE.TextureLoader()
 
   useFrame((state, delta) => {
+    //console.log('tick');
+    
     tick(delta).then((res) => {
-      for (let [variable, data] of res) {
+      for (let [variable, data] of res.variables) {
         texture.load(data.current_url, (tt) => {
           if (sphereRef.current) {
             sphereRef.current.material.map = tt

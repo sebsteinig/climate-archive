@@ -69,7 +69,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
   const [lossless, setLossless] = useState(true)
   const [resolution, setResolution] = useState<{ x?: number; y?: number }>({})
   const [variables, setVariables] = useState<string[]>([])
-  const addUnsync = useClusterStore((state) => state.time.addUnSync)
+  const addWorld = useClusterStore((state) => state.time.add)
   if (!display) {
     return (
       <>
@@ -320,9 +320,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
           } as Experiments
           const idx = await database_provider.addCollectionToDb(collection)
           addCollection(idx, collection)
-          addUnsync(idx, {
-            mode: TimeMode.ts,
-          })
+          addWorld(collection)
         }}
       >
         Load

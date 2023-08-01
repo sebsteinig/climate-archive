@@ -10,105 +10,51 @@ import {
   useRef,
 } from "react"
 import {
-  Time,
   TimeFrame,
   TimeFrameRef,
-  TimeFrameValue,
+  TimeID,
+  TimeKind,
   TimeMode,
   TimeState,
+  WorldData,
 } from "@/utils/store/time/time.type"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { chunksDetails } from "@/utils/store/time/handlers/utils"
+import { circular, goto, once, walk } from "@/utils/store/time/time.utils"
 
 type Props = {
   className?: string
-  time_idx: number
+  time_id: TimeID
+  data:WorldData
   current_frame: TimeFrameRef
 }
 export type ControllerRef = {
-  onChange: (collection_idx: number, frame: TimeFrame) => void
+  onChange: (frame: TimeFrame) => void
 }
 
 export const TimeController = forwardRef<ControllerRef, Props>(
-  function TimeController({ className, time_idx }, ref) {
+  function TimeController({ className,current_frame, time_id,data }, ref) {
     const div_ref = useRef<HTMLDivElement>(null)
-    const [is_playing, setPlaying] = useState(false)
-    const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
-    const playTime = useClusterStore((state) => state.time.play)
-    const pauseTime = useClusterStore((state) => state.time.pause)
-    const pin = useClusterStore((state) => state.time.pin)
-    const variables = useClusterStore((state) => state.variables)
-
-
-    const active_variable = useMemo(() => {
-      return Object.values(variables)
-        .filter((v) => v.active)
-        .map((e) => e.name)
-    }, [variables])
-
-    useEffect(() => {
-      if (time?.state === TimeState.playing) {
-        setPlaying(true)
-      } else {
-        setPlaying(false)
-      }
-    }, [time?.state])
-
+    const tween_ref = useRef<gsap.core.Tween|undefined>(null!)
     useImperativeHandle(ref, () => {
       return {
-        onChange: (collection_idx: number, frame: TimeFrame) => {
-          if (!time) {
-            return
+        onChange: (frame: TimeFrame) => {
+          const month = titleOf(Math.floor(frame.weight),12)!
+          if(div_ref.current) {
+            div_ref.current.innerText = month
           }
-          if (
-            time.state === TimeState.paused ||
-            time.state === TimeState.stopped ||
-            time.state === TimeState.zero ||
-            time.state === TimeState.ready
-          ) {
-            return
-          }
-          const first = frame.variables.values().next().value as
-            | TimeFrameValue
-            | undefined
-          if (!first) {
-            return
-          }
-
-          if (!div_ref.current) {
-            return
-          }
-          const exp = first.current.exp.id
-          const metadata = first.current.exp.metadata[0].metadata.text ?? ""
-          if (time.mode === TimeMode.ts) {
-            const s = first.current.info.timesteps
-            const f = first.current.frame
-            const c = first.current.time_chunk
-            const [cs, fpc] = chunksDetails(first.current.info)
-            const t = f + c * fpc
-            const time_title = titleOf(t, s) ?? t.toString()
-            div_ref.current.innerText = `${exp} ${metadata} : ${time_title}`
-          } else {
-            div_ref.current.innerText = `${exp} ${metadata}`
-          }
-        },
+        }
       }
     })
-
-    if (!time) {
-      return null
-    }
+    const [is_playing,setPlaying] = useState(false)
     return (
       <div className={className + "align-middle flex"}>
-        {is_playing ? (
+        { is_playing ? (
           // PAUSE BUTTON
           <Pause
             className={`w-8 h-8 inline-block text-slate-500`}
             onClick={() => {
-              if (time.state === TimeState.playing) {
-                console.log("PAUSE")
-                pauseTime(time_idx)
-              }
+              tween_ref.current?.kill()
+              setPlaying(false)
             }}
           />
         ) : (
@@ -116,19 +62,29 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           <Play
             className={`w-8 h-8 inline-block text-slate-500`}
             onClick={() => {
-              if (active_variable.length > 0 && time.state !== TimeState.zero) {
-                console.log("PLAY")
-                playTime(time_idx)
+              const frame = current_frame.current.get(time_id)
+              if(!frame) return;
+              switch (data.time.kind) {
+                case TimeKind.circular:
+                  tween_ref.current = circular(frame,tween_ref)
+                  break;
+                case TimeKind.once :
+                  tween_ref.current = once(frame,tween_ref,()=>{
+                    setPlaying(false)
+                  })
+                  break;
+                case TimeKind.walk :
+                  tween_ref.current = walk(frame,tween_ref)
+                  break;
               }
+              setPlaying(true)
             }}
           />
         )}
         <Stop
           className={`w-8 h-8 block text-slate-500`}
           onClick={() => {
-            // if(stop()) {
-            //     setPlaying(false)
-            // }
+
           }}
         />
         <div ref={div_ref}></div>

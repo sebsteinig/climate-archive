@@ -26,7 +26,7 @@ export function Variables({
   return (
     <div className="h-2/3" onMouseOver={() => setCurrentDataDetails(false)}>
       <div className="overflow-y-auto overflow-x-hidden max-h-full">
-        <div className="p-2 grid grid-rows-12 gap-5">
+        <div className="grid grid-rows-12 gap-5">
           <Winds
             current_variable_controls={current_variable_controls}
             setCurrentVariableControls={setCurrentVariableControls}

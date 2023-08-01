@@ -5,16 +5,15 @@ import { isPublication } from "@/utils/types.utils"
 import { useState } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import { PropsWithChildren } from "react"
+import { Collection } from "@/utils/store/collection.store"
 
 
 type Props = {
-    collection_idx : number | undefined
+    collection : Collection
     displayCollectionDetails : (x : boolean) => void
   }
   
-  export function ViewCollection({collection_idx, displayCollectionDetails} : Props){
-    const collections = useClusterStore((state) => state.collections)
-    if (!collection_idx) return;
+  export function ViewCollection({collection, displayCollectionDetails} : Props){
     return (
       <div 
         className={`bg-gray-900 
@@ -37,7 +36,7 @@ type Props = {
             />
           </div> */}
           
-          <CollectionDetails collection={collections.get(collection_idx)}/>
+          <CollectionDetails collection={collection}/>
         </div>
       </div>
     )
@@ -50,7 +49,7 @@ type CollectionProps = {
 
 export function CollectionDetails({collection, children} : PropsWithChildren<CollectionProps>){
     const [display_abstract, setDisplayAbstract] = useState(false)
-    if (!collection) return;
+    if (!collection) return null;
 
     if(!isPublication(collection)){
         return(

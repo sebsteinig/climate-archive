@@ -19,7 +19,7 @@ export default function PublicationDetails({
   setDisplaySeeDetails,
   setSearchBarVisible,
 }: Props) {
-  const addUnsync = useClusterStore((state) => state.time.addUnSync)
+  const add = useClusterStore((state) => state.time.add)
   
   const addCollection = useClusterStore((state) => state.addCollection)
 
@@ -41,9 +41,7 @@ export default function PublicationDetails({
             })
             const idx = await database_provider.addCollectionToDb(publication)
             addCollection(idx, publication)
-            addUnsync(idx, {
-              mode: TimeMode.ts,
-            })
+            add( publication )
           }}
         >
           Load
