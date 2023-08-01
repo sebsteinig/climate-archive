@@ -25,7 +25,7 @@ export function Height({
             max={0.8}
             value={height.diplacement}
             onChange={(event: any) => {
-              return height.updateDiplacement(event?.target.value)
+              return height.updateDiplacement(parseFloat(event?.target.value))
             }}
             step={0.001}
           ></Slider>
@@ -34,7 +34,7 @@ export function Height({
             min={0}
             max={0.8}
             onChange={(event: any) => {
-              return height.updateDiplacement(event?.target.value)
+              return height.updateDiplacement(parseFloat(event?.target.value))
             }}
           ></InputNumber>
         </div>

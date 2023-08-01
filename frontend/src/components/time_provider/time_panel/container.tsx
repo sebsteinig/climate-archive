@@ -8,11 +8,16 @@ import RotateIcon from "$/assets/icons/rotate.svg"
 import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
+import ChangeExpIcon from "$/assets/icons/change-exp.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import { PropsWithChildren, forwardRef, useMemo, useState } from "react"
+import { ViewCollection } from "@/components/sidebar/utils/CollectionDetails"
+import InfoIcon from "$/assets/icons/info.svg"
+import { isPublication } from "@/utils/types.utils"
+import Select from "@/components/inputs/Select"
 
 type Props = {
   className?: string
@@ -25,23 +30,36 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     const pauseAll = useClusterStore((state) => state.time.pauseAll)
     const addUnsync = useClusterStore((state) => state.time.addUnSync)
     const remove = useClusterStore((state) => state.time.remove)
+    const [display_collection_details, displayCollectionDetails] = useState(false)
     const time = useClusterStore((state) => state.time.slots.map.get(time_idx))
     const [display_buttons, displayButtons] = useState(false)
-
+    const [display_exps, displayExps] = useState(false)
+    const collection = useClusterStore((state) => state.collections.get(collection_idx))
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={ref}>
         {children}
+
+        {display_collection_details && <ViewCollection displayCollectionDetails={displayCollectionDetails} collection_idx={collection_idx}/>}
+        {(collection && isPublication(collection)) && <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
+            {collection.authors_short}, {collection.year}
+        </p>}
         <CrossIcon
           className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
           onClick={() => remove(time_idx,collection_idx)}
         />
+        {display_exps && <div className="absolute z-30 bottom-3 right-24">
+          <Select onChange={() => {displayExps(false)} }>
+            {collection?.exps.map((e) => <option key={e.id}>{e.id}</option>)}
+          </Select>
+        </div>}
         <div
-          className={`absolute group bottom-0 right-0 bg-gray-900
+          className={`absolute z-30 group bottom-0 right-0 bg-gray-900 border-gray-700 border-2
          rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}
         >
           {display_buttons && (
             <PanelConfiguration
               time_idx={time_idx}
+              displayExps={displayExps}
               collection_idx={collection_idx}
               displayButtons={displayButtons}
             />
@@ -61,6 +79,12 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               addUnsync(collection_idx, { ...time })
             }}
           />
+
+          <InfoIcon
+            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
+            onClick={() => displayCollectionDetails((prev) => !prev)}
+          />
+
         </div>
       </div>
     )
@@ -69,6 +93,7 @@ export const Container = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
 
 type ConfProps = {
   displayButtons: (bool: boolean) => void
+  displayExps: Function
   time_idx: number
   collection_idx: number
 }
@@ -77,6 +102,7 @@ function PanelConfiguration({
   time_idx,
   collection_idx,
   displayButtons,
+  displayExps
 }: ConfProps) {
   const time_slots = useClusterStore((state) => state.time.slots.map)
   const conf = useMemo(() => {
@@ -138,6 +164,11 @@ function PanelConfiguration({
 
       <PinIcon
         className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500`}
+      />
+
+      <ChangeExpIcon 
+        className={`cursor-pointer w-8 h-8 my-2`} 
+        onClick={()=> displayExps((prev:boolean) => !prev)}
       />
     </div>
   )

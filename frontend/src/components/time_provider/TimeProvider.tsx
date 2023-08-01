@@ -109,37 +109,39 @@ export function TimeProvider(props: Props) {
 
   return (
     <>
-        <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
-          <Canvas
-            camera={{
-              fov: 55,
-              near: 0.1,
-              far: 200,
-              position: [3, 2, 9],
-            }}
-            shadows
-            eventSource={container_ref}
-          >
-            {scenes}
-            {/* <View track={view1}>
-                    <World config={config} tick={async (x)=>new Map()}/>
-                    <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
-                    <OrbitControls makeDefault />
-                </View> */}
-            {/* <OrbitControls /> */}
-          </Canvas>
-        </div>
-      <div
-        ref={container_ref}
-        className={`w-full h-full grid gap-4 `}
-        style={
-          {
-            gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
-            gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+      <div className="fixed top-0 left-0 -z-10 w-screen h-screen">
+        <Canvas
+          camera={{
+            fov: 55,
+            near: 0.1,
+            far: 200,
+            position: [3, 2, 9],
+          }}
+          shadows
+          eventSource={container_ref}
+        >
+          {scenes}
+          {/* <View track={view1}>
+                  <World config={config} tick={async (x)=>new Map()}/>
+                  <PerspectiveCamera makeDefault position={[3, 2, 9]} fov={55} near={0.1} far={200} />
+                  <OrbitControls makeDefault />
+              </View> */}
+          {/* <OrbitControls /> */}
+        </Canvas>
+      </div>
+      <div className="flex flex-grow h-full">
+        <div
+          ref={container_ref}
+          className={`ml-16 w-full h-full grid gap-4 `}
+          style={
+            {
+              gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
+              gridTemplateRows : `repeat(${grid.rows}, minmax(0, 1fr))`
+            }
           }
-        }
-      >
-        {panels}
+        >
+          {panels}
+        </div>
       </div>
     </>
   )
