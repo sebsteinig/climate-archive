@@ -11,6 +11,7 @@ import Controls from "./Controls"
 import { Plane } from "./Plane"
 import { Surface } from "./Surface"
 import { ATM_2D } from "./ATM_2D"
+import { AtmosphereLayer } from "./AtmosphereLayer"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
@@ -31,6 +32,9 @@ type Props = {
 }
 
 export function World({ tick }: Props) {
+
+  console.log('creating World component')
+
   // for Leva debug GUI (there must be a better way for this ...)
   // const { usePerformance, useTitle } = useControls('global', {
   //   usePerformance: true,
@@ -42,6 +46,8 @@ export function World({ tick }: Props) {
   const atm2DRef = useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null)
 
   let texture = new THREE.TextureLoader()
+
+  // const state = useClusterStore(state => state.variables)
 
   useFrame((state, delta) => {
 
@@ -67,7 +73,8 @@ export function World({ tick }: Props) {
       <Controls /> */}
       <Lights />
       {/* <Surface ref={sphereRef} config={config} /> */}
-      <ATM_2D ref={atm2DRef} />
+      {/* <ATM_2D ref={atm2DRef} /> */}
+      <AtmosphereLayer ref={atm2DRef} />
 
       <Perf position="bottom-right" />
     </>
