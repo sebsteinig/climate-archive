@@ -16,8 +16,10 @@ import {
 import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
 import { Container, ContainerRef } from "./container"
 import { gridOf } from "@/utils/types.utils"
+import { Collection } from "@/utils/store/collection.store"
 
 export type PanelProps = {
+  displayCollection : (collection : Collection) => void
   time_id:TimeID
   data: WorldData
   current_frame: TimeFrameRef
@@ -30,7 +32,7 @@ export type PanelRef = {
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data , time_id , current_frame },
+  { data , time_id , current_frame, displayCollection },
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)
@@ -50,6 +52,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
 
           <Container
+            displayCollection={displayCollection}
             ref={container_ref}
             time_id={time_id}
             data={data}

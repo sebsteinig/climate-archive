@@ -10,33 +10,28 @@ import { Collection } from "@/utils/store/collection.store"
 
 type Props = {
     collection : Collection
-    displayCollectionDetails : (x : boolean) => void
+    closeViewCollection : () => void
   }
   
-  export function ViewCollection({collection, displayCollectionDetails} : Props){
+  export function ViewCollection({collection, closeViewCollection} : Props){
     return (
-      <div 
-        className={`bg-gray-900 
-            my-10 z-40 
-            fixed top-0 right-0 lg:left-1/2 lg:-translate-x-1/2
-            p-2 lg:w-1/2 rounded-md`}
-      >
-        <div className="relative h-10 w-full">
-
-          <CrossIcon
-              className="absolute right-5 top-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
-              onClick={() => displayCollectionDetails(false)}
-              />
-        </div>
-        <div className={`max-w-full max-h-[80vh] overflow-y-auto overflow-x-hidden `}>
-          {/* <div className="static grid grid-cols-1">
+      <div className="flex flex-grow">
+        <div 
+          className={`bg-gray-900 
+              z-40 p-2 my-5
+              fixed top-0 right-0 lg:left-1/2 lg:-translate-x-1/2
+              lg:w-1/2 rounded-md`}
+        >
+          <div className="relative h-10 w-full">
             <CrossIcon
-              className="justify-self-end w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
-              onClick={() => displayCollectionDetails(false)}
-            />
-          </div> */}
-          
-          <CollectionDetails collection={collection}/>
+                className="absolute right-2 top-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+                onClick={() => closeViewCollection()}
+                />
+          </div>
+          <div className={`max-w-full max-h-full overflow-y-auto overflow-x-hidden `}>
+            
+            <CollectionDetails collection={collection}/>
+          </div>
         </div>
       </div>
     )
@@ -67,19 +62,19 @@ export function CollectionDetails({collection, children} : PropsWithChildren<Col
             <p className="font-medium tracking-wide">{collection.authors_full}</p>
             <div className="pt-2 pr-4">
                 <p className="pb-1 font-semibold">Abstract : </p>
-                <p>
-                  {display_abstract
+                <p>{collection.abstract}
+                  {/* {display_abstract
                     ? collection.abstract
-                    : collection.abstract.slice(0, 90) + " ..."}
+                    : collection.abstract.slice(0, 90) + " ..."} */}
                 </p>
-                <div
+                {/* <div
                 className="cursor-pointer hover:underline text-right"
                 onClick={() => {
                     setDisplayAbstract((prev) => !prev)
                 }}
                 >
                     {display_abstract ? "Hide" : "Full abstract"}
-                </div>
+                </div> */}
             </div>
             <div className="w-full flex flex-col items-center gap-2 justify-center">
                 {children}
