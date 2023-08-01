@@ -68,7 +68,13 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
   // material.uniforms.uUserMinValue.value = parseFloat(pr.min)
   // material.uniforms.uUserMaxValue.value = parseFloat(pr.max)
 
-  function update(data) {
+  function tick(weight) {
+    
+    materialRef.current.uniforms.uFrameWeight.value = weight
+
+  }
+
+  function updateTextures(data) {
     
     // console.log(prRef)
     // materialRef.current.uniforms.uFrameWeight.value = Math.random()
@@ -91,7 +97,8 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
   useImperativeHandle(ref,()=> 
   {
     return {
-      update,
+      tick,
+      updateTextures
     }
   })
 

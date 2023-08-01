@@ -53,15 +53,21 @@ export function World({ tick }: Props) {
   useFrame((state, delta) => {
 
     tick(delta).then((res) => {
-      // console.log(res)
-      for (let [variable, data] of res) {
-        switch (variable) {
-          case VariableName.pr : { 
-            atm2DRef.current.update(data) 
-            break
+
+      atm2DRef.current.tick(res.weight)
+
+      if (res.variables.size != 0) {
+        console.log(res.variables)
+        for (let [variable, data] of res) {
+          switch (variable) {
+            case VariableName.pr : { 
+              atm2DRef.current.updateTextures(data) 
+              break
+            }
           }
         }
-      }
+      } 
+
 
     })
 
