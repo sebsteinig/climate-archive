@@ -26,11 +26,6 @@ import { gridOf } from "@/utils/types.utils"
 
 type Props = {}
 
-var config = {
-  model: "Dune",
-  heightData: "/assets/textures/tfgzk_height.smoothed.png",
-}
-
 export function TimeProvider(props: Props) {
   const prepareTime = useClusterStore((state) => state.time.prepareAll)
   //const saveAll = useClusterStore((state) => state.time.saveAll)

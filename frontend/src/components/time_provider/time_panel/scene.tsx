@@ -31,10 +31,6 @@ export function Scene({
   context,
   onChange,
 }: SceneProps) {
-  var config = {
-    model: "Dune",
-    heightData: "/assets/textures/tfgzk_height.smoothed.png",
-  }
   const time_slots = useClusterStore((state) => state.time.slots.map)
   const conf = useMemo(() => {
     return time_slots.get(time_idx)!.collections.get(collection_idx)!
@@ -43,7 +39,6 @@ export function Scene({
   return (
     <View track={track}>
       <World
-        config={config}
         tick={tickBuilder(
           time,
           time_idx,

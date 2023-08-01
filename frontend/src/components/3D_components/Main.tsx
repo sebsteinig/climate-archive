@@ -5,16 +5,6 @@ import React, { RefObject } from "react"
 import ReactDOM from "react-dom/client"
 import { World } from "./World"
 
-type modelDesciptor = {
-  model: string
-  heightData: string
-}
-
-var config: modelDesciptor = {
-  model: "Dune",
-  heightData: "/assets/textures/tfgzk_height.smoothed.png",
-}
-
 type Props = {
   tick: (delta: number) => void
 }
@@ -32,7 +22,7 @@ export default function Main({ tick }: Props) {
         }}
         shadows
       >
-        <World config={config} tick={tick} />
+        <World tick={tick} />
       </Canvas>
     </div>
   )

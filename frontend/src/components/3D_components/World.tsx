@@ -16,10 +16,6 @@ import { VariableName } from "@/utils/store/variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
 
 type Props = {
-  config: {
-    model: string
-    heightData: string
-  }
   tick: (delta: number) => Promise<
     Map<
       VariableName,
@@ -34,7 +30,7 @@ type Props = {
   >
 }
 
-export function World({ config, tick }: Props) {
+export function World({ tick }: Props) {
   // for Leva debug GUI (there must be a better way for this ...)
   // const { usePerformance, useTitle } = useControls('global', {
   //   usePerformance: true,
@@ -48,43 +44,20 @@ export function World({ config, tick }: Props) {
   let texture = new THREE.TextureLoader()
 
   useFrame((state, delta) => {
-    // if(res.precipitation) {
-    // console.log(sphereRef)
 
-    // sphereRef.current.update()
-    // }
     tick(delta).then((res) => {
       // console.log(res)
       for (let [variable, data] of res) {
-        if (variable == 6) {
-          atm2DRef.current.update(data)
+        switch (variable) {
+          case VariableName.pr : { 
+            atm2DRef.current.update(data) 
+            break
+          }
         }
-        // texture.load(data.current_url, (tt) => {
-        //   if (sphereRef.current) {
-        //     sphereRef.current.material.map = tt
-        //   }
-        }
-      // console.log(res)
-      // for (let [variable, data] of res) {
-      //   texture.load(data.current_url, (tt) => {
-      //     if (sphereRef.current) {
-      //       sphereRef.current.material.map = tt
-      //     }
-      //   })
-      //   break
-      // }
-      //   for (let [variable, data] of res) {
-      //     console.log(variable)
-      //   break
-      // }
-      // if(res.precipitation) {
-      //   sphereRef.current.update(res.precipitation)
-      // }
+      }
+
     })
 
-    // if (rotate) {
-    //   sphereRef.current!.rotation.y += delta / 3
-    // }
   })
 
   return (
@@ -94,9 +67,9 @@ export function World({ config, tick }: Props) {
       <Controls /> */}
       <Lights />
       {/* <Surface ref={sphereRef} config={config} /> */}
-      <ATM_2D ref={atm2DRef} config={{placeholder: "test"}}/>
+      <ATM_2D ref={atm2DRef} />
+
       <Perf position="bottom-right" />
-      {/* <Plane /> */}
     </>
   )
 }
