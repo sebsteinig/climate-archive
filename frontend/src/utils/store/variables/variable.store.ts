@@ -64,7 +64,6 @@ export const createVariableSlice: StateCreator<
     }),
     variables: {
       currents: {
-        //active:false,
         name: VariableName.currents,
         animation_speed: 0.025,
         reference_speed: 50,
@@ -72,10 +71,6 @@ export const createVariableSlice: StateCreator<
         arrows_size: 1,
         scale_by_magnitude: true,
         color_by_magnitude: false,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.currents.active = !state.variables.currents.active
-        //   }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {
             state.variables.currents.animation_speed = value
@@ -104,59 +99,29 @@ export const createVariableSlice: StateCreator<
           }),
       },
       clt: {
-        //active:false,
         name: VariableName.clt,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.clt.active = !state.variables.clt.active
-        //   }),
       },
       height: {
-        //active:false,
         name: VariableName.height,
         diplacement: 0.2,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.height.active = !state.variables.height.active
-        //   }),
         updateDiplacement: (value: number) =>
           set((state) => {
             state.variables.height.diplacement = value
           }),
       },
       liconc: {
-        //active:false,
         name: VariableName.liconc,
-      //   toggle: () =>
-      //     set((state) => {
-      //       state.variables.liconc.active = !state.variables.liconc.active
-      //     }),
       },
       mlotst: {
-        //active:false,
         name: VariableName.mlotst,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.mlotst.active = !state.variables.mlotst.active
-        //   }),
       },
       pfts: {
-        //active:false,
         name: VariableName.pfts,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.pfts.active = !state.variables.pfts.active
-        //   }),
       },
       pr: {
-        //active:false,
         name: VariableName.pr,
         min: 3.5,
         max: 12,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.pr.active = !state.variables.pr.active
-        //   }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.pr.min = value
@@ -167,41 +132,21 @@ export const createVariableSlice: StateCreator<
           }),
       },
       sic: {
-        //active:false,
         name: VariableName.sic,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.sic.active = !state.variables.sic.active
-        //   }),
       },
       snc: {
-        //active:false,
         name: VariableName.snc,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.snc.active = !state.variables.snc.active
-        //   }),
       },
       tas: {
-        //active:false,
         name: VariableName.tas,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.tas.active = !state.variables.tas.active
-        //   }),
       },
       tos: {
-        //active:false,
         min: -2,
         max: 36,
         anomaly_range: 15,
         anomalies_lower_bound: 2.5,
         sea_ice: true,
         name: VariableName.tos,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.tos.active = !state.variables.tos.active
-        //   }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.tos.min = value
@@ -224,7 +169,6 @@ export const createVariableSlice: StateCreator<
           }),
       },
       winds: {
-        //active:false,
         name: VariableName.winds,
         animation_speed: 0.025,
         min_speed: 20,
@@ -233,10 +177,6 @@ export const createVariableSlice: StateCreator<
         arrows_size: 2,
         scale_by_magnitude: true,
         color_by_magnitude: true,
-        // toggle: () =>
-        //   set((state) => {
-        //     state.variables.winds.active = !state.variables.winds.active
-        //   }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {
             state.variables.winds.animation_speed = value
