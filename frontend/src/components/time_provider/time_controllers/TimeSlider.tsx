@@ -1,6 +1,7 @@
 import { useClusterStore } from "@/utils/store/cluster.store"
 import {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -38,7 +39,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
   useImperativeHandle(ref, () => {
     return {
       onChange: (frame: TimeFrame) => {
-       
+        const first = frame?.variables.values().next().value as TimeFrameState|undefined
+        const timestep = first?.info.timesteps
+        if(timestep && parseFloat(input_ref.current.max) !== timestep - 1 ) {
+          input_ref.current.max = (timestep - 1).toString()
+        }
       },
       onWeightUpdate : (frame: TimeFrame)=>{
         if(!is_changing.current){
@@ -47,6 +52,13 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
       }
     }
   })
+  const max = useMemo(()=>{
+    const frame = current_frame.current.get(time_id)
+    const first = frame?.variables.values().next().value as TimeFrameState|undefined
+    const timestep = first?.info.timesteps
+    return timestep ?? 0
+  },[current_frame.current.get(time_id)])
+  
   return (
     <div className={className}>
       <input
@@ -54,13 +66,15 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         type="range"
         className="w-full"
         min={0}
-        max={12}
+        max={max}
         step={0.1}
         onChange={(e) => {
           const frame = current_frame.current.get(time_id)
           if(!frame) return;
           is_changing.current = true
           const to = parseFloat(e.target.value)
+          if(!to) return;
+          
           goto(frame,to,undefined,()=>{
             is_changing.current = false
           })

@@ -55,6 +55,7 @@ export function tickBuilder(
           }
         }
         panel_ref.current?.controller_ref.current?.onChange(frame)
+        panel_ref.current?.input_ref.current?.onChange(frame)
         frame.swapping = false
         frame.swap_flag = false
       }
