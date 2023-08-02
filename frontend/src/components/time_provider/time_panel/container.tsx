@@ -108,7 +108,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
           />
           
           <InfoIcon
-            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
+            className="w-12 h-12 cursor-pointer p-2 text-slate-500"
             onClick={() => displayCollection(data.collection)}
           />
           
