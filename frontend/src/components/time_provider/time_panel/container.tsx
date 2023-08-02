@@ -8,23 +8,24 @@ import RotateIcon from "$/assets/icons/rotate.svg"
 import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
-import ChangeExpIcon from "$/assets/icons/change-exp.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import { MutableRefObject, PropsWithChildren, forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react"
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
-import { ViewCollection } from "@/components/sidebar/utils/CollectionDetails"
 import InfoIcon from "$/assets/icons/info.svg"
 import { isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
+import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+
 
 type Props = {
   className?: string
   time_id: TimeID,
   data:WorldData,
+  displayCollection : (collection : Collection) => void
   current_frame:TimeFrameRef
 }
 
@@ -33,7 +34,7 @@ export type ContainerRef = {
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
-  function Container({ time_id, data,current_frame, className, children }, ref) {
+  function Container({ time_id, data, className, current_frame, displayCollection, children }, ref) {
     const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
     const variables = useClusterStore((state) => state.variables)
@@ -50,15 +51,14 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         track:div_ref
       }
     })
-    const [display_collection_details, displayCollectionDetails] = useState(false)
+    
     const [display_buttons, displayButtons] = useState(false)
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={div_ref}>
         {children}
 
-        {display_collection_details && <ViewCollection displayCollectionDetails={displayCollectionDetails} collection={data.collection}/>}
-        {(data.collection && isPublication(data.collection)) && 
-        <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
+
+        {(data.collection && isPublication(data.collection)) && <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
             {data.collection.authors_short}, {data.collection.year}
         </p>}
         <div className="absolute top-0 left-0 flex m-2">
@@ -106,10 +106,12 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-500 child:fill-slate-500"
             onClick={() => displayButtons(true)}
           />
+          
           <InfoIcon
-            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
-            onClick={() => displayCollectionDetails((prev) => !prev)}
+            className="w-12 h-12 cursor-pointer p-2 text-slate-500"
+            onClick={() => displayCollection(data.collection)}
           />
+          
           <DuplicateIcon
             className="w-10 h-10 cursor-pointer p-2 text-slate-500"
             onClick={() => {

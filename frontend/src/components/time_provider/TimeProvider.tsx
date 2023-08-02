@@ -15,10 +15,14 @@ import { Panel, PanelRef } from "./time_panel/panel"
 import React from "react"
 import { Scene } from "./time_panel/scene"
 import { sync } from "@/utils/store/time/time.utils"
+import { Collection } from "@/utils/store/collection.store"
+import { ViewCollection } from "../sidebar/utils/CollectionDetails"
 
 type Props = {}
 
 export function TimeProvider(props: Props) {
+  const [current_collection_details, setCollectionDetails] = useState<Collection>()
+  const [display_view_collection, displayViewCollection] = useState<boolean>(true)
   const time_slots = useClusterStore((state) => state.time.slots)
   const variables = useClusterStore((state) => state.variables)
   const active_variables = useMemo(() => {
@@ -54,7 +58,11 @@ export function TimeProvider(props: Props) {
 
   return (
     <>
-
+      {
+       current_collection_details && display_view_collection && 
+        <ViewCollection closeViewCollection={() => displayViewCollection(false)} collection={current_collection_details}/>
+      }
+        
 
       <div className="flex flex-grow h-full">
         <div
@@ -72,6 +80,10 @@ export function TimeProvider(props: Props) {
               ([time_id,data]) => {
 
                 return <Panel
+                  displayCollection = {(collection : Collection) => {
+                    displayViewCollection(true)
+                    setCollectionDetails(collection)
+                  }}
                   current_frame={current_frame}
                   key={time_id}
                   data={data}
