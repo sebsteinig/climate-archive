@@ -10,8 +10,10 @@ import {
 } from "./api.types"
 
 // const URL_API = "http://localhost:3000/"
-const URL_API = "http://51.89.165.226:3000/"
-const URL_IMAGE = "http://51.89.165.226:3005/"
+// const URL_API = "http://51.89.165.226:3000/"
+// const URL_IMAGE = "http://51.89.165.226:3005/"
+const URL_API = "http://localhost:3000/"
+const URL_IMAGE = "http://localhost:3000/"
 
 /**
  * @param query {'title', 'journal', 'authors_short'}
