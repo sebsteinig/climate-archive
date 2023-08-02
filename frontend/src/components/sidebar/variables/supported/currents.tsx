@@ -12,10 +12,8 @@ export function Currents({
   return (
     <Variable
       title={currents.name}
-      toggle={() => currents.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      active={currents.active}
       controls={true}
     >
       <div>

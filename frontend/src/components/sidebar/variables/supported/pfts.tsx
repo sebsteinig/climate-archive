@@ -9,10 +9,8 @@ export function Pfts({
   return (
     <Variable
       title={pfts.name}
-      toggle={() => pfts.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      active={pfts.active}
       controls={false}
     >
       <div></div>

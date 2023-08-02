@@ -40,12 +40,14 @@ export function TimeProvider(props: Props) {
   const [current_collection_details, setCollectionDetails] = useState<Collection>()
   const [display_view_collection, displayViewCollection] = useState<boolean>(true)
   const time_slots = useClusterStore((state) => state.time.slots)
-  const variables = useClusterStore((state) => state.variables)
+  const stored_active_variables = useClusterStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
-    return Object.values(variables)
-      .filter((v) => v.active)
-      .map((e) => e.name)
-  }, [variables])
+    let actives = []
+    for (let [key, active] of stored_active_variables.entries()){
+      if (active) actives.push(key);
+    }
+    return actives
+  }, [stored_active_variables])
 
   // useEffect(() => {
   //   if (active_variable.length === 0) {

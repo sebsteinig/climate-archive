@@ -10,6 +10,7 @@ import EyeClosed from "$/assets/icons/eye-closed-slate-500.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
 import { VariableName } from "@/utils/store/variables/variable.types"
+import { useClusterStore } from "@/utils/store/cluster.store"
 
 export type VariableProps = {
   current_variable_controls: VariableName | undefined
@@ -17,9 +18,7 @@ export type VariableProps = {
 }
 
 type Props = VariableProps & {
-  toggle: Function
   controls: boolean
-  active: boolean
   title: VariableName
 }
 
@@ -102,31 +101,31 @@ function IconOf({
 }
 
 export function Variable({
-  toggle,
-  active,
   title,
   controls,
   current_variable_controls,
   setCurrentVariableControls,
   children,
 }: PropsWithChildren<Props>) {
+  const active_variables = useClusterStore((state) => state.active_variables)
+  const activate = useClusterStore((state) => state.activate)
   return (
     <div
       className={`group flex flex-row 
        bg-gray-900 cursor-pointer
          rounded-lg p-2 h-fit w-fit z-30 ${
-           active ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""
+          active_variables.get(title) ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""
          }`}
     >
-      <IconOf name={title} active={active} toggle={toggle} />
+      <IconOf name={title} active={active_variables.get(title)!} toggle={() => activate(title)} />
       <div
         className={
           current_variable_controls === title ? "" : "hidden group-hover:block"
         }
       >
-        <div onClick={() => toggle()} className="flex flex-wrap items-center">
+        <div onClick={() => activate(title)} className="flex flex-wrap items-center">
           <h3>{titleOf(title)} </h3>
-          {active ? (
+          {active_variables.get(title) ? (
             <EyeClosed className="w-8 text-slate-500 px-1 ml-2 h-8" />
           ) : (
             <Eye className="w-8 text-slate-500 px-1 ml-2 h-8" />
