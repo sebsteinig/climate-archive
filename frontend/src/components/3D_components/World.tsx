@@ -2,7 +2,7 @@
 import { useFrame } from "@react-three/fiber"
 import { useControls } from "leva"
 import { Perf } from "r3f-perf"
-import { useRef, forwardRef, RefObject } from "react"
+import { useRef, useEffect, forwardRef, RefObject } from "react"
 
 import * as THREE from "three"
 import { Title } from "./Title"
@@ -37,6 +37,22 @@ export function World({ tick }: Props) {
   console.log('creating World component')
 
   const atm2DRef = useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null)
+
+  useEffect(() => {
+    console.log("subscribe")
+    // Subscribe to store updates and update prRef.current whenever variables.pr changes
+    const unsubscribe = useClusterStore.subscribe(
+      (state) => {
+        atm2DRef.current.updateUserUniforms(state.variables.pr);
+      },
+    );
+  
+    // Cleanup the subscription on unmount
+    return () => {
+      console.log("unsubscribe")
+      unsubscribe();
+    };
+  }, []);
 
   useFrame((state, delta) => {
 

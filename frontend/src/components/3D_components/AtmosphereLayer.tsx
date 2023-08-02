@@ -44,52 +44,31 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
   console.log('creating AtmosphereLayer compnent')
 
   const materialRef = useRef(material)
-
-  // use hook because we want to use the store state, 
-  // but not re-render component when it changes
-  const prRef = useRef();
-  useEffect(() => {
-    console.log("subscribe")
-    // Subscribe to store updates and update prRef.current whenever variables.pr changes
-    const unsubscribe = useClusterStore.subscribe(
-      (state) => {
-        prRef.current = state.variables.pr;
-      },
-      (state) => state.variables.pr
-    );
-  
-    // Cleanup the subscription on unmount
-    return () => {
-      console.log("unsubscribe")
-      unsubscribe();
-    };
-  }, []);
   
   function tick(weight) {
-    
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
-
   }
 
-  function updateTextures(data, weight) {
-    
+  function updateUserUniforms(store) {
+    materialRef.current.uniforms.uUserMinValue.value = parseFloat(store.min)
+    materialRef.current.uniforms.uUserMaxValue.value = parseFloat(store.max)
+  }
 
+  function updateTextures(data, weight) { 
     materialRef.current.uniforms.thisDataFrame.value = loader.load(data.current_url)
     materialRef.current.uniforms.nextDataFrame.value = loader.load(data.next_url) 
-    materialRef.current.uniforms.thisDataMin.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight)].min * 86400.
-    materialRef.current.uniforms.thisDataMax.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight)].max * 86400.
-    materialRef.current.uniforms.nextDataMin.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight+1)].min * 86400.
-    materialRef.current.uniforms.nextDataMax.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight+1)].max * 86400.
-    materialRef.current.uniforms.uUserMinValue.value = parseFloat(prRef.current.min)
-    materialRef.current.uniforms.uUserMaxValue.value = parseFloat(prRef.current.max)
-
+    materialRef.current.uniforms.thisDataMin.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight)].min * 86400.
+    materialRef.current.uniforms.thisDataMax.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight)].max * 86400.
+    materialRef.current.uniforms.nextDataMin.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight+1)].min * 86400.
+    materialRef.current.uniforms.nextDataMax.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight+1)].max * 86400.
   }
 
   useImperativeHandle(ref,()=> 
   {
     return {
       tick,
-      updateTextures
+      updateTextures,
+      updateUserUniforms
     }
   })
 
