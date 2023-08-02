@@ -73,18 +73,13 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
 
   function updateTextures(data, weight) {
     
-    console.log(data.info.metadata)
 
     materialRef.current.uniforms.thisDataFrame.value = loader.load(data.current_url)
     materialRef.current.uniforms.nextDataFrame.value = loader.load(data.next_url) 
-    // materialRef.current.uniforms.thisDataMin.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight)].min * 86400.
-    // materialRef.current.uniforms.thisDataMax.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight)].max * 86400.
-    // materialRef.current.uniforms.nextDataMin.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight+1)].min * 86400.
-    // materialRef.current.uniforms.nextDataMax.value = data.info.metadata.metadata[12].bounds_matrix[0][Math.floor(weight+1)].max * 86400.
-    materialRef.current.uniforms.thisDataMin.value = 0
-    materialRef.current.uniforms.thisDataMax.value = 20
-    materialRef.current.uniforms.nextDataMin.value = 0
-    materialRef.current.uniforms.nextDataMax.value = 20
+    materialRef.current.uniforms.thisDataMin.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight)].min * 86400.
+    materialRef.current.uniforms.thisDataMax.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight)].max * 86400.
+    materialRef.current.uniforms.nextDataMin.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight+1)].min * 86400.
+    materialRef.current.uniforms.nextDataMax.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight+1)].max * 86400.
     materialRef.current.uniforms.uUserMinValue.value = parseFloat(prRef.current.min)
     materialRef.current.uniforms.uUserMaxValue.value = parseFloat(prRef.current.max)
 
