@@ -53,6 +53,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
 
           <Container
             displayCollection={displayCollection}
+            current_frame={current_frame}
             ref={container_ref}
             time_id={time_id}
             data={data}

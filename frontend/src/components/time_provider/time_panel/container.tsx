@@ -14,18 +14,21 @@ import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import { MutableRefObject, PropsWithChildren, forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react"
-import { TimeID, WorldData } from "@/utils/store/time/time.type"
+import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
 import { ViewCollection } from "@/components/sidebar/utils/CollectionDetails"
 import InfoIcon from "$/assets/icons/info.svg"
 import { isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
 import { Collection } from "@/utils/store/collection.store"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+
 
 type Props = {
   className?: string
   time_id: TimeID,
   data:WorldData,
   displayCollection : (collection : Collection) => void
+  current_frame:TimeFrameRef
 }
 
 export type ContainerRef = {
@@ -33,10 +36,16 @@ export type ContainerRef = {
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
-  function Container({ time_id, data, className, displayCollection, children }, ref) {
+  function Container({ time_id, data, className, current_frame, displayCollection, children }, ref) {
     const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
-
+    const variables = useClusterStore((state) => state.variables)
+    const active_variables = useMemo(() => {
+      return Object.values(variables)
+        .filter((v) => v.active)
+        .map((e) => e.name)
+    }, [variables])
+  
     const div_ref= useRef<HTMLDivElement>(null!)
 
     useImperativeHandle(ref,()=>{
@@ -46,23 +55,43 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     })
     const [display_collection_details, displayCollectionDetails] = useState(false)
     const [display_buttons, displayButtons] = useState(false)
-    const [display_exps, displayExps] = useState(false)
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={div_ref}>
         {children}
 
+
         {(data.collection && isPublication(data.collection)) && <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
             {data.collection.authors_short}, {data.collection.year}
         </p>}
-        <CrossIcon
-          className="absolute top-0 left-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
-          onClick={() => remove(time_id)}
-        />
-        {display_exps && <div className="absolute z-30 bottom-3 right-24">
-          <Select onChange={() => {displayExps(false)} }>
-            {data.collection?.exps.map((e) => <option key={e.id}>{e.id}</option>)}
-          </Select>
-        </div>}
+        <div className="absolute top-0 left-0 flex m-2">
+            <CrossIcon
+              className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+              onClick={() => remove(time_id)}
+            />
+            <Select 
+              className="ml-5"
+              onChange={
+              (e) => {
+                  const idx = e.target.selectedIndex
+                  const exp = data.collection.exps[idx]
+
+                  database_provider.load({
+                    exp_id: exp.id,
+                  }).then(
+                    () => {
+                      const frame = current_frame.current.get(time_id)
+                      if(!frame) return;
+                      current_frame.current.init(time_id,exp,active_variables).then(()=>{})
+                    }
+                  )
+              } 
+            }>
+              {data.collection?.exps.map((e) => {
+                const label = `${e.metadata[0].metadata.text}`
+                return <option key={e.id}>{e.id} | {label}</option>
+              })}
+            </Select>
+        </div>
         <div
           className={`absolute z-30 group bottom-0 right-0 bg-gray-900
          rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}
@@ -71,18 +100,18 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             <PanelConfiguration
               time_id={time_id}
               data={data}
-              displayExps={displayExps}
               displayButtons={displayButtons}
             />
           )}
 
-          {!display_buttons && (
-            <ArrowUpIcon
-              className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-500 child:fill-slate-500"
-              onClick={() => displayButtons(true)}
-            />
-          )}
-
+          <ArrowUpIcon
+            className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-500 child:fill-slate-500"
+            onClick={() => displayButtons(true)}
+          />
+          <InfoIcon
+            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
+            onClick={() => displayCollectionDetails((prev) => !prev)}
+          />
           <DuplicateIcon
             className="w-10 h-10 cursor-pointer p-2 text-slate-500"
             onClick={() => {
@@ -105,14 +134,12 @@ type ConfProps = {
   displayButtons: (bool: boolean) => void
   time_id: TimeID
   data: WorldData
-  displayExps: Function
 }
 
 function PanelConfiguration({
   time_id,
   data,
   displayButtons,
-  displayExps
 }: ConfProps) {
   const [as_planet, setAsPlanet] = useState(true)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
@@ -170,11 +197,6 @@ function PanelConfiguration({
 
       <PinIcon
         className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500`}
-      />
-
-      <ChangeExpIcon 
-        className={`cursor-pointer w-8 h-8 my-2`} 
-        onClick={()=> displayExps((prev:boolean) => !prev)}
       />
     </div>
   )
