@@ -9,8 +9,8 @@ import {
   SelectCollectionResult,
 } from "./api.types"
 
-const URL_API = "http://localhost:3000/"
-const URL_IMAGE = "http://localhost:3060/"
+const URL_API = "http://51.89.165.226:3000/"
+const URL_IMAGE = "http://51.89.165.226:3005/"
 
 /**
  * @param query {'title', 'journal', 'authors_short'}
@@ -105,9 +105,9 @@ export async function selectAll(query: SelectCollectionParameter) {
 }
 
 export async function getImage(path: string) {
-  let url = URL + path
+  let url = new URL(trimRoutes(path,6), URL_IMAGE)
   try {
-    let data = await axios.get(url, {
+    let data = await axios.get(url.href, {
       responseType: "arraybuffer",
     })
 
@@ -123,10 +123,14 @@ export async function getImage(path: string) {
   }
 }
 
+function trimRoutes(path:string,nb_of_sub_route:number):string {
+  return path.split("/").slice(nb_of_sub_route).reduce((acc,route)=>`${acc}/${route}`,'')
+}
+
 export async function getImageArrayBuffer(path: string) {
-  let url = URL_API + path
+  let url = new URL(trimRoutes(path,7), URL_IMAGE)
   try {
-    let res = await axios.get(url, {
+    let res = await axios.get(url.href, {
       responseType: "arraybuffer",
     })
 
