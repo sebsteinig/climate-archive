@@ -66,7 +66,8 @@ ctx.drawImage(
     xsize,
     ysize,
 )
-res = canvas.toDataURL("image/png")
+// res = canvas.toDataURL("image/png")
+res = canvas.toDataURL("image/webp")
 cache.set(JSON.stringify({ path, frame, vertical }), res)
 return res
 }

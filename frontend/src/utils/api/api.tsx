@@ -9,9 +9,9 @@ import {
   SelectCollectionResult,
 } from "./api.types"
 
-const URL_API = "http://localhost:3000/"
-// const URL_API = "http://51.89.165.226:3000/"
-const URL_IMAGE = "http://localhost:3060/"
+// const URL_API = "http://localhost:3000/"
+const URL_API = "http://51.89.165.226:3000/"
+const URL_IMAGE = "https://www.paleo.bristol.ac.uk/"
 
 /**
  * @param query {'title', 'journal', 'authors_short'}
@@ -125,9 +125,15 @@ export async function getImage(path: string) {
 }
 
 export async function getImageArrayBuffer(path: string) {
-  let url = URL_API + path
+  console.log(path.split('/').slice(6).reduce((acc,e)=>acc+'/'+e,''));
+  
+  //BRIDGE server
+  // let url = new URL(path.split('/').slice(4).reduce((acc,e)=>acc+'/'+e,''), URL_IMAGE)
+  let url = new URL(path.split('/').slice(6).reduce((acc,e)=>acc+'/'+e,''), URL_API)
+
+  // let url = URL_API + path
   try {
-    let res = await axios.get(url, {
+    let res = await axios.get(url.href, {
       responseType: "arraybuffer",
     })
 

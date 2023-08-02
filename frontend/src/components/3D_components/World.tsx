@@ -54,10 +54,7 @@ export function World({ tick }: Props) {
           }
         }
       } 
-
-
     })
-
   })
 
   return (
