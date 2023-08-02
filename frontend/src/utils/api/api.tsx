@@ -11,7 +11,7 @@ import {
 
 // const URL_API = "http://localhost:3000/"
 const URL_API = "http://51.89.165.226:3000/"
-const URL_IMAGE = "https://www.paleo.bristol.ac.uk/"
+const URL_IMAGE = "http://51.89.165.226:3005/"
 
 /**
  * @param query {'title', 'journal', 'authors_short'}
@@ -125,11 +125,11 @@ export async function getImage(path: string) {
 }
 
 export async function getImageArrayBuffer(path: string) {
-  console.log(path.split('/').slice(6).reduce((acc,e)=>acc+'/'+e,''));
+  console.log(path.split('/').slice(7).reduce((acc,e)=>acc+'/'+e,''));
   
   //BRIDGE server
   // let url = new URL(path.split('/').slice(4).reduce((acc,e)=>acc+'/'+e,''), URL_IMAGE)
-  let url = new URL(path.split('/').slice(6).reduce((acc,e)=>acc+'/'+e,''), URL_API)
+  let url = new URL(path.split('/').slice(7).reduce((acc,e)=>acc+'/'+e,''), URL_IMAGE)
 
   // let url = URL_API + path
   try {
