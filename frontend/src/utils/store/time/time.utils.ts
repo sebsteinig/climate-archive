@@ -16,7 +16,7 @@ export function buildWorldConf(config?: WorldConf): WorldConf {
 export function buildTimeConf(config ?: TimeConf) : TimeConf {
     return {
         direction: config?.direction ?? TimeDirection.forward,
-        kind : config?.kind ?? TimeKind.walk,
+        kind : config?.kind ?? TimeKind.circular,
         speed : 1,
     }
 }

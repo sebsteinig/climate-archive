@@ -9,6 +9,7 @@ import {
   SelectCollectionResult,
 } from "./api.types"
 
+// const URL_API = "http://localhost:3000/"
 const URL_API = "http://51.89.165.226:3000/"
 const URL_IMAGE = "http://51.89.165.226:3005/"
 
@@ -105,7 +106,7 @@ export async function selectAll(query: SelectCollectionParameter) {
 }
 
 export async function getImage(path: string) {
-  let url = new URL(trimRoutes(path,6), URL_IMAGE)
+  let url = new URL(trimRoutes(path,7), URL_IMAGE)
   try {
     let data = await axios.get(url.href, {
       responseType: "arraybuffer",

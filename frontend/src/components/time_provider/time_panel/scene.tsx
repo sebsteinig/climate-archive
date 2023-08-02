@@ -24,10 +24,6 @@ export function Scene({
   active_variables,
   canvas,
 }: SceneProps) {
-  var config = {
-    model: "Dune",
-    heightData: "/assets/textures/tfgzk_height.smoothed.png",
-  }
   const camera = useRef()
   if(!panel_ref.current?.container_ref.current){
     return null
@@ -35,7 +31,6 @@ export function Scene({
   return (
     <View track={panel_ref.current!.container_ref.current!.track}>
       <World
-        config={config}
         tick={tickBuilder(
           time_id,
           panel_ref,

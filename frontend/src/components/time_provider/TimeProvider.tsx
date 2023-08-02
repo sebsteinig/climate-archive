@@ -20,22 +20,6 @@ import { ViewCollection } from "../sidebar/utils/CollectionDetails"
 
 type Props = {}
 
-var config = {
-  model: "Dune",
-  heightData: "/assets/textures/tfgzk_height.smoothed.png",
-}
-
-// const panel_refs = new Map<TimeID, RefObject<PanelRef>>();
-// function setRef(key: TimeID): RefObject<PanelRef>  {
-//   const ref = React.createRef<PanelRef>();
-//   panel_refs.set(key, ref);
-//   return ref;
-// }
-
-// function getRef(key: TimeID): React.RefObject<PanelRef> | undefined {
-//   return panel_refs.get(key) as React.RefObject<PanelRef>;
-// }
-
 export function TimeProvider(props: Props) {
   const [current_collection_details, setCollectionDetails] = useState<Collection>()
   const [display_view_collection, displayViewCollection] = useState<boolean>(true)
