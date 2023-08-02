@@ -8,14 +8,12 @@ import RotateIcon from "$/assets/icons/rotate.svg"
 import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
-import ChangeExpIcon from "$/assets/icons/change-exp.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import { MutableRefObject, PropsWithChildren, forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react"
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
-import { ViewCollection } from "@/components/sidebar/utils/CollectionDetails"
 import InfoIcon from "$/assets/icons/info.svg"
 import { isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
@@ -53,7 +51,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         track:div_ref
       }
     })
-    const [display_collection_details, displayCollectionDetails] = useState(false)
+    
     const [display_buttons, displayButtons] = useState(false)
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={div_ref}>
@@ -108,10 +106,12 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-500 child:fill-slate-500"
             onClick={() => displayButtons(true)}
           />
+          
           <InfoIcon
             className="w-10 h-10 cursor-pointer p-2 text-slate-500"
-            onClick={() => displayCollectionDetails((prev) => !prev)}
+            onClick={() => displayCollection(data.collection)}
           />
+          
           <DuplicateIcon
             className="w-10 h-10 cursor-pointer p-2 text-slate-500"
             onClick={() => {
@@ -119,10 +119,6 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             }}
           />
 
-          <InfoIcon
-            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
-            onClick={() => displayCollection(data.collection)}
-          />
 
         </div>
       </div>
