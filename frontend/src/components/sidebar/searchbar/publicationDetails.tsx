@@ -36,6 +36,7 @@ export default function PublicationDetails({
             // const request = {
             //   exp_ids: publication.exps.map((e) => e.id),
             // }
+            publication.exps = publication.exps.filter(e=> e.id)
             await database_provider.load({
               exp_id: publication.exps[0].id,
             })
