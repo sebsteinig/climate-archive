@@ -37,12 +37,14 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
   function Container({ time_id, data, className, current_frame, displayCollection, children }, ref) {
     const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
-    const variables = useClusterStore((state) => state.variables)
+    const stored_active_variables = useClusterStore((state) => state.active_variables)
     const active_variables = useMemo(() => {
-      return Object.values(variables)
-        .filter((v) => v.active)
-        .map((e) => e.name)
-    }, [variables])
+      let actives = []
+      for (let [key, active] of stored_active_variables.entries()){
+        if (active) actives.push(key);
+      }
+      return actives
+    }, [stored_active_variables])
   
     const div_ref= useRef<HTMLDivElement>(null!)
 

@@ -12,10 +12,8 @@ export function Tos({
   return (
     <Variable
       title={tos.name}
-      toggle={() => tos.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      active={tos.active}
       controls={true}
     >
       <div>

@@ -11,10 +11,8 @@ export function Height({
   return (
     <Variable
       title={height.name}
-      toggle={() => height.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      active={height.active}
       controls={true}
     >
       <div>

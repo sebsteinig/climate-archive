@@ -12,10 +12,8 @@ export function Pr({
   return (
     <Variable
       title={pr.name}
-      toggle={() => pr.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      active={pr.active}
       controls={true}
     >
       <div>

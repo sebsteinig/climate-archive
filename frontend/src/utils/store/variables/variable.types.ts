@@ -14,7 +14,6 @@ export enum VariableName {
 }
 
 type Variable = {
-  active: boolean
   name: VariableName
 }
 
@@ -27,7 +26,7 @@ export type Currents = Variable & {
   color_by_magnitude: boolean
 }
 export interface CurrentsSlice extends Currents {
-  toggle: () => void
+  //toggle: () => void
   updateAnimationSpeed: (value: number) => void
   updateReferenceSpeed: (value: number) => void
   updateArrows: (value: number) => void
@@ -38,30 +37,30 @@ export interface CurrentsSlice extends Currents {
 
 export type Clt = Variable & {}
 export interface CltSlice extends Clt {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Height = Variable & {
   diplacement: number
 }
 export interface HeightSlice extends Height {
-  toggle: () => void
+  //toggle: () => void
   updateDiplacement: (value: number) => void
 }
 
 export type Liconc = Variable & {}
 export interface LiconcSlice extends Liconc {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Mlotst = Variable & {}
 export interface MlotstSlice extends Mlotst {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Pfts = Variable & {}
 export interface PftsSlice extends Pfts {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Pr = Variable & {
@@ -69,24 +68,24 @@ export type Pr = Variable & {
   max: number
 }
 export interface PrSlice extends Pr {
-  toggle: () => void
+  //toggle: () => void
   updateMin: (value: number) => void
   updateMax: (value: number) => void
 }
 
 export type Sic = Variable & {}
 export interface SicSlice extends Sic {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Snc = Variable & {}
 export interface SncSlice extends Snc {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Tas = Variable & {}
 export interface TasSlice extends Tas {
-  toggle: () => void
+  //toggle: () => void
 }
 
 export type Tos = Variable & {
@@ -97,7 +96,7 @@ export type Tos = Variable & {
   sea_ice: boolean
 }
 export interface TosSlice extends Tos {
-  toggle: () => void
+  //toggle: () => void
   updateMin: (value: number) => void
   updateMax: (value: number) => void
   updateAnomalyRange: (value: number) => void
@@ -115,7 +114,7 @@ export type Winds = Variable & {
   color_by_magnitude: boolean
 }
 export interface WindsSlice extends Winds {
-  toggle: () => void
+  //toggle: () => void
   updateAnimationSpeed: (value: number) => void
   updateReferenceSpeed: (value: number) => void
   updateMinSpeed: (value: number) => void

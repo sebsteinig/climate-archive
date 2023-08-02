@@ -12,10 +12,8 @@ export function Winds({
   return (
     <Variable
       title={winds.name}
-      toggle={() => winds.toggle()}
       current_variable_controls={current_variable_controls}
       setCurrentVariableControls={setCurrentVariableControls}
-      active={winds.active}
       controls={true}
     >
       <div>
