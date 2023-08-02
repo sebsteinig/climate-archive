@@ -107,7 +107,10 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
               {exps.length > 0 &&
                 exps.map((exp) => {
                   let label =
-                    exp.metadata.length > 0 ? exp.metadata[0].metadata.text : ""
+                    exp.metadata.length == 1 ? exp.metadata[0].metadata.text : ""
+                  if (exp.metadata.length > 1){
+                    label = exp.metadata.filter((m) => m.metadata.age)[0].metadata.age
+                  }
                   return (
                     <tr
                       className="w-full border-b dark:border-neutral-500"
