@@ -2,11 +2,10 @@
 
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import ButtonPrimary from "../../buttons/ButtonPrimary"
-import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useClusterStore } from "@/utils/store/cluster.store"
 import { Publication } from "../../../utils/types"
 import { TimeMode } from "@/utils/store/time/time.type"
 import { CollectionDetails } from "../utils/CollectionDetails"
+import Link from 'next/link'
 
 type Props =  {
   publication : Publication
@@ -19,9 +18,6 @@ export default function PublicationDetails({
   setDisplaySeeDetails,
   setSearchBarVisible,
 }: Props) {
-  const add = useClusterStore((state) => state.time.add)
-  
-  const addCollection = useClusterStore((state) => state.addCollection)
 
   return (
     <div className="border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4">
@@ -30,25 +26,12 @@ export default function PublicationDetails({
         onClick={() => setDisplaySeeDetails(false)}
       />
       <CollectionDetails collection={publication}>
-        <ButtonPrimary
-          onClick={async () => {
-            setSearchBarVisible(false)
-            // const request = {
-            //   exp_ids: publication.exps.map((e) => e.id),
-            // }
-            publication.exps = publication.exps.filter(e=> e.id)
-            await database_provider.load({
-              exp_id: publication.exps[0].id,
-            })
-            console.log(publication.exps);
-            
-            const idx = await database_provider.addCollectionToDb(publication)
-            addCollection(idx, publication)
-            add( publication )
-          }}
-        >
-          Load
-        </ButtonPrimary>
+        <Link href={`/publication/${publication.authors_short.replaceAll(" ", ".")}*${publication.year}`}>
+          <ButtonPrimary
+            onClick={() => {/*setSearchBarVisible(false)*/}}>
+            Load
+          </ButtonPrimary>
+        </Link>
       </CollectionDetails>
     </div>
   )

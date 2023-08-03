@@ -1,3 +1,4 @@
+'use client'
 import { useState } from "react"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Variables } from "./variables/Variables"
