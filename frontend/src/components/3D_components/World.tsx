@@ -32,7 +32,8 @@ type Props = {
   >
 }
 
-export function World ({ tick }: Props) {
+const World = memo(({ tick }: Props) => {
+// export function World ({ tick }: Props) {
 
   console.log('creating World component')
 
@@ -59,7 +60,6 @@ export function World ({ tick }: Props) {
     // console.log(state.scene.children)
     tick(delta).then((res) => {
       
-
       atm2DRef.current.tick(res.weight)
 
       if (res.variables.size != 0) {
@@ -88,4 +88,6 @@ export function World ({ tick }: Props) {
       <Perf position="bottom-right" />
     </>
   )
-}
+});
+
+export { World };
