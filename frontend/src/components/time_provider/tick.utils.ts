@@ -3,35 +3,24 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { TimeFrameState, TimeMode } from "@/utils/store/time/time.type"
 import { LRUCache } from "lru-cache"
 import { CanvasRef } from "./useCanvas"
-import { TickData } from "./tick"
+import { TickData, TickDataState } from "./tick"
+import { VariableName } from "@/utils/store/variables/variable.types"
+import { chunksDetails } from "@/utils/store/time/time.utils"
 
 export function getPath(
-mode: TimeMode,
-data: TimeFrameState,
-info: TextureInfo,
-): [string, string] {
-    let current_path: string
-    let next_path: string
-    switch (mode) {
-        case TimeMode.mean:
-        current_path =
-        info.paths_mean.paths[0].grid[0][data.current.time_chunk]
-        next_path = info.paths_mean.paths[0].grid[0][data.next.time_chunk]
-        return [current_path, next_path]
-        case TimeMode.ts:
-        current_path =
-        info.paths_ts.paths[0].grid[0][data.current.time_chunk]
-        next_path = info.paths_ts.paths[0].grid[0][data.next.time_chunk]
-        // console.log(
-        //     {
-        //         current_path,
-        //         next_path,
-        //         data,
-        //     }
-        // );
+    mode: TimeMode,
+    data: TimeFrameState,
+    vertical:number,
+    info: TextureInfo,
+): {current_path:string,next_path:string}[] {
 
-        return [current_path, next_path]
-    }
+    return info.paths_ts.paths.map((path)=> {
+        const paths = path.grid[vertical]
+        return {
+            current_path:paths[data.current.time_chunk],
+            next_path:paths[data.next.time_chunk],
+        }
+    })
 }
 
 const cache: LRUCache<string, string> = new LRUCache({
@@ -81,51 +70,80 @@ destination: number,
 return 0
 }
 
+function processInfo(variable:VariableName,t:number,z:number,info:TextureInfo) : TickDataState{
+    const metadata = info.metadata as {
+        metadata : {
+            bounds_matrix:{
+                max:string
+                min:string
+            }[][]
+        }[]
+    }
+    const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
 
+    const min = bound_matrices.map(matrix => parseFloat(matrix[z][t].min))
+    const max = bound_matrices.map(matrix => parseFloat(matrix[z][t].max))
+    return {
+        min,
+        max,
+        levels:info.levels,
+        timesteps:info.timesteps,
+        xsize:info.xsize,
+        xfirst:info.xfirst,
+        xinc:info.xinc,
+        ysize:info.ysize,
+        yfirst:info.yfirst,
+        yinc:info.yinc,
+        nan_value_encoding:info.nan_value_encoding,
+    }
+}
 
-export async function compute(data:TimeFrameState,canvas:CanvasRef) : Promise<TickData|undefined>{
-    const [current_path, next_path] = getPath(
+async function getTextureFromPath(path:string,time:number,vertical:number,info:TextureInfo,canvas:HTMLCanvasElement,ctx:CanvasRenderingContext2D) {
+    const texture = await database_provider.getTexture(path)
+    const blob = new Blob([texture.image], {
+        type: `image/${info.extension.toLowerCase()}`,
+    })
+    const bitmap = await createImageBitmap(blob)
+    const url = crop(
+        canvas,
+        ctx,
+        bitmap,
+        path,
+        time,
+        vertical,
+        info.xsize,
+        info.ysize,
+    )
+    return url
+}
+
+export async function compute(variable:VariableName,data:TimeFrameState,canvas:CanvasRef) : Promise<TickData|undefined>{
+    const paths = getPath(
         TimeMode.ts,
         data,
+        0,
         data.info,
       )
-    const current_texture = await database_provider.getTexture(current_path)
-    const next_texture = await database_provider.getTexture(next_path)
-
-    const current_blob = new Blob([current_texture.image], {
-    type: "image/png",
-    })
-    const next_blob = new Blob([next_texture.image], { type: "image/png" })
-
-    const current_bitmap = await createImageBitmap(current_blob)
-    const next_bitmap = await createImageBitmap(next_blob)
     if (!canvas.current|| !canvas.current.current.ctx || !canvas.current.next.ctx) {
         return
     }
+    const textures = await Promise.all(paths.map(async ({current_path,next_path}) => {
+        const current_url = await getTextureFromPath(current_path,data.current.frame,0,data.info,canvas.current!.current.canvas,canvas.current!.current.ctx!)
+        const next_url = await getTextureFromPath(current_path,data.current.frame,0,data.info,canvas.current!.next.canvas,canvas.current!.next.ctx!)
 
-    const current_url = crop(
-        canvas.current.current.canvas,
-        canvas.current.current.ctx,
-        current_bitmap,
-        current_path,
-        data.current.frame,
-        0,
-        data.info.xsize,
-        data.info.ysize,
-    )
-    const next_url = crop(
-        canvas.current.next.canvas,
-        canvas.current.next.ctx,
-        next_bitmap,
-        next_path,
-        data.next.frame,
-        0,
-        data.info.xsize,
-        data.info.ysize,
-    )
+        return {
+            current_url,
+            next_url
+        }
+    }))
+    
+    const [_, fpc] = chunksDetails(data.info)
+    const current_t = data.current.frame + data.current.time_chunk*fpc
+    const next_t = data.next.frame + data.next.time_chunk*fpc
+
     return {
-        current_url,
-        next_url,
-        info: data.info,
+        textures,
+        current:processInfo(variable,current_t,0,data.info),
+        next:processInfo(variable,next_t,0,data.info),
     }
 }

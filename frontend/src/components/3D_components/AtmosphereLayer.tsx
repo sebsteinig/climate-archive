@@ -1,11 +1,13 @@
 "use client"
-import { forwardRef, useImperativeHandle, useRef, useEffect } from "react"
+import { forwardRef, useImperativeHandle, useRef, useEffect, RefObject } from "react"
 import { memo } from 'react';
 import * as THREE from 'three'
-import vertexShader from '../../shaders/precipitationVert.glsl'
-import fragmentShader from '../../shaders/precipitationFrag.glsl'
+import vertexShader from '$/shaders/precipitationVert.glsl'
+import fragmentShader from '$/shaders/precipitationFrag.glsl'
 import { createColormapTexture } from '../../utils/three/colormapTexture.js'
 import { useClusterStore } from "@/utils/store/cluster.store"
+import { TickData } from "../time_provider/tick";
+import { PrSlice } from "@/utils/store/variables/variable.types";
 
 type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 
@@ -39,15 +41,25 @@ const material = new THREE.ShaderMaterial( {
   },
 } );
 
-const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
+type Props = {
+
+}
+
+export type AtmosphereLayerRef = {
+  type : RefObject<SphereType>,
+  updateTextures : (data:TickData) => void
+  tick: (weight:number) => void
+}
+
+const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) => {
 
   console.log('creating AtmosphereLayer compnent')
-
+  const atmosphere_layer_ref = useRef<SphereType>(null)
   const materialRef = useRef(material)
 
   // use hook because we want to use the store state, 
   // but not re-render component when it changes
-  const prRef = useRef();
+  const prRef = useRef<PrSlice>(null!);
   useEffect(() => {
     console.log("subscribe")
     // Subscribe to store updates and update prRef.current whenever variables.pr changes
@@ -55,7 +67,7 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
       (state) => {
         prRef.current = state.variables.pr;
       },
-      (state) => state.variables.pr
+      //(state) => state.variables.pr
     );
   
     // Cleanup the subscription on unmount
@@ -65,29 +77,30 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
     };
   }, []);
   
-  function tick(weight) {
+  function tick(weight:number) {
     
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
 
   }
 
-  function updateTextures(data, weight) {
+  function updateTextures(data:TickData) {
     
 
-    materialRef.current.uniforms.thisDataFrame.value = loader.load(data.current_url)
-    materialRef.current.uniforms.nextDataFrame.value = loader.load(data.next_url) 
-    materialRef.current.uniforms.thisDataMin.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight)].min * 86400.
-    materialRef.current.uniforms.thisDataMax.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight)].max * 86400.
-    materialRef.current.uniforms.nextDataMin.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight+1)].min * 86400.
-    materialRef.current.uniforms.nextDataMax.value = data.info.metadata.metadata[0].bounds_matrix[0][Math.floor(weight+1)].max * 86400.
-    materialRef.current.uniforms.uUserMinValue.value = parseFloat(prRef.current.min)
-    materialRef.current.uniforms.uUserMaxValue.value = parseFloat(prRef.current.max)
+    materialRef.current.uniforms.thisDataFrame.value = loader.load(data.textures[0].current_url)
+    materialRef.current.uniforms.nextDataFrame.value = loader.load(data.textures[0].next_url) 
+    materialRef.current.uniforms.thisDataMin.value = data.current.min[0] * 86400.
+    materialRef.current.uniforms.thisDataMax.value = data.current.max[0]  * 86400.
+    materialRef.current.uniforms.nextDataMin.value = data.next.min[0]  * 86400.
+    materialRef.current.uniforms.nextDataMax.value = data.next.max[0]  * 86400.
+    materialRef.current.uniforms.uUserMinValue.value = prRef.current?.min ?? 0
+    materialRef.current.uniforms.uUserMaxValue.value = prRef.current?.max ?? 20
 
   }
 
   useImperativeHandle(ref,()=> 
   {
     return {
+      type:atmosphere_layer_ref,
       tick,
       updateTextures
     }
@@ -95,7 +108,7 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
 
   return (
     <mesh 
-      ref={ref} 
+      ref={atmosphere_layer_ref} 
       geometry={ geometry }
       material={ material }>
     </mesh>

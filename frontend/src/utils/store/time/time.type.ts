@@ -48,6 +48,7 @@ export type TimeFrameState = {
 export type TimeFrame = {
   exp: Experiment
   //ts_idx : number
+  uSphereWrapAmount:number,
   variables: Map<VariableName, TimeFrameState>
   weight: number
   swap_flag : boolean
