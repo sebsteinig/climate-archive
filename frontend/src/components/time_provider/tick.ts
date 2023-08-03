@@ -70,13 +70,10 @@ export function tickBuilder(
         frame.swapping = true
         update_texture = true
         await update(frame,active_variables)
-        console.log(frame);
         
         for(let [variable,state] of frame.variables) {
           const data = await compute(variable,state,canvas)
           if(data) {
-            console.log(data);
-            
             res.set(variable,data)
           }
         }
