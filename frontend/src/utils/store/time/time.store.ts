@@ -17,6 +17,7 @@ export interface TimeSlice {
     slots : Slots
 
     add : (collection:Collection) => void
+    replace : (collection:Collection) => void
     remove : (id:TimeID) => void
     dup : (time_id:TimeID) => void
 
@@ -70,6 +71,17 @@ export const createTimeSlice: StateCreator<
             })
           })
       },
+      replace(collection) {
+        set(state => {
+          state.time.__auto_increment += 1
+          state.time.slots.clear()
+          state.time.slots.set(state.time.__auto_increment,{
+            collection,
+            conf : buildWorldConf(),
+            time : buildTimeConf(),
+          })
+        })
+    },
       dup(time_id) {
         set(state => {
           const data = state.time.slots.get(time_id)
