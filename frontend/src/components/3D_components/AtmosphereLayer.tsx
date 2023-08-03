@@ -14,36 +14,38 @@ const loader = new THREE.TextureLoader();
 const cmap = createColormapTexture('YlGnBu-9')
 
 const geometry = new THREE.PlaneGeometry(4, 2, 64, 32);
-const material = new THREE.ShaderMaterial( {
-  vertexShader: vertexShader,
-  fragmentShader: fragmentShader,
-  wireframe: false,
-  transparent: true,
-  side: THREE.DoubleSide,
-  uniforms: {
-    uFrameWeight: {value: null},
-    uSphereWrapAmount: {value: 0.0},
-    uLayerHeight: {value: 0.15},
-    uLayerOpacity: {value: 1.0},
-    thisDataFrame: {value: null},
-    nextDataFrame: {value: null}, 
-    thisDataMin: {value: null},
-    thisDataMax: {value: null},
-    nextDataMin: {value: null},
-    nextDataMax: {value: null},
-    uUserMinValue: {value: null},
-    uUserMaxValue: {value: null},
-    colorMap: {value: cmap},
-    numLon: {value: 96},
-    numLat: {value: 73},
-  },
-} );
 
 const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
 
+  const materialRef = useRef(new THREE.ShaderMaterial( {
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    wireframe: false,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      uFrameWeight: {value: null},
+      uSphereWrapAmount: {value: 0.0},
+      uLayerHeight: {value: 0.15},
+      uLayerOpacity: {value: 1.0},
+      thisDataFrame: {value: null},
+      nextDataFrame: {value: null}, 
+      thisDataMin: {value: null},
+      thisDataMax: {value: null},
+      nextDataMin: {value: null},
+      nextDataMax: {value: null},
+      uUserMinValue: {value: null},
+      uUserMaxValue: {value: null},
+      colorMap: {value: cmap},
+      numLon: {value: 96},
+      numLat: {value: 73},
+    },
+  } ));
+
   console.log('creating AtmosphereLayer compnent')
 
-  const materialRef = useRef(material)
+  // const materialRef = useRef(material)
+
   
   function tick(weight) {
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
@@ -73,10 +75,10 @@ const AtmosphereLayer = memo(forwardRef<SphereType, null>(({ }, ref) => {
   })
 
   return (
-    <mesh 
+    <mesh
       ref={ref} 
       geometry={ geometry }
-      material={ material }>
+      material={ materialRef.current }>
     </mesh>
   )
 }))

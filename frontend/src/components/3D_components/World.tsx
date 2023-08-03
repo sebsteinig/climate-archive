@@ -2,7 +2,7 @@
 import { useFrame } from "@react-three/fiber"
 import { useControls } from "leva"
 import { Perf } from "r3f-perf"
-import { useRef, useEffect, forwardRef, RefObject } from "react"
+import { memo, useRef, useEffect, forwardRef, RefObject } from "react"
 
 import * as THREE from "three"
 import { Title } from "./Title"
@@ -32,7 +32,7 @@ type Props = {
   >
 }
 
-export function World({ tick }: Props) {
+export function World ({ tick }: Props) {
 
   console.log('creating World component')
 
@@ -56,7 +56,9 @@ export function World({ tick }: Props) {
 
   useFrame((state, delta) => {
 
+    // console.log(state.scene.children)
     tick(delta).then((res) => {
+      
 
       atm2DRef.current.tick(res.weight)
 
