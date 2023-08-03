@@ -87,7 +87,10 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
               } 
             }>
               {data.collection?.exps.map((e) => {
-                const label = `${e.metadata[0].metadata.text}`
+                let label = e.metadata.length == 1 ? `${e.metadata[0].metadata.text}` : ""
+                if (e.metadata.length > 1){
+                  label = e.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
+                }
                 return <option key={e.id}>{e.id} | {label}</option>
               })}
             </Select>
