@@ -129,7 +129,7 @@ export async function compute(variable:VariableName,data:TimeFrameState,canvas:C
     }
     const textures = await Promise.all(paths.map(async ({current_path,next_path}) => {
         const current_url = await getTextureFromPath(current_path,data.current.frame,0,data.info,canvas.current!.current.canvas,canvas.current!.current.ctx!)
-        const next_url = await getTextureFromPath(current_path,data.current.frame,0,data.info,canvas.current!.next.canvas,canvas.current!.next.ctx!)
+        const next_url = await getTextureFromPath(next_path,data.next.frame,0,data.info,canvas.current!.next.canvas,canvas.current!.next.ctx!)
 
         return {
             current_url,
