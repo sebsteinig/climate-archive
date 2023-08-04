@@ -5,14 +5,11 @@ import { Collection } from "@/utils/store/collection.store"
 
 type Props = {
   publications: Publication[]
-  displayCollection : (collection:Collection) => void
+  displayCollection: (collection: Collection) => void
 }
 
-export function Publications({
-  publications,
-  displayCollection,
-}: Props) {
-    useState<Publication>()
+export function Publications({ publications, displayCollection }: Props) {
+  useState<Publication>()
   return (
     <div>
       <div>

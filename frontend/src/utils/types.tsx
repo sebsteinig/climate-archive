@@ -8,7 +8,8 @@ export type Experiment = {
         }
       | {
           age: string
-      } | any
+        }
+      | any
   }[]
 }
 

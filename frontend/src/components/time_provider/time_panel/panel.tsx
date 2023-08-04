@@ -1,14 +1,5 @@
-import {
-  TimeFrameRef,
-  TimeID,
-  WorldData,
-} from "@/utils/store/time/time.type"
-import {
-  RefObject,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-} from "react"
+import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import {
   ControllerRef,
   TimeController,
@@ -19,21 +10,21 @@ import { gridOf } from "@/utils/types.utils"
 import { Collection } from "@/utils/store/collection.store"
 
 export type PanelProps = {
-  displayCollection : (collection : Collection) => void
-  time_id:TimeID
-  grid_id:number
+  displayCollection: (collection: Collection) => void
+  time_id: TimeID
+  grid_id: number
   data: WorldData
   current_frame: TimeFrameRef
 }
 
 export type PanelRef = {
-  container_ref : RefObject<ContainerRef>,
-  controller_ref : RefObject<ControllerRef>,
-  input_ref : RefObject<InputRef>,
+  container_ref: RefObject<ContainerRef>
+  controller_ref: RefObject<ControllerRef>
+  input_ref: RefObject<InputRef>
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data , time_id , grid_id, current_frame, displayCollection },
+  { data, time_id, grid_id, current_frame, displayCollection },
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)
@@ -46,20 +37,19 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
       controller_ref,
       container_ref,
     }
-  }) 
+  })
 
   return (
     <div className="w-full h-full grid grid-cols-1 grid-rows-2 gap-2">
       <div className="row-span-4 border-2 border-slate-900 rounded-md">
-
-          <Container
-            displayCollection={displayCollection}
-            current_frame={current_frame}
-            grid_id={grid_id}
-            ref={container_ref}
-            time_id={time_id}
-            data={data}
-          />
+        <Container
+          displayCollection={displayCollection}
+          current_frame={current_frame}
+          grid_id={grid_id}
+          ref={container_ref}
+          time_id={time_id}
+          data={data}
+        />
       </div>
       <div className="row-start-5 z-10">
         <TimeController

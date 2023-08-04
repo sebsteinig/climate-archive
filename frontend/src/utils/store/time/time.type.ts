@@ -48,18 +48,22 @@ export type TimeFrameState = {
 export type TimeFrame = {
   exp: Experiment
   //ts_idx : number
-  uSphereWrapAmount:number,
+  uSphereWrapAmount: number
   variables: Map<VariableName, TimeFrameState>
   weight: number
-  swap_flag : boolean
-  swapping : boolean
+  swap_flag: boolean
+  swapping: boolean
 }
 
 export type TimeFrameHolder = {
   map: Map<TimeID, TimeFrame>
   update: (frame: TimeFrame, time_id: TimeID) => TimeFrame
   get: (time_id: TimeID) => TimeFrame | undefined
-  init: (time_id: TimeID,exp:Experiment,active_variables:VariableName[]) => Promise<void>
+  init: (
+    time_id: TimeID,
+    exp: Experiment,
+    active_variables: VariableName[],
+  ) => Promise<void>
 }
 
 export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
@@ -80,9 +84,9 @@ export type WorldConf = {
 }
 
 export type WorldData = {
-  conf : WorldConf,
-  collection : Collection
-  time : TimeConf
+  conf: WorldConf
+  collection: Collection
+  time: TimeConf
 }
 
-export type Slots = Map<TimeID,WorldData>
+export type Slots = Map<TimeID, WorldData>

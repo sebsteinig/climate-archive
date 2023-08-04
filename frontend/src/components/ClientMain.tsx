@@ -9,8 +9,7 @@ import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "./ViewCollection"
 
-type Props = {
-}
+type Props = {}
 
 export default function ClientMain({}: Props) {
   const addCollection = useClusterStore((state) => state.addCollection)
@@ -20,16 +19,19 @@ export default function ClientMain({}: Props) {
       e.map((element) => {
         addCollection(element.id!, element.data)
       })
-      const most_recent = e.sort((a,b) => Date.parse(b.date) - Date.parse(a.date))[0]
-      if(most_recent){
+      const most_recent = e.sort(
+        (a, b) => Date.parse(b.date) - Date.parse(a.date),
+      )[0]
+      if (most_recent) {
         add(most_recent.data)
       }
-    }
-    )
+    })
   }, [])
   const [search_bar_visible, displaySearchBar] = useState(false)
-  const [collection, setCollection] = useState<Collection|undefined>()
-  const [onReturn,buildReturn] = useState<{fn:()=>void}|undefined>(undefined)
+  const [collection, setCollection] = useState<Collection | undefined>()
+  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
+    undefined,
+  )
   return (
     <>
       <div className="flex flex-row w-full h-full gap-5">
@@ -45,22 +47,23 @@ export default function ClientMain({}: Props) {
               <SideBar journals={<></>} />
             </div>
           </div>
-
         </div>
         <div className="flex-grow flex flex-col gap-5">
           <div className="flex flex-grow-0 justify-end">
-            <SearchBar 
+            <SearchBar
               is_visible={search_bar_visible}
-              displaySearchBar={displaySearchBar} 
+              displaySearchBar={displaySearchBar}
               displayCollection={(collection) => {
                 setCollection(collection)
                 displaySearchBar(false)
-                buildReturn({fn:() => {
-                  setCollection(undefined)
-                  displaySearchBar(true)
-                }})
-              }
-            }>
+                buildReturn({
+                  fn: () => {
+                    setCollection(undefined)
+                    displaySearchBar(true)
+                  },
+                })
+              }}
+            >
               {<></>}
             </SearchBar>
             <div className="h-14  flex items-center">
@@ -70,16 +73,19 @@ export default function ClientMain({}: Props) {
           <div className="overflow-y-auto flex-grow ">
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
-                <TimeProvider displayCollection={(collection) => {
+                <TimeProvider
+                  displayCollection={(collection) => {
                     setCollection(collection)
-                  }}/>
+                  }}
+                />
               </div>
-              {collection &&
-                  <ViewCollection 
-                    onClose={{fn:() => setCollection(undefined)}}
-                    onReturn={onReturn}
-                    collection={collection}/>
-              }
+              {collection && (
+                <ViewCollection
+                  onClose={{ fn: () => setCollection(undefined) }}
+                  onReturn={onReturn}
+                  collection={collection}
+                />
+              )}
             </div>
           </div>
         </div>

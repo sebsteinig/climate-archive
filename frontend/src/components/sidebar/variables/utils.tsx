@@ -50,36 +50,24 @@ function IconOf({
   toggle: Function
   active: boolean
 }) {
-  const className = `w-10 h-10 px-1 ${active ? "text-emerald-400" : "text-slate-500"}`
-  const classNameWithChild = `w-10 h-10 px-1 ${active ? "text-emerald-400 child:fill-emerald-400" : "text-slate-500 child:fill-slate-500"}`
+  const className = `w-10 h-10 px-1 ${
+    active ? "text-emerald-400" : "text-slate-500"
+  }`
+  const classNameWithChild = `w-10 h-10 px-1 ${
+    active
+      ? "text-emerald-400 child:fill-emerald-400"
+      : "text-slate-500 child:fill-slate-500"
+  }`
   switch (name) {
     case VariableName.currents:
-      return (
-        <WaveIcon
-          onClick={() => toggle()}
-          className={className}
-        />
-      )
+      return <WaveIcon onClick={() => toggle()} className={className} />
     case VariableName.pr:
-      return (
-        <RainIcon
-          onClick={() => toggle()}
-          className={className}
-        />
-      )
+      return <RainIcon onClick={() => toggle()} className={className} />
     case VariableName.height:
-      return (
-        <MountainIcon
-          onClick={() => toggle()}
-          className={className}
-        />
-      )
+      return <MountainIcon onClick={() => toggle()} className={className} />
     case VariableName.winds:
       return (
-        <WindsIcon
-          onClick={() => toggle()}
-          className={classNameWithChild}
-        />
+        <WindsIcon onClick={() => toggle()} className={classNameWithChild} />
       )
     case VariableName.tos:
       return (
@@ -90,10 +78,7 @@ function IconOf({
       )
     case VariableName.pfts:
       return (
-        <TreesIcon
-          onClick={() => toggle()}
-          className={classNameWithChild}
-        />
+        <TreesIcon onClick={() => toggle()} className={classNameWithChild} />
       )
     default:
       return ""
@@ -114,16 +99,25 @@ export function Variable({
       className={`group flex flex-row 
        bg-gray-900 cursor-pointer
          rounded-lg p-2 h-fit w-fit z-30 ${
-          active_variables.get(title) ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]" : ""
+           active_variables.get(title)
+             ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]"
+             : ""
          }`}
     >
-      <IconOf name={title} active={active_variables.get(title)!} toggle={() => activate(title)} />
+      <IconOf
+        name={title}
+        active={active_variables.get(title)!}
+        toggle={() => activate(title)}
+      />
       <div
         className={
           current_variable_controls === title ? "" : "hidden group-hover:block"
         }
       >
-        <div onClick={() => activate(title)} className="flex flex-wrap items-center">
+        <div
+          onClick={() => activate(title)}
+          className="flex flex-wrap items-center"
+        >
           <h3>{titleOf(title)} </h3>
           {active_variables.get(title) ? (
             <EyeClosed className="w-8 text-slate-500 px-1 ml-2 h-8" />

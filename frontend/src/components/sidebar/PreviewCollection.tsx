@@ -11,7 +11,6 @@ import { Experiment, Experiments, Publication } from "@/utils/types"
 import { TimeMode } from "@/utils/store/time/time.type"
 import { CollectionDetails } from "../ViewCollection"
 
-
 // type Props = {
 //   display_details: boolean
 //   setDisplayDetails: Function
@@ -31,7 +30,7 @@ import { CollectionDetails } from "../ViewCollection"
 //   const [display_all, displayAll] = useState(false)
 //   return (
 //     <div
-//       className={`bg-gray-900 mt-3 rounded-md 
+//       className={`bg-gray-900 mt-3 rounded-md
 //                             ${ !display_all
 //                                 ? "h-fit w-fit p-2"
 //                                 : ""
@@ -107,7 +106,9 @@ function OneCollection({
           }}
         />
 
-        {display_details && <CollectionDetails collection={current_details.collection}/>}
+        {display_details && (
+          <CollectionDetails collection={current_details.collection} />
+        )}
 
         <EditCollection
           display_details={display_details}

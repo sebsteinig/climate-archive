@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { useState } from "react"
 import { SearchButton } from "../searchbar/SearchButton"
 import { Variables } from "./variables/Variables"
@@ -18,9 +18,9 @@ export default function SideBar({ journals }: Props) {
   return (
     <div>
       <Variables
-          setCurrentDataDetails={setCurrentDataDetails}
-          current_variable_controls={current_variable_controls}
-          setCurrentVariableControls={setCurrentVariableControls}
+        setCurrentDataDetails={setCurrentDataDetails}
+        current_variable_controls={current_variable_controls}
+        setCurrentVariableControls={setCurrentVariableControls}
       />
       {/* <div className="absolute top-0 left-0 m-5 h-full">
         <SearchButton
@@ -40,7 +40,7 @@ export default function SideBar({ journals }: Props) {
           setDisplayDetails={setCurrentDataDetails}
           search_bar_visible={search_bar_visible}
         /> */}
-      </div>
+    </div>
     //   {search_bar_visible && (
     //     <SearchBar setSearchBarVisible={setSearchBarVisible}>
     //       {journals}

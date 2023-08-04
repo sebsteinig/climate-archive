@@ -22,29 +22,26 @@ type Props = {
 }
 
 export function World({ tick }: Props) {
-
-  console.log('creating World component')
+  console.log("creating World component")
 
   const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
 
   useFrame((state, delta) => {
-
     tick(delta).then((res) => {
       //console.log(res.update_texture);
-      if(atmosphere_layer_ref.current) {       
+      if (atmosphere_layer_ref.current) {
         atmosphere_layer_ref.current.tick(res.weight)
       }
       for (let [variable, data] of res.variables) {
         switch (variable) {
-          case VariableName.pr : { 
-              if(atmosphere_layer_ref.current && res.update_texture) {
-                atmosphere_layer_ref.current.updateTextures(data) 
-              }
+          case VariableName.pr: {
+            if (atmosphere_layer_ref.current && res.update_texture) {
+              atmosphere_layer_ref.current.updateTextures(data)
+            }
             break
           }
         }
       }
-      
     })
   })
 

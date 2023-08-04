@@ -87,7 +87,9 @@ export function Tos({
             max={20}
             value={tos.anomalies_lower_bound}
             onChange={(event: any) => {
-              return tos.updateAnomaliesLowerBound(parseFloat(event?.target.value))
+              return tos.updateAnomaliesLowerBound(
+                parseFloat(event?.target.value),
+              )
             }}
             step={0.1}
           ></Slider>
@@ -96,7 +98,9 @@ export function Tos({
             min={0}
             max={20}
             onChange={(event: any) => {
-              return tos.updateAnomaliesLowerBound(parseFloat(event?.target.value))
+              return tos.updateAnomaliesLowerBound(
+                parseFloat(event?.target.value),
+              )
             }}
           ></InputNumber>
         </div>

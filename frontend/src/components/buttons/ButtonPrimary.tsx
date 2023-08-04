@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react"
 type Props = {
   onClick: Function
   disabled?: boolean
-  className?:string
+  className?: string
 }
 
 export default function ButtonPrimary({
@@ -15,7 +15,9 @@ export default function ButtonPrimary({
   return (
     <button
       className={`bg-sky-600 text-slate-100 rounded-lg hover:bg-sky-500
-        outline-none px-5 py-2 uppercase tracking-widest shadow disabled:opacity-30  ${className ?? ""}`}
+        outline-none px-5 py-2 uppercase tracking-widest shadow disabled:opacity-30  ${
+          className ?? ""
+        }`}
       onClick={() => onClick()}
       disabled={disabled}
     >

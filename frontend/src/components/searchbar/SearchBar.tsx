@@ -31,7 +31,7 @@ import { Collection } from "@/utils/store/collection.store"
 
 type MoreOptionsProps = {
   filters: SearchPublication
-  displaySearchBar:  Dispatch<SetStateAction<boolean>>
+  displaySearchBar: Dispatch<SetStateAction<boolean>>
   setRequestFilters: (filters: SearchPublication) => void
 }
 
@@ -59,8 +59,8 @@ function MoreOptions({
 
 type Props = {
   displaySearchBar: Dispatch<SetStateAction<boolean>>
-  displayCollection : (collection:Collection) => void
-  is_visible:boolean
+  displayCollection: (collection: Collection) => void
+  is_visible: boolean
 }
 
 export default function SearchBar({
@@ -199,7 +199,7 @@ export default function SearchBar({
         )}
         {search_panel_visible && (
           <Publications
-            displayCollection = {displayCollection}
+            displayCollection={displayCollection}
             publications={publications}
           />
         )}

@@ -16,8 +16,8 @@ import {
 } from "./variable.types"
 
 export type VariableSlice = {
-  active_variables : Map<VariableName, boolean>,
-  activate : (v : VariableName) => void,
+  active_variables: Map<VariableName, boolean>
+  activate: (v: VariableName) => void
   variables: {
     currents: CurrentsSlice
     clt: CltSlice
@@ -34,7 +34,7 @@ export type VariableSlice = {
   }
 }
 
-function initMap(){
+function initMap() {
   let m = new Map()
   m.set(VariableName.currents, false)
   m.set(VariableName.clt, false)
@@ -58,10 +58,11 @@ export const createVariableSlice: StateCreator<
   VariableSlice
 > = (set) => {
   return {
-    active_variables : initMap(),
-    activate: (v : VariableName) => set((state) =>{
-      state.active_variables.set(v, !state.active_variables.get(v)!)
-    }),
+    active_variables: initMap(),
+    activate: (v: VariableName) =>
+      set((state) => {
+        state.active_variables.set(v, !state.active_variables.get(v)!)
+      }),
     variables: {
       currents: {
         name: VariableName.currents,

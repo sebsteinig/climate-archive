@@ -9,7 +9,7 @@ import { tickBuilder } from "../tick"
 
 export type SceneProps = {
   time_id: TimeID
-  panel_ref : RefObject<PanelRef>
+  panel_ref: RefObject<PanelRef>
   data: WorldData
   current_frame: TimeFrameRef
   active_variables: VariableName[]
@@ -25,7 +25,7 @@ export function Scene({
   canvas,
 }: SceneProps) {
   const camera = useRef()
-  if(!panel_ref.current?.container_ref.current){
+  if (!panel_ref.current?.container_ref.current) {
     return null
   }
   return (
@@ -40,9 +40,9 @@ export function Scene({
           canvas,
         )}
       />
-      {data.conf.camera.is_linked ? 
-          <OrbitControls  />
-        : 
+      {data.conf.camera.is_linked ? (
+        <OrbitControls />
+      ) : (
         <>
           <PerspectiveCamera
             makeDefault
@@ -52,9 +52,9 @@ export function Scene({
             near={0.1}
             far={200}
           />
-          <OrbitControls  camera={camera.current}/>
+          <OrbitControls camera={camera.current} />
         </>
-      }
+      )}
     </View>
   )
 }
