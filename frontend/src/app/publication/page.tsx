@@ -7,8 +7,10 @@ import { Publication } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { useRouter, useSearchParams } from 'next/navigation'
+import dynamic from "next/dynamic"
 
 //example : /?Lunt.et.al*2010=tbpie&publication.2*year==expid2
+const ClientMain = dynamic(() => import("@/components/ClientMain"), { ssr: false })
 export default function PublicationPage(){
   const replace = useClusterStore((state) => state.time.replace)
   const add = useClusterStore((state) => state.time.add)
@@ -44,8 +46,7 @@ export default function PublicationPage(){
 
     return(
       <>
-        <TimeProvider />
-        <SideBar journals={<></>} />
+        <ClientMain />
       </>
     )
 }

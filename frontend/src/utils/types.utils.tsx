@@ -1,4 +1,4 @@
-import { Experiments, Publication } from "./types"
+import { Experiment, Experiments, Publication } from "./types"
 
 export const isPublication = (
   obj: Experiments | Publication,
@@ -39,6 +39,17 @@ export function uniqueIdx(x: number, y: number, z: number) {
   return Math.pow(2, x) * Math.pow(5, y) * Math.pow(7, z)
 }
 
+export function getTitleOfExp(exp:Experiment) {
+  let label = exp.metadata.length == 1 ? `${exp.metadata[0].metadata.text}` : ""
+  if (exp.metadata.length > 1){
+    label = exp.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
+  }
+  
+  return {
+    id:exp.id,
+    label:label,
+  }
+}
 
 export function gridOf(n:number) {
   let width : number;
