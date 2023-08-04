@@ -59,8 +59,7 @@ type CollectionProps = {
 }
 
 export function CollectionDetails({ collection, load }: CollectionProps) {
-  const [display_abstract, setDisplayAbstract] = useState(false)
-  const router = useRouter()
+  
   const searchParams = useSearchParams()
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return true

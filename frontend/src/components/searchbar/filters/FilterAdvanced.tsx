@@ -4,7 +4,7 @@ import InputField from "@/components/inputs/InputField"
 import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
 import { DefaultParameter } from "@/utils/api/api.types"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import Cross from "$/assets/icons/cross-small-emerald-300.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
@@ -12,7 +12,9 @@ import { RequestMultipleTexture } from "@/utils/database_provider/database_provi
 import { Experiments } from "../../../utils/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import Link from "next/link"
 import { TimeMode } from "@/utils/store/time/time.type"
+import { useSearchParams } from "next/navigation"
 type Exp = {
   id: string
   display: boolean
@@ -69,7 +71,13 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
   const [lossless, setLossless] = useState(true)
   const [resolution, setResolution] = useState<{ x?: number; y?: number }>({})
   const [variables, setVariables] = useState<string[]>([])
-  const addWorld = useClusterStore((state) => state.time.add)
+
+  const searchParams = useSearchParams()
+  const reload = useMemo(() => {
+    if (!searchParams.has("reload")) return true
+    return searchParams.get("reload") == "true"
+  }, [searchParams])
+  
   if (!display) {
     return (
       <>
@@ -294,37 +302,34 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
           </Select>
         </span>
       </div>
-
-      <ButtonSecondary
-        disabled={exp_ids.exp_ids.length == 0}
-        onClick={async () => {
-          displaySearchBar(false)
-          const request = {
-            exp_ids: exp_ids.exp_ids.map((e) => e.id),
-            variables: variables,
-            config_name: config != "" ? config : undefined,
-            extension: extension,
-            lossless: lossless,
-            resolution: {
-              x: resolution.x ?? 0,
-              y: resolution.y ?? 0,
-            },
-          }
-          await database_provider.loadAll({
-            exp_ids: request.exp_ids,
-          })
-          const collection = {
-            exps: request.exp_ids.map((exp) => {
-              return { id: exp, metadata: [] }
-            }),
-          } as Experiments
-          const idx = await database_provider.addCollectionToDb(collection)
-          addCollection(idx, collection)
-          addWorld(collection)
-        }}
+          
+      {exp_ids.exp_ids.length >0 &&
+      <Link href={`/publication?reload=${!reload}&experiments={exp_ids=${exp_ids.exp_ids.
+          map((e) => e.id + ".")};variables=${
+            variables
+          };config_name=${
+            config != "" ? config : undefined};extension=${
+              extension
+            };lossless=${
+              lossless
+            };resolution=${
+              resolution.x ?? 0
+            }*${
+              resolution.y ?? 0
+            }}`}     
       >
-        Load
-      </ButtonSecondary>
+        <ButtonSecondary
+          disabled={exp_ids.exp_ids.length == 0}
+          onClick={async () => {
+            displaySearchBar(false)
+            
+            
+          }}
+        >
+          Load
+        </ButtonSecondary>
+      </Link>
+      }
     </>
   )
 }

@@ -82,32 +82,40 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     const pathname = usePathname()
     const [display_buttons, displayButtons] = useState(false)
 
-    const paramsOnChangeExp: (id: string) => string = (id: string) => {
+    const onChangeExp: (id: string) => void = (id: string) => {
       let p = new URLSearchParams()
-      Array.from(searchParams, ([k, v], i) => {
-        p.append(k, i == grid_id + 1 ? id : v)
-      })
-      return p.toString()
-    }
-
-    const [params_on_dup, params_on_del, current_exp_id] = useMemo(() => {
-      if (grid_id + 1 >= Array.from(searchParams).length)
-        return [null, null, data.collection.exps[0].id]
-      const exp_id = Array.from(searchParams)[grid_id + 1][1]
-
-      //on duplicate
-      let on_dup = new URLSearchParams()
-      if (isPublication(data.collection)) {
-        on_dup.set(
+      if(!pathname.includes("publication")){
+        p.append(isPublication(data.collection) ? 
           `${data.collection.authors_short.replaceAll(" ", ".")}*${
             data.collection.year
-          }`,
-          exp_id,
-        )
+          }`: `${data.collection.exps.map((e) => e.id + ".")}`, id)
+        router.push(`/publication?reload=false&${p.toString()}`)
+      } else {
+        Array.from(searchParams, ([k, v], i) => {
+          p.append(k, i == grid_id + 1 ? id : v)
+        })
+        router.push(`${pathname}?${p.toString()}`)
       }
+    }
 
-      //on delete
+    const [route_on_dup, params_on_del, current_exp_id] = useMemo(() => {
+      const key = isPublication(data.collection)
+      ? `${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`
+      : `${data.collection.exps.map((e) => e.id + ".")}`   
+
+      let on_dup = new URLSearchParams()
       let on_del = new URLSearchParams()
+      if (grid_id + 1 >= Array.from(searchParams).length){        
+        on_dup.append(key, data.collection.exps[0].id)
+        on_dup.append(key, data.collection.exps[0].id)
+        return [`/publication?reload=false&${on_dup.toString()}`, on_del, data.collection.exps[0].id];
+      }
+     //on duplicate
+      on_dup.set( key, Array.from(searchParams)[grid_id + 1][1])      
+      const route_dup = `${pathname}?${searchParams.toString()}&${on_dup.toString()}`
+        
+        
+      //on delete
       Array.from(searchParams, ([k, v], idx) => {
         if (idx != grid_id + 1) {
           on_del.append(k, v)
@@ -115,12 +123,13 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
       })
 
       //on change experiment
+      const exp_id = Array.from(searchParams)[grid_id + 1][1]
       if (exp_id == data.collection.exps[0].id)
-        return [on_dup.toString(), on_del.toString(), exp_id]
+        return [route_dup, on_del.toString(), exp_id]
       const current_exp = data.collection.exps.filter((e) => e.id == exp_id)
       if (current_exp.length == 0)
         return [
-          on_dup.toString(),
+          route_dup,
           on_del.toString(),
           data.collection.exps[0].id,
         ]
@@ -135,7 +144,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             .init(time_id, current_exp[0], active_variables)
             .then(() => {})
         })
-      return [on_dup.toString(), on_del.toString(), exp_id]
+      return [route_dup, on_del.toString(), exp_id]
     }, [Array.from(searchParams)])
 
     return (
@@ -150,7 +159,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
-        {grid_id + 1 < Array.from(searchParams).length && (
+        {(!pathname.includes("publication") || grid_id + 1 < Array.from(searchParams).length) && (
           <div className="absolute top-0 left-0 flex m-2">
             <Link href={`${pathname}?${params_on_del}`}>
               <CrossIcon
@@ -165,7 +174,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
               onChange={(e) => {
                 const idx = e.target.selectedIndex
                 const exp = data.collection.exps[idx]
-                router.push(`${pathname}?${paramsOnChangeExp(exp.id)}`)
+                onChangeExp(exp.id)
               }}
             >
               {data.collection?.exps.map((e) => {
@@ -204,10 +213,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             onClick={() => displayCollection(data.collection)}
           />
 
-          {grid_id + 1 < Array.from(searchParams).length && (
-            <Link
-              href={`${pathname}?${searchParams.toString()}&${params_on_dup}`}
-            >
+          {(!pathname.includes("publication") || grid_id + 1 < Array.from(searchParams).length) && (
+            <Link href={route_on_dup} >
               <DuplicateIcon
                 className="w-10 h-10 cursor-pointer p-2 text-slate-500"
                 onClick={() => {
