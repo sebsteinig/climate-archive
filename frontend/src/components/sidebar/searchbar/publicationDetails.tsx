@@ -3,9 +3,8 @@
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import ButtonPrimary from "../../buttons/ButtonPrimary"
 import { Publication } from "../../../utils/types"
-import { TimeMode } from "@/utils/store/time/time.type"
 import { CollectionDetails } from "../utils/CollectionDetails"
-import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 type Props =  {
   publication : Publication
@@ -18,7 +17,7 @@ export default function PublicationDetails({
   setDisplaySeeDetails,
   setSearchBarVisible,
 }: Props) {
-
+  const router = useRouter()
   return (
     <div className="border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4">
       <ArrowLeft
@@ -26,12 +25,14 @@ export default function PublicationDetails({
         onClick={() => setDisplaySeeDetails(false)}
       />
       <CollectionDetails collection={publication}>
-        <Link href={`/publication/${publication.authors_short.replaceAll(" ", ".")}*${publication.year}`}>
-          <ButtonPrimary
-            onClick={() => {/*setSearchBarVisible(false)*/}}>
-            Load
-          </ButtonPrimary>
-        </Link>
+        <ButtonPrimary
+          onClick={() => {
+            setSearchBarVisible(false)
+            router.push(`/publication?reload=true&${publication.authors_short.replaceAll(" ", ".")}*${publication.year}=${publication.exps[0].id}`)
+          }}
+        >
+          Load
+        </ButtonPrimary>
       </CollectionDetails>
     </div>
   )

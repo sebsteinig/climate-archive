@@ -19,12 +19,15 @@ import { isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
 import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 
 type Props = {
   className?: string
-  time_id: TimeID,
-  data:WorldData,
+  time_id: TimeID
+  grid_id:number
+  data:WorldData
   displayCollection : (collection : Collection) => void
   current_frame:TimeFrameRef
 }
@@ -34,7 +37,7 @@ export type ContainerRef = {
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
-  function Container({ time_id, data, className, current_frame, displayCollection, children }, ref) {
+  function Container({ time_id, data, className, grid_id, current_frame, displayCollection, children }, ref) {
     const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
     const stored_active_variables = useClusterStore((state) => state.active_variables)
@@ -53,8 +56,45 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         track:div_ref
       }
     })
-    
+
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
     const [display_buttons, displayButtons] = useState(false)
+    const onChangeExp :(id : string) => string = (id : string) => {
+      let p = new URLSearchParams()
+      Array.from(searchParams, ([k, v], i) =>{
+        p.append(k, i == grid_id? id : v)
+      })
+      return p.toString()
+    }
+
+
+    const params_on_dup = useMemo(() => {
+      let p = new URLSearchParams()
+      if (isPublication(data.collection)){
+        if(grid_id< Array.from(searchParams).length){
+          p.set(`${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`, data.collection.exps[0].id)
+          //Array.from(searchParams)[grid_id][1])
+        }        
+      }
+      return p.toString()
+    }, [Array.from(searchParams)])
+
+    const params_on_del = useMemo(() => {
+      let p = new URLSearchParams()
+        if(grid_id< Array.from(searchParams).length){
+          Array.from(searchParams, (([k, v], idx) => {
+            if(idx != grid_id){
+              p.append(k, v)
+            }
+          }))          
+      }
+      return p.toString()
+    }, [Array.from(searchParams)])
+
+    
+
     return (
       <div className={`relative w-full h-full ${className ?? ""}`} ref={div_ref}>
         {children}
@@ -64,36 +104,42 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             {data.collection.authors_short}, {data.collection.year}
         </p>}
         <div className="absolute top-0 left-0 flex m-2">
-            <CrossIcon
-              className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
-              onClick={() => remove(time_id)}
-            />
-            <Select 
-              className="ml-5"
-              onChange={
-              (e) => {
-                  const idx = e.target.selectedIndex
-                  const exp = data.collection.exps[idx]
 
-                  database_provider.load({
-                    exp_id: exp.id,
-                  }).then(
-                    () => {
-                      const frame = current_frame.current.get(time_id)
-                      if(!frame) return;
-                      current_frame.current.init(time_id,exp,active_variables).then(()=>{})
-                    }
-                  )
-              } 
-            }>
-              {data.collection?.exps.map((e) => {
-                let label = e.metadata.length == 1 ? `${e.metadata[0].metadata.text}` : ""
-                if (e.metadata.length > 1){
-                  label = e.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
-                }
-                return <option key={e.id}>{e.id} | {label}</option>
-              })}
-            </Select>
+          {grid_id < Array.from(searchParams).length && 
+            <Link href={`${pathname}?${params_on_del}`}>
+              <CrossIcon
+                className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+                onClick={() => remove(time_id)}
+              />
+            </Link>
+          }
+            
+          <Select 
+            className="ml-5"
+            onChange={
+            (e) => {
+                const idx = e.target.selectedIndex
+                const exp = data.collection.exps[idx]
+                router.push(`${pathname}?${onChangeExp(exp.id)}`)
+                database_provider.load({
+                  exp_id: exp.id,
+                }).then(
+                  () => {
+                    const frame = current_frame.current.get(time_id)
+                    if(!frame) return;
+                    current_frame.current.init(time_id,exp,active_variables).then(()=>{})
+                  }
+                )
+            } 
+          }>
+            {data.collection?.exps.map((e) => {
+              let label = e.metadata.length == 1 ? `${e.metadata[0].metadata.text}` : ""
+              if (e.metadata.length > 1){
+                label = e.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
+              }
+              return <option key={e.id}>{e.id} | {label}</option>
+            })}
+          </Select>
         </div>
         <div
           className={`absolute z-30 group bottom-0 right-0 bg-gray-900
@@ -107,22 +153,25 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             />
           )}
 
-          <ArrowUpIcon
+          {!display_buttons && <ArrowUpIcon
             className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-500 child:fill-slate-500"
             onClick={() => displayButtons(true)}
-          />
+          />}
           
           <InfoIcon
             className="w-12 h-12 cursor-pointer p-2 text-slate-500"
             onClick={() => displayCollection(data.collection)}
           />
           
-          <DuplicateIcon
-            className="w-10 h-10 cursor-pointer p-2 text-slate-500"
-            onClick={() => {
-              dup(time_id)
-            }}
-          />
+          
+          {grid_id< Array.from(searchParams).length && <Link href={`${pathname}?${searchParams.toString()}&${params_on_dup}`}>
+            <DuplicateIcon
+              className="w-10 h-10 cursor-pointer p-2 text-slate-500"
+              onClick={() => {                
+                dup(time_id)
+              }}
+            />
+          </Link>}
 
 
         </div>

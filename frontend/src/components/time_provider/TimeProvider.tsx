@@ -79,13 +79,13 @@ export function TimeProvider(props: Props) {
         >
           {
             Array.from(time_slots,
-              ([time_id,data]) => {
-
+              ([time_id,data], idx) => {
                 return <Panel
                   displayCollection = {(collection : Collection) => {
                     displayViewCollection(true)
                     setCollectionDetails(collection)
                   }}
+                  grid_id={idx}
                   current_frame={current_frame}
                   key={time_id}
                   data={data}
