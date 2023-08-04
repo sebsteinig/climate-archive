@@ -44,7 +44,6 @@ export function getTitleOfExp(exp:Experiment) {
   if (exp.metadata.length > 1){
     label = exp.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
   }
-  console.log(label);
   
   return {
     id:exp.id,
