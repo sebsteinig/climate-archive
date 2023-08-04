@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react"
 
 type Props = {
   value: number
-  onChange: Function
+  onChange: (number:number) => void
   onKeyDown?: Function
   min?: number
   max?: number
@@ -23,7 +23,7 @@ export default function InputField({
     <input
       className="bg-slate-600 border-x-4 w-28 text-xs border-r-slate-500 border-l-slate-500
         px-5 py-2 placeholder:text-slate-300/80 outline-none"
-      onChange={(e) => onChange(e)}
+      onChange={(e) => onChange(parseFloat(e.target.value))}
       onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : {})}
       value={value}
       id={id}

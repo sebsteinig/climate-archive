@@ -4,7 +4,7 @@ type Props = {
   min: number
   max: number
   value: number
-  onChange: Function
+  onChange: (number:number) => void
   step?: number
   onKeyDown?: Function
   name?: string
@@ -24,7 +24,7 @@ export default function Slider({
   return (
     <input
       className="bg-slate-600 w-32 web"
-      onChange={(e) => onChange(e)}
+      onChange={(e) => onChange(parseFloat(e.target.value))}
       onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : {})}
       min={min}
       max={max}
