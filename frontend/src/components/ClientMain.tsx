@@ -8,6 +8,7 @@ import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "./ViewCollection"
+import { HelpButton } from "./help/HelpButton"
 
 type Props = {}
 
@@ -42,10 +43,11 @@ export default function ClientMain({}: Props) {
               displaySearchBar={displaySearchBar}
             />
           </div>
-          <div className="flex-grow relative">
+          <div className="flex-grow flex relative">
             <div className=" h-full flex  items-center absolute">
               <SideBar journals={<></>} />
             </div>
+            <HelpButton className="absolute bottom-0 grow-0 justify-self-end"/>
           </div>
         </div>
         <div className="flex-grow flex flex-col gap-5">
