@@ -66,7 +66,7 @@ export default function ClientMain({}: Props) {
             >
               {<></>}
             </SearchBar>
-            <div className="h-14  flex items-center">
+            <div className="h-14 cursor-pointer flex items-center">
               <h1 className="">CLIMATE ARCHIVE</h1>
             </div>
           </div>

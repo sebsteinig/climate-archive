@@ -1,6 +1,6 @@
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { Experiment, Experiments, Publication } from "@/utils/types"
-import { isPublication } from "@/utils/types.utils"
+import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo, useState } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import LeftPage from "$/assets/icons/left-page.svg"
@@ -18,15 +18,14 @@ type Props = {
   collection: Collection
   onClose?: { fn: () => void }
   onReturn?: { fn: () => void }
-  load?: () => void
 }
 
-export function ViewCollection({ collection, onClose, onReturn, load }: Props) {
+export function ViewCollection({ collection, onClose, onReturn }: Props) {
   return (
     <div className="h-full">
       <div
         className={`flex flex-col bg-gray-900 
-              p-5 w-full h-full rounded-md`}
+              p-5 w-full h-full rounded-lg`}
       >
         <div className="flex-grow-0 h-10 w-full">
           {!onReturn && onClose && (
@@ -59,8 +58,6 @@ type CollectionProps = {
 }
 
 export function CollectionDetails({ collection, load }: CollectionProps) {
-  const [display_abstract, setDisplayAbstract] = useState(false)
-  const router = useRouter()
   const searchParams = useSearchParams()
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return true
@@ -91,7 +88,7 @@ export function CollectionDetails({ collection, load }: CollectionProps) {
             Abstract :{" "}
           </p>
           <br />
-          <p className="tracking-wide leading-relaxed indent-10 break-words">
+          <p className="text-slate-400 tracking-wide leading-relaxed indent-10 break-words">
             {collection.abstract}
           </p>
         </div>
@@ -100,15 +97,16 @@ export function CollectionDetails({ collection, load }: CollectionProps) {
         <div className="row-span-4 h-full overflow-hidden">
           <ExperimentsTab exps={collection.exps} />
         </div>
-        <div className="row-start-5 ">
+        <div className="row-start-5 flex justify-center">
           {load && (
             <Link
+              className="cursor-pointer m-5"
               href={`/publication?reload=${!reload}&${collection.authors_short.replaceAll(
                 " ",
                 ".",
               )}*${collection.year}=${collection.exps[0].id}`}
             >
-              <ButtonPrimary onClick={() => {}}>Load</ButtonPrimary>
+              <ButtonPrimary onClick={() => {}}>Discover</ButtonPrimary>
             </Link>
           )}
         </div>
@@ -124,51 +122,50 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
   })
   return (
     <div className="p-5 overflow-x-hidden rounded-lg h-full flex flex-col ">
-      <table
-        className="w-full flex-grow  table-fixed border-collapse"
-        id="exps-table"
-      >
-        <thead className="text-left bg-slate-700  uppercase tracking-widest font-medium text-lg">
-          <tr className="rounded-lg">
-            <th
-              scope="col"
-              className="px-10 py-3 border border-slate-700 rounded-lg"
-            >
-              Experiments
-            </th>
-            <th
-              scope="col"
-              className="px-10 py-3 border border-slate-700 rounded-lg"
-            >
-              Age
-            </th>
-          </tr>
-        </thead>
-        <tbody className="overflow-hidden">
-          {exps.length > 0 &&
-            exps.slice(slice.from, slice.from + slice.size).map((exp) => {
-              let label =
-                exp.metadata.length == 1 ? exp.metadata[0].metadata.text : ""
-              if (exp.metadata.length > 1) {
-                label = exp.metadata.filter((m) => m.metadata.age)[0].metadata
-                  .age
-              }
-              return (
-                <tr
-                  className="w-full  tracking-widest font-normal text-md border-b border-slate-500 hover:bg-slate-800"
-                  key={exp.id}
-                >
-                  <td className="truncate border px-10 py-3 font-medium border-slate-800">
-                    {exp.id}
-                  </td>
-                  <td className="truncate border px-10 py-3 font-medium border-slate-800">
-                    {label}
-                  </td>
-                </tr>
-              )
-            })}
-        </tbody>
-      </table>
+      <div className="flex-grow ">
+        <table
+          className="w-full table-fixed border-collapse"
+          id="exps-table"
+        >
+          <thead className="text-left bg-slate-700">
+            <tr className="rounded-lg">
+              <th
+                scope="col"
+                className="px-10 py-3 small-caps tracking-[.5em] font-semibold text-lg border border-slate-700 rounded-lg"
+              >
+                Experiments
+              </th>
+              <th
+                scope="col"
+                className="px-10 py-3 small-caps tracking-[.5em] font-semibold text-lg border border-slate-700 rounded-lg"
+              >
+                Age
+              </th>
+            </tr>
+          </thead>
+          <tbody className="overflow-hidden">
+            {exps.length > 0 &&
+              exps.slice(slice.from, slice.from + slice.size).map((exp) => {
+                const {id,label} = getTitleOfExp(exp)
+                return (
+                  <tr
+                    title={`${id} | ${label}`}
+                    className="w-full  tracking-widest font-normal text-md border-b border-slate-500 hover:bg-slate-800"
+                    key={exp.id}
+                  >
+                    <td className="truncate border px-10 py-3 font-medium border-slate-800">
+                      {id}
+                    </td>
+                    <td className="truncate border px-10 py-3 font-medium border-slate-800">
+                      {label}
+                    </td>
+                  </tr>
+                )
+              })}
+          </tbody>
+        </table>
+      </div>
+      
       <div className="justify-between mt-5 flex flex-row">
         <div className="ml-5 tracking-[.5em] small-caps opacity-70 cursor-default">
           {exps.length} Experiment{exps.length > 1 ? "s" : ""}
@@ -191,7 +188,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
               })
             }}
           />
-          <div>
+          <div className="cursor-default">
             {Math.floor(slice.from / slice.size) + 1} of{" "}
             {Math.floor(exps.length / slice.size) + 1}
           </div>
