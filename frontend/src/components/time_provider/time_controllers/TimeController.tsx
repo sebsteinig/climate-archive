@@ -71,7 +71,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           {is_playing ? (
             // PAUSE BUTTON
             <Pause
-              className={`cursor-pointer w-8 h-8 inline-block text-slate-500`}
+              className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 pause(tween_ref, setPlaying)
               }}
@@ -79,13 +79,13 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           ) : (
             // PLAY BUTTON
             <Play
-              className={`cursor-pointer w-8 h-8 inline-block text-slate-500`}
+              className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 play(data, time_id, current_frame, tween_ref, setPlaying)
               }}
             />
           )}
-          <Stop className={`cursor-pointer w-8 h-8 block text-slate-500`} onClick={() => {}} />
+          <Stop className={`cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`} onClick={() => {}} />
         </div>
         <div className="flex-grow"></div>
       </div>
