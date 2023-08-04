@@ -2,7 +2,7 @@
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { Experiment, Experiments, Publication } from "@/utils/types"
 import { isPublication } from "@/utils/types.utils"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import LeftPage from "$/assets/icons/left-page.svg"
 import RightPage from "$/assets/icons/right-page.svg"
@@ -13,6 +13,7 @@ import { Collection } from "@/utils/store/collection.store"
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import Link from "next/link"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
+import { useRouter, useSearchParams } from "next/navigation"
 
 
 type Props = {
@@ -61,6 +62,13 @@ type CollectionProps = {
 
 export function CollectionDetails({collection, load} : CollectionProps){
     const [display_abstract, setDisplayAbstract] = useState(false)
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const reload = useMemo(() => {
+      if(!searchParams.has("reload")) return true;
+      return searchParams.get("reload") == "true"
+    }, [searchParams])
+
     if (!collection) return null;
 
     if(!isPublication(collection)){
@@ -93,7 +101,7 @@ export function CollectionDetails({collection, load} : CollectionProps){
               <div className="row-start-5 ">
                 {
                   load &&
-                  <Link href={`/publication/${collection.authors_short.replaceAll(" ", ".")}*${collection.year}`}>
+                  <Link href={`/publication?reload=${!reload}&${collection.authors_short.replaceAll(" ", ".")}*${collection.year}=${collection.exps[0].id}`}>
                     <ButtonPrimary onClick={()=>{}}> 
                       Load
                     </ButtonPrimary>

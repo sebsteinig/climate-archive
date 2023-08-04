@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react"
-import PublicationDetails from "./publicationDetails"
-import ButtonSecondary from "../../buttons/ButtonSecondary"
-import { Publication, Experiment } from "../../../utils/types"
+import ButtonSecondary from "../buttons/ButtonSecondary"
+import { Publication, Experiment } from "../../utils/types"
 import { Collection } from "@/utils/store/collection.store"
 
 type Props = {

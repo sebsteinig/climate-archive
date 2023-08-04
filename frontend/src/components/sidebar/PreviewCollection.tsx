@@ -9,7 +9,7 @@ import { MdSeparator } from "@/components/separators/separators"
 import { isPublication } from "@/utils/types.utils"
 import { Experiment, Experiments, Publication } from "@/utils/types"
 import { TimeMode } from "@/utils/store/time/time.type"
-import { CollectionDetails } from "./utils/CollectionDetails"
+import { CollectionDetails } from "../ViewCollection"
 
 
 // type Props = {

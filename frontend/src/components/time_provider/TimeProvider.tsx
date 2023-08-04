@@ -16,7 +16,7 @@ import React from "react"
 import { Scene } from "./time_panel/scene"
 import { sync } from "@/utils/store/time/time.utils"
 import { Collection } from "@/utils/store/collection.store"
-import { ViewCollection } from "../sidebar/utils/CollectionDetails"
+import { ViewCollection } from "../ViewCollection"
 
 type Props = {
   displayCollection : (collection:Collection) => void
@@ -73,10 +73,10 @@ export function TimeProvider(props: Props) {
         >
           {
             Array.from(time_slots,
-              ([time_id,data]) => {
-
+              ([time_id,data], idx) => {
                 return <Panel
                   displayCollection = {props.displayCollection}
+                  grid_id={idx}
                   current_frame={current_frame}
                   key={time_id}
                   data={data}

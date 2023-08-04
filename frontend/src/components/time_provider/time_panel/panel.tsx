@@ -21,6 +21,7 @@ import { Collection } from "@/utils/store/collection.store"
 export type PanelProps = {
   displayCollection : (collection : Collection) => void
   time_id:TimeID
+  grid_id:number
   data: WorldData
   current_frame: TimeFrameRef
 }
@@ -32,7 +33,7 @@ export type PanelRef = {
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data , time_id , current_frame, displayCollection },
+  { data , time_id , grid_id, current_frame, displayCollection },
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)
@@ -54,6 +55,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
           <Container
             displayCollection={displayCollection}
             current_frame={current_frame}
+            grid_id={grid_id}
             ref={container_ref}
             time_id={time_id}
             data={data}

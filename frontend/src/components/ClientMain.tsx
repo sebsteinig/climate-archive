@@ -4,16 +4,15 @@ import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useEffect, useState } from "react"
-import SearchBar from "./sidebar/searchbar/SearchBar"
-import { SearchButton } from "./sidebar/searchbar/SearchButton"
+import SearchBar from "./searchbar/SearchBar"
+import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
-import { ViewCollection } from "./sidebar/utils/CollectionDetails"
+import { ViewCollection } from "./ViewCollection"
 
 type Props = {
-  journals: JSX.Element
 }
 
-export default function UI({ journals }: Props) {
+export default function ClientMain({}: Props) {
   const addCollection = useClusterStore((state) => state.addCollection)
   const add = useClusterStore((state) => state.time.add)
   useEffect(() => {
@@ -43,7 +42,7 @@ export default function UI({ journals }: Props) {
           </div>
           <div className="flex-grow relative">
             <div className=" h-full flex  items-center absolute">
-              <SideBar journals={journals} />
+              <SideBar journals={<></>} />
             </div>
           </div>
 
@@ -62,7 +61,7 @@ export default function UI({ journals }: Props) {
                 }})
               }
             }>
-              {journals}
+              {<></>}
             </SearchBar>
             <div className="h-14  flex items-center">
               <h1 className="">CLIMATE ARCHIVE</h1>

@@ -1,8 +1,8 @@
 'use client'
 import { useState } from "react"
-import { SearchButton } from "./searchbar/SearchButton"
+import { SearchButton } from "../searchbar/SearchButton"
 import { Variables } from "./variables/Variables"
-import SearchBar from "./searchbar/SearchBar"
+import SearchBar from "../searchbar/SearchBar"
 import { VariableName } from "@/utils/store/variables/variable.types"
 //import { PreviewCollection } from "./PreviewCollection"
 
