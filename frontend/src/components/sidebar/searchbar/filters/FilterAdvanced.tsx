@@ -4,7 +4,7 @@ import InputField from "@/components/inputs/InputField"
 import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
 import { DefaultParameter } from "@/utils/api/api.types"
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import Cross from "$/assets/icons/cross-small-emerald-300.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
@@ -54,10 +54,10 @@ function ExpButton({ exp, remove }: { exp: Exp; remove: Function }) {
 }
 
 type Props = {
-  setSearchBarVisible: Function
+  displaySearchBar: Dispatch<SetStateAction<boolean>>
 }
 
-export default function FilterAdvanced({ setSearchBarVisible }: Props) {
+export default function FilterAdvanced({ displaySearchBar }: Props) {
   const addCollection = useClusterStore((state) => state.addCollection)
   const [display, setDisplay] = useState(false)
   const [exp_ids, setExpIds] = useState<{ exp_ids: Exp[]; search: string }>({
@@ -298,7 +298,7 @@ export default function FilterAdvanced({ setSearchBarVisible }: Props) {
       <ButtonSecondary
         disabled={exp_ids.exp_ids.length == 0}
         onClick={async () => {
-          setSearchBarVisible(false)
+          displaySearchBar(false)
           const request = {
             exp_ids: exp_ids.exp_ids.map((e) => e.id),
             variables: variables,

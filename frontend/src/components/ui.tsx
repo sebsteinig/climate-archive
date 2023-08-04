@@ -3,7 +3,11 @@ import { TimeProvider } from "./time_provider/TimeProvider"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import SearchBar from "./sidebar/searchbar/SearchBar"
+import { SearchButton } from "./sidebar/searchbar/SearchButton"
+import { Collection } from "@/utils/store/collection.store"
+import { ViewCollection } from "./sidebar/utils/CollectionDetails"
 
 type Props = {
   journals: JSX.Element
@@ -24,11 +28,63 @@ export default function UI({ journals }: Props) {
     }
     )
   }, [])
-
+  const [search_bar_visible, displaySearchBar] = useState(false)
+  const [collection, setCollection] = useState<Collection|undefined>()
+  const [onReturn,buildReturn] = useState<{fn:()=>void}|undefined>(undefined)
   return (
     <>
-      <TimeProvider />
-      <SideBar journals={journals} />
+      <div className="flex flex-row w-full h-full gap-5">
+        <div className="flex flex-col gap-5">
+          <div className="grow-0 ">
+            <SearchButton
+              search_bar_visible={search_bar_visible}
+              displaySearchBar={displaySearchBar}
+            />
+          </div>
+          <div className="flex-grow relative">
+            <div className=" h-full flex  items-center absolute">
+              <SideBar journals={journals} />
+            </div>
+          </div>
+
+        </div>
+        <div className="flex-grow flex flex-col gap-5">
+          <div className="flex flex-grow-0 justify-end">
+            <SearchBar 
+              is_visible={search_bar_visible}
+              displaySearchBar={displaySearchBar} 
+              displayCollection={(collection) => {
+                setCollection(collection)
+                displaySearchBar(false)
+                buildReturn({fn:() => {
+                  setCollection(undefined)
+                  displaySearchBar(true)
+                }})
+              }
+            }>
+              {journals}
+            </SearchBar>
+            <div className="h-14  flex items-center">
+              <h1 className="">CLIMATE ARCHIVE</h1>
+            </div>
+          </div>
+          <div className="overflow-y-auto flex-grow ">
+            <div className="h-full">
+              <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
+                <TimeProvider displayCollection={(collection) => {
+                    setCollection(collection)
+                  }}/>
+              </div>
+              {collection &&
+                  <ViewCollection 
+                    onClose={{fn:() => setCollection(undefined)}}
+                    onReturn={onReturn}
+                    collection={collection}/>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   )
 }

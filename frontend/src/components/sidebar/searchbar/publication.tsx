@@ -1,27 +1,23 @@
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import PublicationDetails from "./publicationDetails"
 import ButtonSecondary from "../../buttons/ButtonSecondary"
 import { Publication, Experiment } from "../../../utils/types"
+import { Collection } from "@/utils/store/collection.store"
 
 type Props = {
   publications: Publication[]
-  setSearchBarVisible: Function
-  more_options: boolean
+  displayCollection : (collection:Collection) => void
 }
 
 export function Publications({
   publications,
-  more_options,
-  setSearchBarVisible,
+  displayCollection,
 }: Props) {
-  const [display_see_details, setDisplaySeeDetails] = useState(false)
-  const [displayed_publication, setDisplayedPublication] =
     useState<Publication>()
   return (
     <div>
       <div>
         {publications.length > 0 &&
-          !display_see_details &&
           publications.map((publication: Publication, idx: number) => {
             return (
               <div
@@ -29,9 +25,7 @@ export function Publications({
                 className="border-s-4 border-sky-300 group mb-2 px-4 cursor-pointer 
                             hover:opacity-100 opacity-80"
                 onClick={() => {
-                  setDisplaySeeDetails(true)
-                  setDisplayedPublication(publication)
-                  console.log("load")
+                  displayCollection(publication)
                 }}
               >
                 <p className="font-semibold text-sky-200">
@@ -47,13 +41,6 @@ export function Publications({
               </div>
             )
           })}
-        {displayed_publication != undefined && display_see_details && (
-          <PublicationDetails
-            setSearchBarVisible={setSearchBarVisible}
-            setDisplaySeeDetails={setDisplaySeeDetails}
-            publication={displayed_publication}
-          />
-        )}
       </div>
     </div>
   )

@@ -4,33 +4,49 @@ import { Experiment, Experiments, Publication } from "@/utils/types"
 import { isPublication } from "@/utils/types.utils"
 import { useState } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
+import LeftPage from "$/assets/icons/left-page.svg"
+import RightPage from "$/assets/icons/right-page.svg"
+import FirstPage from "$/assets/icons/first-page.svg"
+import LastPage from "$/assets/icons/last-page.svg"
 import { PropsWithChildren } from "react"
 import { Collection } from "@/utils/store/collection.store"
+import ArrowLeft from "$/assets/icons/arrow-left.svg"
+import Link from "next/link"
+import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 
 
 type Props = {
     collection : Collection
-    closeViewCollection : () => void
+    onClose ?: {fn:() => void}
+    onReturn ?: {fn:() => void}
+    load ?: () => void
   }
   
-  export function ViewCollection({collection, closeViewCollection} : Props){
+  export function ViewCollection({collection, onClose,onReturn,load} : Props){
     return (
-      <div className="flex flex-grow">
+      <div className="h-full">
         <div 
-          className={`bg-gray-900 
-              z-40 p-2 my-5
-              fixed top-0 right-0 lg:left-1/2 lg:-translate-x-1/2
-              lg:w-1/2 rounded-md`}
+          className={`flex flex-col bg-gray-900 
+              p-5 w-full h-full rounded-md`}
         >
-          <div className="relative h-10 w-full">
-            <CrossIcon
-                className="absolute right-2 top-0 w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
-                onClick={() => closeViewCollection()}
+          <div className="flex-grow-0 h-10 w-full">
+            {
+              !onReturn && onClose &&
+              <CrossIcon
+                  className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+                  onClick={() => onClose.fn()}
                 />
+            }           
+            {
+              onReturn &&
+              <ArrowLeft
+                className="w-4 h-4 cursor-pointer text-emerald-400 child:fill-emerald-400"
+                onClick={() => onReturn.fn()}
+              />
+            }
           </div>
-          <div className={`max-w-full max-h-full overflow-y-auto overflow-x-hidden `}>
-            
-            <CollectionDetails collection={collection}/>
+          <div className={`max-h-full overflow-y-auto flex flex-grow h-full`}>
+              <CollectionDetails collection={collection} load={onReturn !== undefined}/>
           </div>
         </div>
       </div>
@@ -40,9 +56,10 @@ type Props = {
 
 type CollectionProps = {
     collection : Publication | Experiments | undefined
+    load:boolean
 }
 
-export function CollectionDetails({collection, children} : PropsWithChildren<CollectionProps>){
+export function CollectionDetails({collection, load} : CollectionProps){
     const [display_abstract, setDisplayAbstract] = useState(false)
     if (!collection) return null;
 
@@ -52,60 +69,64 @@ export function CollectionDetails({collection, children} : PropsWithChildren<Col
         )
     }
     return (
-        <div className={`p-2`}>
-            <p className="py-2 font-semibold text-center text-sky-200">
+        <div className={`flex-grow h-full h-hull grid grid-cols-2`}>
+          <div className="max-h-full overflow-y-auto border-r-2 border-slate-500">
+            <h1 className="tracking-wide font-semibold text-center text-sky-200">
             {collection.title}
-          </p>
-            <p className="italic py-2 text-slate-400 text-sm">
+            </h1>
+            <br />
+            <h3 className="italic text-center  tracking-wide text-slate-400 text-sm">
                 {collection.journal}, {collection.year}
-            </p>
-            <p className="font-medium tracking-wide">{collection.authors_full}</p>
-            <div className="pt-2 pr-4">
-                <p className="pb-1 font-semibold">Abstract : </p>
-                <p>{collection.abstract}
-                  {/* {display_abstract
-                    ? collection.abstract
-                    : collection.abstract.slice(0, 90) + " ..."} */}
-                </p>
-                {/* <div
-                className="cursor-pointer hover:underline text-right"
-                onClick={() => {
-                    setDisplayAbstract((prev) => !prev)
-                }}
-                >
-                    {display_abstract ? "Hide" : "Full abstract"}
-                </div> */}
+            </h3>
+            <h2 className="font-medium  text-center tracking-wide text-sm text-slate-400">{collection.authors_full}</h2>
+            <br />
+            <div className="px-5 ">
+              <p className="tracking-[.5em] small-caps  font-semibold">Abstract : </p>
+              <br />
+              <p className="tracking-wide leading-relaxed indent-10 break-words">{collection.abstract}</p>
             </div>
-            <div className="w-full flex flex-col items-center gap-2 justify-center">
-                {children}
+          </div>
+          <div className="grid grid-rows-2 h-full">
+              <div className="row-span-4 h-full overflow-hidden">
                 <ExperimentsTab exps={collection.exps} />
-            </div>
+              </div>
+              <div className="row-start-5 ">
+                {
+                  load &&
+                  <Link href={`/publication/${collection.authors_short.replaceAll(" ", ".")}*${collection.year}`}>
+                    <ButtonPrimary onClick={()=>{}}> 
+                      Load
+                    </ButtonPrimary>
+                  </Link>
+                }
+              </div>
+          </div>
     </div>
     )
 }
 
 
 function ExperimentsTab({ exps }: { exps: Experiment[] }) {
+    const [slice,setSlice] = useState<{from:number,size:number}>({from:0,size:10})
     return (
-      <div className="py-3 px-4">
-        <div className="overflow-y-visible overflow-x-hidden max-h-52">
+        <div className="p-5 overflow-x-hidden rounded-lg h-full flex flex-col ">
           <table
-            className="w-11/12 table-fixed border-t-0 border"
+            className="w-full flex-grow  table-fixed border-collapse"
             id="exps-table"
           >
-            <thead className="border-b  text-left font-medium border-neutral-500 bg-slate-600 sticky top-0">
-              <tr className="">
-                <th scope="col" className="border-r px-6 py-2 border-neutral-500">
+            <thead className="text-left bg-slate-700  uppercase tracking-widest font-medium text-lg">
+              <tr className="rounded-lg">
+                <th scope="col" className="px-10 py-3 border border-slate-700 rounded-lg">
                   Experiments
                 </th>
-                <th scope="col" className="border-r px-6 py-2 border-neutral-500">
+                <th scope="col" className="px-10 py-3 border border-slate-700 rounded-lg">
                   Age
                 </th>
               </tr>
             </thead>
-            <tbody className="">
+            <tbody className="overflow-hidden">
               {exps.length > 0 &&
-                exps.map((exp) => {
+                exps.slice(slice.from,slice.from+slice.size).map((exp) => {
                   let label =
                     exp.metadata.length == 1 ? exp.metadata[0].metadata.text : ""
                   if (exp.metadata.length > 1){
@@ -113,13 +134,13 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
                   }
                   return (
                     <tr
-                      className="w-full border-b dark:border-neutral-500"
+                      className="w-full  tracking-widest font-normal text-md border-b border-slate-500 hover:bg-slate-800"
                       key={exp.id}
                     >
-                      <td className="border px-6 py-2 font-medium dark:border-neutral-500">
+                      <td className="truncate border px-10 py-3 font-medium border-slate-800">
                         {exp.id}
                       </td>
-                      <td className="border px-6 py-2 font-medium dark:border-neutral-500">
+                      <td className="truncate border px-10 py-3 font-medium border-slate-800">
                         {label}
                       </td>
                     </tr>
@@ -127,8 +148,40 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
                 })}
             </tbody>
           </table>
+          <div className="justify-between mt-5 flex flex-row">
+            <div className="ml-5 tracking-[.5em] small-caps opacity-70 cursor-default">
+                {exps.length} Experiment{exps.length > 1 ? 's' : ''}
+            </div>
+            <div className=" flex flex-row">
+              <FirstPage className="cursor-pointer mx-5 w-5 h-5" onClick={() => {
+                setSlice((prev) => {
+                  return {...prev,from:0}
+                })
+              }}/>
+              <LeftPage className="cursor-pointer mx-5 w-5 h-5" onClick={() => {
+                setSlice((prev) => {
+                  const nfrom = Math.max(prev.from - prev.size,0)
+                  return {...prev,from: nfrom}
+                })
+              }}/>
+              <div>
+                {Math.floor(slice.from / slice.size)+1} of {Math.floor(exps.length / slice.size)+1}
+              </div>
+              <RightPage className="cursor-pointer mx-5 w-5 h-5" onClick={() => {
+                setSlice((prev) => {
+                  const nfrom = Math.min((prev.from + prev.size) / prev.size,Math.floor(exps.length / prev.size)) * prev.size
+                  return {...prev,from: nfrom}
+                })
+              }}/>
+              <LastPage className="cursor-pointer mx-5 w-5 h-5" onClick={() => {
+                setSlice((prev) => {
+                  const nfrom = Math.floor(exps.length / prev.size)*prev.size
+                  return {...prev,from: nfrom}
+                })
+              }}/>
+            </div>
+          </div>
         </div>
-      </div>
     )
   }
   

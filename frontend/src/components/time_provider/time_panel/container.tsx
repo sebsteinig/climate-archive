@@ -15,7 +15,7 @@ import PinIcon from "$/assets/icons/place.svg"
 import { MutableRefObject, PropsWithChildren, forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react"
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
 import InfoIcon from "$/assets/icons/info.svg"
-import { isPublication } from "@/utils/types.utils"
+import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
 import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -87,11 +87,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
               } 
             }>
               {data.collection?.exps.map((e) => {
-                let label = e.metadata.length == 1 ? `${e.metadata[0].metadata.text}` : ""
-                if (e.metadata.length > 1){
-                  label = e.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
-                }
-                return <option key={e.id}>{e.id} | {label}</option>
+                const {id,label} = getTitleOfExp(e)
+                return <option key={id}>{id} | {label}</option>
               })}
             </Select>
         </div>
