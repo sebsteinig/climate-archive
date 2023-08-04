@@ -5,6 +5,7 @@ import ButtonPrimary from "../../buttons/ButtonPrimary"
 import { Publication } from "../../../utils/types"
 import { CollectionDetails } from "../utils/CollectionDetails"
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useMemo } from "react"
 
 type Props =  {
   publication : Publication
@@ -18,6 +19,11 @@ export default function PublicationDetails({
   setSearchBarVisible,
 }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const reload = useMemo(() => {
+    if(!searchParams.has("reload")) return true;
+    return searchParams.get("reload") == "true"
+  }, [searchParams])
   return (
     <div className="border-s-4 flex flex-wrap gap-2 border-sky-700 mt-2 mb-2 pl-4">
       <ArrowLeft
@@ -28,7 +34,7 @@ export default function PublicationDetails({
         <ButtonPrimary
           onClick={() => {
             setSearchBarVisible(false)
-            router.push(`/publication?reload=true&${publication.authors_short.replaceAll(" ", ".")}*${publication.year}=${publication.exps[0].id}`)
+            router.push(`/publication?reload=${!reload}&${publication.authors_short.replaceAll(" ", ".")}*${publication.year}=${publication.exps[0].id}`)
           }}
         >
           Load

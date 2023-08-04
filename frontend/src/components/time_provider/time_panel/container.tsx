@@ -61,36 +61,48 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     const router = useRouter()
     const pathname = usePathname()
     const [display_buttons, displayButtons] = useState(false)
-    const onChangeExp :(id : string) => string = (id : string) => {
+
+    const paramsOnChangeExp :(id : string) => string = (id : string) => {
       let p = new URLSearchParams()
       Array.from(searchParams, ([k, v], i) =>{
-        p.append(k, i == grid_id? id : v)
+        p.append(k, i == grid_id + 1 ? id : v)
       })
       return p.toString()
     }
 
 
-    const params_on_dup = useMemo(() => {
-      let p = new URLSearchParams()
-      if (isPublication(data.collection)){
-        if(grid_id< Array.from(searchParams).length){
-          p.set(`${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`, data.collection.exps[0].id)
-          //Array.from(searchParams)[grid_id][1])
-        }        
-      }
-      return p.toString()
-    }, [Array.from(searchParams)])
+    const [params_on_dup, params_on_del, current_exp_id] = useMemo(() => {
+      if(grid_id+1 >= Array.from(searchParams).length) return [null, null, data.collection.exps[0].id]
+      const exp_id = Array.from(searchParams)[grid_id+1][1]
 
-    const params_on_del = useMemo(() => {
-      let p = new URLSearchParams()
-        if(grid_id< Array.from(searchParams).length){
-          Array.from(searchParams, (([k, v], idx) => {
-            if(idx != grid_id){
-              p.append(k, v)
-            }
-          }))          
+      //on duplicate
+      let on_dup = new URLSearchParams()
+      if (isPublication(data.collection)){
+        on_dup.set(`${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`, exp_id)
       }
-      return p.toString()
+
+      //on delete
+      let on_del = new URLSearchParams()
+      Array.from(searchParams, (([k, v], idx) => {
+        if(idx != grid_id+1){
+          on_del.append(k, v)
+        }
+      }))
+
+      //on change experiment
+      if(exp_id == data.collection.exps[0].id) return[on_dup.toString(), on_del.toString(), exp_id];
+      const current_exp = data.collection.exps.filter((e) => e.id == exp_id)
+      if(current_exp.length == 0) return[on_dup.toString(), on_del.toString(), data.collection.exps[0].id];
+      database_provider.load({
+        exp_id: exp_id,
+      }).then(
+        () => {
+          const frame = current_frame.current.get(time_id)
+          if(!frame) return;
+          current_frame.current.init(time_id,current_exp[0],active_variables).then(()=>{})
+        }
+      )
+      return [on_dup.toString(), on_del.toString(), exp_id]
     }, [Array.from(searchParams)])
 
     
@@ -103,44 +115,37 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         {(data.collection && isPublication(data.collection)) && <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
             {data.collection.authors_short}, {data.collection.year}
         </p>}
-        <div className="absolute top-0 left-0 flex m-2">
+        {grid_id + 1 < Array.from(searchParams).length && 
+          <div className="absolute top-0 left-0 flex m-2">
 
-          {grid_id < Array.from(searchParams).length && 
             <Link href={`${pathname}?${params_on_del}`}>
               <CrossIcon
                 className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
                 onClick={() => remove(time_id)}
               />
             </Link>
-          }
             
-          <Select 
-            className="ml-5"
-            onChange={
-            (e) => {
+            <Select 
+              className="ml-5"
+              defaultValue={current_exp_id}
+              onChange={
+              (e) => {
                 const idx = e.target.selectedIndex
                 const exp = data.collection.exps[idx]
-                router.push(`${pathname}?${onChangeExp(exp.id)}`)
-                database_provider.load({
-                  exp_id: exp.id,
-                }).then(
-                  () => {
-                    const frame = current_frame.current.get(time_id)
-                    if(!frame) return;
-                    current_frame.current.init(time_id,exp,active_variables).then(()=>{})
-                  }
-                )
-            } 
-          }>
-            {data.collection?.exps.map((e) => {
-              let label = e.metadata.length == 1 ? `${e.metadata[0].metadata.text}` : ""
-              if (e.metadata.length > 1){
-                label = e.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
-              }
-              return <option key={e.id}>{e.id} | {label}</option>
-            })}
-          </Select>
-        </div>
+                router.push(`${pathname}?${paramsOnChangeExp(exp.id)}`)
+              } 
+            }>
+              {data.collection?.exps.map((e) => {
+                let label = e.metadata.length == 1 ? `${e.metadata[0].metadata.text}` : ""
+                if (e.metadata.length > 1){
+                  label = e.metadata.filter((m:{label:string, metadata:any}) => m.metadata.age)[0].metadata.age
+                }
+                return <option key={e.id} value={e.id}>{e.id} | {label}</option>
+              })}
+            </Select>
+          </div>
+        }
+
         <div
           className={`absolute z-30 group bottom-0 right-0 bg-gray-900
          rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}
@@ -164,7 +169,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
           />
           
           
-          {grid_id< Array.from(searchParams).length && <Link href={`${pathname}?${searchParams.toString()}&${params_on_dup}`}>
+          {grid_id + 1< Array.from(searchParams).length && <Link href={`${pathname}?${searchParams.toString()}&${params_on_dup}`}>
             <DuplicateIcon
               className="w-10 h-10 cursor-pointer p-2 text-slate-500"
               onClick={() => {                

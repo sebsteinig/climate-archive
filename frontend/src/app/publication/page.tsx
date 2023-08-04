@@ -17,14 +17,8 @@ export default function PublicationPage(){
   const router = useRouter()
 
   const reload = useMemo(() => {
-    const res = searchParams.has("reload")
-    if(!res) return res
-    let p = new URLSearchParams()
-    searchParams.forEach((v, k) => {
-      if(k != "reload") p.append(k, v);
-    })
-    router.push(`/publication?${p.toString()}`)    
-    return res
+    if (!searchParams.has("reload")) return false;
+    return (searchParams.get("reload") == "true")
   }, [searchParams])
 
   useEffect(() => {
