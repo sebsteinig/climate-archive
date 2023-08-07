@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react"
 
 type Props = {
   value: number
-  onChange: (number:number) => void
+  onChange: (number: number) => void
   onKeyDown?: Function
   min?: number
   max?: number

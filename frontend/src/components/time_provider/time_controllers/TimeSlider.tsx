@@ -55,7 +55,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
   })
   const max = useMemo(() => {
     const frame = current_frame.current.get(time_id)
-    const timestep = frame?.timesteps    
+    const timestep = frame?.timesteps
     return timestep ?? 0
   }, [current_frame.current.get(time_id)])
 

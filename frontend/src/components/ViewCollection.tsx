@@ -58,7 +58,6 @@ type CollectionProps = {
 }
 
 export function CollectionDetails({ collection, load }: CollectionProps) {
-  
   const searchParams = useSearchParams()
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return true
@@ -124,10 +123,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
   return (
     <div className="p-5 overflow-x-hidden rounded-lg h-full flex flex-col ">
       <div className="flex-grow ">
-        <table
-          className="w-full table-fixed border-collapse"
-          id="exps-table"
-        >
+        <table className="w-full table-fixed border-collapse" id="exps-table">
           <thead className="text-left bg-slate-700">
             <tr className="rounded-lg">
               <th
@@ -147,7 +143,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
           <tbody className="overflow-hidden">
             {exps.length > 0 &&
               exps.slice(slice.from, slice.from + slice.size).map((exp) => {
-                const {id,label} = getTitleOfExp(exp)
+                const { id, label } = getTitleOfExp(exp)
                 return (
                   <tr
                     title={`${id} | ${label}`}
@@ -166,7 +162,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
           </tbody>
         </table>
       </div>
-      
+
       <div className="justify-between mt-5 flex flex-row">
         <div className="ml-5 tracking-[.5em] small-caps opacity-70 cursor-default">
           {exps.length} Experiment{exps.length > 1 ? "s" : ""}

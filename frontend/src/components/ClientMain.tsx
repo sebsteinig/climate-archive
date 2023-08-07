@@ -1,5 +1,5 @@
 "use client"
-import { TimeProvider } from "./time_provider/TimeProvider"
+import { TimeProvider } from "./time_provider/TimeManager"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -19,7 +19,7 @@ export default function ClientMain({}: Props) {
   const add = useClusterStore((state) => state.time.add)
   const pathname = usePathname()
   useEffect(() => {
-    if (!pathname.includes("publication")){
+    if (!pathname.includes("publication")) {
       Promise.all([database_provider.loadAllColections()]).then(([e]) => {
         e.map((element) => {
           addCollection(element.id!, element.data)
@@ -52,7 +52,7 @@ export default function ClientMain({}: Props) {
             <div className=" h-full flex  items-center absolute">
               <SideBar journals={<></>} />
             </div>
-            <HelpButton className="absolute bottom-0 grow-0 justify-self-end"/>
+            <HelpButton className="absolute bottom-0 grow-0 justify-self-end" />
           </div>
         </div>
         <div className="flex-grow flex flex-col gap-5">

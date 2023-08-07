@@ -1,4 +1,10 @@
-import { RowWithCheckBox, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import {
+  RowWithCheckBox,
+  RowWithSlider,
+  Rows,
+  Variable,
+  VariableProps,
+} from "../utils"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import InputNumber from "@/components/inputs/InputNumber"
 import Slider from "@/components/inputs/Slider"
@@ -17,8 +23,8 @@ export function Winds({
       controls={true}
     >
       <Rows>
-        <RowWithSlider 
-          onChange={(n)=> {
+        <RowWithSlider
+          onChange={(n) => {
             winds.updateAnimationSpeed(n)
           }}
           min={0}
@@ -26,9 +32,9 @@ export function Winds({
           step={0.0001}
           value={winds.animation_speed}
           label="animation speed"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             winds.updateMinSpeed(n)
           }}
           min={1}
@@ -36,9 +42,9 @@ export function Winds({
           step={1}
           value={winds.min_speed}
           label="min speed [m/s]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             winds.updateReferenceSpeed(n)
           }}
           min={1}
@@ -46,9 +52,9 @@ export function Winds({
           step={0.1}
           value={winds.reference_speed}
           label="reference speed [m/s]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             winds.updateArrows(n)
           }}
           min={0}
@@ -56,9 +62,9 @@ export function Winds({
           step={100}
           value={winds.arrows}
           label="number of arrows"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             winds.updateArrowsSize(n)
           }}
           min={0}
@@ -66,21 +72,21 @@ export function Winds({
           step={0.01}
           value={winds.arrows}
           label="number of arrows"
-          />
-        <RowWithCheckBox 
-          toggle={()=> {
+        />
+        <RowWithCheckBox
+          toggle={() => {
             winds.toggleScaleByMagnitude()
           }}
           checked={winds.scale_by_magnitude}
           label="scale by magnitude"
-          />
-        <RowWithCheckBox 
-          toggle={()=> {
+        />
+        <RowWithCheckBox
+          toggle={() => {
             winds.toggleColorByMagnitude()
           }}
           checked={winds.color_by_magnitude}
           label="color by magnitude"
-          />
+        />
       </Rows>
     </Variable>
   )

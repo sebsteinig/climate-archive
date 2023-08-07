@@ -33,7 +33,9 @@ function Period({
     (year && year[0]) || DEFAULT_LOWER,
   )
   const [year_upper, setYearUpper] = useState(
-    (year && on_period && year[1]) || (year && !on_period && year[0]) || DEFAULT_UPPER,
+    (year && on_period && year[1]) ||
+      (year && !on_period && year[0]) ||
+      DEFAULT_UPPER,
   )
   if (on_period) {
     return (
@@ -43,13 +45,16 @@ function Period({
             {" "}
             <h4>Year : </h4>{" "}
           </div>
-          <ButtonSecondary onClick={() => {
-            setOnPeriod(false)
-            onChange([year_upper === DEFAULT_UPPER
-              ? new Date().getFullYear()
-              : parseInt(year_upper.toString())
-            ])
-          }}>
+          <ButtonSecondary
+            onClick={() => {
+              setOnPeriod(false)
+              onChange([
+                year_upper === DEFAULT_UPPER
+                  ? new Date().getFullYear()
+                  : parseInt(year_upper.toString()),
+              ])
+            }}
+          >
             {" "}
             {on_period ? "Between" : "Exactly"}
           </ButtonSecondary>
@@ -64,7 +69,7 @@ function Period({
                   new_year = parseInt(e.target.value)
                 }
                 let yu = new Date().getFullYear()
-                if(year_upper !== DEFAULT_UPPER){
+                if (year_upper !== DEFAULT_UPPER) {
                   yu = parseInt(year_upper.toString())
                 }
                 onChange([new_year, yu])
@@ -89,11 +94,11 @@ function Period({
               id="period_upper"
               onChange={(e: any) => {
                 let new_year = new Date().getFullYear()
-                if(e.target.value !== DEFAULT_UPPER){
+                if (e.target.value !== DEFAULT_UPPER) {
                   new_year = parseInt(e.target.value)
                 }
                 let yl = 1970
-                if (year_lower !== DEFAULT_LOWER){
+                if (year_lower !== DEFAULT_LOWER) {
                   yl = parseInt(year_lower.toString())
                 }
                 onChange([yl, new_year])
@@ -120,11 +125,19 @@ function Period({
           {" "}
           <h4>Year : </h4>{" "}
         </div>
-        <ButtonSecondary onClick={() => {
-          setOnPeriod(true)
-          onChange([year_lower == DEFAULT_LOWER ? 1900 : parseInt(year_lower.toString()), 
-            year_upper == DEFAULT_UPPER ? new Date().getFullYear() : parseInt(year_upper.toString())])
-        }}>
+        <ButtonSecondary
+          onClick={() => {
+            setOnPeriod(true)
+            onChange([
+              year_lower == DEFAULT_LOWER
+                ? 1900
+                : parseInt(year_lower.toString()),
+              year_upper == DEFAULT_UPPER
+                ? new Date().getFullYear()
+                : parseInt(year_upper.toString()),
+            ])
+          }}
+        >
           {" "}
           {on_period ? "Between" : "Exactly"}
         </ButtonSecondary>
@@ -213,7 +226,9 @@ export default function FilterPublication({
                 setRequestFilters({ journal: e.target.value })
               }}
             >
-              <option disabled selected value={""}>Select a journal ...</option>
+              <option disabled selected value={""}>
+                Select a journal ...
+              </option>
               {children}
             </Select>
           </div>
