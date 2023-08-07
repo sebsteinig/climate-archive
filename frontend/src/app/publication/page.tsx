@@ -8,7 +8,6 @@ import { useClusterStore } from "@/utils/store/cluster.store"
 import { useRouter, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 
-
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
@@ -19,22 +18,22 @@ export default function PublicationPage() {
   const searchParams = useSearchParams()
   const addWorld = useClusterStore((state) => state.time.add)
   const router = useRouter()
-  
+
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return false
     return searchParams.get("reload") == "true"
   }, [searchParams])
 
-  const loadExperiments = async(request : Map<string, any>) =>{
+  const loadExperiments = async (request: Map<string, any>) => {
     await database_provider.loadAll({
       exp_ids: request.get("exp_ids")!,
     })
     const collection = {
-      exps: request.get("exp_ids")!.map((exp : string) => {
+      exps: request.get("exp_ids")!.map((exp: string) => {
         return { id: exp, metadata: [] }
       }),
     } as Experiments
-    
+
     const idx = await database_provider.addCollectionToDb(collection)
     addCollection(idx, collection)
     addWorld(collection)
@@ -45,28 +44,25 @@ export default function PublicationPage() {
     for (let [key, value] of searchParams.entries()) {
       if (key == "reload") continue
 
-
-      if (key=="experiments"){
+      if (key == "experiments") {
         const values = value.replace("{", "").replace("}", "").split(";")
         const request = new Map()
-        for (let i = 0; i< values.length; i++){
+        for (let i = 0; i < values.length; i++) {
           const [k, v] = values[i].split("=")
-          switch (k){
+          switch (k) {
             case "resolution":
-              request.set(k, {x : v.split("*")[0], y : v.split("*")[1]})
+              request.set(k, { x: v.split("*")[0], y: v.split("*")[1] })
               break
             case "exp_ids":
               const ids = v.split(".")
-              if(ids[ids.length-1]=="") ids.pop()
+              if (ids[ids.length - 1] == "") ids.pop()
               request.set(k, ids)
               break
             default:
               request.set(k, v)
           }
         }
-        loadExperiments(request)  
-
-
+        loadExperiments(request)
       } else {
         const [author, year] = key.split("*")
         searchPublication({

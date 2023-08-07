@@ -77,7 +77,7 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
     if (!searchParams.has("reload")) return true
     return searchParams.get("reload") == "true"
   }, [searchParams])
-  
+
   if (!display) {
     return (
       <>
@@ -302,34 +302,27 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
           </Select>
         </span>
       </div>
-          
-      {exp_ids.exp_ids.length >0 &&
-      <Link href={`/publication?reload=${!reload}&experiments={exp_ids=${exp_ids.exp_ids.
-          map((e) => e.id + ".")};variables=${
-            variables
-          };config_name=${
-            config != "" ? config : undefined};extension=${
-              extension
-            };lossless=${
-              lossless
-            };resolution=${
-              resolution.x ?? 0
-            }*${
-              resolution.y ?? 0
-            }}`}     
-      >
-        <ButtonSecondary
-          disabled={exp_ids.exp_ids.length == 0}
-          onClick={async () => {
-            displaySearchBar(false)
-            
-            
-          }}
+
+      {exp_ids.exp_ids.length > 0 && (
+        <Link
+          href={`/publication?reload=${!reload}&experiments={exp_ids=${exp_ids.exp_ids.map(
+            (e) => e.id + ".",
+          )};variables=${variables};config_name=${
+            config != "" ? config : undefined
+          };extension=${extension};lossless=${lossless};resolution=${
+            resolution.x ?? 0
+          }*${resolution.y ?? 0}}`}
         >
-          Load
-        </ButtonSecondary>
-      </Link>
-      }
+          <ButtonSecondary
+            disabled={exp_ids.exp_ids.length == 0}
+            onClick={async () => {
+              displaySearchBar(false)
+            }}
+          >
+            Load
+          </ButtonSecondary>
+        </Link>
+      )}
     </>
   )
 }

@@ -1,4 +1,10 @@
-import { RowWithCheckBox, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import {
+  RowWithCheckBox,
+  RowWithSlider,
+  Rows,
+  Variable,
+  VariableProps,
+} from "../utils"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -17,8 +23,8 @@ export function Currents({
       controls={true}
     >
       <Rows>
-        <RowWithSlider 
-          onChange={(n)=> {
+        <RowWithSlider
+          onChange={(n) => {
             currents.updateAnimationSpeed(n)
           }}
           min={0}
@@ -26,9 +32,9 @@ export function Currents({
           step={0.0001}
           value={currents.animation_speed}
           label="animation speed"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             currents.updateReferenceSpeed(n)
           }}
           min={1}
@@ -36,9 +42,9 @@ export function Currents({
           step={0.1}
           value={currents.reference_speed}
           label="reference speed [cm/s]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             currents.updateArrows(n)
           }}
           min={0}
@@ -46,9 +52,9 @@ export function Currents({
           step={0.01}
           value={currents.arrows}
           label="number of arrows"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             currents.updateArrowsSize(n)
           }}
           min={0}
@@ -56,21 +62,21 @@ export function Currents({
           step={0.01}
           value={currents.arrows_size}
           label="size of arrows"
-          />
-        <RowWithCheckBox 
-          toggle={()=> {
+        />
+        <RowWithCheckBox
+          toggle={() => {
             currents.toggleScaleByMagnitude()
           }}
           checked={currents.scale_by_magnitude}
           label="scale by magnitude"
-          />
-        <RowWithCheckBox 
-          toggle={()=> {
+        />
+        <RowWithCheckBox
+          toggle={() => {
             currents.toggleColorByMagnitude()
           }}
           checked={currents.color_by_magnitude}
           label="color by magnitude"
-          />
+        />
       </Rows>
     </Variable>
   )

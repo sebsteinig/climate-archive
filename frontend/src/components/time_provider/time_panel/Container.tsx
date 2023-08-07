@@ -29,6 +29,7 @@ import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { ContainerConf } from "./ContainerConf"
 
 type Props = {
   className?: string
@@ -84,11 +85,15 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
 
     const onChangeExp: (id: string) => void = (id: string) => {
       let p = new URLSearchParams()
-      if(!pathname.includes("publication")){
-        p.append(isPublication(data.collection) ? 
-          `${data.collection.authors_short.replaceAll(" ", ".")}*${
-            data.collection.year
-          }`: `${data.collection.exps.map((e) => e.id + ".")}`, id)
+      if (!pathname.includes("publication")) {
+        p.append(
+          isPublication(data.collection)
+            ? `${data.collection.authors_short.replaceAll(" ", ".")}*${
+                data.collection.year
+              }`
+            : `${data.collection.exps.map((e) => e.id + ".")}`,
+          id,
+        )
         router.push(`/publication?reload=false&${p.toString()}`)
       } else {
         Array.from(searchParams, ([k, v], i) => {
@@ -100,21 +105,26 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
 
     const [route_on_dup, params_on_del, current_exp_id] = useMemo(() => {
       const key = isPublication(data.collection)
-      ? `${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`
-      : `${data.collection.exps.map((e) => e.id + ".")}`   
+        ? `${data.collection.authors_short.replaceAll(" ", ".")}*${
+            data.collection.year
+          }`
+        : `${data.collection.exps.map((e) => e.id + ".")}`
 
       let on_dup = new URLSearchParams()
       let on_del = new URLSearchParams()
-      if (grid_id + 1 >= Array.from(searchParams).length){        
+      if (grid_id + 1 >= Array.from(searchParams).length) {
         on_dup.append(key, data.collection.exps[0].id)
         on_dup.append(key, data.collection.exps[0].id)
-        return [`/publication?reload=false&${on_dup.toString()}`, on_del, data.collection.exps[0].id];
+        return [
+          `/publication?reload=false&${on_dup.toString()}`,
+          on_del,
+          data.collection.exps[0].id,
+        ]
       }
-     //on duplicate
-      on_dup.set( key, Array.from(searchParams)[grid_id + 1][1])      
+      //on duplicate
+      on_dup.set(key, Array.from(searchParams)[grid_id + 1][1])
       const route_dup = `${pathname}?${searchParams.toString()}&${on_dup.toString()}`
-        
-        
+
       //on delete
       Array.from(searchParams, ([k, v], idx) => {
         if (idx != grid_id + 1) {
@@ -128,11 +138,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         return [route_dup, on_del.toString(), exp_id]
       const current_exp = data.collection.exps.filter((e) => e.id == exp_id)
       if (current_exp.length == 0)
-        return [
-          route_dup,
-          on_del.toString(),
-          data.collection.exps[0].id,
-        ]
+        return [route_dup, on_del.toString(), data.collection.exps[0].id]
       database_provider
         .load({
           exp_id: exp_id,
@@ -159,7 +165,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
-        {(!pathname.includes("publication") || grid_id + 1 < Array.from(searchParams).length) && (
+        {(!pathname.includes("publication") ||
+          grid_id + 1 < Array.from(searchParams).length) && (
           <div className="absolute top-0 left-0 flex m-2">
             <Link href={`${pathname}?${params_on_del}`}>
               <CrossIcon
@@ -189,110 +196,15 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
           </div>
         )}
 
-        <div
-          className={` shadow-lg shadow-slate-950 
-          absolute z-30 group bottom-0 right-0 bg-gray-900
-         rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}
-        >
-          {display_buttons && (
-            <PanelConfiguration
-              time_id={time_id}
-              data={data}
-              displayButtons={displayButtons}
-            />
-          )}
-
-          {!display_buttons && (
-            <ArrowUpIcon
-              className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-400 child:fill-slate-400"
-              onClick={() => displayButtons(true)}
-            />
-          )}
-
-          <InfoIcon
-            className="w-12 h-12 cursor-pointer p-2 text-slate-400"
-            onClick={() => displayCollection(data.collection)}
-          />
-
-          {(!pathname.includes("publication") || grid_id + 1 < Array.from(searchParams).length) && (
-            <Link href={route_on_dup} >
-              <DuplicateIcon
-                className="w-10 h-10 cursor-pointer p-2 text-slate-400"
-                onClick={() => {
-                  dup(time_id)
-                }}
-              />
-            </Link>
-          )}
-        </div>
+        <ContainerConf
+          className="absolute bottom-0 right-0 m-2 "
+          data={data}
+          current_frame={current_frame}
+          displayCollection={displayCollection}
+          on_dup_href={route_on_dup}
+          time_id={time_id}
+        />
       </div>
     )
   },
 )
-
-type ConfProps = {
-  displayButtons: (bool: boolean) => void
-  time_id: TimeID
-  data: WorldData
-}
-
-function PanelConfiguration({ time_id, data, displayButtons }: ConfProps) {
-  const [as_planet, setAsPlanet] = useState(true)
-  const linkCamera = useClusterStore((state) => state.time.linkCamera)
-  return (
-    <div className="grid grid-cols-1 gap-1 justify-items-center ">
-      <ArrowDownIcon
-        className="p-2 w-10 h-10 cursor-pointer text-slate-400 child:fill-slate-400"
-        onClick={() => displayButtons(false)}
-      />
-
-      {/* <div className="grid grid-cols-2 items-center p-2">
-        <LinkIcon className="cursor-pointer w-4 h-4"
-          onClick={() => null}
-          /> */}
-      {/* </div> */}
-
-      <CameraIcon
-        className={`cursor-pointer w-5 h-5 my-2 ${
-          data.conf.camera.is_linked ? "text-slate-400" : "text-slate-300"
-        }`}
-        onClick={() => {
-          linkCamera(time_id, !data.conf.camera.is_linked)
-        }}
-      />
-
-      <RecenterIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
-      />
-
-      <FullScreenIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
-      />
-
-      <ScreenshotIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400 `}
-      />
-
-      <WorldIcon
-        className={`cursor-pointer w-6 h-6 my-2 
-        ${
-          as_planet
-            ? "text-emerald-400 child:fill-emerald-400"
-            : "text-slate-400 child:fill-slate-400"
-        }`}
-        onClick={() => setAsPlanet((prev) => !prev)}
-      />
-
-      <RotateIcon
-        className={`w-7 h-7 my-2 text-slate-400 child:fill-slate-400
-        ${as_planet ? "cursor-pointer" : "opacity-70"}`}
-      />
-
-      <GridIcon className={`cursor-pointer w-6 h-6 my-2 text-slate-400`} />
-
-      <PinIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
-      />
-    </div>
-  )
-}

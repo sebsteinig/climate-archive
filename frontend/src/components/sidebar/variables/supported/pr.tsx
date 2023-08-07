@@ -17,8 +17,8 @@ export function Pr({
       controls={true}
     >
       <Rows>
-        <RowWithSlider 
-          onChange={(n)=> {
+        <RowWithSlider
+          onChange={(n) => {
             pr.updateMin(n)
           }}
           min={0}
@@ -26,9 +26,9 @@ export function Pr({
           step={0.1}
           value={pr.min}
           label="precip min. [mm/day]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             pr.updateMax(n)
           }}
           min={0}
@@ -36,7 +36,7 @@ export function Pr({
           step={0.1}
           value={pr.max}
           label="precip max. [mm/day]"
-          />
+        />
       </Rows>
     </Variable>
   )

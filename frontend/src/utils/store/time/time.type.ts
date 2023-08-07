@@ -44,11 +44,11 @@ export type TimeFrameState = {
     frame: number
   }
   info: TextureInfo
-  is_freezed:boolean
+  is_freezed: boolean
 }
 export type TimeFrame = {
   exp: Experiment
-  timesteps ?: number
+  timesteps?: number
   uSphereWrapAmount: number
   variables: Map<EVarID, TimeFrameState>
   weight: number

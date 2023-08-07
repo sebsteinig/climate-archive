@@ -48,12 +48,12 @@ function IconOf({
   name,
   toggle,
   active,
-  className
+  className,
 }: {
   name: EVarID
   toggle: Function
   active: boolean
-  className?:string
+  className?: string
 }) {
   const _className = `p-1 w-10 h-10 ${
     active ? "text-emerald-500" : "text-slate-500"
@@ -65,7 +65,7 @@ function IconOf({
   }`
   switch (name) {
     case EVarID.currents:
-      return <WaveIcon onClick={() => toggle()} className={_className}/>
+      return <WaveIcon onClick={() => toggle()} className={_className} />
     case EVarID.pr:
       return <RainIcon onClick={() => toggle()} className={_className} />
     case EVarID.height:
@@ -135,15 +135,13 @@ export function Variable({
           </div>
         </div>
         {controls && (
-          <div 
-            className="flex gap-5 w-fit items-center"               
-            onClick={
-              () => {
-                setCurrentVariableControls(
-                  current_variable_controls === title ? undefined : title,
-                )
-              }
-            }
+          <div
+            className="flex gap-5 w-fit items-center"
+            onClick={() => {
+              setCurrentVariableControls(
+                current_variable_controls === title ? undefined : title,
+              )
+            }}
           >
             <h4 className="tracking-widest w-fit whitespace-nowrap">
               {current_variable_controls === title
@@ -165,39 +163,45 @@ export function Variable({
         )}
         <br />
         <div className="mr-5">
-            {current_variable_controls === title && children}
+          {current_variable_controls === title && children}
         </div>
       </div>
     </div>
   )
 }
 
-
-export function Label({children,className}:PropsWithChildren<{className?:string}>) {
+export function Label({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) {
   return (
     <>
-      <h5 className={`flex-grow capitalize truncate whitespace-nowrap ${className ?? ''}`}>{children}</h5>
+      <h5
+        className={`flex-grow capitalize truncate whitespace-nowrap ${
+          className ?? ""
+        }`}
+      >
+        {children}
+      </h5>
       <h5>:</h5>
     </>
   )
 }
 
-export function Row({children}:PropsWithChildren<{}>) {
-  return <div className="flex flex-row gap-5 justify-between">
-    {children}
-  </div>
+export function Row({ children }: PropsWithChildren<{}>) {
+  return <div className="flex flex-row gap-5 justify-between">{children}</div>
 }
 
 type RowWithSliderProps = {
-  onChange : (number:number) => void
-  label:string
-  min:number
-  max:number
-  step ?: number
-  value : number
+  onChange: (number: number) => void
+  label: string
+  min: number
+  max: number
+  step?: number
+  value: number
 }
 
-export function RowWithSlider(props:RowWithSliderProps) {
+export function RowWithSlider(props: RowWithSliderProps) {
   return (
     <Row>
       <Label>{props.label}</Label>
@@ -219,29 +223,22 @@ export function RowWithSlider(props:RowWithSliderProps) {
 }
 
 type RowWithCheckBoxProps = {
-  toggle : () => void
-  label:string
+  toggle: () => void
+  label: string
   checked: boolean
 }
 
-export function RowWithCheckBox(props:RowWithCheckBoxProps) {
+export function RowWithCheckBox(props: RowWithCheckBoxProps) {
   return (
     <Row>
       <Label>{props.label}</Label>
       <div className="grow-[2]">
-      <Checkbox
-          checked={props.checked}
-          onChange={() => props.toggle()}
-        />
+        <Checkbox checked={props.checked} onChange={() => props.toggle()} />
       </div>
     </Row>
   )
 }
 
-export function Rows({children}:PropsWithChildren<{}>) {
-  return (
-    <div className="flex flex-col gap-5">
-      {children}
-    </div>
-  )
+export function Rows({ children }: PropsWithChildren<{}>) {
+  return <div className="flex flex-col gap-5">{children}</div>
 }

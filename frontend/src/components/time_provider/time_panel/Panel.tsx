@@ -5,7 +5,7 @@ import {
   TimeController,
 } from "../time_controllers/TimeController"
 import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
-import { Container, ContainerRef } from "./container"
+import { Container, ContainerRef } from "./Container"
 import { gridOf } from "@/utils/types.utils"
 import { Collection } from "@/utils/store/collection.store"
 

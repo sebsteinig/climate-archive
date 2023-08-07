@@ -4,7 +4,7 @@ type Props = {
   min: number
   max: number
   value: number
-  onChange: (number:number) => void
+  onChange: (number: number) => void
   step?: number
   onKeyDown?: Function
   name?: string

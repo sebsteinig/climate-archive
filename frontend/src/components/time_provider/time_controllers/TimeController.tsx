@@ -85,7 +85,10 @@ export const TimeController = forwardRef<ControllerRef, Props>(
               }}
             />
           )}
-          <Stop className={`cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`} onClick={() => {}} />
+          <Stop
+            className={`cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`}
+            onClick={() => {}}
+          />
         </div>
         <div className="flex-grow"></div>
       </div>

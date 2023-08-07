@@ -1,4 +1,10 @@
-import { RowWithCheckBox, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import {
+  RowWithCheckBox,
+  RowWithSlider,
+  Rows,
+  Variable,
+  VariableProps,
+} from "../utils"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -17,8 +23,8 @@ export function Tos({
       controls={true}
     >
       <Rows>
-        <RowWithSlider 
-          onChange={(n)=> {
+        <RowWithSlider
+          onChange={(n) => {
             tos.updateMin(n)
           }}
           min={-2}
@@ -26,9 +32,9 @@ export function Tos({
           step={0.1}
           value={tos.min}
           label="SST min. [°C]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             tos.updateMax(n)
           }}
           min={-2}
@@ -36,9 +42,9 @@ export function Tos({
           step={0.1}
           value={tos.max}
           label="SST max. [°C]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             tos.updateAnomalyRange(n)
           }}
           min={0}
@@ -46,9 +52,9 @@ export function Tos({
           step={0.1}
           value={tos.anomaly_range}
           label="anomaly range [°C]"
-          />
-        <RowWithSlider 
-          onChange={(n)=> {
+        />
+        <RowWithSlider
+          onChange={(n) => {
             tos.updateAnomaliesLowerBound(n)
           }}
           min={0}
@@ -56,14 +62,14 @@ export function Tos({
           step={0.1}
           value={tos.anomalies_lower_bound}
           label="mask anomalies below [°C]"
-          />
-        <RowWithCheckBox 
-          toggle={()=> {
+        />
+        <RowWithCheckBox
+          toggle={() => {
             tos.toggleSeaIce()
           }}
           checked={tos.sea_ice}
           label="show sea ice"
-          />
+        />
       </Rows>
     </Variable>
   )
