@@ -1,4 +1,4 @@
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { Clt } from "./supported/clt"
 import { Currents } from "./supported/currents"
 import { Height } from "./supported/height"
@@ -13,7 +13,7 @@ import { Tos } from "./supported/tos"
 import { Winds } from "./supported/winds"
 
 type Props = {
-  current_variable_controls: VariableName | undefined
+  current_variable_controls: EVarID | undefined
   setCurrentVariableControls: Function
   setCurrentDataDetails: Function
 }
@@ -26,7 +26,7 @@ export function Variables({
   return (
     <div className="h-2/3" onMouseOver={() => setCurrentDataDetails(false)}>
       <div className="overflow-y-auto overflow-x-hidden max-h-full">
-        <div className="grid grid-rows-12 gap-5">
+        <div className="flex flex-col gap-5">
           <Winds
             current_variable_controls={current_variable_controls}
             setCurrentVariableControls={setCurrentVariableControls}
@@ -52,11 +52,11 @@ export function Variables({
             setCurrentVariableControls={setCurrentVariableControls}
           />
           {/* <Liconc />
-                    <Clt  />
-                    <Mlotst />
-                    <Sic />
-                    <Snc />
-                    <Tas /> */}
+              <Clt  />
+              <Mlotst />
+              <Sic />
+              <Snc />
+              <Tas /> */}
         </div>
       </div>
     </div>

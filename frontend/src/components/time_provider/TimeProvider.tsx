@@ -11,7 +11,7 @@ import {
 } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { TimeFrameRef, Slots, TimeID } from "@/utils/store/time/time.type"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { gridOf } from "@/utils/types.utils"
 import { useFrameRef } from "./useFrameRef"
 import { useCanvas } from "./useCanvas"
@@ -122,7 +122,7 @@ export function TimeProvider(props: Props) {
 async function init(
   slots: Slots,
   current_frame: TimeFrameRef,
-  active_variables: VariableName[],
+  active_variables: EVarID[],
 ) {
   for (let [time_id, data] of slots) {
     const exp =

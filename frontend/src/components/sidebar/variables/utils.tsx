@@ -9,32 +9,35 @@ import Eye from "$/assets/icons/eye-slate-500.svg"
 import EyeClosed from "$/assets/icons/eye-closed-slate-500.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { useClusterStore } from "@/utils/store/cluster.store"
+import Slider from "@/components/inputs/Slider"
+import InputNumber from "@/components/inputs/InputNumber"
+import Checkbox from "@/components/inputs/Checkbox"
 
 export type VariableProps = {
-  current_variable_controls: VariableName | undefined
+  current_variable_controls: EVarID | undefined
   setCurrentVariableControls: Function
 }
 
 type Props = VariableProps & {
   controls: boolean
-  title: VariableName
+  title: EVarID
 }
 
-function titleOf(name: VariableName) {
+function titleOf(name: EVarID) {
   switch (name) {
-    case VariableName.currents:
+    case EVarID.currents:
       return "Currents"
-    case VariableName.pr:
+    case EVarID.pr:
       return "Precipitations"
-    case VariableName.height:
+    case EVarID.height:
       return "Surface"
-    case VariableName.winds:
+    case EVarID.winds:
       return "Winds"
-    case VariableName.tos:
+    case EVarID.tos:
       return "SST"
-    case VariableName.pfts:
+    case EVarID.pfts:
       return "Vegetation"
     default:
       return ""
@@ -45,43 +48,45 @@ function IconOf({
   name,
   toggle,
   active,
+  className
 }: {
-  name: VariableName
+  name: EVarID
   toggle: Function
   active: boolean
+  className?:string
 }) {
-  const className = `w-10 h-10 px-1 ${
-    active ? "text-emerald-400" : "text-slate-500"
+  const _className = `p-1 w-10 h-10 ${
+    active ? "text-emerald-500" : "text-slate-500"
   }`
-  const classNameWithChild = `w-10 h-10 px-1 ${
+  const _classNameWithChild = `p-1 w-10 h-10 ${
     active
-      ? "text-emerald-400 child:fill-emerald-400"
+      ? "text-emerald-500 child:fill-emerald-500"
       : "text-slate-500 child:fill-slate-500"
   }`
   switch (name) {
-    case VariableName.currents:
-      return <WaveIcon onClick={() => toggle()} className={className} />
-    case VariableName.pr:
-      return <RainIcon onClick={() => toggle()} className={className} />
-    case VariableName.height:
-      return <MountainIcon onClick={() => toggle()} className={className} />
-    case VariableName.winds:
+    case EVarID.currents:
+      return <WaveIcon onClick={() => toggle()} className={_className}/>
+    case EVarID.pr:
+      return <RainIcon onClick={() => toggle()} className={_className} />
+    case EVarID.height:
+      return <MountainIcon onClick={() => toggle()} className={_className} />
+    case EVarID.winds:
       return (
-        <WindsIcon onClick={() => toggle()} className={classNameWithChild} />
+        <WindsIcon onClick={() => toggle()} className={_classNameWithChild} />
       )
-    case VariableName.tos:
+    case EVarID.tos:
       return (
         <TemperatureIcon
           onClick={() => toggle()}
-          className={classNameWithChild}
+          className={_classNameWithChild}
         />
       )
-    case VariableName.pfts:
+    case EVarID.pfts:
       return (
-        <TreesIcon onClick={() => toggle()} className={classNameWithChild} />
+        <TreesIcon onClick={() => toggle()} className={_classNameWithChild} />
       )
     default:
-      return ""
+      return <></>
   }
 }
 
@@ -97,18 +102,20 @@ export function Variable({
   return (
     <div
       className={`group flex flex-row 
-       bg-gray-900 cursor-pointer
-         rounded-lg p-2 h-fit w-fit z-30 ${
+       bg-gray-900 cursor-pointer w-fit h-fit gap-5
+         rounded-lg p-2 z-30 ${
            active_variables.get(title)
              ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]"
              : ""
          }`}
     >
-      <IconOf
-        name={title}
-        active={active_variables.get(title)!}
-        toggle={() => activate(title)}
-      />
+      <div className="grow-0">
+        <IconOf
+          name={title}
+          active={active_variables.get(title)!}
+          toggle={() => activate(title)}
+        />
+      </div>
       <div
         className={
           current_variable_controls === title ? "" : "hidden group-hover:block"
@@ -116,42 +123,125 @@ export function Variable({
       >
         <div
           onClick={() => activate(title)}
-          className="flex flex-wrap items-center"
+          className="flex flex-row justify-between items-center"
         >
-          <h3>{titleOf(title)} </h3>
-          {active_variables.get(title) ? (
-            <EyeClosed className="w-8 text-slate-500 px-1 ml-2 h-8" />
-          ) : (
-            <Eye className="w-8 text-slate-500 px-1 ml-2 h-8" />
-          )}
+          <h3 className="tracking-[.5em] small-caps">{titleOf(title)} </h3>
+          <div className="ml-5">
+            {active_variables.get(title) ? (
+              <EyeClosed className="w-8 text-slate-500 h-8" />
+            ) : (
+              <Eye className="w-8 text-slate-500 h-8" />
+            )}
+          </div>
         </div>
         {controls && (
-          <div className="flex flex-wrap">
-            <h4
-              className="inline-flex"
-              onClick={() => {
+          <div 
+            className="flex gap-5 w-fit items-center"               
+            onClick={
+              () => {
                 setCurrentVariableControls(
                   current_variable_controls === title ? undefined : title,
                 )
-              }}
-            >
+              }
+            }
+          >
+            <h4 className="tracking-widest w-fit whitespace-nowrap">
               {current_variable_controls === title
                 ? "Close controls"
                 : "Open controls"}
+            </h4>
+            <div className="mx-2">
               {current_variable_controls === title ? (
                 <ArrowUp
-                  className={`text-emerald-400 w-4 h-4 self-center ml-4 child:fill-emerald-400`}
+                  className={`text-slate-500 w-5 h-5 self-center  child:fill-slate-500`}
                 />
               ) : (
                 <ArrowDown
-                  className={`text-emerald-400 w-4 h-4 self-center ml-4 child:fill-emerald-400`}
+                  className={`text-slate-500 w-5 h-5 self-center child:fill-slate-500`}
                 />
               )}
-            </h4>
+            </div>
           </div>
         )}
-        {current_variable_controls === title && children}
+        <br />
+        <div className="mr-5">
+            {current_variable_controls === title && children}
+        </div>
       </div>
+    </div>
+  )
+}
+
+
+export function Label({children,className}:PropsWithChildren<{className?:string}>) {
+  return (
+    <>
+      <h5 className={`flex-grow capitalize truncate whitespace-nowrap ${className ?? ''}`}>{children}</h5>
+      <h5>:</h5>
+    </>
+  )
+}
+
+export function Row({children}:PropsWithChildren<{}>) {
+  return <div className="flex flex-row gap-5 justify-between">
+    {children}
+  </div>
+}
+
+type RowWithSliderProps = {
+  onChange : (number:number) => void
+  label:string
+  min:number
+  max:number
+  step ?: number
+  value : number
+}
+
+export function RowWithSlider(props:RowWithSliderProps) {
+  return (
+    <Row>
+      <Label>{props.label}</Label>
+      <Slider
+        min={props.min}
+        max={props.max}
+        value={props.value}
+        onChange={props.onChange}
+        step={props.step}
+      ></Slider>
+      <InputNumber
+        value={props.value}
+        min={props.min}
+        max={props.max}
+        onChange={props.onChange}
+      ></InputNumber>
+    </Row>
+  )
+}
+
+type RowWithCheckBoxProps = {
+  toggle : () => void
+  label:string
+  checked: boolean
+}
+
+export function RowWithCheckBox(props:RowWithCheckBoxProps) {
+  return (
+    <Row>
+      <Label>{props.label}</Label>
+      <div className="grow-[2]">
+      <Checkbox
+          checked={props.checked}
+          onChange={() => props.toggle()}
+        />
+      </div>
+    </Row>
+  )
+}
+
+export function Rows({children}:PropsWithChildren<{}>) {
+  return (
+    <div className="flex flex-col gap-5">
+      {children}
     </div>
   )
 }

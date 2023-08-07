@@ -10,6 +10,7 @@ import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "./ViewCollection"
 import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
+import { HelpButton } from "./help/HelpButton"
 
 type Props = {}
 
@@ -47,10 +48,11 @@ export default function ClientMain({}: Props) {
               displaySearchBar={displaySearchBar}
             />
           </div>
-          <div className="flex-grow relative">
+          <div className="flex-grow flex relative">
             <div className=" h-full flex  items-center absolute">
               <SideBar journals={<></>} />
             </div>
+            <HelpButton className="absolute bottom-0 grow-0 justify-self-end"/>
           </div>
         </div>
         <div className="flex-grow flex flex-col gap-5">
@@ -71,7 +73,7 @@ export default function ClientMain({}: Props) {
             >
               {<></>}
             </SearchBar>
-            <div className="h-14  flex items-center">
+            <div className="h-14 cursor-pointer flex items-center">
               <h1 className="">CLIMATE ARCHIVE</h1>
             </div>
           </div>

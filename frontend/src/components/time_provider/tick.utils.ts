@@ -4,7 +4,7 @@ import { TimeFrameState, TimeMode } from "@/utils/store/time/time.type"
 import { LRUCache } from "lru-cache"
 import { CanvasRef } from "./useCanvas"
 import { TickData, TickDataState } from "./tick"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { chunksDetails } from "@/utils/store/time/time.utils"
 
 export function getPath(
@@ -70,7 +70,7 @@ function surf(
 }
 
 function processInfo(
-  variable: VariableName,
+  variable: EVarID,
   t: number,
   z: number,
   info: TextureInfo,
@@ -129,7 +129,7 @@ async function getTextureFromPath(
 }
 
 export async function compute(
-  variable: VariableName,
+  variable: EVarID,
   data: TimeFrameState,
   canvas: CanvasRef,
 ): Promise<TickData | undefined> {

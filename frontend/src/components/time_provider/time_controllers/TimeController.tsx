@@ -43,7 +43,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     useImperativeHandle(ref, () => {
       return {
         onChange: (frame: TimeFrame) => {
-          const month = titleOf(Math.floor(frame.weight), 12)!
+          const month = titleOf(Math.floor(frame.weight), frame.timesteps ?? 0)!
           if (time_title_ref.current) {
             time_title_ref.current.innerText = month
           }
@@ -57,7 +57,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const [is_playing, setPlaying] = useState(false)
     return (
       <div className={`flex gap-5 m-5 ${className ?? ""}`}>
-        <div className="flex-grow overflow-hidden">
+        <div className="cursor-default flex-grow overflow-hidden">
           <p
             className="text-emerald-600 font-semibold small-caps tracking-[.5em]"
             ref={time_title_ref}
@@ -71,7 +71,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           {is_playing ? (
             // PAUSE BUTTON
             <Pause
-              className={`w-8 h-8 inline-block text-slate-500`}
+              className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 pause(tween_ref, setPlaying)
               }}
@@ -79,13 +79,13 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           ) : (
             // PLAY BUTTON
             <Play
-              className={`w-8 h-8 inline-block text-slate-500`}
+              className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 play(data, time_id, current_frame, tween_ref, setPlaying)
               }}
             />
           )}
-          <Stop className={`w-8 h-8 block text-slate-500`} onClick={() => {}} />
+          <Stop className={`cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`} onClick={() => {}} />
         </div>
         <div className="flex-grow"></div>
       </div>

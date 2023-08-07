@@ -149,13 +149,13 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
 
     return (
       <div
-        className={`relative w-full h-full ${className ?? ""}`}
+        className={`relative overflow-hidden w-full h-full ${className ?? ""}`}
         ref={div_ref}
       >
         {children}
 
         {data.collection && isPublication(data.collection) && (
-          <p className="absolute bottom-0 left-0 italic p-2 text-slate-400 text-sm">
+          <p className="absolute bottom-0 left-0 italic m-4 text-slate-400 text-sm">
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
@@ -163,7 +163,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
           <div className="absolute top-0 left-0 flex m-2">
             <Link href={`${pathname}?${params_on_del}`}>
               <CrossIcon
-                className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+                className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
                 onClick={() => remove(time_id)}
               />
             </Link>
@@ -190,7 +190,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         )}
 
         <div
-          className={`absolute z-30 group bottom-0 right-0 bg-gray-900
+          className={` shadow-lg shadow-slate-950 
+          absolute z-30 group bottom-0 right-0 bg-gray-900
          rounded-full p-2 m-2 grid grid-cols-1 justify-items-center`}
         >
           {display_buttons && (
@@ -203,20 +204,20 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
 
           {!display_buttons && (
             <ArrowUpIcon
-              className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-500 child:fill-slate-500"
+              className="p-2 hidden w-10 h-10 cursor-pointer text-align:center group-hover:block text-slate-400 child:fill-slate-400"
               onClick={() => displayButtons(true)}
             />
           )}
 
           <InfoIcon
-            className="w-12 h-12 cursor-pointer p-2 text-slate-500"
+            className="w-12 h-12 cursor-pointer p-2 text-slate-400"
             onClick={() => displayCollection(data.collection)}
           />
 
           {(!pathname.includes("publication") || grid_id + 1 < Array.from(searchParams).length) && (
             <Link href={route_on_dup} >
               <DuplicateIcon
-                className="w-10 h-10 cursor-pointer p-2 text-slate-500"
+                className="w-10 h-10 cursor-pointer p-2 text-slate-400"
                 onClick={() => {
                   dup(time_id)
                 }}
@@ -241,7 +242,7 @@ function PanelConfiguration({ time_id, data, displayButtons }: ConfProps) {
   return (
     <div className="grid grid-cols-1 gap-1 justify-items-center ">
       <ArrowDownIcon
-        className="p-2 w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500"
+        className="p-2 w-10 h-10 cursor-pointer text-slate-400 child:fill-slate-400"
         onClick={() => displayButtons(false)}
       />
 
@@ -253,7 +254,7 @@ function PanelConfiguration({ time_id, data, displayButtons }: ConfProps) {
 
       <CameraIcon
         className={`cursor-pointer w-5 h-5 my-2 ${
-          data.conf.camera.is_linked ? "text-slate-500" : "text-slate-300"
+          data.conf.camera.is_linked ? "text-slate-400" : "text-slate-300"
         }`}
         onClick={() => {
           linkCamera(time_id, !data.conf.camera.is_linked)
@@ -261,15 +262,15 @@ function PanelConfiguration({ time_id, data, displayButtons }: ConfProps) {
       />
 
       <RecenterIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500`}
+        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
       />
 
       <FullScreenIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500`}
+        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
       />
 
       <ScreenshotIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500 `}
+        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400 `}
       />
 
       <WorldIcon
@@ -277,20 +278,20 @@ function PanelConfiguration({ time_id, data, displayButtons }: ConfProps) {
         ${
           as_planet
             ? "text-emerald-400 child:fill-emerald-400"
-            : "text-slate-500 child:fill-slate-500"
+            : "text-slate-400 child:fill-slate-400"
         }`}
         onClick={() => setAsPlanet((prev) => !prev)}
       />
 
       <RotateIcon
-        className={`w-7 h-7 my-2 text-slate-500 child:fill-slate-500
+        className={`w-7 h-7 my-2 text-slate-400 child:fill-slate-400
         ${as_planet ? "cursor-pointer" : "opacity-70"}`}
       />
 
-      <GridIcon className={`cursor-pointer w-6 h-6 my-2 text-slate-500`} />
+      <GridIcon className={`cursor-pointer w-6 h-6 my-2 text-slate-400`} />
 
       <PinIcon
-        className={`cursor-pointer w-6 h-6 my-2 text-slate-500 child:fill-slate-500`}
+        className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
       />
     </div>
   )

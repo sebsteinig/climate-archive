@@ -1,6 +1,6 @@
 import { enableMapSet } from "immer"
 import { StateCreator } from "zustand"
-import { VariableName } from "./variables/variable.types"
+import { EVarID } from "./variables/variable.types"
 import { Publication, Experiments } from "../types"
 import { isPublication } from "../types.utils"
 

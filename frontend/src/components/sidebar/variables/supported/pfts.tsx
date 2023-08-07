@@ -13,7 +13,6 @@ export function Pfts({
       setCurrentVariableControls={setCurrentVariableControls}
       controls={false}
     >
-      <div></div>
     </Variable>
   )
 }
