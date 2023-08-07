@@ -1,4 +1,4 @@
-import { Experiments, Publication } from "./types"
+import { Experiment, Experiments, Publication } from "./types"
 
 export const isPublication = (
   obj: Experiments | Publication,
@@ -39,101 +39,114 @@ export function uniqueIdx(x: number, y: number, z: number) {
   return Math.pow(2, x) * Math.pow(5, y) * Math.pow(7, z)
 }
 
+export function getTitleOfExp(exp: Experiment) {
+  let label = exp.metadata.length == 1 ? `${exp.metadata[0].metadata.text}` : ""
+  if (exp.metadata.length > 1) {
+    label = exp.metadata.filter(
+      (m: { label: string; metadata: any }) => m.metadata.age,
+    )[0].metadata.age
+  }
 
-export function gridOf(n:number) {
-  let width : number;
-  let height : number;
+  return {
+    id: exp.id,
+    label: label,
+  }
+}
+
+export function gridOf(n: number) {
+  let width: number
+  let height: number
   switch (n) {
     case 1:
       width = 1
       height = 1
-      break;
+      break
     case 2:
       width = 2
       height = 1
-      break;
+      break
     case 3:
       width = 3
       height = 1
-      break;
+      break
     case 4:
       width = 2
       height = 2
-      break;
+      break
     case 5:
     case 6:
       width = 3
       height = 2
-      break;
+      break
     case 7:
     case 8:
       width = 4
       height = 2
-      break;
+      break
     case 9:
       width = 3
       height = 3
-      break;
+      break
     default:
       let grid = _gridOf(n)
       width = grid.width
       height = grid.height
-      break;
+      break
   }
 
   return {
-    cols : width,
-    rows : height,
+    cols: width,
+    rows: height,
   }
   //return `grid-cols-${css_width} grid-rows-${css_height}`
 }
-function _gridOf(n:number):{width:number,height:number}{
+function _gridOf(n: number): { width: number; height: number } {
   let factors = primeFactors(n)
-  
-  if(factors.length === 1 && factors[0] === 2){
+
+  if (factors.length === 1 && factors[0] === 2) {
     return {
-      width : 2,
-      height : 1,
+      width: 2,
+      height: 1,
     }
   }
-  if(factors.length === 1 && factors[0] === 3){
+  if (factors.length === 1 && factors[0] === 3) {
     return {
-      width : 3,
-      height : 1,
+      width: 3,
+      height: 1,
     }
   }
   let i = 0
-  while(factors.length === 1) {
+  while (factors.length === 1) {
     i += 1
-    factors = primeFactors(n-i)
+    factors = primeFactors(n - i)
   }
-  const [x,y] = halve(factors)
+  const [x, y] = halve(factors)
   return {
-    width : x + i,
-    height : y,
+    width: x + i,
+    height: y,
   }
 }
 
-function halve(arr:number[]):[number,number] {
-  const middle_idx = Math.ceil(arr.length / 2);
-  const first_half = arr.splice(0, middle_idx);   
-  const second_half = arr.splice(-middle_idx);
-  const x = first_half.reduce((acc,n)=>acc+n,0)
-  const y = second_half.reduce((acc,n)=>acc+n,0)
-  return [x,y]
+function halve(arr: number[]): [number, number] {
+  const middle_idx = Math.ceil(arr.length / 2)
+  const first_half = arr.splice(0, middle_idx)
+  const second_half = arr.splice(-middle_idx)
+  const x = first_half.reduce((acc, n) => acc + n, 0)
+  const y = second_half.reduce((acc, n) => acc + n, 0)
+  return [x, y]
 }
 
-function primeFactors(n:number) {
-  const factors = [];
-  let divisor = 2;
+function primeFactors(n: number) {
+  const factors = []
+  let divisor = 2
 
   while (n >= 2) {
     if (n % divisor == 0) {
-      factors.push(divisor);
-      n = n / divisor;
+      factors.push(divisor)
+      n = n / divisor
     } else {
-      divisor++;
+      divisor++
     }
   }
-  return factors;
+  return factors
 }

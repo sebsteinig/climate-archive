@@ -1,18 +1,19 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, SetStateAction, Dispatch } from "react"
 import { searchPublication } from "@/utils/api/api"
 import FilterPublication from "./filters/FilterPublication"
 import FilterLabels from "./filters/FilterLabels"
 import FilterAdvanced from "./filters/FilterAdvanced"
 import { Publications } from "./publication"
-import { Publication } from "../../../utils/types"
+import { Publication } from "../../utils/types"
 import { DefaultParameter, SearchPublication } from "@/utils/api/api.types"
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
-import { FullWidthSeparator, MdSeparator } from "../../separators/separators"
+import { FullWidthSeparator, MdSeparator } from "../separators/separators"
 import { PropsWithChildren } from "react"
+import { Collection } from "@/utils/store/collection.store"
 
 // function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
 //     useEffect(() => {
@@ -30,14 +31,14 @@ import { PropsWithChildren } from "react"
 
 type MoreOptionsProps = {
   filters: SearchPublication
-  setSearchBarVisible: Function
+  displaySearchBar: Dispatch<SetStateAction<boolean>>
   setRequestFilters: (filters: SearchPublication) => void
 }
 
 function MoreOptions({
   filters,
   setRequestFilters,
-  setSearchBarVisible,
+  displaySearchBar,
   children,
 }: PropsWithChildren<MoreOptionsProps>) {
   return (
@@ -50,18 +51,22 @@ function MoreOptions({
       </FilterPublication>
       <br />
       {/* <FilterLabels setRequestFilters={setRequestFilters}/> */}
-      <FilterAdvanced setSearchBarVisible={setSearchBarVisible} />
+      <FilterAdvanced displaySearchBar={displaySearchBar} />
       <br />
     </div>
   )
 }
 
 type Props = {
-  setSearchBarVisible: Function
+  displaySearchBar: Dispatch<SetStateAction<boolean>>
+  displayCollection: (collection: Collection) => void
+  is_visible: boolean
 }
 
 export default function SearchBar({
-  setSearchBarVisible,
+  displaySearchBar,
+  displayCollection,
+  is_visible,
   children,
 }: PropsWithChildren<Props>) {
   const [search_panel_visible, setSearchPanelVisible] = useState(true)
@@ -96,7 +101,9 @@ export default function SearchBar({
 
   return (
     <div
-      className={`bg-slate-700 
+      className={`
+        ${is_visible ? "visible" : "hidden"}
+        bg-slate-700 
         z-30
         p-5 m-5 
         rounded-md 
@@ -108,7 +115,7 @@ export default function SearchBar({
     >
       <CrossIcon
         className={`w-8 h-8 absolute top-0 right-0 text-emerald-400 cursor-pointer`}
-        onClick={() => setSearchBarVisible(false)}
+        onClick={() => displaySearchBar(false)}
       />
       <SearchIcon
         className={`w-8 h-8 lg:invisible text-emerald-400 lg:hidden ${
@@ -161,7 +168,7 @@ export default function SearchBar({
 
             {display_more_options && (
               <MoreOptions
-                setSearchBarVisible={setSearchBarVisible}
+                displaySearchBar={displaySearchBar}
                 filters={requestFilters}
                 setRequestFilters={(filters: SearchPublication) => {
                   setRequestFilters((prev) => {
@@ -192,9 +199,8 @@ export default function SearchBar({
         )}
         {search_panel_visible && (
           <Publications
-            more_options={display_more_options}
+            displayCollection={displayCollection}
             publications={publications}
-            setSearchBarVisible={setSearchBarVisible}
           />
         )}
       </div>

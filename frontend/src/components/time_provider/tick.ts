@@ -1,9 +1,5 @@
-import {
-  TimeFrameRef,
-  TimeID,
-  WorldData,
-} from "@/utils/store/time/time.type"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { CanvasRef } from "./useCanvas"
 import { PanelRef } from "./time_panel/panel"
 import { MutableRefObject, RefObject } from "react"
@@ -12,69 +8,65 @@ import { TextureInfo } from "@/utils/database/database.types"
 import { compute, getPath } from "./tick.utils"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 
-
 export type TickDataState = {
-  min:number[]
-  max:number[]
+  min: number[]
+  max: number[]
   levels: number
-  timesteps : number
-  xsize : number
-  xfirst : number
-  xinc : number
-  ysize : number
-  yfirst : number
-  yinc : number
-  nan_value_encoding : number
+  timesteps: number
+  xsize: number
+  xfirst: number
+  xinc: number
+  ysize: number
+  yfirst: number
+  yinc: number
+  nan_value_encoding: number
 }
 
-export type TickData =       {
+export type TickData = {
   textures: {
-    current_url:string,
-    next_url:string,
+    current_url: string
+    next_url: string
   }[]
-  current : TickDataState
-  next : TickDataState
+  current: TickDataState
+  next: TickDataState
 }
 
-export type TickFn = (delta:number) => Promise<{
-  weight:number,
-  update_texture:boolean,
-  uSphereWrapAmount:number,
-  variables : Map<VariableName,TickData>
+export type TickFn = (delta: number) => Promise<{
+  weight: number
+  update_texture: boolean
+  uSphereWrapAmount: number
+  variables: Map<EVarID, TickData>
 }>
 
 export function tickBuilder(
   time_id: TimeID,
-  panel_ref : RefObject<PanelRef>,
+  panel_ref: RefObject<PanelRef>,
   data: WorldData,
   current_frame: TimeFrameRef,
-  active_variables: VariableName[],
+  active_variables: EVarID[],
   canvas: CanvasRef,
-) : TickFn{
-
-
-
-
+): TickFn {
   return async function tick(delta: number) {
-    const res:Map<VariableName,TickData> = new Map()
+    const res: Map<EVarID, TickData> = new Map()
     let frame = current_frame.current.get(time_id)
-    if(!frame) return {
-      weight:0,
-      update_texture:false,
-      uSphereWrapAmount:0,
-      variables:res
-    }
+    if (!frame)
+      return {
+        weight: 0,
+        update_texture: false,
+        uSphereWrapAmount: 0,
+        variables: res,
+      }
     let update_texture = false
-    if(frame.swap_flag) {
-      if(!frame.swapping) {
+    if (frame.swap_flag) {
+      if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
-        await update(frame,active_variables)
-        
-        for(let [variable,state] of frame.variables) {
-          const data = await compute(variable,state,canvas)
-          if(data) {
-            res.set(variable,data)
+        await update(frame, active_variables)
+
+        for (let [variable, state] of frame.variables) {
+          const data = await compute(variable, state, canvas)
+          if (data) {
+            res.set(variable, data)
           }
         }
         panel_ref.current?.controller_ref.current?.onChange(frame)
@@ -85,10 +77,10 @@ export function tickBuilder(
     }
     panel_ref.current?.input_ref.current?.onWeightUpdate(frame)
     return {
-      weight:frame.weight,
-      uSphereWrapAmount:frame.uSphereWrapAmount,
-      update_texture:update_texture,
-      variables:res
+      weight: frame.weight,
+      uSphereWrapAmount: frame.uSphereWrapAmount,
+      update_texture: update_texture,
+      variables: res,
     }
   }
 }

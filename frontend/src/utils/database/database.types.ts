@@ -27,7 +27,7 @@ export class TextureInfo {
   ysize!: number
   yfirst!: number
   yinc!: number
-  metadata! : Object
+  metadata!: Object
   created_at!: string
   config_name!: string
   extension!: string

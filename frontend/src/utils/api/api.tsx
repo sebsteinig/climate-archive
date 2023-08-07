@@ -106,7 +106,7 @@ export async function selectAll(query: SelectCollectionParameter) {
 }
 
 export async function getImage(path: string) {
-  let url = new URL(trimRoutes(path,7), URL_IMAGE)
+  let url = new URL(trimRoutes(path, 7), URL_IMAGE)
   try {
     let data = await axios.get(url.href, {
       responseType: "arraybuffer",
@@ -124,12 +124,15 @@ export async function getImage(path: string) {
   }
 }
 
-function trimRoutes(path:string,nb_of_sub_route:number):string {
-  return path.split("/").slice(nb_of_sub_route).reduce((acc,route)=>`${acc}/${route}`,'')
+function trimRoutes(path: string, nb_of_sub_route: number): string {
+  return path
+    .split("/")
+    .slice(nb_of_sub_route)
+    .reduce((acc, route) => `${acc}/${route}`, "")
 }
 
 export async function getImageArrayBuffer(path: string) {
-  let url = new URL(trimRoutes(path,7), URL_IMAGE)
+  let url = new URL(trimRoutes(path, 7), URL_IMAGE)
   try {
     let res = await axios.get(url.href, {
       responseType: "arraybuffer",

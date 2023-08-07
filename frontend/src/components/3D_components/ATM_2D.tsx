@@ -1,20 +1,20 @@
 "use client"
 import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import { useTexture, shaderMaterial } from "@react-three/drei"
-import { extend, useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
-import { useControls } from 'leva'
-import vertexShader from '$/shaders/precipitationVert.glsl'
-import fragmentShader from '$/shaders/precipitationFrag.glsl'
-import { createColormapTexture } from '@/utils/three/colormapTexture.js'
+import { extend, useFrame } from "@react-three/fiber"
+import * as THREE from "three"
+import { useControls } from "leva"
+import vertexShader from "$/shaders/precipitationVert.glsl"
+import fragmentShader from "$/shaders/precipitationFrag.glsl"
+import { createColormapTexture } from "@/utils/three/colormapTexture.js"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { TickData } from "../time_provider/tick"
 
 type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 
-const loader = new THREE.TextureLoader();
-// const cmap = loader.load("/assets/colormaps/ipccPrecip.png" ); 
-const cmap = createColormapTexture('YlGnBu-9')
+const loader = new THREE.TextureLoader()
+// const cmap = loader.load("/assets/colormaps/ipccPrecip.png" );
+const cmap = createColormapTexture("YlGnBu-9")
 
 const DataMaterial = shaderMaterial(
   {
@@ -23,7 +23,7 @@ const DataMaterial = shaderMaterial(
     uLayerHeight: 0.15,
     uLayerOpacity: 1.0,
     thisDataFrame: null,
-    nextDataFrame: null, 
+    nextDataFrame: null,
     thisDataMin: null,
     thisDataMax: null,
     nextDataMin: null,
@@ -35,38 +35,41 @@ const DataMaterial = shaderMaterial(
     numLat: 73,
   },
   vertexShader,
-  fragmentShader
+  fragmentShader,
 )
-
 
 extend({ DataMaterial })
 
 type Props = {}
 
 export type ATM_2D_Ref = {
-  type : RefObject<SphereType>,
-  update : (data:TickData) => void
+  type: RefObject<SphereType>
+  update: (data: TickData) => void
 }
 
-const ATM_2D = forwardRef<ATM_2D_Ref, Props>(({ }, ref) => {
-
-  console.log('creating ATM_2D compnent')
+const ATM_2D = forwardRef<ATM_2D_Ref, Props>(({}, ref) => {
+  console.log("creating ATM_2D compnent")
   const sphere_type_ref = useRef<SphereType>(null)
   const materialRef = useRef<typeof DataMaterial>(null!)
 
-  const pr = useClusterStore(state => state.variables.pr)
+  const pr = useClusterStore((state) => state.variables.pr)
 
   // materialRef.current.uniforms.uUserMinValue.value = parseFloat(pr.min)
   // materialRef.current.uniforms.uUserMaxValue.value = parseFloat(pr.max)
 
-  function update(data:TickData) {
+  function update(data: TickData) {
     // materialRef.current.uniforms.uFrameWeight.value = Math.random()
-    materialRef.current.uniforms.thisDataFrame.value = loader.load(data.current_url)
-    materialRef.current.uniforms.nextDataFrame.value = loader.load(data.next_url) 
-    materialRef.current.uniforms.thisDataMin.value = data.current.min * 86400.
-    materialRef.current.uniforms.thisDataMax.value = data.current.max * 86400 * 5.
-    materialRef.current.uniforms.nextDataMin.value = data.next.min * 86400.
-    materialRef.current.uniforms.nextDataMax.value = data.next.max * 86400 * 5.
+    materialRef.current.uniforms.thisDataFrame.value = loader.load(
+      data.current_url,
+    )
+    materialRef.current.uniforms.nextDataFrame.value = loader.load(
+      data.next_url,
+    )
+    materialRef.current.uniforms.thisDataMin.value = data.current.min * 86400
+    materialRef.current.uniforms.thisDataMax.value =
+      data.current.max * 86400 * 5
+    materialRef.current.uniforms.nextDataMin.value = data.next.min * 86400
+    materialRef.current.uniforms.nextDataMax.value = data.next.max * 86400 * 5
     materialRef.current.uniforms.uUserMinValue.value = pr.min
     materialRef.current.uniforms.uUserMaxValue.value = pr.max
 
@@ -77,28 +80,26 @@ const ATM_2D = forwardRef<ATM_2D_Ref, Props>(({ }, ref) => {
     // console.log(data.current_info.metadata)
   }
 
-  useImperativeHandle(ref,()=> 
-  {
+  useImperativeHandle(ref, () => {
     return {
-      type:sphere_type_ref,
+      type: sphere_type_ref,
       update,
     }
   })
 
-  const { uSphereWrap } = useControls({ 
+  const { uSphereWrap } = useControls({
     uSphereWrap: {
-      value: 0., 
+      value: 0,
       min: 0,
       max: 1,
-      step: 0.0001
+      step: 0.0001,
     },
   })
-
 
   return (
     <mesh ref={sphere_type_ref}>
       <planeGeometry args={[4, 2, 64, 32]} />
-      <dataMaterial ref={materialRef} uSphereWrapAmount={uSphereWrap}/>
+      <dataMaterial ref={materialRef} uSphereWrapAmount={uSphereWrap} />
     </mesh>
   )
 })

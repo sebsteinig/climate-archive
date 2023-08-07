@@ -19,8 +19,8 @@ type SphereProps = {
   config: config
 }
 
-function update(params:type) {
-  console.log('update')
+function update(params: type) {
+  console.log("update")
 }
 
 const Surface = forwardRef<SphereType, SphereProps>(({ config }, ref) => {
@@ -29,10 +29,9 @@ const Surface = forwardRef<SphereType, SphereProps>(({ config }, ref) => {
   texture.minFilter = NearestFilter
   texture.magFilter = NearestFilter
 
-  useImperativeHandle(ref,()=> 
-  {
+  useImperativeHandle(ref, () => {
     return {
-      update
+      update,
     }
   })
 
