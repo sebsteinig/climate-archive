@@ -58,6 +58,7 @@ type CollectionProps = {
 }
 
 export function CollectionDetails({ collection, load }: CollectionProps) {
+  
   const searchParams = useSearchParams()
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return true
