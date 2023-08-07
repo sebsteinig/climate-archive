@@ -30,6 +30,7 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ContainerConf } from "./ContainerConf"
+import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
 
 type Props = {
   className?: string
@@ -57,8 +58,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     },
     ref,
   ) {
-    const dup = useClusterStore((state) => state.time.dup)
     const remove = useClusterStore((state) => state.time.remove)
+    const changeExp = useClusterStore((state) => state.time.changeExp)
     const stored_active_variables = useClusterStore(
       (state) => state.active_variables,
     )
@@ -78,80 +79,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
       }
     })
 
-    const searchParams = useSearchParams()
-    const router = useRouter()
-    const pathname = usePathname()
-    const [display_buttons, displayButtons] = useState(false)
-
-    const onChangeExp: (id: string) => void = (id: string) => {
-      let p = new URLSearchParams()
-      if (!pathname.includes("publication")) {
-        p.append(
-          isPublication(data.collection)
-            ? `${data.collection.authors_short.replaceAll(" ", ".")}*${
-                data.collection.year
-              }`
-            : `${data.collection.exps.map((e) => e.id + ".")}`,
-          id,
-        )
-        router.push(`/publication?reload=false&${p.toString()}`)
-      } else {
-        Array.from(searchParams, ([k, v], i) => {
-          p.append(k, i == grid_id + 1 ? id : v)
-        })
-        router.push(`${pathname}?${p.toString()}`)
-      }
-    }
-
-    const [route_on_dup, params_on_del, current_exp_id] = useMemo(() => {
-      const key = isPublication(data.collection)
-        ? `${data.collection.authors_short.replaceAll(" ", ".")}*${
-            data.collection.year
-          }`
-        : `${data.collection.exps.map((e) => e.id + ".")}`
-
-      let on_dup = new URLSearchParams()
-      let on_del = new URLSearchParams()
-      if (grid_id + 1 >= Array.from(searchParams).length) {
-        on_dup.append(key, data.collection.exps[0].id)
-        on_dup.append(key, data.collection.exps[0].id)
-        return [
-          `/publication?reload=false&${on_dup.toString()}`,
-          on_del,
-          data.collection.exps[0].id,
-        ]
-      }
-      //on duplicate
-      on_dup.set(key, Array.from(searchParams)[grid_id + 1][1])
-      const route_dup = `${pathname}?${searchParams.toString()}&${on_dup.toString()}`
-
-      //on delete
-      Array.from(searchParams, ([k, v], idx) => {
-        if (idx != grid_id + 1) {
-          on_del.append(k, v)
-        }
-      })
-
-      //on change experiment
-      const exp_id = Array.from(searchParams)[grid_id + 1][1]
-      if (exp_id == data.collection.exps[0].id)
-        return [route_dup, on_del.toString(), exp_id]
-      const current_exp = data.collection.exps.filter((e) => e.id == exp_id)
-      if (current_exp.length == 0)
-        return [route_dup, on_del.toString(), data.collection.exps[0].id]
-      database_provider
-        .load({
-          exp_id: exp_id,
-        })
-        .then(() => {
-          const frame = current_frame.current.get(time_id)
-          if (!frame) return
-          current_frame.current
-            .init(time_id, current_exp[0], active_variables)
-            .then(() => {})
-        })
-      return [route_dup, on_del.toString(), exp_id]
-    }, [Array.from(searchParams)])
+    const frame = current_frame.current.get(time_id)
 
     return (
       <div
@@ -165,23 +93,29 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
-        {(!pathname.includes("publication") ||
-          grid_id + 1 < Array.from(searchParams).length) && (
           <div className="absolute top-0 left-0 flex m-2">
-            <Link href={`${pathname}?${params_on_del}`}>
-              <CrossIcon
-                className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
-                onClick={() => remove(time_id)}
-              />
-            </Link>
+            <CrossIcon
+              className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
+              onClick={() => {
+                current_frame.current.map.delete(time_id)
+                remove(time_id)
+              }}
+            />
 
             <Select
               className="ml-5"
-              defaultValue={current_exp_id}
+              defaultValue={data.exp?.id}
               onChange={(e) => {
                 const idx = e.target.selectedIndex
                 const exp = data.collection.exps[idx]
-                onChangeExp(exp.id)
+
+                database_provider.load({exp_id:exp.id})
+                .then(
+                  async () => {
+                    changeExp(time_id,exp)
+                  }
+                )
+
               }}
             >
               {data.collection?.exps.map((e) => {
@@ -194,14 +128,13 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
               })}
             </Select>
           </div>
-        )}
+        
 
         <ContainerConf
           className="absolute bottom-0 right-0 m-2 "
           data={data}
           current_frame={current_frame}
           displayCollection={displayCollection}
-          on_dup_href={route_on_dup}
           time_id={time_id}
         />
       </div>

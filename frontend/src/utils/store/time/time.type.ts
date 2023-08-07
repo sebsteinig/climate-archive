@@ -88,6 +88,7 @@ export type WorldData = {
   conf: WorldConf
   collection: Collection
   time: TimeConf
+  exp ?: Experiment
 }
 
 export type Slots = Map<TimeID, WorldData>

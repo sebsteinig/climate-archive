@@ -18,13 +18,14 @@ import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
 import Link from "next/link"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { gsap } from "gsap"
+import { usePathname, useRouter } from "next/navigation"
+import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
 
 type Props = {
   className?: string
   displayCollection: (collection: Collection) => void
   data: WorldData
   time_id: TimeID
-  on_dup_href: string
   current_frame: TimeFrameRef
 }
 
@@ -34,11 +35,9 @@ export function ContainerConf({
   data,
   current_frame,
   time_id,
-  on_dup_href,
 }: Props) {
   const [is_expanded, expand] = useState(false)
   const linkCamera = useClusterStore((state) => state.time.linkCamera)
-  const dup = useClusterStore((state) => state.time.dup)
 
   return (
     <div
@@ -67,6 +66,8 @@ export function ContainerConf({
           <ScreenshotBtn />
           <WorldBtn onClick={(time_id, is_spheric) => {
             const frame = current_frame.current.get(time_id)
+            console.log({current_frame,time_id});
+            
             if(!frame) return;
             const to = is_spheric ? 1 : 0
             gsap.to(frame,{uSphereWrapAmount:to,duration:1, ease: "none"})
@@ -80,7 +81,7 @@ export function ContainerConf({
         is_linked={data.conf.camera.is_linked}
         time_id={time_id}
       />
-      <DupBtn href={on_dup_href} onClick={dup} time_id={time_id} />
+      <DupBtn time_id={time_id} current_frame={current_frame}/>
       <InfoBtn onClick={displayCollection} collection={data.collection} />
     </div>
   )
@@ -103,21 +104,22 @@ function InfoBtn({ onClick, collection }: InfoBtnProps) {
 }
 
 type DupBtnProps = {
-  href: string
-  onClick: (id: TimeID) => void
   time_id: TimeID
+  current_frame : TimeFrameRef
 }
 
-function DupBtn({ href, onClick, time_id }: DupBtnProps) {
+function DupBtn({ time_id ,current_frame}: DupBtnProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const dup = useClusterStore((state) => state.time.dup)
+
   return (
-    <Link href={href}>
       <DuplicateIcon
         className="w-10 h-10 cursor-pointer p-2 text-slate-400"
         onClick={() => {
-          onClick(time_id)
+          dup(time_id)
         }}
       />
-    </Link>
   )
 }
 
