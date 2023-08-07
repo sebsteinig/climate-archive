@@ -21,7 +21,6 @@ export function useFrameRef() {
     async init(time_id, exp: Experiment, active_variables: EVarID[]) {
       const data = this.map.get(time_id)
       console.log(`init`)
-
       const frame: TimeFrame = {
         exp: exp,
         swap_flag: true,

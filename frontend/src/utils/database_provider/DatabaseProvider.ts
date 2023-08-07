@@ -208,21 +208,21 @@ class DatabaseProvider {
     return collections
   }
 
-  async addCollectionToDb(collection: Publication | Experiments) {
+  async addPublicationToDb(publication: Publication) {
     const collections_array = await this.database.collections
       .filter((e) => {
-        return collectionEquals(collection, e.data)
+        return collectionEquals(publication, e.data)
       })
       .toArray()
 
     if (!collections_array || collections_array.length === 0) {
       return await this.database.collections.add({
-        data: collection,
+        data: publication,
         date: new Date().toISOString(),
       })
     } else {
       const map_experiments = new Map<string, Experiment>()
-      for (let exp of collection.exps) {
+      for (let exp of publication.exps) {
         map_experiments.set(exp.id, exp)
       }
       for (let exp of collections_array[0].data.exps) {
@@ -231,7 +231,7 @@ class DatabaseProvider {
 
       return await this.database.collections
         .filter((e) => {
-          return collectionEquals(collection, e.data)
+          return collectionEquals(publication, e.data)
         })
         .modify({ "data.exps": Array.from(map_experiments).map((v) => v[1]) })
     }
