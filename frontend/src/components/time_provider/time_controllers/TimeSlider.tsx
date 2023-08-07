@@ -70,11 +70,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         step={0.1}
         onPointerDown={() => {
           departure.current = Math.round(parseFloat(input_ref.current.value))
+          is_changing.current = true
         }}
         onPointerUp={() => {
           const frame = current_frame.current.get(time_id)
           if (!frame) return
-          is_changing.current = true
           const to = Math.round(destination.current)
           if (!to) return
           const duration =
