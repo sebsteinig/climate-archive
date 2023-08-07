@@ -3,7 +3,7 @@ import { useState } from "react"
 import { SearchButton } from "../searchbar/SearchButton"
 import { Variables } from "./variables/Variables"
 import SearchBar from "../searchbar/SearchBar"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 //import { PreviewCollection } from "./PreviewCollection"
 
 type Props = {
@@ -14,7 +14,7 @@ export default function SideBar({ journals }: Props) {
   const [search_bar_visible, setSearchBarVisible] = useState(false)
   const [current_data_details, setCurrentDataDetails] = useState(false)
   const [current_variable_controls, setCurrentVariableControls] =
-    useState<VariableName>()
+    useState<EVarID>()
   return (
     <div>
       <Variables

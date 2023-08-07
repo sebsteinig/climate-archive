@@ -1,4 +1,4 @@
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { Clt } from "./supported/clt"
 import { Currents } from "./supported/currents"
 import { Height } from "./supported/height"
@@ -13,7 +13,7 @@ import { Tos } from "./supported/tos"
 import { Winds } from "./supported/winds"
 
 type Props = {
-  current_variable_controls: VariableName | undefined
+  current_variable_controls: EVarID | undefined
   setCurrentVariableControls: Function
   setCurrentDataDetails: Function
 }

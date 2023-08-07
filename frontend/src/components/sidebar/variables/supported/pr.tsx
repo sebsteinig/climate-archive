@@ -29,7 +29,7 @@ export function Pr({
           />
         <RowWithSlider 
           onChange={(n)=> {
-            pr.updateMin(n)
+            pr.updateMax(n)
           }}
           min={0}
           max={20}

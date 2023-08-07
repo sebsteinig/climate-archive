@@ -1,5 +1,5 @@
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { World } from "@/components/3D_components/World"
 import { OrbitControls, PerspectiveCamera, View } from "@react-three/drei"
 import { CanvasRef } from "../useCanvas"
@@ -12,7 +12,7 @@ export type SceneProps = {
   panel_ref: RefObject<PanelRef>
   data: WorldData
   current_frame: TimeFrameRef
-  active_variables: VariableName[]
+  active_variables: EVarID[]
   canvas: CanvasRef
 }
 

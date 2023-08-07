@@ -43,7 +43,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     useImperativeHandle(ref, () => {
       return {
         onChange: (frame: TimeFrame) => {
-          const month = titleOf(Math.floor(frame.weight), 12)!
+          const month = titleOf(Math.floor(frame.weight), frame.timesteps ?? 0)!
           if (time_title_ref.current) {
             time_title_ref.current.innerText = month
           }

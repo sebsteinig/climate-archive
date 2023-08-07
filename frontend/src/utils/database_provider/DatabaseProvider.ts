@@ -7,7 +7,7 @@ import {
   RequestTexture,
 } from "./database_provider.types"
 import { LRUCache } from "lru-cache"
-import { VariableName } from "../store/variables/variable.types"
+import { EVarID } from "../store/variables/variable.types"
 import { SelectSingleResult } from "../api/api.types"
 import { Experiment, Experiments, Publication } from "../types"
 import { collectionEquals } from "../types.utils"
@@ -20,9 +20,9 @@ class TextureNotFound extends Error {
   }
 }
 class TextureMustBeLoaded extends Error {
-  path!: string | TextureInfo | { exp_id: string; variable: VariableName }
+  path!: string | TextureInfo | { exp_id: string; variable: EVarID }
   constructor(
-    path: string | TextureInfo | { exp_id: string; variable: VariableName },
+    path: string | TextureInfo | { exp_id: string; variable: EVarID },
   ) {
     super()
     this.path = path
@@ -32,7 +32,7 @@ class TextureMustBeLoaded extends Error {
 class DatabaseProvider {
   database!: Database
   cache!: LRUCache<string, Texture>
-  info_cache!: LRUCache<{ exp_id: string; variable: VariableName }, TextureInfo>
+  info_cache!: LRUCache<{ exp_id: string; variable: EVarID }, TextureInfo>
 
   constructor() {
     this.database = new Database()
@@ -97,7 +97,7 @@ class DatabaseProvider {
     }
     return {
       exp_id: info.exp_id,
-      variable: VariableName[info.variable as keyof typeof VariableName],
+      variable: EVarID[info.variable as keyof typeof EVarID],
       mean: leaf_mean,
       ts: leaf_ts,
     }
@@ -108,7 +108,7 @@ class DatabaseProvider {
       .equals(requested_texture.exp_id)
       .toArray()
 
-    if (texture_infos.length === Object.keys(VariableName).length / 2) {
+    if (texture_infos.length === Object.keys(EVarID).length / 2) {
       return undefined
     }
 
@@ -174,12 +174,12 @@ class DatabaseProvider {
     return base64
   }
 
-  async getInfo(exp_id: string, variable: VariableName) {
+  async getInfo(exp_id: string, variable: EVarID) {
     let texture_info = this.info_cache.get({ exp_id, variable })
     if (!texture_info) {
       texture_info = await this.database.textures_info.get([
         exp_id,
-        VariableName[variable],
+        EVarID[variable],
       ])
     }
     if (!texture_info) {

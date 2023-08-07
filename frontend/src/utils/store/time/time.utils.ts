@@ -8,7 +8,7 @@ import {
   WorldConf,
 } from "./time.type"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { VariableName } from "../variables/variable.types"
+import { ALL_VARIABLES, EVarID } from "../variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
 import { MutableRefObject, RefObject } from "react"
 
@@ -54,9 +54,22 @@ function computeFramePos(
   return [frame, time_chunk]
 }
 
+export async function getMaxTimesteps(frame:TimeFrame) {
+    const ts = await Promise.all(ALL_VARIABLES.map(async (variable) => {
+      try {
+        const info = await database_provider.getInfo(frame.exp.id, variable)
+        return info.timesteps
+      } catch (error) {
+        return 0
+      } 
+    }))
+    return Math.max(...ts)
+}
+
+
 export async function sync(
   frame: TimeFrame,
-  variable: VariableName,
+  variable: EVarID,
 ): Promise<TimeFrameState> {
   const info = await database_provider.getInfo(frame.exp.id, variable)
   const [nb_c, fpc] = chunksDetails(info)
@@ -82,12 +95,13 @@ export async function sync(
       time_chunk: next_time_chunk,
     },
     info,
+    is_freezed : info.timesteps !== frame.timesteps,
   }
 }
 
 export async function update(
   frame: TimeFrame,
-  active_variables: VariableName[],
+  active_variables: EVarID[],
 ) {
   const current_time = Math.floor(frame.weight)
   let next_time = current_time + 1
@@ -99,6 +113,10 @@ export async function update(
       frame.variables.set(variable, synced)
       continue
     }
+    if(state.is_freezed) {
+      continue
+    }
+    
     if (next_time >= state.info.timesteps) {
       next_time = current_time
     }
@@ -180,14 +198,12 @@ export function circular(
   frame: TimeFrame,
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
 ) {
-  const first = frame.variables.values().next().value as
-    | TimeFrameState
-    | undefined
-  if (!first) return undefined
+
+  if (!frame.timesteps) return undefined
   let state = {
     previous_idx: Math.floor(frame.weight),
   }
-  const to = first.info.timesteps
+  const to = frame.timesteps
   return gsap.to(frame, {
     duration: to,
     ease: "none",
@@ -221,14 +237,12 @@ export function once(
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
   onComplete: () => void,
 ) {
-  const first = frame.variables.values().next().value as
-    | TimeFrameState
-    | undefined
-  if (!first) return undefined
+
+  if (!frame.timesteps) return undefined
   let state = {
     previous_idx: Math.floor(frame.weight),
   }
-  const to = first.info.timesteps
+  const to = frame.timesteps
   return gsap.to(frame, {
     duration: to,
     ease: "none",
@@ -258,17 +272,15 @@ export function walk(
   frame: TimeFrame,
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
 ) {
-  const first = frame.variables.values().next().value as
-    | TimeFrameState
-    | undefined
-  if (!first) return undefined
+
+  if (!frame.timesteps) return undefined
   const to =
-    frame.weight === first.info.timesteps - 1 ? 0 : first.info.timesteps - 1
+    frame.weight === frame.timesteps - 1 ? 0 : frame.timesteps - 1
   let state = {
     previous_idx: Math.floor(frame.weight),
   }
   return gsap.to(frame, {
-    duration: first.info.timesteps,
+    duration: frame.timesteps,
     ease: "none",
     weight: to,
     onCompleteParams: [frame, tween_ref],

@@ -9,35 +9,35 @@ import Eye from "$/assets/icons/eye-slate-500.svg"
 import EyeClosed from "$/assets/icons/eye-closed-slate-500.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
 import Checkbox from "@/components/inputs/Checkbox"
 
 export type VariableProps = {
-  current_variable_controls: VariableName | undefined
+  current_variable_controls: EVarID | undefined
   setCurrentVariableControls: Function
 }
 
 type Props = VariableProps & {
   controls: boolean
-  title: VariableName
+  title: EVarID
 }
 
-function titleOf(name: VariableName) {
+function titleOf(name: EVarID) {
   switch (name) {
-    case VariableName.currents:
+    case EVarID.currents:
       return "Currents"
-    case VariableName.pr:
+    case EVarID.pr:
       return "Precipitations"
-    case VariableName.height:
+    case EVarID.height:
       return "Surface"
-    case VariableName.winds:
+    case EVarID.winds:
       return "Winds"
-    case VariableName.tos:
+    case EVarID.tos:
       return "SST"
-    case VariableName.pfts:
+    case EVarID.pfts:
       return "Vegetation"
     default:
       return ""
@@ -50,7 +50,7 @@ function IconOf({
   active,
   className
 }: {
-  name: VariableName
+  name: EVarID
   toggle: Function
   active: boolean
   className?:string
@@ -64,24 +64,24 @@ function IconOf({
       : "text-slate-500 child:fill-slate-500"
   }`
   switch (name) {
-    case VariableName.currents:
+    case EVarID.currents:
       return <WaveIcon onClick={() => toggle()} className={_className}/>
-    case VariableName.pr:
+    case EVarID.pr:
       return <RainIcon onClick={() => toggle()} className={_className} />
-    case VariableName.height:
+    case EVarID.height:
       return <MountainIcon onClick={() => toggle()} className={_className} />
-    case VariableName.winds:
+    case EVarID.winds:
       return (
         <WindsIcon onClick={() => toggle()} className={_classNameWithChild} />
       )
-    case VariableName.tos:
+    case EVarID.tos:
       return (
         <TemperatureIcon
           onClick={() => toggle()}
           className={_classNameWithChild}
         />
       )
-    case VariableName.pfts:
+    case EVarID.pfts:
       return (
         <TreesIcon onClick={() => toggle()} className={_classNameWithChild} />
       )

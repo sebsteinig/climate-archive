@@ -1,4 +1,4 @@
-import { VariableName } from "../store/variables/variable.types"
+import { EVarID } from "../store/variables/variable.types"
 
 export type RequestTexture = {
   exp_id: string

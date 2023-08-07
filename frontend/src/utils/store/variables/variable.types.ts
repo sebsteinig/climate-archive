@@ -1,4 +1,4 @@
-export enum VariableName {
+export enum EVarID {
   clt,
   currents,
   height,
@@ -12,9 +12,23 @@ export enum VariableName {
   tos,
   winds,
 }
+export const ALL_VARIABLES = [
+  EVarID.clt,
+  EVarID.currents,
+  EVarID.height,
+  EVarID.liconc,
+  EVarID.mlotst,
+  EVarID.pfts,
+  EVarID.pr,
+  EVarID.sic,
+  EVarID.snc,
+  EVarID.tas,
+  EVarID.tos,
+  EVarID.winds,
+] as const
 
 type Variable = {
-  name: VariableName
+  name: EVarID
 }
 
 export type Currents = Variable & {

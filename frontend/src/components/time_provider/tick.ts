@@ -1,5 +1,5 @@
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
-import { VariableName } from "@/utils/store/variables/variable.types"
+import { EVarID } from "@/utils/store/variables/variable.types"
 import { CanvasRef } from "./useCanvas"
 import { PanelRef } from "./time_panel/panel"
 import { MutableRefObject, RefObject } from "react"
@@ -35,7 +35,7 @@ export type TickFn = (delta: number) => Promise<{
   weight: number
   update_texture: boolean
   uSphereWrapAmount: number
-  variables: Map<VariableName, TickData>
+  variables: Map<EVarID, TickData>
 }>
 
 export function tickBuilder(
@@ -43,11 +43,11 @@ export function tickBuilder(
   panel_ref: RefObject<PanelRef>,
   data: WorldData,
   current_frame: TimeFrameRef,
-  active_variables: VariableName[],
+  active_variables: EVarID[],
   canvas: CanvasRef,
 ): TickFn {
   return async function tick(delta: number) {
-    const res: Map<VariableName, TickData> = new Map()
+    const res: Map<EVarID, TickData> = new Map()
     let frame = current_frame.current.get(time_id)
     if (!frame)
       return {
