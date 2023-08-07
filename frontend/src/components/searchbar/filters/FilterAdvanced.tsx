@@ -304,19 +304,19 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
       </div>
           
       {exp_ids.exp_ids.length >0 &&
-      <Link href={`/publication?reload=${!reload}&experiments={exp_ids=${exp_ids.exp_ids.
-          map((e) => e.id + ".")};variables=${
+      <Link href={`/experiments?reload=${!reload}&exp_ids=${exp_ids.exp_ids.
+          map((e) => e.id)}&variables=${
             variables
-          };config_name=${
-            config != "" ? config : undefined};extension=${
+          }&config_name=${
+            config}&extension=${
               extension
-            };lossless=${
+            }&lossless=${
               lossless
-            };resolution=${
+            }&resolution=${
               resolution.x ?? 0
             }*${
               resolution.y ?? 0
-            }}`}     
+            }`}     
       >
         <ButtonSecondary
           disabled={exp_ids.exp_ids.length == 0}

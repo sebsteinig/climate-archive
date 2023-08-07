@@ -7,7 +7,7 @@ import {
   RequestTexture,
 } from "./database_provider.types"
 import { LRUCache } from "lru-cache"
-import { EVarID } from "../store/variables/variable.types"
+import { ALL_VARIABLES, EVarID } from "../store/variables/variable.types"
 import { SelectSingleResult } from "../api/api.types"
 import { Experiment, Experiments, Publication } from "../types"
 import { collectionEquals } from "../types.utils"
@@ -108,7 +108,7 @@ class DatabaseProvider {
       .equals(requested_texture.exp_id)
       .toArray()
 
-    if (texture_infos.length === Object.keys(EVarID).length / 2) {
+    if (texture_infos.length === ALL_VARIABLES.length) {
       return undefined
     }
 
@@ -127,7 +127,12 @@ class DatabaseProvider {
     const response = await selectAll({
       vars: requested_textures.variables,
       ids: requested_textures.exp_ids,
-      /** TODO : resolutions */
+      config_name: requested_textures.config_name,
+      extension: requested_textures.extension,
+      lossless: requested_textures.lossless,
+      rx: requested_textures.resolution?.x,
+      ry: requested_textures.resolution?.y
+      /** TODO : nan_value_encoding, chunks, threshold */
     })
     const res = await Promise.all(
       Object.entries(response).flatMap(async (tmp) => {

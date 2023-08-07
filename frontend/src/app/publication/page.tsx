@@ -7,6 +7,7 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { useRouter, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
+import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
 
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
@@ -17,75 +18,35 @@ export default function PublicationPage() {
   const add = useClusterStore((state) => state.time.add)
   const addCollection = useClusterStore((state) => state.addCollection)
   const searchParams = useSearchParams()
-  const addWorld = useClusterStore((state) => state.time.add)
-  const router = useRouter()
+
   
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return false
     return searchParams.get("reload") == "true"
   }, [searchParams])
-
-  const loadExperiments = async(request : Map<string, any>) =>{
-    await database_provider.loadAll({
-      exp_ids: request.get("exp_ids")!,
-    })
-    const collection = {
-      exps: request.get("exp_ids")!.map((exp : string) => {
-        return { id: exp, metadata: [] }
-      }),
-    } as Experiments
-    
-    const idx = await database_provider.addCollectionToDb(collection)
-    addCollection(idx, collection)
-    addWorld(collection)
-  }
-
+  
   useEffect(() => {
     let do_replace = true
     for (let [key, value] of searchParams.entries()) {
       if (key == "reload") continue
-
-
-      if (key=="experiments"){
-        const values = value.replace("{", "").replace("}", "").split(";")
-        const request = new Map()
-        for (let i = 0; i< values.length; i++){
-          const [k, v] = values[i].split("=")
-          switch (k){
-            case "resolution":
-              request.set(k, {x : v.split("*")[0], y : v.split("*")[1]})
-              break
-            case "exp_ids":
-              const ids = v.split(".")
-              if(ids[ids.length-1]=="") ids.pop()
-              request.set(k, ids)
-              break
-            default:
-              request.set(k, v)
-          }
-        }
-        loadExperiments(request)  
-
-
-      } else {
-        const [author, year] = key.split("*")
-        searchPublication({
-          authors_short: author.replaceAll(".", " "),
-          year: [parseInt(year)],
-        })
-          ?.then(async (publications: Publication[]) => {
-            if (publications.length == 0) return
-            const publication = publications[0]
-            await database_provider.load({
-              exp_id: value,
-            })
-            const idx = await database_provider.addCollectionToDb(publication)
-            addCollection(idx, publication)
-            do_replace ? replace(publication) : add(publication)
-            do_replace = false
+      const [author, year] = key.split("*")
+      searchPublication({
+        authors_short: author.replaceAll(".", " "),
+        year: [parseInt(year)],
+      })
+        ?.then(async (publications: Publication[]) => {
+          if (publications.length == 0) return
+          const publication = publications[0]
+          await database_provider.load({
+            exp_id: value,
           })
-          .then(() => {})
-      }
+          const idx = await database_provider.addCollectionToDb(publication)
+          addCollection(idx, publication)
+          do_replace ? replace(publication) : add(publication)
+          do_replace = false
+        })
+        .then(() => {})
+      
     }
   }, [reload])
 

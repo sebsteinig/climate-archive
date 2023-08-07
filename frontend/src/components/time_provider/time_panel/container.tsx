@@ -83,12 +83,13 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     const [display_buttons, displayButtons] = useState(false)
 
     const onChangeExp: (id: string) => void = (id: string) => {
+      if(pathname.includes("experiments")) return;
       let p = new URLSearchParams()
       if(!pathname.includes("publication")){
         p.append(isPublication(data.collection) ? 
           `${data.collection.authors_short.replaceAll(" ", ".")}*${
             data.collection.year
-          }`: `${data.collection.exps.map((e) => e.id + ".")}`, id)
+          }`: `id`, id)
         router.push(`/publication?reload=false&${p.toString()}`)
       } else {
         Array.from(searchParams, ([k, v], i) => {
@@ -99,9 +100,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     }
 
     const [route_on_dup, params_on_del, current_exp_id] = useMemo(() => {
-      const key = isPublication(data.collection)
-      ? `${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`
-      : `${data.collection.exps.map((e) => e.id + ".")}`   
+      if (!isPublication(data.collection)) return [`${pathname}?${searchParams.toString()}`, undefined, data.collection.exps[0].id];
+      const key = `${data.collection.authors_short.replaceAll(" ", ".")}*${data.collection.year}`
 
       let on_dup = new URLSearchParams()
       let on_del = new URLSearchParams()
