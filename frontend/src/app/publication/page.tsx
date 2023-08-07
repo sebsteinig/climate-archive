@@ -34,7 +34,6 @@ export default function PublicationPage() {
         return { id: exp, metadata: [] }
       }),
     } as Experiments
-    console.log(collection);
     
     const idx = await database_provider.addCollectionToDb(collection)
     addCollection(idx, collection)
@@ -70,7 +69,6 @@ export default function PublicationPage() {
 
       } else {
         const [author, year] = key.split("*")
-        console.log(author)
         searchPublication({
           authors_short: author.replaceAll(".", " "),
           year: [parseInt(year)],
