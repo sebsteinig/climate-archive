@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import InputField from "@/components/inputs/InputField"
 import Select from "@/components/inputs/Select"
@@ -33,7 +33,7 @@ function Period({
     (year && year[0]) || DEFAULT_LOWER,
   )
   const [year_upper, setYearUpper] = useState(
-    (year && year[1]) || DEFAULT_UPPER,
+    (year && on_period && year[1]) || (year && !on_period && year[0]) || DEFAULT_UPPER,
   )
   if (on_period) {
     return (
@@ -43,24 +43,30 @@ function Period({
             {" "}
             <h4>Year : </h4>{" "}
           </div>
-          <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}>
+          <ButtonSecondary onClick={() => {
+            setOnPeriod(false)
+            onChange([year_upper === DEFAULT_UPPER
+              ? new Date().getFullYear()
+              : parseInt(year_upper.toString())
+            ])
+          }}>
             {" "}
             {on_period ? "Between" : "Exactly"}
           </ButtonSecondary>
           <div className="w-1/5">
             <Select
-              defaultValue={`${year_lower}`}
+              value={`${year_lower}`}
               name="period_lower"
               id="period_lower"
               onChange={(e: any) => {
-                let new_year = 1900
+                let new_year = 1970
                 if (e.target.value !== DEFAULT_LOWER) {
                   new_year = parseInt(e.target.value)
                 }
-                const yu =
-                  year_upper === DEFAULT_UPPER
-                    ? new Date().getFullYear()
-                    : parseInt(year_upper.toString())
+                let yu = new Date().getFullYear()
+                if(year_upper !== DEFAULT_UPPER){
+                  yu = parseInt(year_upper.toString())
+                }
                 onChange([new_year, yu])
                 setYearLower(new_year)
               }}
@@ -78,18 +84,18 @@ function Period({
           <h4> and </h4>
           <div className="w-1/5">
             <Select
-              defaultValue={`${year_upper}`}
+              value={`${year_upper}`}
               name="period_upper"
               id="period_upper"
               onChange={(e: any) => {
-                let new_year =
-                  e.target.value !== DEFAULT_LOWER
-                    ? parseInt(e.target.value)
-                    : new Date().getFullYear()
-                const yl =
-                  year_lower === DEFAULT_UPPER
-                    ? 1900
-                    : parseInt(year_lower.toString())
+                let new_year = new Date().getFullYear()
+                if(e.target.value !== DEFAULT_UPPER){
+                  new_year = parseInt(e.target.value)
+                }
+                let yl = 1970
+                if (year_lower !== DEFAULT_LOWER){
+                  yl = parseInt(year_lower.toString())
+                }
                 onChange([yl, new_year])
                 setYearUpper(new_year)
               }}
@@ -114,25 +120,25 @@ function Period({
           {" "}
           <h4>Year : </h4>{" "}
         </div>
-        <ButtonSecondary onClick={() => setOnPeriod((prev) => !prev)}>
+        <ButtonSecondary onClick={() => {
+          setOnPeriod(true)
+          onChange([year_lower == DEFAULT_LOWER ? 1900 : parseInt(year_lower.toString()), 
+            year_upper == DEFAULT_UPPER ? new Date().getFullYear() : parseInt(year_upper.toString())])
+        }}>
           {" "}
           {on_period ? "Between" : "Exactly"}
         </ButtonSecondary>
         <div className="w-1/5">
           <Select
-            defaultValue={`${year_upper}`}
+            value={`${year_upper}`}
             name="period_upper"
             id="period_upper"
             onChange={(e: any) => {
               let new_year = new Date().getFullYear()
-              if (e.target.value !== DEFAULT_LOWER) {
+              if (e.target.value !== DEFAULT_UPPER) {
                 new_year = parseInt(e.target.value)
               }
-              const yl =
-                year_lower === DEFAULT_UPPER
-                  ? 1900
-                  : parseInt(year_lower.toString())
-              onChange([yl, new_year])
+              onChange([new_year])
               setYearUpper(new_year)
             }}
           >
@@ -207,6 +213,7 @@ export default function FilterPublication({
                 setRequestFilters({ journal: e.target.value })
               }}
             >
+              <option disabled selected value={""}>Select a journal ...</option>
               {children}
             </Select>
           </div>

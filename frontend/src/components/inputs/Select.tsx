@@ -16,6 +16,7 @@ export default function Select({
   id,
   className,
   title,
+  value,
   defaultValue,
   children,
 }: PropsWithChildren<Props>) {
@@ -28,6 +29,7 @@ export default function Select({
       onChange={(e) => onChange(e)}
       title={title}
       defaultValue={defaultValue}
+      value={value}
       id={id}
       name={name}
     >
