@@ -11,6 +11,7 @@ import Controls from "./Controls"
 import { Plane } from "./Plane"
 import { Surface } from "./Surface"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
+import { WindLayer, WindLayerRef } from "./winds/WindsLayer"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
@@ -26,6 +27,7 @@ const World = memo(({ tick }: Props) => {
   console.log('creating World component')
 
   const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
+  const wind_layer_ref = useRef<WindLayerRef>(null)
 
   useEffect(() => {
     console.log("subscribe")
@@ -33,6 +35,7 @@ const World = memo(({ tick }: Props) => {
     const unsubscribe = useClusterStore.subscribe(
       (state) => {
         atmosphere_layer_ref.current.updateUserUniforms(state.variables.pr);
+        wind_layer_ref.current.updateUserUniforms(state.variables.winds);
       },
     );
   
@@ -46,15 +49,23 @@ const World = memo(({ tick }: Props) => {
   useFrame((state, delta) => {
     tick(delta).then((res) => {
 
-      //console.log(res.update_texture);
       if (atmosphere_layer_ref.current) {
         atmosphere_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
+      }
+      if (wind_layer_ref.current) {
+        wind_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
       }
       for (let [variable, data] of res.variables) {
         switch (variable) {
           case EVarID.pr: {
             if (atmosphere_layer_ref.current && res.update_texture) {
               atmosphere_layer_ref.current.updateTextures(data)
+            }
+            break
+          }
+          case EVarID.winds: {
+            if (wind_layer_ref.current && res.update_texture) {
+              wind_layer_ref.current.updateTextures(data)
             }
             break
           }
@@ -72,6 +83,7 @@ const World = memo(({ tick }: Props) => {
       {/* <Surface ref={sphereRef} config={config} /> */}
       {/* <ATM_2D ref={atm2DRef} /> */}
       <AtmosphereLayer ref={atmosphere_layer_ref} />
+      <WindLayer ref={wind_layer_ref} />
 
       <Perf position="bottom-right" />
     </>
