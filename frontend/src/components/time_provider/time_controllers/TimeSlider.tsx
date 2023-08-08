@@ -64,7 +64,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
       <input
         ref={input_ref}
         type="range"
-        className="w-full"
+        className="w-full range accent-emerald-400"
         min={0}
         max={max}
         step={0.1}

@@ -211,6 +211,7 @@ export function RowWithSlider(props: RowWithSliderProps) {
         value={props.value}
         onChange={props.onChange}
         step={props.step}
+        className="accent-emerald-400"
       ></Slider>
       <InputNumber
         value={props.value}
