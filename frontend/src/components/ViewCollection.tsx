@@ -110,7 +110,7 @@ export function CollectionDetails({ collection, load,onClose }: CollectionProps)
                   year : collection.year,
                   exp_id : collection.exps[0].id,
                 })
-                router.push("/publication/?"+search_params.toString())
+                router.push("/publication/?" + search_params.toString() + "&reload=" + !reload)
                 if(onClose) {
                   onClose.fn()
                 } 

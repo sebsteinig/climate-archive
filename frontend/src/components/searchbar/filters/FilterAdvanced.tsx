@@ -60,7 +60,6 @@ type Props = {
 }
 
 export default function FilterAdvanced({ displaySearchBar }: Props) {
-  const addCollection = useClusterStore((state) => state.addCollection)
   const [display, setDisplay] = useState(false)
   const [exp_ids, setExpIds] = useState<{ exp_ids: Exp[]; search: string }>({
     exp_ids: [],
