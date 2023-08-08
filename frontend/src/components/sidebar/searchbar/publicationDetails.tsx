@@ -40,6 +40,8 @@ export default function PublicationDetails({
             await database_provider.load({
               exp_id: publication.exps[0].id,
             })
+            console.log(publication.exps);
+            
             const idx = await database_provider.addCollectionToDb(publication)
             addCollection(idx, publication)
             add( publication )

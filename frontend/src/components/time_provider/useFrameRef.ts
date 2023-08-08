@@ -1,4 +1,4 @@
-import { TimeFrameHolder } from "@/utils/store/time/time.type"
+import { TimeFrame, TimeFrameHolder, TimeFrameState } from "@/utils/store/time/time.type"
 import { sync } from "@/utils/store/time/time.utils"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { Experiment } from "@/utils/types"
@@ -18,10 +18,11 @@ export function useFrameRef() {
         },
         async init(time_id,exp:Experiment,active_variables:VariableName[]) {
           const data = this.map.get(time_id)!
-          const frame = {
+          const frame : TimeFrame = {
             exp:exp,
             swap_flag:true,
             swapping:false,
+            uSphereWrapAmount:0,
             //ts_idx:0,
             weight:0,
             variables:new Map()

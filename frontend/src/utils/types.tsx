@@ -6,7 +6,9 @@ export type Experiment = {
       | {
           text: string
         }
-      | any
+      | {
+          age: string
+      } | any
   }[]
 }
 

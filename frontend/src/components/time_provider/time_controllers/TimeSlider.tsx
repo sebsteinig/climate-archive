@@ -36,6 +36,8 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
 ) {
   const input_ref = useRef<HTMLInputElement>(null!)
   const is_changing = useRef(false)
+  const departure  = useRef<number>(null!)
+  const destination = useRef<number>(null!)
   useImperativeHandle(ref, () => {
     return {
       onChange: (frame: TimeFrame) => {
@@ -68,16 +70,23 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         min={0}
         max={max}
         step={0.1}
-        onChange={(e) => {
+        onPointerDown={() => {
+          departure.current = Math.round(parseFloat(input_ref.current.value))
+        }}
+        onPointerUp={() => {
           const frame = current_frame.current.get(time_id)
           if(!frame) return;
           is_changing.current = true
-          const to = parseFloat(e.target.value)
+          const to = Math.round(destination.current)
           if(!to) return;
-          
-          goto(frame,to,undefined,()=>{
+          const duration = 5 * Math.abs(to - departure.current??0)/ (max>0 ? max : 1)
+          goto(frame,to,duration,()=>{
             is_changing.current = false
           })
+
+        }}
+        onChange={(e) => {
+          destination.current = parseFloat(e.target.value)
         }}
       />
     </div>

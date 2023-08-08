@@ -104,13 +104,7 @@ export async function update(frame:TimeFrame,active_variables:VariableName[]) {
             time_chunk : next_time_chunk,
         }
     }
-    // for(let [variable,state] of frame.variables) {
-    //     const info = await database_provider.getInfo(frame.exp.id,variable)
-    //     state.info = info,
-
-    // }
-}
-//export type sequence = 
+} 
 const EPSILON = 0.00001
 export function goto(frame:TimeFrame,to:number,duration?:number,onComplete?:()=>void) {
     let state = {

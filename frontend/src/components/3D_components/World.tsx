@@ -10,26 +10,15 @@ import Lights from "./Lights"
 import Controls from "./Controls"
 import { Plane } from "./Plane"
 import { Surface } from "./Surface"
-import { ATM_2D } from "./ATM_2D"
-import { AtmosphereLayer } from "./AtmosphereLayer"
+import { ATM_2D, ATM_2D_Ref } from "./ATM_2D"
+import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { VariableName } from "@/utils/store/variables/variable.types"
 import { TextureInfo } from "@/utils/database/database.types"
 import { TickFn } from "../time_provider/tick"
 
 type Props = {
-  tick: (delta: number) => Promise<
-    Map<
-      VariableName,
-      {
-        current_url: string
-        next_url: string
-        weight: number
-        current_info: TextureInfo
-        next_info: TextureInfo
-      }
-    >
-  >
+  tick: TickFn
 }
 
 const World = memo(({ tick }: Props) => {
@@ -37,14 +26,14 @@ const World = memo(({ tick }: Props) => {
 
   console.log('creating World component')
 
-  const atm2DRef = useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null)
+  const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
 
   useEffect(() => {
     console.log("subscribe")
     // Subscribe to store updates and update prRef.current whenever variables.pr changes
     const unsubscribe = useClusterStore.subscribe(
       (state) => {
-        atm2DRef.current.updateUserUniforms(state.variables.pr);
+        atmosphere_layer_ref.current.updateUserUniforms(state.variables.pr);
       },
     );
   
@@ -59,19 +48,22 @@ const World = memo(({ tick }: Props) => {
 
     // console.log(state.scene.children)
     tick(delta).then((res) => {
-      
-      atm2DRef.current.tick(res.weight)
 
-      if (res.variables.size != 0) {
-        for (let [variable, data] of res.variables) {
-          switch (variable) {
-            case VariableName.pr : { 
-              atm2DRef.current.updateTextures(data, res.weight) 
-              break
-            }
+      //console.log(res.update_texture);
+      if(atmosphere_layer_ref.current) {       
+        atmosphere_layer_ref.current.tick(res.weight)
+      }
+      for (let [variable, data] of res.variables) {
+        switch (variable) {
+          case VariableName.pr : { 
+              if(atmosphere_layer_ref.current && res.update_texture) {
+                atmosphere_layer_ref.current.updateTextures(data) 
+              }
+            break
           }
         }
-      } 
+      }
+      
     })
   })
 
@@ -83,7 +75,7 @@ const World = memo(({ tick }: Props) => {
       <Lights />
       {/* <Surface ref={sphereRef} config={config} /> */}
       {/* <ATM_2D ref={atm2DRef} /> */}
-      <AtmosphereLayer ref={atm2DRef} />
+      <AtmosphereLayer ref={atmosphere_layer_ref} />
 
       <Perf position="bottom-right" />
     </>
