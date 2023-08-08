@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo } from "react"
 import { searchPublication } from "@/utils/api/api"
-import { Experiments, Publication } from "@/utils/types"
+import { Publication } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { getContainers } from "@/utils/URL_params/url_params.utils"
 
