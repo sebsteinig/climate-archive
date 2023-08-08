@@ -1,5 +1,5 @@
 "use client"
-import { TimeProvider } from "./time_provider/TimeProvider"
+import { TimeProvider } from "./time_provider/TimeManager"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -12,27 +12,29 @@ import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 
-type Props = {}
+type Props = {
+
+}
 
 export default function ClientMain({}: Props) {
-  const addCollection = useClusterStore((state) => state.addCollection)
-  const add = useClusterStore((state) => state.time.add)
-  const pathname = usePathname()
-  useEffect(() => {
-    if (!pathname.includes("publication")){
-      Promise.all([database_provider.loadAllColections()]).then(([e]) => {
-        e.map((element) => {
-          addCollection(element.id!, element.data)
-        })
-        const most_recent = e.sort(
-          (a, b) => Date.parse(b.date) - Date.parse(a.date),
-        )[0]
-        if (most_recent) {
-          add(most_recent.data)
-        }
-      })
-    }
-  }, [])
+  // const addCollection = useClusterStore((state) => state.addCollection)
+  // const add = useClusterStore((state) => state.time.add)
+  // const pathname = usePathname()
+  // useEffect(() => {
+  //   if (!pathname.includes("publication")) {
+  //     Promise.all([database_provider.loadAllColections()]).then(([e]) => {
+  //       e.map((element) => {
+  //         addCollection(element.id!, element.data)
+  //       })
+  //       const most_recent = e.sort(
+  //         (a, b) => Date.parse(b.date) - Date.parse(a.date),
+  //       )[0]
+  //       if (most_recent) {
+  //         add(most_recent.data)
+  //       }
+  //     })
+  //   }
+  // }, [])
   const [search_bar_visible, displaySearchBar] = useState(false)
   const [collection, setCollection] = useState<Collection | undefined>()
   const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
@@ -52,7 +54,7 @@ export default function ClientMain({}: Props) {
             <div className=" h-full flex  items-center absolute">
               <SideBar journals={<></>} />
             </div>
-            <HelpButton className="absolute bottom-0 grow-0 justify-self-end"/>
+            <HelpButton className="absolute bottom-0 grow-0 justify-self-end" />
           </div>
         </div>
         <div className="flex-grow flex flex-col gap-5">

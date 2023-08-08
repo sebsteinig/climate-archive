@@ -13,10 +13,9 @@ const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
 export default function PublicationPage() {
-  const replace = useClusterStore((state) => state.time.replace)
   const add = useClusterStore((state) => state.time.add)
-  const addCollection = useClusterStore((state) => state.addCollection)
   const searchParams = useSearchParams()
+  const clear = useClusterStore((state) => state.time.clear)
 
   
   const reload = useMemo(() => {
@@ -31,14 +30,12 @@ export default function PublicationPage() {
         return { id: exp, metadata: [] }
       }),
     } as Experiments    
-    const idx = await database_provider.addCollectionToDb(collection)
-    addCollection(idx, collection)
     add(collection)
 
   }
 
-  //clear
   useEffect(() => {
+    clear()
     var request : RequestMultipleTexture = {exp_ids : []}
     for (let [key, value] of searchParams.entries()) {
         if (key == "reload") continue

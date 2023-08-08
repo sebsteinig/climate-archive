@@ -3,7 +3,7 @@ import { EVarID } from "@/utils/store/variables/variable.types"
 import { World } from "@/components/3D_components/World"
 import { OrbitControls, PerspectiveCamera, View } from "@react-three/drei"
 import { CanvasRef } from "../useCanvas"
-import { PanelRef } from "./panel"
+import { PanelRef } from "./Panel"
 import { MutableRefObject, RefObject, useRef } from "react"
 import { tickBuilder } from "../tick"
 

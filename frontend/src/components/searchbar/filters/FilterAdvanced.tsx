@@ -77,7 +77,7 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
     if (!searchParams.has("reload")) return true
     return searchParams.get("reload") == "true"
   }, [searchParams])
-  
+
   if (!display) {
     return (
       <>
@@ -318,17 +318,15 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
               resolution.y ?? 0
             }`}     
       >
-        <ButtonSecondary
-          disabled={exp_ids.exp_ids.length == 0}
-          onClick={async () => {
-            displaySearchBar(false)
-            
-            
-          }}
-        >
-          Load
-        </ButtonSecondary>
-      </Link>
+          <ButtonSecondary
+            disabled={exp_ids.exp_ids.length == 0}
+            onClick={async () => {
+              displaySearchBar(false)
+            }}
+          >
+            Load
+          </ButtonSecondary>
+        </Link>
       }
     </>
   )

@@ -15,9 +15,9 @@ export function Height({
       setCurrentVariableControls={setCurrentVariableControls}
       controls={true}
     >
-       <Rows>
-        <RowWithSlider 
-          onChange={(n)=> {
+      <Rows>
+        <RowWithSlider
+          onChange={(n) => {
             height.updateDiplacement(n)
           }}
           min={0}
@@ -25,8 +25,8 @@ export function Height({
           step={0.001}
           value={height.diplacement}
           label="height diplacement"
-          />
-        </Rows>
+        />
+      </Rows>
     </Variable>
   )
 }

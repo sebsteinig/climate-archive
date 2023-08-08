@@ -15,12 +15,14 @@ import { EVarID } from "@/utils/store/variables/variable.types"
 import { gridOf } from "@/utils/types.utils"
 import { useFrameRef } from "./useFrameRef"
 import { useCanvas } from "./useCanvas"
-import { Panel, PanelRef } from "./time_panel/panel"
+import { Panel, PanelRef } from "./time_panel/Panel"
 import React from "react"
-import { Scene } from "./time_panel/scene"
+import { Scene } from "./time_panel/Scene"
 import { sync } from "@/utils/store/time/time.utils"
 import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "../ViewCollection"
+import { usePathname, useRouter } from "next/navigation"
+import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
 
 type Props = {
   displayCollection: (collection: Collection) => void
@@ -50,8 +52,18 @@ export function TimeProvider(props: Props) {
 
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
-    init(time_slots, current_frame, active_variables)
+    init(time_slots, current_frame, active_variables).then(
+      () => {
+        if(pathname.includes("publication")) {
+          const search_params = resolveURLparams(time_slots)
+          search_params.set("reload","false")
+          router.push(pathname+"?"+search_params.toString())
+        }
+      }
+    )
   }, [time_slots, active_variables])
+  const router = useRouter()
+  const pathname = usePathname()
 
   const grid = useMemo(() => {
     return gridOf(time_slots.size)
@@ -125,8 +137,7 @@ async function init(
   active_variables: EVarID[],
 ) {
   for (let [time_id, data] of slots) {
-    const exp =
-      current_frame.current.get(time_id)?.exp ?? data.collection.exps[0]
+    const exp = (data.exp ?? data.collection.exps[0])
     await current_frame.current.init(time_id, exp, active_variables)
   }
 }

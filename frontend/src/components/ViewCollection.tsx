@@ -13,6 +13,7 @@ import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import Link from "next/link"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import { useRouter, useSearchParams } from "next/navigation"
+import { upPush } from "@/utils/URL_params/url_params.utils"
 
 type Props = {
   collection: Collection
@@ -45,6 +46,7 @@ export function ViewCollection({ collection, onClose, onReturn }: Props) {
           <CollectionDetails
             collection={collection}
             load={onReturn !== undefined}
+            onClose={onClose}
           />
         </div>
       </div>
@@ -55,16 +57,16 @@ export function ViewCollection({ collection, onClose, onReturn }: Props) {
 type CollectionProps = {
   collection: Publication | Experiments | undefined
   load: boolean
+  onClose?: { fn: () => void }
 }
 
-export function CollectionDetails({ collection, load }: CollectionProps) {
-  
+export function CollectionDetails({ collection, load,onClose }: CollectionProps) {
   const searchParams = useSearchParams()
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return true
     return searchParams.get("reload") == "true"
   }, [searchParams])
-
+  const router = useRouter()
   if (!collection) return null
 
   if (!isPublication(collection)) {
@@ -100,15 +102,19 @@ export function CollectionDetails({ collection, load }: CollectionProps) {
         </div>
         <div className="row-start-5 flex justify-center">
           {load && (
-            <Link
-              className="cursor-pointer m-5"
-              href={`/publication?reload=${!reload}&${collection.authors_short.replaceAll(
-                " ",
-                ".",
-              )}*${collection.year}=${collection.exps[0].id}`}
-            >
-              <ButtonPrimary onClick={() => {}}>Discover</ButtonPrimary>
-            </Link>
+              <ButtonPrimary onClick={() => {
+                const search_params = new URLSearchParams()
+
+                upPush(search_params,{
+                  authors_short : collection.authors_short,
+                  year : collection.year,
+                  exp_id : collection.exps[0].id,
+                })
+                router.push("/publication/?"+search_params.toString())
+                if(onClose) {
+                  onClose.fn()
+                } 
+              }}>Discover</ButtonPrimary>
           )}
         </div>
       </div>
@@ -124,10 +130,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
   return (
     <div className="p-5 overflow-x-hidden rounded-lg h-full flex flex-col ">
       <div className="flex-grow ">
-        <table
-          className="w-full table-fixed border-collapse"
-          id="exps-table"
-        >
+        <table className="w-full table-fixed border-collapse" id="exps-table">
           <thead className="text-left bg-slate-700">
             <tr className="rounded-lg">
               <th
@@ -147,7 +150,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
           <tbody className="overflow-hidden">
             {exps.length > 0 &&
               exps.slice(slice.from, slice.from + slice.size).map((exp) => {
-                const {id,label} = getTitleOfExp(exp)
+                const { id, label } = getTitleOfExp(exp)
                 return (
                   <tr
                     title={`${id} | ${label}`}
@@ -166,7 +169,7 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
           </tbody>
         </table>
       </div>
-      
+
       <div className="justify-between mt-5 flex flex-row">
         <div className="ml-5 tracking-[.5em] small-caps opacity-70 cursor-default">
           {exps.length} Experiment{exps.length > 1 ? "s" : ""}
