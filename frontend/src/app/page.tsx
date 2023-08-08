@@ -46,15 +46,58 @@ export default function Home() {
             </div>
         </nav>
 
-        <div className="grow grid grid-cols-3 gap-5">
-
-          <div className="col-span-2 flex flex-col gap-5">
+        <div className="grow grid grid-cols-2 gap-5">
+          <div className="">
+              <div className="p-5 rounded-lg h-full bg-slate-950 flex flex-col justify-between items-center">
+                <h2 className="text-slate-300 tracking-[.5em] small-caps">paleoclimate</h2>
+                <div className="">
+                  <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
+                </div>
+                <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
+                <Link href={""} 
+                className="bg-emerald-500 w-fit px-5 py-4 rounded-lg
+                  outline-none
+                  tracking-[.5em] uppercase text-slate-900"
+                >Discover</Link>
+              </div>
+          </div>
+          <div className="flex flex-col gap-5">
             <div className="grow grid grid-rows-2 gap-5">
-              <div className="h-full">
-                <div className="transition-colors duration-300 hover:bg-slate-700 p-5 rounded-lg h-full bg-slate-800 border-2 border-slate-900  flex flex-row gap-5">
-                  <div className="grow-0 w-3/5 flex justify-center items-center">
-                    <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
+              <div className="w-full">
+                  <div className="border-l-4 border-sky-500 bg-slate-900 w-full p-5">
+                    <h2 className="text-slate-300 tracking-[.5em] small-caps">prediction</h2>
                   </div>
+                  <p className="p-5">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatibus quam maxime in, hic voluptatem rerum quae! Non atque ut numquam.</p>
+                  <div className="p-5 flex flex-col gap-5">
+                    <Link href={""} className="text-right tracking-[.5em] py-5 transition-colors duration-300 uppercase text-slate-300 hover:text-emerald-500">next 80 years</Link>
+                    <Link href={""} className="tracking-[.5em] uppercase py-5 transition-colors duration-300 text-slate-300 hover:text-emerald-500">next millions years</Link>
+                  </div>
+              </div>
+              {/* <div className="border-2 border-blue-500">
+
+              </div> */}
+              <div className="">
+                <div className="p-5 rounded-lg h-full bg-slate-700">
+                  <div className="grid grid-cols-2 gap-5 w-full h-full">
+                    <div className="flex flex-col gap-5">
+                      <h2 className="text-slate-300 tracking-[.5em] small-caps">fantasy worlds</h2>
+                      <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
+                    </div>
+                    <div
+                      className="w-full h-full bg-center bg-no-repeat"
+                      style={{
+                        backgroundImage: `url("/assets/world-test.png")`,
+                        backgroundSize: 'contain',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              {/* <div className="">
+                <div className="transition-colors duration-300 hover:bg-slate-700 p-5 rounded-lg h-full bg-slate-800 border-2 border-slate-900  flex flex-row gap-5">
+                   <div className="grow-0 w-3/5 flex justify-center items-center">
+                    <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
+                  </div> 
                   <div className="grow flex flex-col gap-5 ">
                     <h2 className="text-slate-300 tracking-[.5em] small-caps">weather</h2>
                     <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
@@ -77,7 +120,7 @@ export default function Home() {
                   </div>
 
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="grow-0 shrink-0">
               <footer className="rounded-lg bg-slate-900 flex flex-row gap-5 p-5 justify-evenly">
@@ -87,20 +130,7 @@ export default function Home() {
               </footer>
             </div>
           </div>
-          <div className="col-start-3">
-            <div className="p-5 rounded-lg h-full bg-slate-950 flex flex-col justify-between items-center">
-              <h2 className="text-slate-300 tracking-[.5em] small-caps">paleoclimate</h2>
-              <div className="p-5 w-full">
-                <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
-              </div>
-              <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
-              <Link href={""} 
-              className="bg-emerald-500 w-fit px-5 py-4 rounded-lg
-                outline-none
-                tracking-[.5em] uppercase text-slate-900"
-              >Discover</Link>
-            </div>
-          </div>
+
         </div>
       </div>
     </main>
