@@ -100,9 +100,12 @@ export default function SearchBar({
   }, [searched_content, requestFilters])
 
   return (
-    <div className={`z-40 absolute left-0 top-0 w-full h-full backdrop-blur ${is_visible ? "visible" : "hidden"}`} onClick={() => {
+    <div className={`z-40 absolute left-0 top-0 w-full h-full backdrop-blur transition-opacity duration-100 ${is_visible ? "opacity-100" : "opacity-0"}`} 
+      style={{ pointerEvents: is_visible ? 'auto' : 'none' }}
+      onClick={() => {
       displaySearchBar(false)
-    }}>
+      }}
+    >
       <div
         className={`
           ${is_visible ? "visible" : "hidden"}
