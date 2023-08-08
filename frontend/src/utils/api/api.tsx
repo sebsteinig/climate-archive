@@ -8,8 +8,10 @@ import {
   SelectSingleResult,
   SelectCollectionResult,
 } from "./api.types"
+import { Publication } from "../types"
 
 // const URL_API = "http://localhost:3000/"
+// const URL_IMAGE = "http://localhost:3005/"
 const URL_API = "http://51.89.165.226:3000/"
 const URL_IMAGE = "http://51.89.165.226:3005/"
 // const URL_API = "http://localhost:3000/"
@@ -19,7 +21,7 @@ const URL_IMAGE = "http://51.89.165.226:3005/"
  * @param query {'title', 'journal', 'authors_short'}
  * @returns experiments from publication as json
  */
-export function searchPublication(query: SearchPublication) {
+export async function searchPublication(query: SearchPublication) {
   let url = new URL("search/publication/", URL_API)
   if (query.title || query.journal || query.authors_short) {
     Object.entries(query).map((bind) => {
@@ -29,8 +31,9 @@ export function searchPublication(query: SearchPublication) {
       }
     })
 
-    return getData(url.href)
+    return await getData<Publication[]>(url.href)
   }
+  return []
 }
 
 /**
@@ -64,13 +67,9 @@ export function search(query: SearchExperiment) {
   }
 }
 
-async function getData(url: string) {
-  try {
-    let data = await axios.get(url)
-    return data.data
-  } catch (error) {
-    return {}
-  }
+async function getData<T>(url: string) {
+  let data = await axios.get(url)
+  return data.data as T
 }
 
 export async function selectCollection(query: SelectCollectionParameter) {
@@ -108,7 +107,7 @@ export async function selectAll(query: SelectCollectionParameter) {
 }
 
 export async function getImage(path: string) {
-  let url = new URL(trimRoutes(path,7), URL_IMAGE)
+  let url = new URL(trimRoutes(path, 7), URL_IMAGE)
   try {
     let data = await axios.get(url.href, {
       responseType: "arraybuffer",
@@ -126,12 +125,15 @@ export async function getImage(path: string) {
   }
 }
 
-function trimRoutes(path:string,nb_of_sub_route:number):string {
-  return path.split("/").slice(nb_of_sub_route).reduce((acc,route)=>`${acc}/${route}`,'')
+function trimRoutes(path: string, nb_of_sub_route: number): string {
+  return path
+    .split("/")
+    .slice(nb_of_sub_route)
+    .reduce((acc, route) => `${acc}/${route}`, "")
 }
 
 export async function getImageArrayBuffer(path: string) {
-  let url = new URL(trimRoutes(path,7), URL_IMAGE)
+  let url = new URL(trimRoutes(path, 7), URL_IMAGE)
   try {
     let res = await axios.get(url.href, {
       responseType: "arraybuffer",

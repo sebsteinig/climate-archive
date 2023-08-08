@@ -1,5 +1,5 @@
 import { TextureInfo } from "@/utils/database/database.types"
-import { VariableName } from "../variables/variable.types"
+import { EVarID } from "../variables/variable.types"
 import { Experiment } from "@/utils/types"
 import { MutableRefObject } from "react"
 import { Collection } from "../collection.store"
@@ -44,22 +44,27 @@ export type TimeFrameState = {
     frame: number
   }
   info: TextureInfo
+  is_freezed: boolean
 }
 export type TimeFrame = {
   exp: Experiment
-  //ts_idx : number
-  uSphereWrapAmount:number,
-  variables: Map<VariableName, TimeFrameState>
+  timesteps?: number
+  uSphereWrapAmount: number
+  variables: Map<EVarID, TimeFrameState>
   weight: number
-  swap_flag : boolean
-  swapping : boolean
+  swap_flag: boolean
+  swapping: boolean
 }
 
 export type TimeFrameHolder = {
   map: Map<TimeID, TimeFrame>
   update: (frame: TimeFrame, time_id: TimeID) => TimeFrame
   get: (time_id: TimeID) => TimeFrame | undefined
-  init: (time_id: TimeID,exp:Experiment,active_variables:VariableName[]) => Promise<void>
+  init: (
+    time_id: TimeID,
+    exp: Experiment,
+    active_variables: EVarID[],
+  ) => Promise<void>
 }
 
 export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
@@ -80,9 +85,10 @@ export type WorldConf = {
 }
 
 export type WorldData = {
-  conf : WorldConf,
-  collection : Collection
-  time : TimeConf
+  conf: WorldConf
+  collection: Collection
+  time: TimeConf
+  exp ?: Experiment
 }
 
-export type Slots = Map<TimeID,WorldData>
+export type Slots = Map<TimeID, WorldData>

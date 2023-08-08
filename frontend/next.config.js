@@ -25,7 +25,7 @@ const nextConfig = {
       {
         test: /\.glsl/,
         type: "asset/source",
-      }
+      },
     )
 
     // Modify the file loader rule to ignore *.svg, since we have it handled now.

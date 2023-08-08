@@ -1,13 +1,19 @@
 "use client"
-import { forwardRef, useImperativeHandle, useRef, useEffect, RefObject } from "react"
-import { memo } from 'react';
-import * as THREE from 'three'
-import vertexShader from '$/shaders/precipitationVert.glsl'
-import fragmentShader from '$/shaders/precipitationFrag.glsl'
-import { createColormapTexture } from '../../utils/three/colormapTexture.js'
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useEffect,
+  RefObject,
+} from "react"
+import { memo } from "react"
+import * as THREE from "three"
+import vertexShader from "$/shaders/precipitationVert.glsl"
+import fragmentShader from "$/shaders/precipitationFrag.glsl"
+import { createColormapTexture } from "../../utils/three/colormapTexture.js"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { TickData } from "../time_provider/tick";
-import { PrSlice } from "@/utils/store/variables/variable.types";
+import { TickData } from "../time_provider/tick"
+import { PrSlice } from "@/utils/store/variables/variable.types"
 
 type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 

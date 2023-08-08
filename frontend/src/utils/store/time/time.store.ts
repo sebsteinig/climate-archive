@@ -1,31 +1,25 @@
 import { StateCreator } from "zustand"
-import {
-  TimeState,
-  TimeID,
-  CollectionID,
-  WorldData,
-  Slots,
-} from "./time.type"
+import { TimeState, TimeID, CollectionID, WorldData, Slots } from "./time.type"
 
 import { Collection } from "../collection.store"
 import { buildTimeConf, buildWorldConf } from "./time.utils"
+import { Experiment, Publication } from "@/utils/types"
 
 export interface TimeSlice {
   time: {
-
     __auto_increment: number
-    slots : Slots
+    slots: Slots
 
-    add : (collection:Collection) => void
-    remove : (id:TimeID) => void
-    dup : (time_id:TimeID) => void
+    add: (collection: Collection) => void
+    addAll: (collection: {publication:Publication,exp_id:string}[]) => void
+    clear : () => void
+    replace: (collection: Collection) => void
+    remove: (id: TimeID) => void
+    dup: (time_id: TimeID) => void
 
-    linkCamera: (
-      time_id: TimeID,
-      linked: boolean,
-    ) => void
+    changeExp : (id:TimeID,exp:Experiment) => void
+    linkCamera: (time_id: TimeID, linked: boolean) => void
     // slots: TimeMap
-
 
     // addSync: (
     //   collection_idx: CollectionID,
@@ -57,31 +51,70 @@ export const createTimeSlice: StateCreator<
 > = (set) => {
   return {
     time: {
-      __auto_increment : -1,
-      slots : new Map(),
+      __auto_increment: -1,
+      slots: new Map(),
 
       add(collection) {
-          set(state => {
-            state.time.__auto_increment += 1
-            state.time.slots.set(state.time.__auto_increment,{
-              collection,
-              conf : buildWorldConf(),
-              time : buildTimeConf(),
-            })
+        set((state) => {
+          state.time.__auto_increment += 1
+          state.time.slots.set(state.time.__auto_increment, {
+            collection,
+            conf: buildWorldConf(),
+            time: buildTimeConf(),
           })
+        })
+      },
+
+      addAll(collections) {
+        set((state) => {
+          for(let collection of collections) {
+            state.time.__auto_increment += 1
+            state.time.slots.set(state.time.__auto_increment, {
+              collection:collection.publication,
+              exp : collection.publication.exps.find(exp => exp.id === collection.exp_id),
+              conf: buildWorldConf(),
+              time: buildTimeConf(),
+            })
+          }
+        })
+      },
+      replace(collection) {
+        set((state) => {
+          state.time.__auto_increment += 1
+          state.time.slots.clear()
+          state.time.slots.set(state.time.__auto_increment, {
+            collection,
+            conf: buildWorldConf(),
+            time: buildTimeConf(),
+          })
+        })
+      },
+      clear() {
+        set(state => {
+          state.time.__auto_increment = 0
+          state.time.slots.clear()
+        })
       },
       dup(time_id) {
-        set(state => {
+        set((state) => {
           const data = state.time.slots.get(time_id)
-          if(!data) return
+          if (!data) return
           state.time.__auto_increment += 1
-          state.time.slots.set(state.time.__auto_increment,data)
+          state.time.slots.set(state.time.__auto_increment, data)
         })
-    },
+      },
       remove(id) {
-        set(state => {
+        set((state) => {
           state.time.slots.delete(id)
         })
+      },
+
+      changeExp(id, exp) {
+          set((state) => {
+            const data = state.time.slots.get(id)
+            if (!data) return
+            data.exp = exp
+          })
       },
 
       // slots: {
@@ -90,13 +123,10 @@ export const createTimeSlice: StateCreator<
       //   auto_increment: 0,
       // },
 
-      linkCamera: (
-        time_id: TimeID,
-        linked: boolean,
-      ) => {
+      linkCamera: (time_id: TimeID, linked: boolean) => {
         set((state) => {
           const data = state.time.slots.get(time_id)
-          if (data ) {
+          if (data) {
             data.conf.camera.is_linked = linked
           }
         })

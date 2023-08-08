@@ -12,12 +12,12 @@ import {
   TasSlice,
   TosSlice,
   WindsSlice,
-  VariableName,
+  EVarID,
 } from "./variable.types"
 
 export type VariableSlice = {
-  active_variables : Map<VariableName, boolean>,
-  activate : (v : VariableName) => void,
+  active_variables: Map<EVarID, boolean>
+  activate: (v: EVarID) => void
   variables: {
     currents: CurrentsSlice
     clt: CltSlice
@@ -34,20 +34,20 @@ export type VariableSlice = {
   }
 }
 
-function initMap(){
+function initMap() {
   let m = new Map()
-  m.set(VariableName.currents, false)
-  m.set(VariableName.clt, false)
-  m.set(VariableName.height, false)
-  m.set(VariableName.liconc, false)
-  m.set(VariableName.mlotst, false)
-  m.set(VariableName.pfts, false)
-  m.set(VariableName.pr, false)
-  m.set(VariableName.sic, false)
-  m.set(VariableName.snc, false)
-  m.set(VariableName.tas, false)
-  m.set(VariableName.tos, false)
-  m.set(VariableName.winds, false)
+  m.set(EVarID.currents, false)
+  m.set(EVarID.clt, false)
+  m.set(EVarID.height, false)
+  m.set(EVarID.liconc, false)
+  m.set(EVarID.mlotst, false)
+  m.set(EVarID.pfts, false)
+  m.set(EVarID.pr, false)
+  m.set(EVarID.sic, false)
+  m.set(EVarID.snc, false)
+  m.set(EVarID.tas, false)
+  m.set(EVarID.tos, false)
+  m.set(EVarID.winds, false)
   return m
 }
 
@@ -58,13 +58,14 @@ export const createVariableSlice: StateCreator<
   VariableSlice
 > = (set) => {
   return {
-    active_variables : initMap(),
-    activate: (v : VariableName) => set((state) =>{
-      state.active_variables.set(v, !state.active_variables.get(v)!)
-    }),
+    active_variables: initMap(),
+    activate: (v: EVarID) =>
+      set((state) => {
+        state.active_variables.set(v, !state.active_variables.get(v)!)
+      }),
     variables: {
       currents: {
-        name: VariableName.currents,
+        name: EVarID.currents,
         animation_speed: 0.025,
         reference_speed: 50,
         arrows: 1.3,
@@ -99,10 +100,10 @@ export const createVariableSlice: StateCreator<
           }),
       },
       clt: {
-        name: VariableName.clt,
+        name: EVarID.clt,
       },
       height: {
-        name: VariableName.height,
+        name: EVarID.height,
         diplacement: 0.2,
         updateDiplacement: (value: number) =>
           set((state) => {
@@ -110,16 +111,16 @@ export const createVariableSlice: StateCreator<
           }),
       },
       liconc: {
-        name: VariableName.liconc,
+        name: EVarID.liconc,
       },
       mlotst: {
-        name: VariableName.mlotst,
+        name: EVarID.mlotst,
       },
       pfts: {
-        name: VariableName.pfts,
+        name: EVarID.pfts,
       },
       pr: {
-        name: VariableName.pr,
+        name: EVarID.pr,
         min: 3.5,
         max: 12,
         updateMin: (value: number) =>
@@ -132,13 +133,13 @@ export const createVariableSlice: StateCreator<
           }),
       },
       sic: {
-        name: VariableName.sic,
+        name: EVarID.sic,
       },
       snc: {
-        name: VariableName.snc,
+        name: EVarID.snc,
       },
       tas: {
-        name: VariableName.tas,
+        name: EVarID.tas,
       },
       tos: {
         min: -2,
@@ -146,7 +147,7 @@ export const createVariableSlice: StateCreator<
         anomaly_range: 15,
         anomalies_lower_bound: 2.5,
         sea_ice: true,
-        name: VariableName.tos,
+        name: EVarID.tos,
         updateMin: (value: number) =>
           set((state) => {
             state.variables.tos.min = value
@@ -169,7 +170,7 @@ export const createVariableSlice: StateCreator<
           }),
       },
       winds: {
-        name: VariableName.winds,
+        name: EVarID.winds,
         animation_speed: 0.025,
         min_speed: 20,
         reference_speed: 35,

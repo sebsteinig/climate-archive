@@ -1,4 +1,4 @@
-import { Variable, VariableProps } from "../utils"
+import { RowWithSlider, Rows, Variable, VariableProps } from "../utils"
 import { useClusterStore } from "@/utils/store/cluster.store"
 
 import Slider from "@/components/inputs/Slider"
@@ -16,49 +16,28 @@ export function Pr({
       setCurrentVariableControls={setCurrentVariableControls}
       controls={true}
     >
-      <div>
-        <div className="flex flex-wrap gap-2 items-center py-1">
-          <h5 className="w-56"> precip min. [mm/day] :</h5>
-          <Slider
-            min={0}
-            max={20}
-            value={pr.min}
-            onChange={(event: any) => {
-              return pr.updateMin(parseFloat(event?.target.value))
-            }}
-            step={0.1}
-          ></Slider>
-          <InputNumber
-            value={pr.min}
-            min={0}
-            max={20}
-            onChange={(event: any) => {
-              return pr.updateMin(parseFloat(event?.target.value))
-            }}
-          ></InputNumber>
-        </div>
-
-        <div className="flex flex-wrap gap-2 items-center py-1">
-          <h5 className="w-56"> precip max. [mm/day] :</h5>
-          <Slider
-            min={0}
-            max={20}
-            value={pr.max}
-            onChange={(event: any) => {
-              return pr.updateMax(parseFloat(event?.target.value))
-            }}
-            step={0.1}
-          ></Slider>
-          <InputNumber
-            value={pr.max}
-            min={0}
-            max={20}
-            onChange={(event: any) => {
-              return pr.updateMax(parseFloat(event?.target.value))
-            }}
-          ></InputNumber>
-        </div>
-      </div>
+      <Rows>
+        <RowWithSlider
+          onChange={(n) => {
+            pr.updateMin(n)
+          }}
+          min={0}
+          max={20}
+          step={0.1}
+          value={pr.min}
+          label="precip min. [mm/day]"
+        />
+        <RowWithSlider
+          onChange={(n) => {
+            pr.updateMax(n)
+          }}
+          min={0}
+          max={20}
+          step={0.1}
+          value={pr.max}
+          label="precip max. [mm/day]"
+        />
+      </Rows>
     </Variable>
   )
 }
