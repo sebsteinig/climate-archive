@@ -56,8 +56,8 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     })
     const [is_playing, setPlaying] = useState(false)
     return (
-      <div className={`flex gap-5 m-5 ${className ?? ""}`}>
-        <div className="cursor-default flex-grow overflow-hidden">
+      <div className={`grid grid-cols-3 grid-rows-1 gap-5 px-5 py-2 ${className ?? ""}`}>
+        <div className="cursor-default col-span-2 overflow-hidden">
           <p
             className="text-emerald-600 font-semibold small-caps tracking-[.5em]"
             ref={time_title_ref}
@@ -67,7 +67,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             ref={exp_title_ref}
           ></p>
         </div>
-        <div className="flex-grow flex gap-5 justify-center">
+        <div className="col-start-3 flex gap-5 justify-center">
           {is_playing ? (
             // PAUSE BUTTON
             <Pause
