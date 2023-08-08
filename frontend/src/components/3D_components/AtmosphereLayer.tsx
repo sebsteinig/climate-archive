@@ -13,7 +13,7 @@ import { createColormapTexture } from "../../utils/three/colormapTexture.js"
 import { TickData } from "../time_provider/tick"
 import { PrSlice } from "@/utils/store/variables/variable.types"
 
-type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
+type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 
 // create global geometry and material for later re-use
 const loader = new THREE.TextureLoader();
@@ -26,7 +26,7 @@ type Props = {
 }
 
 export type AtmosphereLayerRef = {
-  type : RefObject<SphereType>,
+  type : RefObject<PlaneType>,
   updateTextures : (data:TickData) => void
   tick: (weight:number, uSphereWrapAmount:number) => void
 }
@@ -34,7 +34,7 @@ export type AtmosphereLayerRef = {
 const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) => {
 
   console.log('creating AtmosphereLayer compnent')
-  const atmosphere_layer_ref = useRef<SphereType>(null)
+  const atmosphere_layer_ref = useRef<PlaneType>(null)
 
   const materialRef = useRef(new THREE.ShaderMaterial( {
     vertexShader: vertexShader,
@@ -62,9 +62,6 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   } ));
 
   console.log('creating AtmosphereLayer compnent')
-
-  // const materialRef = useRef(material)
-
   
   function tick(weight:number, uSphereWrapAmount:number) {
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
