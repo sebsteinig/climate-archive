@@ -104,7 +104,7 @@ export default function SearchBar({
       className={`
         ${is_visible ? "visible" : "hidden"}
         bg-slate-700 
-        z-30
+        z-40
         p-5 m-5 
         rounded-md 
         lg:w-1/2

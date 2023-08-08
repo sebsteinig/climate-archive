@@ -16,7 +16,6 @@ export default function PublicationPage() {
   const add = useClusterStore((state) => state.time.add)
   const searchParams = useSearchParams()
   const clear = useClusterStore((state) => state.time.clear)
-
   
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return false
@@ -31,9 +30,8 @@ export default function PublicationPage() {
       }),
     } as Experiments    
     add(collection)
-
   }
-
+  
   useEffect(() => {
     clear()
     var request : RequestMultipleTexture = {exp_ids : []}
