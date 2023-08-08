@@ -3,7 +3,6 @@ import {
   forwardRef,
   useImperativeHandle,
   useRef,
-  useEffect,
   RefObject,
 } from "react"
 import { memo } from "react"
@@ -11,7 +10,6 @@ import * as THREE from "three"
 import vertexShader from "$/shaders/precipitationVert.glsl"
 import fragmentShader from "$/shaders/precipitationFrag.glsl"
 import { createColormapTexture } from "../../utils/three/colormapTexture.js"
-import { useClusterStore } from "@/utils/store/cluster.store"
 import { TickData } from "../time_provider/tick"
 import { PrSlice } from "@/utils/store/variables/variable.types"
 
@@ -30,7 +28,7 @@ type Props = {
 export type AtmosphereLayerRef = {
   type : RefObject<SphereType>,
   updateTextures : (data:TickData) => void
-  tick: (weight:number) => void
+  tick: (weight:number, uSphereWrapAmount:number) => void
 }
 
 const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) => {
@@ -68,13 +66,14 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   // const materialRef = useRef(material)
 
   
-  function tick(weight:number) {
+  function tick(weight:number, uSphereWrapAmount:number) {
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
+    materialRef.current.uniforms.uSphereWrapAmount.value = uSphereWrapAmount
   }
 
   function updateUserUniforms(store:PrSlice) {
-    materialRef.current.uniforms.uUserMinValue.value = parseFloat(store.min)
-    materialRef.current.uniforms.uUserMaxValue.value = parseFloat(store.max)
+    materialRef.current.uniforms.uUserMinValue.value = store.min
+    materialRef.current.uniforms.uUserMaxValue.value = store.max
   }
 
   function updateTextures(data:TickData) {
