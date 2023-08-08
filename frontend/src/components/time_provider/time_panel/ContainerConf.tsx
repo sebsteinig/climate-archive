@@ -41,21 +41,22 @@ export function ContainerConf({
 
   return (
     <div
-      className={` shadow-lg shadow-slate-950 
-            z-30 group bg-gray-900
-         rounded-full p-2  max-h-full w-fit overflow-y-auto overflow-x-hidden
-         flex flex-col flex-wrap items-center ${
-           className ?? ""
+    
+      className={` shadow-lg shadow-slate-950 w-fit overflow-y-auto overflow-x-hidden
+      z-20 group bg-gray-900 max-h-[90%] grid grid-cols-1 place-items-center
+      
+      rounded-full p-2   ${
+        className ?? ""
          }`}
     >
       {is_expanded ? (
         <ArrowDownIcon
-          className="p-2 w-10 h-10 cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
+          className="p-2 w-10 h-10  cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
           onClick={() => expand(false)}
         />
       ) : (
         <ArrowUpIcon
-          className="p-2 w-10 h-10 cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
+          className="p-2 w-10 h-10  cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
           onClick={() => expand(true)}
         />
       )}
@@ -73,6 +74,7 @@ export function ContainerConf({
             gsap.to(frame,{uSphereWrapAmount:to,duration:1, ease: "none"})
           }} time_id={time_id} />
           <RotateBtn />
+          <GridBtn/>
           <PinBtn />
         </>
       )}
@@ -95,7 +97,7 @@ type InfoBtnProps = {
 function InfoBtn({ onClick, collection }: InfoBtnProps) {
   return (
     <InfoIcon
-      className="w-12 h-12 cursor-pointer p-2 text-slate-400"
+      className="w-12 h-12  cursor-pointer p-2 text-slate-400"
       onClick={() => {
         onClick(collection)
       }}
@@ -115,7 +117,7 @@ function DupBtn({ time_id ,current_frame}: DupBtnProps) {
 
   return (
       <DuplicateIcon
-        className="w-10 h-10 cursor-pointer p-2 text-slate-400"
+        className="w-10 h-10   cursor-pointer p-2 text-slate-400 child:fill-slate-400"
         onClick={() => {
           dup(time_id)
         }}
@@ -132,7 +134,7 @@ type CamBtnProps = {
 function CamBtn({ is_linked, onClick, time_id }: CamBtnProps) {
   return (
     <CameraIcon
-      className={`cursor-pointer w-5 h-5 my-2 ${
+      className={`cursor-pointer  w-5 h-5 my-2 ${
         is_linked ? "text-slate-400" : "text-emerald-400"
       }`}
       onClick={() => {
@@ -147,7 +149,7 @@ type RecenterBtnProps = {}
 function RecenterBtn(params: RecenterBtnProps) {
   return (
     <RecenterIcon
-      className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+      className={`cursor-pointer w-6 h-6   my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }
@@ -157,7 +159,7 @@ type FullScreenBtnProps = {}
 function FullScreenBtn(params: FullScreenBtnProps) {
   return (
     <FullScreenIcon
-      className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }
@@ -167,7 +169,7 @@ type ScreenshotBtnProps = {}
 function ScreenshotBtn(params: ScreenshotBtnProps) {
   return (
     <ScreenshotIcon
-      className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400 `}
+      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400 `}
     />
   )
 }
@@ -181,7 +183,7 @@ function WorldBtn({ onClick, time_id }: WorldBtnProps) {
   const [is_spheric, setSpheric] = useState(false)
   return (
     <WorldIcon
-      className={`cursor-pointer w-6 h-6 my-2 
+      className={`cursor-pointer  w-6 h-6 my-2 
         ${
           is_spheric
             ? "text-emerald-400 child:fill-emerald-400"
@@ -198,13 +200,13 @@ function WorldBtn({ onClick, time_id }: WorldBtnProps) {
 type RotateBtnProps = {}
 
 function RotateBtn(params: RotateBtnProps) {
-  return <GridIcon className={`cursor-pointer w-6 h-6 my-2 text-slate-400`} />
+  return <RotateIcon className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`} />
 }
 
 type GridBtnProps = {}
 
 function GridBtn(params: GridBtnProps) {
-  return <GridIcon className={`cursor-pointer w-6 h-6 my-2 text-slate-400`} />
+  return <GridIcon className={`cursor-pointer  w-6 h-6 my-2 text-slate-400`} />
 }
 
 type PinBtnProps = {}
@@ -212,7 +214,7 @@ type PinBtnProps = {}
 function PinBtn(params: PinBtnProps) {
   return (
     <PinIcon
-      className={`cursor-pointer w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }
