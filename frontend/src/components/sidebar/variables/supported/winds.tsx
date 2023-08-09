@@ -70,8 +70,8 @@ export function Winds({
           min={0}
           max={5}
           step={0.01}
-          value={winds.arrows}
-          label="number of arrows"
+          value={winds.arrows_size}
+          label="size of arrows"
         />
         <RowWithCheckBox
           toggle={() => {
