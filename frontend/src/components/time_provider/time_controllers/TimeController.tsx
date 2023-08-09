@@ -15,6 +15,7 @@ import {
 import {
   TimeFrame,
   TimeFrameRef,
+  TimeFrameState,
   TimeID,
   TimeKind,
   TimeMode,
@@ -43,12 +44,32 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     useImperativeHandle(ref, () => {
       return {
         onChange: (frame: TimeFrame) => {
-          const month = titleOf(Math.floor(frame.weight), frame.timesteps ?? 0)!
+          let id:string;
+          let label:string;
+          let title:string;
+          if(data.time.mode === TimeMode.mean) {
+            const first = frame.variables.values().next().value as TimeFrameState | undefined
+            if(!first || !first.mean) {
+              const t = getTitleOfExp(frame.exp)
+              id = t.id
+              label = t.label
+              title = t.label
+            }else {
+              const t = getTitleOfExp(first.mean.current.exp)
+              id = t.id
+              label = t.label
+              title = t.label
+            }
+          }else {
+            const t = getTitleOfExp(frame.exp)
+            id = t.id
+            label = t.label
+            title = titleOf(Math.floor(frame.weight), frame.timesteps ?? 0)!
+          }
           if (time_title_ref.current) {
-            time_title_ref.current.innerText = month
+              time_title_ref.current.innerText = title
           }
           if (exp_title_ref.current) {
-            const { id, label } = getTitleOfExp(frame.exp)
             exp_title_ref.current.innerText = `${id} | ${label}`
           }
         },
@@ -115,15 +136,15 @@ function play(
   if (!frame) return
   switch (data.time.kind) {
     case TimeKind.circular:
-      tween_ref.current = circular(frame, tween_ref)
+      tween_ref.current = circular(frame, tween_ref,data)
       break
     case TimeKind.once:
-      tween_ref.current = once(frame, tween_ref, () => {
+      tween_ref.current = once(frame, tween_ref,data, () => {
         setPlaying(false)
       })
       break
     case TimeKind.walk:
-      tween_ref.current = walk(frame, tween_ref)
+      tween_ref.current = walk(frame, tween_ref,data)
       break
   }
   setPlaying(true)

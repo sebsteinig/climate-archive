@@ -2,6 +2,7 @@ import {
   TimeFrame,
   TimeFrameHolder,
   TimeFrameState,
+  WorldData,
 } from "@/utils/store/time/time.type"
 import { getMaxTimesteps, sync } from "@/utils/store/time/time.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
@@ -18,14 +19,14 @@ export function useFrameRef() {
     get(time_id) {
       return this.map.get(time_id)
     },
-    async init(time_id, exp: Experiment, active_variables: EVarID[]) {
+    async init(time_id, exp: Experiment, active_variables: EVarID[],world_data:WorldData) {
       const data = this.map.get(time_id)
       console.log(`init`)
       const frame: TimeFrame = {
         exp: exp,
         swap_flag: true,
         swapping: false,
-        uSphereWrapAmount: data?.uSphereWrapAmount ?? 0,
+        uSphereWrapAmount: data?.uSphereWrapAmount ?? 1,
         weight: data?.weight ?? 0,
         variables: data?.variables ?? new Map(),
       }
@@ -33,7 +34,7 @@ export function useFrameRef() {
       frame.timesteps = max_ts
       const variables = new Map()
       for (let variable of active_variables) {
-        variables.set(variable, await sync(frame, variable))
+        variables.set(variable, await sync(frame, variable,world_data))
       }
       current_frame.current.update(frame, time_id)
     },

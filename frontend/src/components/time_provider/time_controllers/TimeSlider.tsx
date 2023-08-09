@@ -31,7 +31,7 @@ export type InputRef = {
 }
 
 export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
-  { time_id, className, current_frame }: Props,
+  { time_id, className, current_frame ,data}: Props,
   ref,
 ) {
   const input_ref = useRef<HTMLInputElement>(null!)
@@ -41,10 +41,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
   useImperativeHandle(ref, () => {
     return {
       onChange: (frame: TimeFrame) => {
-        const timestep = frame.timesteps
-        if (timestep && parseFloat(input_ref.current.max) !== timestep - 1) {
-          input_ref.current.max = (timestep - 1).toString()
-        }
+
+        // const timestep = frame.timesteps
+        // if (timestep && parseFloat(input_ref.current.max) !== timestep - 1) {
+        //   input_ref.current.max = (timestep - 1).toString()
+        // }
       },
       onWeightUpdate: (frame: TimeFrame) => {
         if (!is_changing.current) {
@@ -54,11 +55,15 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
     }
   })
   const max = useMemo(() => {
-    const frame = current_frame.current.get(time_id)
-    const timestep = frame?.timesteps
-    return timestep ?? 0
+    if(data.time.mode === TimeMode.mean) {
+      return data.collection.exps.length
+    }else {
+      const frame = current_frame.current.get(time_id)
+      const timestep = frame?.timesteps
+      return timestep ?? 0
+    }
   }, [current_frame.current.get(time_id)])
-
+  
   return (
     <div className={className}>
       <input
@@ -77,9 +82,8 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           if (!frame) return
           const to = Math.round(destination.current)
           if (!to) return
-          const duration =
-            (5 * Math.abs(to - departure.current ?? 0)) / (max > 0 ? max : 1)
-          goto(frame, to, duration, () => {
+
+          goto(frame, to, () => {
             is_changing.current = false
           })
         }}

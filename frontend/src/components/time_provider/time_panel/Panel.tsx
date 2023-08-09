@@ -8,6 +8,7 @@ import { InputRef, TimeSlider } from "../time_controllers/TimeSlider"
 import { Container, ContainerRef } from "./Container"
 import { gridOf } from "@/utils/types.utils"
 import { Collection } from "@/utils/store/collection.store"
+import { SceneRef } from "./Scene"
 
 export type PanelProps = {
   displayCollection: (collection: Collection) => void
@@ -15,6 +16,7 @@ export type PanelProps = {
   grid_id: number
   data: WorldData
   current_frame: TimeFrameRef
+  scene_ref: RefObject<SceneRef>
 }
 
 export type PanelRef = {
@@ -24,7 +26,7 @@ export type PanelRef = {
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data, time_id, grid_id, current_frame, displayCollection },
+  { data, time_id, grid_id, current_frame, displayCollection ,scene_ref},
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)
@@ -49,6 +51,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
           ref={container_ref}
           time_id={time_id}
           data={data}
+          scene_ref={scene_ref}
         />
       </div>
       <div className="row-start-5 z-10">
