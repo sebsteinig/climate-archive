@@ -123,6 +123,11 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
+        colormap: "ipccPrecip.png",
+        updateColormap: (value: string) =>
+        set((state) => {
+          state.variables.pr.colormap = value
+        }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.pr.min = value

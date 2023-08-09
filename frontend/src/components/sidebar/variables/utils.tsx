@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react"
+import { PropsWithChildren, useState } from "react"
 import WindsIcon from "$/assets/icons/winds-slate-500.svg"
 import MountainIcon from "$/assets/icons/mountain-emerald-300.svg"
 import TemperatureIcon from "$/assets/icons/temperature-slate-500.svg"
@@ -134,6 +134,9 @@ export function Variable({
             )}
           </div>
         </div>
+
+        
+
         {controls && (
           <div
             className="flex gap-5 w-fit items-center"
@@ -242,4 +245,29 @@ export function RowWithCheckBox(props: RowWithCheckBoxProps) {
 
 export function Rows({ children }: PropsWithChildren<{}>) {
   return <div className="flex flex-col gap-5">{children}</div>
+}
+
+type ColorMapRowProps ={
+  colormap_name:string
+  onChange: (number: string) => void
+
+}
+
+export function ColorMapRow({colormap_name, onChange, children} : PropsWithChildren<ColorMapRowProps>){
+  const [display_color_maps, displayColorMaps] = useState<boolean>(false)
+  const colormaps_test = ["cbrewerSpeed3.png", "cmapHaxby.png", "ipccPrecip.png", "cmoceanThermal.png"]
+  return(
+    <>
+      <h5 className={`cursor-pointer`} onClick={() => displayColorMaps((prev) => !prev)}>Select color map</h5>
+      {display_color_maps && <div className="w-fit grid grid-cols-1 gap-1 mx-3 rounded-md border-sky-900 border-2">
+        {colormaps_test.filter((v => v!=colormap_name)).map((name : string, i : number) => 
+          <div onClick={()=>{onChange(name)}} className="hover:bg-slate-800">
+            <img key={i} src={`/assets/colormaps/${name}`}
+              className="w-full h-9 p-2"
+            />
+          </div>
+        )}
+      </div>}
+    </>
+  )
 }

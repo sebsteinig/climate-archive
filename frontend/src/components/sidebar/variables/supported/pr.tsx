@@ -1,4 +1,4 @@
-import { RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import { ColorMapRow, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
 import { useClusterStore } from "@/utils/store/cluster.store"
 
 import Slider from "@/components/inputs/Slider"
@@ -17,6 +17,10 @@ export function Pr({
       controls={true}
     >
       <Rows>
+        <ColorMapRow
+          colormap_name = {pr.colormap}
+          onChange = {(n) => pr.updateColormap(n)}
+        />
         <RowWithSlider
           onChange={(n) => {
             pr.updateMin(n)
