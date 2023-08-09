@@ -24,9 +24,11 @@ export enum TimeState {
 }
 
 export enum TimeSpeed {
+  very_slow,
   slow,
   medium,
   fast,
+  very_fast,
 }
 
 export enum TimeMode {
@@ -34,7 +36,7 @@ export enum TimeMode {
   mean,
 }
 
-export type TimeFrameState = {
+export type TimeFrameStateTS = {
   current: {
     time_chunk: number
     frame: number
@@ -46,6 +48,26 @@ export type TimeFrameState = {
   info: TextureInfo
   is_freezed: boolean
 }
+
+export type TimeFrameStateMean = {
+  current: {
+    info: TextureInfo
+    exp: Experiment
+    idx : number
+  }
+  next: {
+    info: TextureInfo
+    exp: Experiment
+    idx: number
+  }
+  is_freezed: boolean
+}
+
+export type TimeFrameState = {
+  ts ?: TimeFrameStateTS
+  mean ?: TimeFrameStateMean
+}
+
 export type TimeFrame = {
   exp: Experiment
   timesteps?: number
@@ -64,6 +86,7 @@ export type TimeFrameHolder = {
     time_id: TimeID,
     exp: Experiment,
     active_variables: EVarID[],
+    world_data:WorldData,
   ) => Promise<void>
 }
 
@@ -76,6 +99,7 @@ export type TimeConf = {
   direction: TimeDirection
   kind: TimeKind
   speed: number
+  mode : TimeMode
 }
 
 export type WorldConf = {
@@ -85,7 +109,7 @@ export type WorldConf = {
 }
 
 export type WorldData = {
-  conf: WorldConf
+  //conf: WorldConf
   collection: Collection
   time: TimeConf
   exp ?: Experiment

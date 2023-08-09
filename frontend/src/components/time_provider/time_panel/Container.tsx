@@ -1,36 +1,22 @@
 import { useClusterStore } from "@/utils/store/cluster.store"
-import DuplicateIcon from "$/assets/icons/duplicate-slate-500.svg"
-import ArrowUpIcon from "$/assets/icons/arrow-up-emerald-400.svg"
-import ArrowDownIcon from "$/assets/icons/arrow-down-emerald-400.svg"
-import WorldIcon from "$/assets/icons/world.svg"
-import ScreenshotIcon from "$/assets/icons/screenshot.svg"
-import RotateIcon from "$/assets/icons/rotate.svg"
-import RecenterIcon from "$/assets/icons/recenter.svg"
-import FullScreenIcon from "$/assets/icons/screenfull.svg"
-import GridIcon from "$/assets/icons/grid.svg"
-import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
-import CameraIcon from "$/assets/icons/camera.svg"
-import PinIcon from "$/assets/icons/place.svg"
 import {
   MutableRefObject,
   PropsWithChildren,
+  RefObject,
   forwardRef,
   useImperativeHandle,
   useMemo,
   useRef,
   useState,
 } from "react"
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
-import InfoIcon from "$/assets/icons/info.svg"
+import { TimeFrameRef, TimeID, TimeMode, WorldData } from "@/utils/store/time/time.type"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
 import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import Link from "next/link"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ContainerConf } from "./ContainerConf"
-import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
+import { SceneRef } from "./Scene"
 
 type Props = {
   className?: string
@@ -39,6 +25,7 @@ type Props = {
   data: WorldData
   displayCollection: (collection: Collection) => void
   current_frame: TimeFrameRef
+  scene_ref: RefObject<SceneRef>
 }
 
 export type ContainerRef = {
@@ -54,6 +41,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
       grid_id,
       current_frame,
       displayCollection,
+      scene_ref,
       children,
     },
     ref,
@@ -101,7 +89,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
                 remove(time_id)
               }}
             />
-
+            {
+            data.time.mode === TimeMode.ts &&            
             <Select
               className="ml-5"
               defaultValue={data.exp?.id}
@@ -127,6 +116,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
                 )
               })}
             </Select>
+            }
           </div>
         
 
@@ -136,6 +126,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
           current_frame={current_frame}
           displayCollection={displayCollection}
           time_id={time_id}
+          scene_ref={scene_ref}
         />
       </div>
     )

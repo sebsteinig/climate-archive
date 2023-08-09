@@ -1,6 +1,6 @@
 import { TextureInfo } from "@/utils/database/database.types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { TimeFrameState, TimeMode } from "@/utils/store/time/time.type"
+import { TimeFrameState, TimeMode, WorldData } from "@/utils/store/time/time.type"
 import { LRUCache } from "lru-cache"
 import { CanvasRef } from "./useCanvas"
 import { TickData, TickDataState } from "./tick"
@@ -11,15 +11,40 @@ export function getPath(
   mode: TimeMode,
   data: TimeFrameState,
   vertical: number,
-  info: TextureInfo,
 ): { current_path: string; next_path: string }[] {
-  return info.paths_ts.paths.map((path) => {
-    const paths = path.grid[vertical]
-    return {
-      current_path: paths[data.current.time_chunk],
-      next_path: paths[data.next.time_chunk],
+  if(mode === TimeMode.mean) {
+    
+    const currents = data.mean!.current.info.paths_mean.paths.map(path => {
+      const paths = path.grid[vertical]
+      return {
+        current_path: paths[0].replaceAll(".ts.",".avg."),
+      }
+    })
+    const nexts = data.mean!.next.info.paths_mean.paths.map(path => {
+      const paths = path.grid[vertical]
+      return {
+        next_path: paths[0].replaceAll(".ts.",".avg."),
+      }
+    })
+    const res = []
+    for(let i = 0; i < currents.length;i++) {
+      res.push({
+        current_path : currents[i].current_path,
+        next_path : nexts[i].next_path
+      })
     }
-  })
+    return res
+  }else {
+    return data.ts!.info.paths_ts.paths.map((path) => {
+      const paths = path.grid[vertical]
+      return {
+        current_path: paths[data.ts!.current.time_chunk],
+        next_path: paths[data.ts!.next.time_chunk],
+      }
+    })
+  }
+
+
 }
 
 const cache: LRUCache<string, string> = new LRUCache({
@@ -60,20 +85,12 @@ export function crop(
   return res
 }
 
-function surf(
-  departure: number,
-  current: number,
-  weight: number,
-  destination: number,
-): number {
-  return 0
-}
-
 function processInfo(
   variable: EVarID,
   t: number,
   z: number,
   info: TextureInfo,
+  mean ?: boolean
 ): TickDataState {
   const metadata = info.metadata as {
     metadata: {
@@ -85,8 +102,24 @@ function processInfo(
   }
   const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
 
-  const min = bound_matrices.map((matrix) => parseFloat(matrix[z][t].min))
-  const max = bound_matrices.map((matrix) => parseFloat(matrix[z][t].max))
+  const min = bound_matrices.map((matrix) => {
+    if(mean) {
+      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.min), 0);
+      const average = sum / matrix[z].length;
+      return average;
+    }else {
+      return parseFloat(matrix[z][t].min)
+    }
+  })
+  const max = bound_matrices.map((matrix) => {
+    if(mean) {
+      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.max), 0);
+      const average = sum / matrix[z].length;
+      return average;
+    }else {
+      return parseFloat(matrix[z][t].max)
+    }
+  })
   return {
     min,
     max,
@@ -132,8 +165,9 @@ export async function compute(
   variable: EVarID,
   data: TimeFrameState,
   canvas: CanvasRef,
+  world_data : WorldData,
 ): Promise<TickData | undefined> {
-  const paths = getPath(TimeMode.ts, data, 0, data.info)
+  const paths = getPath(world_data.time.mode, data, 0)
   if (
     !canvas.current ||
     !canvas.current.current.ctx ||
@@ -141,21 +175,37 @@ export async function compute(
   ) {
     return
   }
+  let current_frame : number;
+  let next_frame : number;
+  let current_info : TextureInfo;
+  let next_info : TextureInfo;
+  if(world_data.time.mode === TimeMode.mean) {
+    current_frame = 0
+    current_info = data.mean!.current.info
+    next_frame = 0
+    next_info = data.mean!.next.info
+  }else {
+    current_frame = data.ts!.current.frame
+    next_frame = data.ts!.next.frame
+    current_info = data.ts!.info
+    next_info = data.ts!.info
+  }
+
   const textures = await Promise.all(
     paths.map(async ({ current_path, next_path }) => {
       const current_url = await getTextureFromPath(
         current_path,
-        data.current.frame,
+        current_frame,
         0,
-        data.info,
+        current_info,
         canvas.current!.current.canvas,
         canvas.current!.current.ctx!,
       )
       const next_url = await getTextureFromPath(
         next_path,
-        data.next.frame,
+        next_frame,
         0,
-        data.info,
+        next_info,
         canvas.current!.next.canvas,
         canvas.current!.next.ctx!,
       )
@@ -166,14 +216,21 @@ export async function compute(
       }
     }),
   )
-
-  const [_, fpc] = chunksDetails(data.info)
-  const current_t = data.current.frame + data.current.time_chunk * fpc
-  const next_t = data.next.frame + data.next.time_chunk * fpc
-
-  return {
-    textures,
-    current: processInfo(variable, current_t, 0, data.info),
-    next: processInfo(variable, next_t, 0, data.info),
+  if(world_data.time.mode === TimeMode.mean) {
+    return {
+      textures,
+      current: processInfo(variable, 0, 0, data.mean!.current.info,true),
+      next: processInfo(variable, 0, 0, data.mean!.current.info,true),
+    }
+  }else {
+    const [_, fpc] = chunksDetails(data.ts!.info)
+    const current_t = data.ts!.current.frame + data.ts!.current.time_chunk * fpc
+    const next_t = data.ts!.next.frame + data.ts!.next.time_chunk * fpc
+  
+    return {
+      textures,
+      current: processInfo(variable, current_t, 0, data.ts!.info),
+      next: processInfo(variable, next_t, 0, data.ts!.info),
+    }
   }
 }

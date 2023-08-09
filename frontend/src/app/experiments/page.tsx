@@ -12,7 +12,7 @@ import { RequestMultipleTexture } from "@/utils/database_provider/database_provi
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
-export default function PublicationPage() {
+export default function ExperimentsPage() {
   const add = useClusterStore((state) => state.time.add)
   const searchParams = useSearchParams()
   const clear = useClusterStore((state) => state.time.clear)
