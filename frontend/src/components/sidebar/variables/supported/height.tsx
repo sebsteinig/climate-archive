@@ -1,4 +1,4 @@
-import { RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import { ColorMapRow, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -16,6 +16,10 @@ export function Height({
       controls={true}
     >
       <Rows>
+        <ColorMapRow
+          colormap_name = {height.colormap}
+          onChange = {(n) => height.updateColormap(n)}
+        />
         <RowWithSlider
           onChange={(n) => {
             height.updateDiplacement(n)

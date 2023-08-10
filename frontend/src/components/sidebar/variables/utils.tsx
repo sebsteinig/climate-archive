@@ -176,10 +176,12 @@ export function Variable({
 export function Label({
   children,
   className,
-}: PropsWithChildren<{ className?: string }>) {
+  onClick,
+}: PropsWithChildren<{ className?: string, onClick ?: (() => void) }>) {
   return (
     <>
       <h5
+        onClick={() => onClick ? onClick() : {}}
         className={`flex-grow capitalize truncate whitespace-nowrap ${
           className ?? ""
         }`}
@@ -253,21 +255,35 @@ type ColorMapRowProps ={
 
 }
 
-export function ColorMapRow({colormap_name, onChange, children} : PropsWithChildren<ColorMapRowProps>){
+export function ColorMapRow({colormap_name, onChange} : ColorMapRowProps){
   const [display_color_maps, displayColorMaps] = useState<boolean>(false)
   const colormaps_test = ["cbrewerSpeed3.png", "cmapHaxby.png", "ipccPrecip.png", "cmoceanThermal.png"]
   return(
-    <>
-      <h5 className={`cursor-pointer`} onClick={() => displayColorMaps((prev) => !prev)}>Select color map</h5>
-      {display_color_maps && <div className="w-fit grid grid-cols-1 gap-1 mx-3 rounded-md border-sky-900 border-2">
-        {colormaps_test.filter((v => v!=colormap_name)).map((name : string, i : number) => 
-          <div onClick={()=>{onChange(name)}} className="hover:bg-slate-800">
-            <img key={i} src={`/assets/colormaps/${name}`}
-              className="w-full h-9 p-2"
+    <Row>
+      <Label onClick={() => {displayColorMaps((prev) => !prev)}}>Select color map</Label>
+      <div className="w-[16rem] ml-1 grid grid-cols-1 gap-1 
+        max-h-20 overflow-y-auto overflow-x-hidden
+        rounded-md border-emerald-400 border-2">
+        
+        {!display_color_maps && <img onClick={() => displayColorMaps(true)}
+          src = {`/assets/colormaps/${colormap_name}`}
+          key={0}
+          className="w-fit h-9 p-2">
+        </img>}
+        {display_color_maps && colormaps_test.filter((v => v!=colormap_name)).map((name : string, i : number) => 
+          <div 
+            onClick={()=>{
+              displayColorMaps(false)
+              onChange(name)
+            }} 
+            className="hover:bg-slate-800">
+            <img key={i+1} src={`/assets/colormaps/${name}`}
+              className="w-fit h-9 p-2"
             />
           </div>
         )}
-      </div>}
-    </>
+      </div>
+      
+    </Row>
   )
 }

@@ -1,4 +1,5 @@
 import {
+  ColorMapRow,
   RowWithCheckBox,
   RowWithSlider,
   Rows,
@@ -23,6 +24,10 @@ export function Currents({
       controls={true}
     >
       <Rows>
+        <ColorMapRow
+          colormap_name = {currents.colormap}
+          onChange = {(n) => currents.updateColormap(n)}
+        />
         <RowWithSlider
           onChange={(n) => {
             currents.updateAnimationSpeed(n)
