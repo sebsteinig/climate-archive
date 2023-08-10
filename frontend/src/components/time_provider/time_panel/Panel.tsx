@@ -26,7 +26,7 @@ export type PanelRef = {
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data, time_id, grid_id, current_frame, displayCollection ,scene_ref},
+  { data, time_id, grid_id, current_frame, displayCollection, scene_ref },
   refs,
 ) {
   const input_ref = useRef<InputRef>(null)

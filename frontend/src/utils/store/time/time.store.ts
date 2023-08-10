@@ -1,5 +1,12 @@
 import { StateCreator } from "zustand"
-import { TimeState, TimeID, CollectionID, WorldData, Slots, TimeConf } from "./time.type"
+import {
+  TimeState,
+  TimeID,
+  CollectionID,
+  WorldData,
+  Slots,
+  TimeConf,
+} from "./time.type"
 
 import { Collection } from "../collection.store"
 import { buildTimeConf, buildWorldConf } from "./time.utils"
@@ -10,15 +17,17 @@ export interface TimeSlice {
     __auto_increment: number
     slots: Slots
 
-    add: (collection: Collection,config?:Partial<TimeConf>) => void
-    addAll: (collection: {publication:Publication,exp_id:string}[],config?:Partial<TimeConf>) => void
-    clear : () => void
+    add: (collection: Collection, config?: Partial<TimeConf>) => void
+    addAll: (
+      collection: { publication: Publication; exp_id: string }[],
+      config?: Partial<TimeConf>,
+    ) => void
+    clear: () => void
     replace: (collection: Collection) => void
     remove: (id: TimeID) => void
     dup: (time_id: TimeID) => void
 
-    changeExp : (id:TimeID,exp:Experiment) => void
-
+    changeExp: (id: TimeID, exp: Experiment) => void
   }
 }
 
@@ -33,7 +42,7 @@ export const createTimeSlice: StateCreator<
       __auto_increment: -1,
       slots: new Map(),
 
-      add(collection,config) {
+      add(collection, config) {
         set((state) => {
           state.time.__auto_increment += 1
           state.time.slots.set(state.time.__auto_increment, {
@@ -44,13 +53,15 @@ export const createTimeSlice: StateCreator<
         })
       },
 
-      addAll(collections,config) {
+      addAll(collections, config) {
         set((state) => {
-          for(let collection of collections) {
+          for (let collection of collections) {
             state.time.__auto_increment += 1
             state.time.slots.set(state.time.__auto_increment, {
-              collection:collection.publication,
-              exp : collection.publication.exps.find(exp => exp.id === collection.exp_id),
+              collection: collection.publication,
+              exp: collection.publication.exps.find(
+                (exp) => exp.id === collection.exp_id,
+              ),
               //conf: buildWorldConf(),
               time: buildTimeConf(config),
             })
@@ -69,7 +80,7 @@ export const createTimeSlice: StateCreator<
         })
       },
       clear() {
-        set(state => {
+        set((state) => {
           state.time.__auto_increment = 0
           state.time.slots.clear()
         })
@@ -89,11 +100,11 @@ export const createTimeSlice: StateCreator<
       },
 
       changeExp(id, exp) {
-          set((state) => {
-            const data = state.time.slots.get(id)
-            if (!data) return
-            data.exp = exp
-          })
+        set((state) => {
+          const data = state.time.slots.get(id)
+          if (!data) return
+          data.exp = exp
+        })
       },
     },
   }

@@ -1,6 +1,10 @@
 import { TextureInfo } from "@/utils/database/database.types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { TimeFrameState, TimeMode, WorldData } from "@/utils/store/time/time.type"
+import {
+  TimeFrameState,
+  TimeMode,
+  WorldData,
+} from "@/utils/store/time/time.type"
 import { LRUCache } from "lru-cache"
 import { CanvasRef } from "./useCanvas"
 import { TickData, TickDataState } from "./tick"
@@ -12,29 +16,28 @@ export function getPath(
   data: TimeFrameState,
   vertical: number,
 ): { current_path: string; next_path: string }[] {
-  if(mode === TimeMode.mean) {
-    
-    const currents = data.mean!.current.info.paths_mean.paths.map(path => {
+  if (mode === TimeMode.mean) {
+    const currents = data.mean!.current.info.paths_mean.paths.map((path) => {
       const paths = path.grid[vertical]
       return {
-        current_path: paths[0].replaceAll(".ts.",".avg."),
+        current_path: paths[0].replaceAll(".ts.", ".avg."),
       }
     })
-    const nexts = data.mean!.next.info.paths_mean.paths.map(path => {
+    const nexts = data.mean!.next.info.paths_mean.paths.map((path) => {
       const paths = path.grid[vertical]
       return {
-        next_path: paths[0].replaceAll(".ts.",".avg."),
+        next_path: paths[0].replaceAll(".ts.", ".avg."),
       }
     })
     const res = []
-    for(let i = 0; i < currents.length;i++) {
+    for (let i = 0; i < currents.length; i++) {
       res.push({
-        current_path : currents[i].current_path,
-        next_path : nexts[i].next_path
+        current_path: currents[i].current_path,
+        next_path: nexts[i].next_path,
       })
     }
     return res
-  }else {
+  } else {
     return data.ts!.info.paths_ts.paths.map((path) => {
       const paths = path.grid[vertical]
       return {
@@ -43,8 +46,6 @@ export function getPath(
       }
     })
   }
-
-
 }
 
 const cache: LRUCache<string, string> = new LRUCache({
@@ -90,7 +91,7 @@ function processInfo(
   t: number,
   z: number,
   info: TextureInfo,
-  mean ?: boolean
+  mean?: boolean,
 ): TickDataState {
   const metadata = info.metadata as {
     metadata: {
@@ -103,20 +104,20 @@ function processInfo(
   const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
 
   const min = bound_matrices.map((matrix) => {
-    if(mean) {
-      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.min), 0);
-      const average = sum / matrix[z].length;
-      return average;
-    }else {
+    if (mean) {
+      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.min), 0)
+      const average = sum / matrix[z].length
+      return average
+    } else {
       return parseFloat(matrix[z][t].min)
     }
   })
   const max = bound_matrices.map((matrix) => {
-    if(mean) {
-      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.max), 0);
-      const average = sum / matrix[z].length;
-      return average;
-    }else {
+    if (mean) {
+      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.max), 0)
+      const average = sum / matrix[z].length
+      return average
+    } else {
       return parseFloat(matrix[z][t].max)
     }
   })
@@ -165,7 +166,7 @@ export async function compute(
   variable: EVarID,
   data: TimeFrameState,
   canvas: CanvasRef,
-  world_data : WorldData,
+  world_data: WorldData,
 ): Promise<TickData | undefined> {
   const paths = getPath(world_data.time.mode, data, 0)
   if (
@@ -175,16 +176,16 @@ export async function compute(
   ) {
     return
   }
-  let current_frame : number;
-  let next_frame : number;
-  let current_info : TextureInfo;
-  let next_info : TextureInfo;
-  if(world_data.time.mode === TimeMode.mean) {
+  let current_frame: number
+  let next_frame: number
+  let current_info: TextureInfo
+  let next_info: TextureInfo
+  if (world_data.time.mode === TimeMode.mean) {
     current_frame = 0
     current_info = data.mean!.current.info
     next_frame = 0
     next_info = data.mean!.next.info
-  }else {
+  } else {
     current_frame = data.ts!.current.frame
     next_frame = data.ts!.next.frame
     current_info = data.ts!.info
@@ -216,17 +217,17 @@ export async function compute(
       }
     }),
   )
-  if(world_data.time.mode === TimeMode.mean) {
+  if (world_data.time.mode === TimeMode.mean) {
     return {
       textures,
-      current: processInfo(variable, 0, 0, data.mean!.current.info,true),
-      next: processInfo(variable, 0, 0, data.mean!.current.info,true),
+      current: processInfo(variable, 0, 0, data.mean!.current.info, true),
+      next: processInfo(variable, 0, 0, data.mean!.current.info, true),
     }
-  }else {
+  } else {
     const [_, fpc] = chunksDetails(data.ts!.info)
     const current_t = data.ts!.current.frame + data.ts!.current.time_chunk * fpc
     const next_t = data.ts!.next.frame + data.ts!.next.time_chunk * fpc
-  
+
     return {
       textures,
       current: processInfo(variable, current_t, 0, data.ts!.info),

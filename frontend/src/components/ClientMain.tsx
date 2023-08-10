@@ -12,9 +12,7 @@ import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 
-type Props = {
-
-}
+type Props = {}
 
 export default function ClientMain({}: Props) {
   // const addCollection = useClusterStore((state) => state.addCollection)

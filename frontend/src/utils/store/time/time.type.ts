@@ -53,7 +53,7 @@ export type TimeFrameStateMean = {
   current: {
     info: TextureInfo
     exp: Experiment
-    idx : number
+    idx: number
   }
   next: {
     info: TextureInfo
@@ -64,8 +64,8 @@ export type TimeFrameStateMean = {
 }
 
 export type TimeFrameState = {
-  ts ?: TimeFrameStateTS
-  mean ?: TimeFrameStateMean
+  ts?: TimeFrameStateTS
+  mean?: TimeFrameStateMean
 }
 
 export type TimeFrame = {
@@ -86,7 +86,7 @@ export type TimeFrameHolder = {
     time_id: TimeID,
     exp: Experiment,
     active_variables: EVarID[],
-    world_data:WorldData,
+    world_data: WorldData,
   ) => Promise<void>
 }
 
@@ -99,7 +99,7 @@ export type TimeConf = {
   direction: TimeDirection
   kind: TimeKind
   speed: number
-  mode : TimeMode
+  mode: TimeMode
 }
 
 export type WorldConf = {
@@ -112,7 +112,7 @@ export type WorldData = {
   //conf: WorldConf
   collection: Collection
   time: TimeConf
-  exp ?: Experiment
+  exp?: Experiment
 }
 
 export type Slots = Map<TimeID, WorldData>
