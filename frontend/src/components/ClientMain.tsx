@@ -1,5 +1,5 @@
 "use client"
-import { TimeProvider } from "./time_provider/TimeManager"
+import { TimeProvider } from "./time_provider/WorldsManager"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"

@@ -41,7 +41,7 @@ export type TickFn = (delta: number) => Promise<{
 export function tickBuilder(
   time_id: TimeID,
   panel_ref: RefObject<PanelRef>,
-  data: WorldData,
+  world_data: WorldData,
   current_frame: TimeFrameRef,
   active_variables: EVarID[],
   canvas: CanvasRef,
@@ -57,14 +57,15 @@ export function tickBuilder(
         variables: res,
       }
     let update_texture = false
+    
     if (frame.swap_flag) {
       if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
-        await update(frame, active_variables)
+        await update(frame, active_variables,world_data)
 
         for (let [variable, state] of frame.variables) {
-          const data = await compute(variable, state, canvas)
+          const data = await compute(variable, state, canvas,world_data)
           if (data) {
             res.set(variable, data)
           }

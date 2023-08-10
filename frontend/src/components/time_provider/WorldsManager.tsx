@@ -17,7 +17,7 @@ import { useFrameRef } from "./useFrameRef"
 import { useCanvas } from "./useCanvas"
 import { Panel, PanelRef } from "./time_panel/Panel"
 import React from "react"
-import { Scene } from "./time_panel/Scene"
+import { Scene, SceneRef } from "./time_panel/Scene"
 import { sync } from "@/utils/store/time/time.utils"
 import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "../ViewCollection"
@@ -70,11 +70,15 @@ export function TimeProvider(props: Props) {
   }, [gridOf(time_slots.size)])
 
   const container_ref = useRef<HTMLDivElement>(null!)
+
   const panel_refs = useRef<RefObject<PanelRef>[]>([])
   for (let time_id of time_slots.keys()) {
     panel_refs.current[time_id] = React.createRef<PanelRef>()
   }
-
+  const scene_refs = useRef<RefObject<SceneRef>[]>([])
+  for (let time_id of time_slots.keys()) {
+    scene_refs.current[time_id] = React.createRef<SceneRef>()
+  }
   return (
     <>
       <div className={`flex flex-grow h-full`}>
@@ -96,6 +100,7 @@ export function TimeProvider(props: Props) {
                 data={data}
                 time_id={time_id}
                 ref={panel_refs.current[time_id]!}
+                scene_ref={scene_refs.current[time_id]!}
               />
             )
           })}
@@ -122,6 +127,7 @@ export function TimeProvider(props: Props) {
                 canvas={canvas}
                 active_variables={active_variables}
                 panel_ref={panel_refs.current[time_id]}
+                ref={scene_refs.current[time_id]!}
               />
             )
           })}
@@ -138,6 +144,6 @@ async function init(
 ) {
   for (let [time_id, data] of slots) {
     const exp = (data.exp ?? data.collection.exps[0])
-    await current_frame.current.init(time_id, exp, active_variables)
+    await current_frame.current.init(time_id, exp, active_variables,data)
   }
 }

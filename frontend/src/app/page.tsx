@@ -54,7 +54,7 @@ export default function Home() {
                   <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
                 </div>
                 <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
-                <Link href={""} 
+                <Link href={"/paleoclimate"} 
                 className="bg-emerald-500 w-fit px-5 py-4 rounded-lg
                   outline-none
                   tracking-[.5em] uppercase text-slate-900"
@@ -93,34 +93,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              {/* <div className="">
-                <div className="transition-colors duration-300 hover:bg-slate-700 p-5 rounded-lg h-full bg-slate-800 border-2 border-slate-900  flex flex-row gap-5">
-                   <div className="grow-0 w-3/5 flex justify-center items-center">
-                    <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
-                  </div> 
-                  <div className="grow flex flex-col gap-5 ">
-                    <h2 className="text-slate-300 tracking-[.5em] small-caps">weather</h2>
-                    <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-5">
-                <div className="p-5 rounded-lg h-full bg-slate-900 flex flex-col gap-5">
-                  <h2 className="text-slate-300 tracking-[.5em] small-caps">fantasy worlds</h2>
-                  <div className="grid grid-cols-2 gap-5 w-full h-full">
-                    <p className="text-slate-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur neque assumenda ex sapiente repudiandae ab odit voluptates corrupti dolore perferendis, praesentium recusandae dicta quisquam, nulla laudantium placeat, veniam beatae alias.</p>
-                    <div className="flex justify-center items-center">
-                      <Image width={499} height={466} alt="" src={"/assets/world-test.png"} />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div className="border-l-4 border-sky-500 w-full p-5">
-                    <h2 className="text-slate-300 tracking-[.5em] small-caps">prediction</h2>
-                  </div>
-
-                </div>
-              </div> */}
             </div>
             <div className="grow-0 shrink-0">
               <footer className="rounded-lg bg-slate-900 flex flex-row gap-5 p-5 justify-evenly">

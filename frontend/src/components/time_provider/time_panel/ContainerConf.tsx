@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { RefObject, useState } from "react"
 import DuplicateIcon from "$/assets/icons/duplicate-slate-500.svg"
 import ArrowUpIcon from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDownIcon from "$/assets/icons/arrow-down-emerald-400.svg"
@@ -20,6 +20,7 @@ import { useClusterStore } from "@/utils/store/cluster.store"
 import { gsap } from "gsap"
 import { usePathname, useRouter } from "next/navigation"
 import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
+import { SceneRef } from "./Scene"
 
 type Props = {
   className?: string
@@ -27,6 +28,7 @@ type Props = {
   data: WorldData
   time_id: TimeID
   current_frame: TimeFrameRef
+  scene_ref: RefObject<SceneRef>
 }
 
 export function ContainerConf({
@@ -35,9 +37,9 @@ export function ContainerConf({
   data,
   current_frame,
   time_id,
+  scene_ref,
 }: Props) {
   const [is_expanded, expand] = useState(false)
-  const linkCamera = useClusterStore((state) => state.time.linkCamera)
 
   return (
     <div
@@ -65,11 +67,13 @@ export function ContainerConf({
           <RecenterBtn />
           <FullScreenBtn />
           <ScreenshotBtn />
-          <WorldBtn onClick={(time_id, is_spheric) => {
+          <WorldBtn 
+            onClick={(time_id, is_spheric) => {
             const frame = current_frame.current.get(time_id)
-            console.log({current_frame,time_id});
-            
             if(!frame) return;
+            if(scene_ref.current) {
+              scene_ref.current.canOrbit(is_spheric)
+            }
             const to = is_spheric ? 1 : 0
             gsap.to(frame,{uSphereWrapAmount:to,duration:1, ease: "none"})
           }} time_id={time_id} />
@@ -79,8 +83,11 @@ export function ContainerConf({
         </>
       )}
       <CamBtn
-        onClick={linkCamera}
-        is_linked={data.conf.camera.is_linked}
+        onClick={(time_id,linked) => {
+          if(scene_ref.current) {
+            scene_ref.current.linkCamera(linked)
+          }
+        }}
         time_id={time_id}
       />
       <DupBtn time_id={time_id} current_frame={current_frame}/>
@@ -126,12 +133,12 @@ function DupBtn({ time_id ,current_frame}: DupBtnProps) {
 }
 
 type CamBtnProps = {
-  is_linked: boolean
   onClick: (id: TimeID, linked: boolean) => void
   time_id: TimeID
 }
 
-function CamBtn({ is_linked, onClick, time_id }: CamBtnProps) {
+function CamBtn({onClick, time_id }: CamBtnProps) {
+  const [is_linked, link] = useState(true)
   return (
     <CameraIcon
       className={`cursor-pointer  w-5 h-5 my-2 ${
@@ -139,6 +146,7 @@ function CamBtn({ is_linked, onClick, time_id }: CamBtnProps) {
       }`}
       onClick={() => {
         onClick(time_id, !is_linked)
+        link((prev) => !prev)
       }}
     />
   )
@@ -180,7 +188,7 @@ type WorldBtnProps = {
 }
 
 function WorldBtn({ onClick, time_id }: WorldBtnProps) {
-  const [is_spheric, setSpheric] = useState(false)
+  const [is_spheric, setSpheric] = useState(true)
   return (
     <WorldIcon
       className={`cursor-pointer  w-6 h-6 my-2 
@@ -192,6 +200,7 @@ function WorldBtn({ onClick, time_id }: WorldBtnProps) {
       onClick={() => {
         onClick(time_id, !is_spheric)
         setSpheric((prev) => !prev)
+        //canOrbit(time_id,!is_spheric)
       }}
     />
   )
