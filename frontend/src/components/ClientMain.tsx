@@ -11,6 +11,7 @@ import { ViewCollection } from "./ViewCollection"
 import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
+import Graph from "./Graph"
 
 type Props = {
 
@@ -36,6 +37,7 @@ export default function ClientMain({}: Props) {
   //   }
   // }, [])
   const [search_bar_visible, displaySearchBar] = useState(false)
+  const [display_graph, displayGraph] = useState<boolean>(true)
   const [collection, setCollection] = useState<Collection | undefined>()
   const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
     undefined,
@@ -83,6 +85,7 @@ export default function ClientMain({}: Props) {
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
                 <TimeProvider
+                  displayGraph = {{fn: () => displayGraph((prev) => !prev)}}
                   displayCollection={(collection) => {
                     setCollection(collection)
                   }}
@@ -98,6 +101,12 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
+
+        <div className={`absolute flex flex-col top-0 right-0 z-30 w-[48%] h-full`}>
+          {display_graph && <Graph 
+            onClose = {{fn: () => displayGraph(false)}}
+            />}
+        </div>        
       </div>
     </>
   )

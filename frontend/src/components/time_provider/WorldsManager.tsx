@@ -26,6 +26,7 @@ import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
 
 type Props = {
   displayCollection: (collection: Collection) => void
+  displayGraph : { fn: () => void }
 }
 
 export function TimeProvider(props: Props) {

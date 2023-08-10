@@ -1,4 +1,4 @@
-import { useClusterStore } from "@/utils/store/cluster.store"
+
 import { Experiment, Experiments, Publication } from "@/utils/types"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo, useState } from "react"
@@ -7,10 +7,8 @@ import LeftPage from "$/assets/icons/left-page.svg"
 import RightPage from "$/assets/icons/right-page.svg"
 import FirstPage from "$/assets/icons/first-page.svg"
 import LastPage from "$/assets/icons/last-page.svg"
-import { PropsWithChildren } from "react"
 import { Collection } from "@/utils/store/collection.store"
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
-import Link from "next/link"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import { useRouter, useSearchParams } from "next/navigation"
 import { upPush } from "@/utils/URL_params/url_params.utils"
@@ -31,7 +29,7 @@ export function ViewCollection({ collection, onClose, onReturn }: Props) {
         <div className="flex-grow-0 h-10 w-full">
           {!onReturn && onClose && (
             <CrossIcon
-              className="w-10 h-10 cursor-pointer text-slate-500 hover:tex-slate-300"
+              className="w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-300"
               onClick={() => onClose.fn()}
             />
           )}
