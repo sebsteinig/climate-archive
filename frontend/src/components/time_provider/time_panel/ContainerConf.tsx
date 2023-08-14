@@ -8,6 +8,7 @@ import RotateIcon from "$/assets/icons/rotate.svg"
 import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
+import AnchorIcon from "$/assets/icons/anchor.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
@@ -66,6 +67,7 @@ export function ContainerConf({
         <>
           <RecenterBtn />
           <FullScreenBtn />
+          <AnchorBtn />
           <ScreenshotBtn />
           <WorldBtn 
             onClick={(time_id, is_spheric) => {
@@ -224,6 +226,17 @@ function PinBtn(params: PinBtnProps) {
   return (
     <PinIcon
       className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+    />
+  )
+}
+
+
+type AnchorBtnProps = {}
+
+function AnchorBtn(params: PinBtnProps) {
+  return (
+    <AnchorIcon
+      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 `}
     />
   )
 }

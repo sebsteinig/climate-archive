@@ -31,7 +31,7 @@ export const MonthlyController = forwardRef<IControllerRef,MonthlyControllerProp
             }
         })
         return (
-            <div className="w-full pt-2 px-5">
+            <div className="w-full pt-5 px-5">
                 <TimeController
                     current_frame={current_frame}
                     time_id={time_id}
@@ -48,7 +48,7 @@ export const MonthlyController = forwardRef<IControllerRef,MonthlyControllerProp
                     border-2 border-slate-200
                 "
                 onMouseLeave={() => {
-                    if(!focus) {
+                    if(focus === undefined) {
                         setHighLightMonth(undefined)
                     }
                 }}>
@@ -57,7 +57,7 @@ export const MonthlyController = forwardRef<IControllerRef,MonthlyControllerProp
                         return( 
                             <Month 
                                 key = {idx}
-                                highlight={!highlighted_month || highlighted_month === idx}
+                                highlight={highlighted_month === undefined || highlighted_month === idx}
                                 focus={focus}
                                 idx={idx}
                                 month={month}
@@ -107,7 +107,7 @@ function Month({idx,month,color,focus,onChange,highlight} : MonthProps) {
                 onChange(idx,true)
             }}
             onMouseOver={()=> {
-                if(!focus) {
+                if(focus === undefined) {
                     onChange(idx,false)
                 }
             }}>
