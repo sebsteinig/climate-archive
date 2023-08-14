@@ -45,7 +45,7 @@ export function ContainerConf({
     <div
     
       className={` shadow-lg shadow-slate-950 w-fit overflow-y-auto overflow-x-hidden
-      z-20 group bg-gray-900 max-h-[90%] grid grid-cols-1 place-items-center
+      z-20 group bg-slate-700 max-h-[90%] grid grid-cols-1 place-items-center
       
       rounded-full p-2   ${
         className ?? ""
