@@ -1,5 +1,5 @@
 "use client"
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
 import {
   useEffect,
   useRef,
@@ -23,6 +23,7 @@ import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "../ViewCollection"
 import { usePathname, useRouter } from "next/navigation"
 import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
+import THREE from "three"
 
 type Props = {
   displayCollection: (collection: Collection) => void
@@ -79,6 +80,7 @@ export function TimeProvider(props: Props) {
   for (let time_id of time_slots.keys()) {
     scene_refs.current[time_id] = React.createRef<SceneRef>()
   }
+
   return (
     <>
       <div className={`flex flex-grow h-full`}>

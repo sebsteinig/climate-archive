@@ -6,6 +6,8 @@ import { CanvasRef } from "../useCanvas"
 import { PanelRef } from "./Panel"
 import { MutableRefObject, RefObject, forwardRef, useImperativeHandle, useRef, useState } from "react"
 import { tickBuilder } from "../tick"
+import { useThree } from "@react-three/fiber"
+import THREE from "three"
 
 export type SceneProps = {
   time_id: TimeID
@@ -35,7 +37,6 @@ function Scene({
   if (!panel_ref.current?.container_ref.current) {
     return null
   }
-  const frame = current_frame.current.get(time_id)
   useImperativeHandle(ref,()=>{
     return {
       canOrbit(can_orbit) {
@@ -48,6 +49,8 @@ function Scene({
   })
   return (
     <View track={panel_ref.current!.container_ref.current!.track}>
+      <color />
+      <color attach="background" args={['#020617']} />
       <World
         tick={tickBuilder(
           time_id,
