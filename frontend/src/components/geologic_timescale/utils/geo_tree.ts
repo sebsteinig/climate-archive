@@ -247,7 +247,7 @@ export const GeoTreeRepr = {
                 color: "#E6F5E1",
                 lvl: 4,
                 branches: {
-                  Pridoli: {
+                  "Pridoli ": {
                     age_span: { from: 419.2, to: 423 },
                     color: "#E6F5E1",
                     lvl: 5,
@@ -935,7 +935,7 @@ export const GeoTreeRepr = {
                 color: "#FEF2E0",
                 lvl: 4,
                 branches: {
-                  Holocene: {
+                  "Holocene ": {
                     age_span: { from: 0, to: 0.0117 },
                     color: "#FEF2E0",
                     lvl: 5,

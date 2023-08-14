@@ -9,6 +9,8 @@ import { Container, ContainerRef } from "./Container"
 import { gridOf } from "@/utils/types.utils"
 import { Collection } from "@/utils/store/collection.store"
 import { SceneRef } from "./Scene"
+import { TimeScale } from "@/components/geologic_timescale/TimeScale"
+import { goto } from "@/utils/store/time/time.utils"
 
 export type PanelProps = {
   displayCollection: (collection: Collection) => void
@@ -55,7 +57,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
         />
       </div>
       <div className="row-start-5 z-10">
-        <TimeController
+        {/* <TimeController
           current_frame={current_frame}
           time_id={time_id}
           data={data}
@@ -67,7 +69,14 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
           time_id={time_id}
           className="w-full"
           ref={input_ref}
-        />
+        /> */}
+        <TimeScale onChange={(idx,exp_id) => {
+          const frame = current_frame.current.get(time_id)
+          if (!frame) return
+          console.log(exp_id);
+          goto(frame, idx, () => {
+          })
+        }}/>
       </div>
     </div>
   )
