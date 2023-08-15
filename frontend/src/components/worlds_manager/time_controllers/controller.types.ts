@@ -1,5 +1,4 @@
-import { TimeFrame } from "@/utils/store/time/time.type"
-
+import { TimeFrame, WorldData } from "@/utils/store/time/time.type"
 
 export interface IControllerRef {
   onChange: (frame: TimeFrame) => void

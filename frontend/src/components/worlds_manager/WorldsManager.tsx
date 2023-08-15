@@ -1,33 +1,24 @@
 "use client"
-import { Canvas, useThree } from "@react-three/fiber"
-import {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  RefObject,
-  useCallback,
-  MutableRefObject,
-} from "react"
+import { Canvas } from "@react-three/fiber"
+import { useEffect, useRef, useMemo, RefObject } from "react"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { TimeFrameRef, Slots, TimeID } from "@/utils/store/time/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { gridOf } from "@/utils/types.utils"
 import { useFrameRef } from "./useFrameRef"
 import { useCanvas } from "./useCanvas"
-import { Panel, PanelRef } from "./time_panel/Panel"
+import { Panel, PanelRef } from "./world_panel/Panel"
 import React from "react"
-import { Scene, SceneRef } from "./time_panel/Scene"
+import { Scene, SceneRef } from "./world_panel/Scene"
 import { sync } from "@/utils/store/time/time.utils"
 import { Collection } from "@/utils/store/collection.store"
-import { ViewCollection } from "../ViewCollection"
 import { usePathname, useRouter } from "next/navigation"
 import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
 import THREE from "three"
 
 type Props = {
   displayCollection: (collection: Collection) => void
-  displayGraph : { fn: () => void }
+  displayGraph: { fn: () => void }
 }
 
 export function WorldManager(props: Props) {

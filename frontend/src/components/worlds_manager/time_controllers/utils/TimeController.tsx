@@ -34,9 +34,9 @@ type Props = {
 }
 export type ControllerRef = {
   onChange: (frame: TimeFrame) => void
-  play : () => void
-  pause : () => void
-  stop : () => void
+  play: () => void
+  pause: () => void
+  stop: () => void
 }
 
 export const TimeController = forwardRef<ControllerRef, Props>(
@@ -52,9 +52,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
         pause() {
           pause(tween_ref, setPlaying)
         },
-        stop() {
-            
-        },
+        stop() {},
         onChange: (frame: TimeFrame) => {
           let id: string
           let label: string

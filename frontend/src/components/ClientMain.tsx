@@ -1,5 +1,5 @@
 "use client"
-import { WorldManager } from "./time_provider/WorldsManager"
+import { WorldManager } from "./worlds_manager/WorldsManager"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -7,12 +7,12 @@ import { useEffect, useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
-import { ViewCollection } from "./ViewCollection"
 import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
+import { CollectionView } from "./CollectionView"
 
 type Props = {}
 
@@ -87,14 +87,14 @@ export default function ClientMain({}: Props) {
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
                 <WorldManager
-                  displayGraph = {{fn: () => displayGraph((prev) => !prev)}}
+                  displayGraph={{ fn: () => displayGraph((prev) => !prev) }}
                   displayCollection={(collection) => {
                     setCollection(collection)
                   }}
                 />
               </div>
               {collection && (
-                <ViewCollection
+                <CollectionView
                   onClose={{ fn: () => setCollection(undefined) }}
                   onReturn={onReturn}
                   collection={collection}
@@ -104,11 +104,13 @@ export default function ClientMain({}: Props) {
           </div>
         </div>
 
-        <div className={`absolute flex flex-col top-0 right-0 z-30 w-[48%] h-full`}>
-          {display_graph && <Graph 
-            onClose = {{fn: () => displayGraph(false)}}
-            />}
-        </div>        
+        {/* <div
+          className={`absolute flex flex-col top-0 right-0 z-30 w-[48%] h-full`}
+        >
+           {display_graph && (
+            <Graph onClose={{ fn: () => displayGraph(false) }} />
+          )} 
+        </div> */}
       </div>
     </>
   )

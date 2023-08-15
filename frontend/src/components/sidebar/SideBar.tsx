@@ -4,7 +4,7 @@ import { SearchButton } from "../searchbar/SearchButton"
 import { Variables } from "./variables/Variables"
 import SearchBar from "../searchbar/SearchBar"
 import { EVarID } from "@/utils/store/variables/variable.types"
-//import { PreviewCollection } from "./PreviewCollection"
+//import { PreCollectionView } from "./PreCollectionView"
 
 type Props = {
   journals: JSX.Element

@@ -9,7 +9,7 @@ import { MdSeparator } from "@/components/separators/separators"
 import { isPublication } from "@/utils/types.utils"
 import { Experiment, Experiments, Publication } from "@/utils/types"
 import { TimeMode } from "@/utils/store/time/time.type"
-import { CollectionDetails } from "../ViewCollection"
+import { CollectionDetails } from "../CollectionView"
 
 // type Props = {
 //   display_details: boolean
@@ -18,7 +18,7 @@ import { CollectionDetails } from "../ViewCollection"
 //   search_bar_visible: boolean
 // }
 
-// export function PreviewCollection({
+// export function PreCollectionView({
 //   search_bar_visible,
 //   display_details,
 //   setDisplayDetails,

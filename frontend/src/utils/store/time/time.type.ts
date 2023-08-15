@@ -88,7 +88,7 @@ export type TimeID = number
 export type CollectionID = number
 
 export type TimeConf = {
-  controller : TimeController
+  controller: TimeController
   kind: TimeKind
   speed: number
   mode: TimeMode

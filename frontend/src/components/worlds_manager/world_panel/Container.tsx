@@ -22,6 +22,7 @@ import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { ContainerConf } from "./ContainerConf"
 import { SceneRef } from "./Scene"
+import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 
 type Props = {
   className?: string
@@ -35,6 +36,7 @@ type Props = {
 
 export type ContainerRef = {
   track: MutableRefObject<HTMLDivElement>
+  showClickPanel : (data:WorldData,x:{lat:number,lon:number}) => void
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
@@ -69,11 +71,14 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     useImperativeHandle(ref, () => {
       return {
         track: div_ref,
+        showClickPanel(data, {lat,lon}) {
+            setPopupData({data,lat,lon})
+        },
       }
     })
 
     const frame = current_frame.current.get(time_id)
-
+    const [popup_data,setPopupData] = useState<{data:WorldData,lat:number,lon:number}|undefined>(undefined)
     return (
       <div
         className={`relative overflow-hidden w-full h-full ${className ?? ""}`}
@@ -82,7 +87,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         {children}
 
         {data.collection && isPublication(data.collection) && (
-          <p className="absolute bottom-0 left-0 italic m-4 text-slate-400 text-sm">
+          <p className="absolute bottom-0 left-0 select-none italic m-4 text-slate-400 text-sm">
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
@@ -118,6 +123,19 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             </Select>
           )}
         </div>
+        {
+          popup_data && (
+            <div className="absolute z-20 bottom-0 m-5 left-1/2 -translate-x-1/2">
+              <Popup
+                close={() => {
+                  setPopupData(undefined)
+                }} 
+                data={popup_data.data}
+                lat={popup_data.lat} 
+                lon={popup_data.lon}/>
+            </div>
+          )
+        }
 
         <ContainerConf
           className="absolute bottom-0 right-0 m-2 "
@@ -131,3 +149,65 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     )
   },
 )
+
+type PopupProps = {
+  data : WorldData
+  lat : number
+  lon : number
+  close : () => void
+}
+
+function Popup({data,lat,lon,close}:PopupProps) {
+  let id_label :{
+    id: string;
+    label: string;
+  } | undefined = undefined
+  if(data.exp) {
+    id_label = getTitleOfExp(data.exp)
+  }
+  const {f_lat,f_lon} = formatCoordinates(lat,lon)
+  return (
+    <div className="p-5 flex flex-row rounded-lg items-center text-slate-900 bg-slate-200 shadow-md shadow-slate-900">
+      <CrossIcon
+        className="w-10 h-10 mr-5 cursor-pointer text-slate-800 hover:tex-slate-700"
+        onClick={() => {
+          close()
+        }}
+      />
+      <div className="grow flex flex-col pr-5">
+        <div className="italic">
+          {isPublication(data.collection) && `${data.collection.authors_short} (${data.collection.year})`}
+        </div>
+        <div className="flex flex-row justify-between">
+          <div className="mr-5">Location : {f_lat} / {f_lon}</div>
+          {id_label && <div>{id_label.id} | {id_label.label}</div>}
+        </div>
+      </div>
+      <ButtonSecondary 
+        className="small-caps shadow-md shadow-slate-800" 
+        onClick={() => {
+        
+        }}
+      >plot
+      </ButtonSecondary>
+    </div>
+  )
+}
+
+type FormattedCoordinates = {
+  f_lat: string;
+  f_lon: string;
+};
+
+function formatCoordinates(lat : number,lon : number): FormattedCoordinates {
+  const lat_direction = lat >= 0 ? 'N' : 'S';
+  const lon_direction = lon >= 0 ? 'E' : 'W';
+
+  const formatted_latitude = `${Math.abs(lat).toFixed(1)}° ${lat_direction}`;
+  const formatted_longitude = `${Math.abs(lon).toFixed(1)}° ${lon_direction}`;
+
+  return {
+    f_lat: formatted_latitude,
+    f_lon: formatted_longitude
+  };
+}

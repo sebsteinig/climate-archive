@@ -1,4 +1,3 @@
-
 import { Experiment, Experiments, Publication } from "@/utils/types"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo, useState } from "react"
@@ -19,7 +18,7 @@ type Props = {
   onReturn?: { fn: () => void }
 }
 
-export function ViewCollection({ collection, onClose, onReturn }: Props) {
+export function CollectionView({ collection, onClose, onReturn }: Props) {
   return (
     <div className="h-full">
       <div

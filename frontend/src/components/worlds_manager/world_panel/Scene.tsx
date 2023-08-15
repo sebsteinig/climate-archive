@@ -18,8 +18,9 @@ import {
   useState,
 } from "react"
 import { tickBuilder } from "../tick"
-import { useThree } from "@react-three/fiber"
+import { ThreeEvent, useThree } from "@react-three/fiber"
 import THREE from "three"
+import { AtmosphereLayerRef } from "@/components/3D_components/AtmosphereLayer"
 
 export type SceneProps = {
   time_id: TimeID
@@ -44,13 +45,10 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
   }: SceneProps,
   ref,
 ) {
-  const camera = useRef()
+  const camera_ref = useRef()
   const [can_orbit, setOrbitControl] = useState(true)
   const [is_linked, linkCamera] = useState(true)
-  if (!panel_ref.current?.container_ref.current) {
-    return null
-  }
-  useImperativeHandle(ref,()=>{
+  useImperativeHandle(ref, () => {
     return {
       canOrbit(can_orbit) {
         setOrbitControl(can_orbit)
@@ -60,11 +58,18 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
       },
     }
   })
+  function handleClickOnWorld(lat:number,lon:number) {
+    panel_ref.current?.container_ref.current?.showClickPanel(data,{lat,lon})
+  }
+  if (!panel_ref.current?.container_ref.current) {
+    return null
+  }
   return (
-    <View track={panel_ref.current!.container_ref.current!.track}>
-      <color />
-      <color attach="background" args={['#020617']} />
+    <View track={panel_ref.current!.container_ref.current!.track} 
+    >
+      <color attach="background" args={["#020617"]} />
       <World
+        onClick={handleClickOnWorld}
         tick={tickBuilder(
           time_id,
           panel_ref,
@@ -97,7 +102,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
         <>
           <PerspectiveCamera
             makeDefault
-            ref={camera}
+            ref={camera_ref}
             position={[3, 2, 9]}
             fov={55}
             near={0.1}

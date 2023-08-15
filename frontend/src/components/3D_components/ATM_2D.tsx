@@ -8,7 +8,7 @@ import vertexShader from "$/shaders/precipitationVert.glsl"
 import fragmentShader from "$/shaders/precipitationFrag.glsl"
 import { createColormapTexture } from "@/utils/three/colormapTexture.js"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { TickData } from "../time_provider/tick"
+import { TickData } from "../worlds_manager/tick"
 
 type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 

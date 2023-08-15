@@ -16,9 +16,9 @@ type TimeScaleProps = {
   onChange: (idx: number, exp_id: string) => void
 }
 
-export function TimeScale({onChange}:TimeScaleProps) {
-  const [tree,exp_span_tree] = useGeologicTree()
-  
+export function TimeScale({ onChange }: TimeScaleProps) {
+  const [tree, exp_span_tree] = useGeologicTree()
+
   function onSelect(param: Selection) {
     const next_selection = {
       id: tree.root.id,
@@ -36,19 +36,22 @@ export function TimeScale({onChange}:TimeScaleProps) {
         setFocus(true)
       }
       setSelection(next_selection)
-      const span_data = query(exp_span_tree,lastOf(next_selection).data.age_span.to)
-      if(span_data) {
-          onChange(span_data.data.idx,span_data.data.exp_id) 
+      const span_data = query(
+        exp_span_tree,
+        lastOf(next_selection).data.age_span.to,
+      )
+      if (span_data) {
+        onChange(span_data.data.idx, span_data.data.exp_id)
       }
     }
   }
   function r_onSelect(param: Selection) {
     param.action = SelectionAction.highlight
     setSelection(param)
-    setFocus(false)      
-    const span_data = query(exp_span_tree,param.data.age_span.from)
-    if(span_data) {
-        onChange(span_data.data.idx,span_data.data.exp_id) 
+    setFocus(false)
+    const span_data = query(exp_span_tree, param.data.age_span.from)
+    if (span_data) {
+      onChange(span_data.data.idx, span_data.data.exp_id)
     }
   }
   const [selection, setSelection] = useState<Selection | undefined>()
@@ -59,9 +62,9 @@ export function TimeScale({onChange}:TimeScaleProps) {
       onMouseLeave={() => {
         if (!is_focus) {
           setSelection(undefined)
-          const span_data = query(exp_span_tree,tree.root.data.age_span.from)
-          if(span_data) {
-              onChange(span_data.data.idx,span_data.data.exp_id) 
+          const span_data = query(exp_span_tree, tree.root.data.age_span.from)
+          if (span_data) {
+            onChange(span_data.data.idx, span_data.data.exp_id)
           }
         }
       }}
@@ -268,9 +271,9 @@ function selectionEquality(sel1: Selection, sel2: Selection): boolean {
   }
 }
 
-function lastOf(selection : Selection) : Selection{
-    if(!selection.child) return selection
-    return lastOf(selection.child)
+function lastOf(selection: Selection): Selection {
+  if (!selection.child) return selection
+  return lastOf(selection.child)
 }
 
 enum SelectionAction {

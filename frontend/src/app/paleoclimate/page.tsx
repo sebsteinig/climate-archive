@@ -2,7 +2,11 @@
 import { searchPublication } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { TimeController, TimeMode, TimeSpeed } from "@/utils/store/time/time.type"
+import {
+  TimeController,
+  TimeMode,
+  TimeSpeed,
+} from "@/utils/store/time/time.type"
 import { Publication } from "@/utils/types"
 import dynamic from "next/dynamic"
 import { useEffect } from "react"
@@ -45,7 +49,7 @@ export default function PaleoClimatePage() {
         addTime(publication, {
           mode: TimeMode.mean,
           speed: TimeSpeed.very_fast,
-          controller : TimeController.geologic,
+          controller: TimeController.geologic,
         })
       })
       .catch((e) => {

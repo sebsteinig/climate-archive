@@ -44,7 +44,7 @@ export function buildTimeConf(config?: Partial<TimeConf>): TimeConf {
       break
   }
   return {
-    controller : config?.controller ?? TimeController.monthly,
+    controller: config?.controller ?? TimeController.monthly,
     kind: config?.kind ?? TimeKind.circular,
     speed: speed,
     mode: config?.mode ?? TimeMode.ts,
@@ -244,7 +244,7 @@ export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
     onCompleteParams: [frame],
     onComplete: (frame: TimeFrame) => {
       frame.swap_flag = true
-      if(onComplete){
+      if (onComplete) {
         onComplete()
       }
     },
@@ -312,7 +312,7 @@ export function circular(
     duration: duration,
     ease: "none",
     weight: to,
-    onCompleteParams: [frame, tween_ref,world_data],
+    onCompleteParams: [frame, tween_ref, world_data],
     onComplete: (
       frame: TimeFrame,
       tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
