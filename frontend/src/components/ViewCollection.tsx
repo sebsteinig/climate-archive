@@ -58,7 +58,11 @@ type CollectionProps = {
   onClose?: { fn: () => void }
 }
 
-export function CollectionDetails({ collection, load,onClose }: CollectionProps) {
+export function CollectionDetails({
+  collection,
+  load,
+  onClose,
+}: CollectionProps) {
   const searchParams = useSearchParams()
   const reload = useMemo(() => {
     if (!searchParams.has("reload")) return true
@@ -100,19 +104,28 @@ export function CollectionDetails({ collection, load,onClose }: CollectionProps)
         </div>
         <div className="row-start-5 flex justify-center">
           {load && (
-              <ButtonPrimary onClick={() => {
+            <ButtonPrimary
+              onClick={() => {
                 const search_params = new URLSearchParams()
 
-                upPush(search_params,{
-                  authors_short : collection.authors_short,
-                  year : collection.year,
-                  exp_id : collection.exps[0].id,
+                upPush(search_params, {
+                  authors_short: collection.authors_short,
+                  year: collection.year,
+                  exp_id: collection.exps[0].id,
                 })
-                router.push("/publication/?" + search_params.toString() + "&reload=" + !reload)
-                if(onClose) {
+                router.push(
+                  "/publication/?" +
+                    search_params.toString() +
+                    "&reload=" +
+                    !reload,
+                )
+                if (onClose) {
                   onClose.fn()
-                } 
-              }}>Discover</ButtonPrimary>
+                }
+              }}
+            >
+              Discover
+            </ButtonPrimary>
           )}
         </div>
       </div>

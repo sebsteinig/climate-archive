@@ -57,26 +57,25 @@ export function tickBuilder(
         variables: res,
       }
     let update_texture = false
-    
+
     if (frame.swap_flag) {
       if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
-        await update(frame, active_variables,world_data)
+        await update(frame, active_variables, world_data)
 
         for (let [variable, state] of frame.variables) {
-          const data = await compute(variable, state, canvas,world_data)
+          const data = await compute(variable, state, canvas, world_data)
           if (data) {
             res.set(variable, data)
           }
         }
         panel_ref.current?.controller_ref.current?.onChange(frame)
-        panel_ref.current?.input_ref.current?.onChange(frame)
         frame.swapping = false
         frame.swap_flag = false
       }
     }
-    panel_ref.current?.input_ref.current?.onWeightUpdate(frame)
+    panel_ref.current?.controller_ref.current?.onWeightUpdate(frame)
     return {
       weight: frame.weight,
       uSphereWrapAmount: frame.uSphereWrapAmount,

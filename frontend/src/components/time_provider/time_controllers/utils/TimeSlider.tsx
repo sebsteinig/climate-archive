@@ -31,7 +31,7 @@ export type InputRef = {
 }
 
 export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
-  { time_id, className, current_frame ,data}: Props,
+  { time_id, className, current_frame, data }: Props,
   ref,
 ) {
   const input_ref = useRef<HTMLInputElement>(null!)
@@ -41,7 +41,6 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
   useImperativeHandle(ref, () => {
     return {
       onChange: (frame: TimeFrame) => {
-
         // const timestep = frame.timesteps
         // if (timestep && parseFloat(input_ref.current.max) !== timestep - 1) {
         //   input_ref.current.max = (timestep - 1).toString()
@@ -55,15 +54,15 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
     }
   })
   const max = useMemo(() => {
-    if(data.time.mode === TimeMode.mean) {
+    if (data.time.mode === TimeMode.mean) {
       return data.collection.exps.length
-    }else {
+    } else {
       const frame = current_frame.current.get(time_id)
       const timestep = frame?.timesteps
       return timestep ?? 0
     }
   }, [current_frame.current.get(time_id)])
-  
+
   return (
     <div className={className}>
       <input

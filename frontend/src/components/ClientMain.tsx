@@ -1,5 +1,5 @@
 "use client"
-import { TimeProvider } from "./time_provider/WorldsManager"
+import { WorldManager } from "./time_provider/WorldsManager"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -12,10 +12,9 @@ import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
+import { HomeButton } from "./buttons/HomeButton"
 
-type Props = {
-
-}
+type Props = {}
 
 export default function ClientMain({}: Props) {
   // const addCollection = useClusterStore((state) => state.addCollection)
@@ -56,11 +55,14 @@ export default function ClientMain({}: Props) {
             <div className=" h-full flex  items-center absolute">
               <SideBar journals={<></>} />
             </div>
-            <HelpButton className="absolute bottom-0 grow-0 justify-self-end" />
+            <div className="absolute bottom-5 flex flex-col gap-5">
+              <HelpButton />
+              <HomeButton />
+            </div>
           </div>
         </div>
-        <div className="flex-grow flex flex-col gap-5">
-          <div className="flex flex-grow-0 justify-end">
+        <div className="flex-grow flex flex-col">
+          <div className="flex flex-grow-0 justify-end ">
             <SearchBar
               is_visible={search_bar_visible}
               displaySearchBar={displaySearchBar}
@@ -77,14 +79,14 @@ export default function ClientMain({}: Props) {
             >
               {<></>}
             </SearchBar>
-            <div className="h-14 cursor-pointer flex items-center">
+            {/* <div className="h-14 cursor-pointer flex items-center">
               <h1 className="">CLIMATE ARCHIVE</h1>
-            </div>
+            </div> */}
           </div>
           <div className="overflow-y-auto flex-grow ">
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
-                <TimeProvider
+                <WorldManager
                   displayGraph = {{fn: () => displayGraph((prev) => !prev)}}
                   displayCollection={(collection) => {
                     setCollection(collection)

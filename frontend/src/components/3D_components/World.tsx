@@ -30,7 +30,7 @@ export function World({ tick }: Props) {
     tick(delta).then((res) => {
       //console.log(res.update_texture);
       if (atmosphere_layer_ref.current) {
-        atmosphere_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
+        atmosphere_layer_ref.current.tick(res.weight, res.uSphereWrapAmount)
       }
       for (let [variable, data] of res.variables) {
         switch (variable) {
