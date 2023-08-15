@@ -1,4 +1,5 @@
 import {
+  ColorMapRow,
   RowWithCheckBox,
   RowWithSlider,
   Rows,
@@ -23,6 +24,10 @@ export function Tos({
       controls={true}
     >
       <Rows>
+        <ColorMapRow
+          colormap_name = {tos.colormap}
+          onChange = {(n) => tos.updateColormap(n)}
+        />
         <RowWithSlider
           onChange={(n) => {
             tos.updateMin(n)

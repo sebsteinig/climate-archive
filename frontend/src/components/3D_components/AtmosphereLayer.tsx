@@ -125,6 +125,7 @@ const AtmosphereLayer = memo(
       materialRef.current.uniforms.uUserMinValue.value = prRef.current?.min ?? 0
       materialRef.current.uniforms.uUserMaxValue.value =
         prRef.current?.max ?? 20
+      //materialRef.current.uniforms.colorMap.value =  ???? `public/assets/colormaps/${prRef.current?.colormap ?? "ipccPrecip.png"}`
     }
 
     useImperativeHandle(ref, () => {

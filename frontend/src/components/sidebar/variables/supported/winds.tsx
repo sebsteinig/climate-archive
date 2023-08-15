@@ -1,4 +1,5 @@
 import {
+  ColorMapRow,
   RowWithCheckBox,
   RowWithSlider,
   Rows,
@@ -23,6 +24,10 @@ export function Winds({
       controls={true}
     >
       <Rows>
+        <ColorMapRow
+          colormap_name = {winds.colormap}
+          onChange = {(n) => winds.updateColormap(n)}
+        />
         <RowWithSlider
           onChange={(n) => {
             winds.updateAnimationSpeed(n)

@@ -72,6 +72,11 @@ export const createVariableSlice: StateCreator<
         arrows_size: 1,
         scale_by_magnitude: true,
         color_by_magnitude: false,
+        colormap: "ipccPrecip.png",
+        updateColormap: (value: string) =>
+        set((state) => {
+          state.variables.currents.colormap = value
+        }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {
             state.variables.currents.animation_speed = value
@@ -105,6 +110,11 @@ export const createVariableSlice: StateCreator<
       height: {
         name: EVarID.height,
         diplacement: 0.2,
+        colormap: "ipccPrecip.png",
+        updateColormap: (value: string) =>
+        set((state) => {
+          state.variables.height.colormap = value
+        }),
         updateDiplacement: (value: number) =>
           set((state) => {
             state.variables.height.diplacement = value
@@ -123,6 +133,11 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
+        colormap: "ipccPrecip.png",
+        updateColormap: (value: string) =>
+        set((state) => {
+          state.variables.pr.colormap = value
+        }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.pr.min = value
@@ -148,6 +163,11 @@ export const createVariableSlice: StateCreator<
         anomalies_lower_bound: 2.5,
         sea_ice: true,
         name: EVarID.tos,
+        colormap: "ipccPrecip.png",
+        updateColormap: (value: string) =>
+        set((state) => {
+          state.variables.tos.colormap = value
+        }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.tos.min = value
@@ -178,6 +198,11 @@ export const createVariableSlice: StateCreator<
         arrows_size: 2,
         scale_by_magnitude: true,
         color_by_magnitude: true,
+        colormap: "ipccPrecip.png",
+        updateColormap: (value: string) =>
+        set((state) => {
+          state.variables.winds.colormap = value
+        }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {
             state.variables.winds.animation_speed = value
