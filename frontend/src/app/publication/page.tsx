@@ -28,22 +28,36 @@ export default function PublicationPage() {
 
     const containers = getContainers(search_params)
 
-    Promise.all(containers.map(
-      async ({authors_short,year,exp_id}) => {
-        const [publication] = await searchPublication({authors_short,year:[year]})
-        if(!publication) return
-        await database_provider.load({exp_id})
+    Promise.all(
+      containers.map(async ({ authors_short, year, exp_id }) => {
+        const [publication] = await searchPublication({
+          authors_short,
+          year: [year],
+        })
+        if (!publication) return
+        await database_provider.load({ exp_id })
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
         return {
           publication,
-          exp_id
+          exp_id,
         }
-      })
-    ).then((publications:({publication:Publication,exp_id:string}|undefined)[])=> {
-      addAll(publications.filter(e=>e) as {publication:Publication,exp_id:string}[])
-    })
-
+      }),
+    ).then(
+      (
+        publications: (
+          | { publication: Publication; exp_id: string }
+          | undefined
+        )[],
+      ) => {
+        addAll(
+          publications.filter((e) => e) as {
+            publication: Publication
+            exp_id: string
+          }[],
+        )
+      },
+    )
   }, [reload])
 
   return (

@@ -1,5 +1,5 @@
 "use client"
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
 import {
   useEffect,
   useRef,
@@ -23,6 +23,7 @@ import { Collection } from "@/utils/store/collection.store"
 import { ViewCollection } from "../ViewCollection"
 import { usePathname, useRouter } from "next/navigation"
 import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
+import THREE from "three"
 
 type Props = {
   displayCollection: (collection: Collection) => void
@@ -52,15 +53,13 @@ export function TimeProvider(props: Props) {
 
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
-    init(time_slots, current_frame, active_variables).then(
-      () => {
-        if(pathname.includes("publication")) {
-          const search_params = resolveURLparams(time_slots)
-          search_params.set("reload","false")
-          router.push(pathname+"?"+search_params.toString())
-        }
+    init(time_slots, current_frame, active_variables).then(() => {
+      if (pathname.includes("publication")) {
+        const search_params = resolveURLparams(time_slots)
+        search_params.set("reload", "false")
+        router.push(pathname + "?" + search_params.toString())
       }
-    )
+    })
   }, [time_slots, active_variables])
   const router = useRouter()
   const pathname = usePathname()
@@ -79,6 +78,7 @@ export function TimeProvider(props: Props) {
   for (let time_id of time_slots.keys()) {
     scene_refs.current[time_id] = React.createRef<SceneRef>()
   }
+
   return (
     <>
       <div className={`flex flex-grow h-full`}>
@@ -143,7 +143,7 @@ async function init(
   active_variables: EVarID[],
 ) {
   for (let [time_id, data] of slots) {
-    const exp = (data.exp ?? data.collection.exps[0])
-    await current_frame.current.init(time_id, exp, active_variables,data)
+    const exp = data.exp ?? data.collection.exps[0]
+    await current_frame.current.init(time_id, exp, active_variables, data)
   }
 }

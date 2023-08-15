@@ -100,10 +100,13 @@ export default function SearchBar({
   }, [searched_content, requestFilters])
 
   return (
-    <div className={`z-40 absolute left-0 top-0 w-full h-full backdrop-blur transition-opacity duration-100 ${is_visible ? "opacity-100" : "opacity-0"}`} 
-      style={{ pointerEvents: is_visible ? 'auto' : 'none' }}
+    <div
+      className={`z-40 absolute left-0 top-0 w-full h-full backdrop-blur transition-opacity duration-100 ${
+        is_visible ? "opacity-100" : "opacity-0"
+      }`}
+      style={{ pointerEvents: is_visible ? "auto" : "none" }}
       onClick={() => {
-      displaySearchBar(false)
+        displaySearchBar(false)
       }}
     >
       <div
@@ -118,12 +121,14 @@ export default function SearchBar({
           ${search_panel_visible && "max-sm:w-[calc(100%_-_2.5rem)]"}
           `}
         ref={search_panel_ref}
-        onClick={(e)=>{e.stopPropagation();}}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
       >
         <CrossIcon
           className={`w-8 h-8 absolute top-0 right-0 m-5 text-emerald-400 cursor-pointer`}
           onClick={() => {
-            setSearchContent('')
+            setSearchContent("")
             displaySearchBar(false)
           }}
         />
@@ -216,6 +221,5 @@ export default function SearchBar({
         </div>
       </div>
     </div>
-    
   )
 }
