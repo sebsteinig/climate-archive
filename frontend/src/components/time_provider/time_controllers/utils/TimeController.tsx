@@ -34,15 +34,27 @@ type Props = {
 }
 export type ControllerRef = {
   onChange: (frame: TimeFrame) => void
+  play : () => void
+  pause : () => void
+  stop : () => void
 }
 
 export const TimeController = forwardRef<ControllerRef, Props>(
   function TimeController({ className, current_frame, time_id, data }, ref) {
-    const time_title_ref = useRef<HTMLParagraphElement>(null)
-    const exp_title_ref = useRef<HTMLParagraphElement>(null)
+    const time_title_ref = useRef<HTMLDivElement>(null)
+    const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
     useImperativeHandle(ref, () => {
       return {
+        play() {
+          play(data, time_id, current_frame, tween_ref, setPlaying)
+        },
+        pause() {
+          pause(tween_ref, setPlaying)
+        },
+        stop() {
+            
+        },
         onChange: (frame: TimeFrame) => {
           let id: string
           let label: string
@@ -66,7 +78,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             const t = getTitleOfExp(frame.exp)
             id = t.id
             label = t.label
-            title = titleOf(Math.floor(frame.weight), frame.timesteps ?? 0)!
+            title = titleOf(Math.round(frame.weight), frame.timesteps ?? 0)!
           }
           if (time_title_ref.current) {
             time_title_ref.current.innerText = title
@@ -79,20 +91,16 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     })
     const [is_playing, setPlaying] = useState(false)
     return (
-      <div
-        className={`grid grid-cols-3 grid-rows-1 gap-5 px-5 py-2 ${
-          className ?? ""
-        }`}
-      >
-        <div className="cursor-default col-span-2 overflow-hidden">
-          <p
-            className="text-emerald-600 font-semibold small-caps tracking-[.5em]"
+      <div className={`grid grid-cols-3 grid-rows-1 gap-5 ${className ?? ""}`}>
+        <div className="cursor-default col-span-2 overflow-hidden flex flex-col justify-between">
+          <div
+            className="text-emerald-600 font-semibold small-caps tracking-[.5em] my-auto"
             ref={time_title_ref}
-          ></p>
-          <p
-            className="truncate italic text-sm text-slate-600"
+          ></div>
+          <div
+            className="truncate italic text-sm text-slate-600  my-auto"
             ref={exp_title_ref}
-          ></p>
+          ></div>
         </div>
         <div className="col-start-3 flex gap-5 justify-center">
           {is_playing ? (

@@ -11,7 +11,8 @@ export function useGeologicTree() : [GeoTree,SpanTree]{
     },[])
     const exp_span = useMemo(() => {
         const span_tree : SpanTree = {
-            root : undefined
+            root : undefined,
+            binder : new Map()
         }
         const middle = exps_span.timeslice[Math.floor(exps_span.timeslice.length/2)]
         insert(span_tree,Math.abs(middle.tMin),Math.abs(middle.tMax),{

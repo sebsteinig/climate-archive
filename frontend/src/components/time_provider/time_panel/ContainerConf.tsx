@@ -8,6 +8,7 @@ import RotateIcon from "$/assets/icons/rotate.svg"
 import RecenterIcon from "$/assets/icons/recenter.svg"
 import FullScreenIcon from "$/assets/icons/screenfull.svg"
 import GridIcon from "$/assets/icons/grid.svg"
+import AnchorIcon from "$/assets/icons/anchor.svg"
 import LinkIcon from "$/assets/icons/link.svg"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
@@ -44,7 +45,7 @@ export function ContainerConf({
   return (
     <div
       className={` shadow-lg shadow-slate-950 w-fit overflow-y-auto overflow-x-hidden
-      z-20 group bg-gray-900 max-h-[90%] grid grid-cols-1 place-items-center
+      z-20 group bg-slate-700 max-h-[90%] grid grid-cols-1 place-items-center
       
       rounded-full p-2   ${className ?? ""}`}
     >
@@ -63,6 +64,7 @@ export function ContainerConf({
         <>
           <RecenterBtn />
           <FullScreenBtn />
+          <AnchorBtn />
           <ScreenshotBtn />
           <WorldBtn
             onClick={(time_id, is_spheric) => {
@@ -231,6 +233,17 @@ function PinBtn(params: PinBtnProps) {
   return (
     <PinIcon
       className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+    />
+  )
+}
+
+
+type AnchorBtnProps = {}
+
+function AnchorBtn(params: PinBtnProps) {
+  return (
+    <AnchorIcon
+      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 `}
     />
   )
 }

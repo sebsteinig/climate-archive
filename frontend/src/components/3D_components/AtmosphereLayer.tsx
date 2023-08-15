@@ -22,30 +22,30 @@ const loader = new THREE.TextureLoader()
 const cmap = createColormapTexture("YlGnBu-9")
 
 const geometry = new THREE.PlaneGeometry(4, 2, 64, 32)
-const material = new THREE.ShaderMaterial({
-  vertexShader: vertexShader,
-  fragmentShader: fragmentShader,
-  wireframe: false,
-  transparent: true,
-  side: THREE.DoubleSide,
-  uniforms: {
-    uFrameWeight: { value: null },
-    uSphereWrapAmount: { value: 0.0 },
-    uLayerHeight: { value: 0.15 },
-    uLayerOpacity: { value: 1.0 },
-    thisDataFrame: { value: null },
-    nextDataFrame: { value: null },
-    thisDataMin: { value: null },
-    thisDataMax: { value: null },
-    nextDataMin: { value: null },
-    nextDataMax: { value: null },
-    uUserMinValue: { value: null },
-    uUserMaxValue: { value: null },
-    colorMap: { value: cmap },
-    numLon: { value: 96 },
-    numLat: { value: 73 },
-  },
-})
+// const material = new THREE.ShaderMaterial({
+//   vertexShader: vertexShader,
+//   fragmentShader: fragmentShader,
+//   wireframe: false,
+//   transparent: true,
+//   side: THREE.DoubleSide,
+//   uniforms: {
+//     uFrameWeight: { value: null },
+//     uSphereWrapAmount: { value: 0.0 },
+//     uLayerHeight: { value: 0.15 },
+//     uLayerOpacity: { value: 1.0 },
+//     thisDataFrame: { value: null },
+//     nextDataFrame: { value: null },
+//     thisDataMin: { value: null },
+//     thisDataMax: { value: null },
+//     nextDataMin: { value: null },
+//     nextDataMax: { value: null },
+//     uUserMinValue: { value: null },
+//     uUserMaxValue: { value: null },
+//     colorMap: { value: cmap },
+//     numLon: { value: 96 },
+//     numLat: { value: 73 },
+//   },
+// })
 
 type Props = {}
 
@@ -59,8 +59,30 @@ const AtmosphereLayer = memo(
   forwardRef<AtmosphereLayerRef, Props>(({}, ref) => {
     console.log("creating AtmosphereLayer compnent")
     const atmosphere_layer_ref = useRef<SphereType>(null)
-    const materialRef = useRef(material)
-
+    const materialRef = useRef(new THREE.ShaderMaterial( {
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      wireframe: false,
+      transparent: true,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uFrameWeight: {value: null},
+        uSphereWrapAmount: {value: 0.0},
+        uLayerHeight: {value: 0.15},
+        uLayerOpacity: {value: 1.0},
+        thisDataFrame: {value: null},
+        nextDataFrame: {value: null}, 
+        thisDataMin: {value: null},
+        thisDataMax: {value: null},
+        nextDataMin: {value: null},
+        nextDataMax: {value: null},
+        uUserMinValue: {value: null},
+        uUserMaxValue: {value: null},
+        colorMap: {value: cmap},
+        numLon: {value: 96},
+        numLat: {value: 73},
+      },
+    } ));
     // use hook because we want to use the store state,
     // but not re-render component when it changes
     const prRef = useRef<PrSlice>(null!)
@@ -70,6 +92,7 @@ const AtmosphereLayer = memo(
       const unsubscribe = useClusterStore.subscribe(
         (state) => {
           prRef.current = state.variables.pr
+          materialRef.current.uniforms.uUserMinValue.value = prRef.current?.min ?? 0
         },
         //(state) => state.variables.pr
       )
@@ -116,7 +139,7 @@ const AtmosphereLayer = memo(
       <mesh
         ref={atmosphere_layer_ref}
         geometry={geometry}
-        material={material}
+        material={materialRef.current}
       ></mesh>
     )
   }),

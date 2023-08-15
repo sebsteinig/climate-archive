@@ -36,7 +36,7 @@ export function TimeScale({onChange}:TimeScaleProps) {
         setFocus(true)
       }
       setSelection(next_selection)
-      const span_data = query(exp_span_tree,lastOf(next_selection).data.age_span.from)
+      const span_data = query(exp_span_tree,lastOf(next_selection).data.age_span.to)
       if(span_data) {
           onChange(span_data.data.idx,span_data.data.exp_id) 
       }

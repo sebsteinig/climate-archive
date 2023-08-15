@@ -18,6 +18,8 @@ import {
   useState,
 } from "react"
 import { tickBuilder } from "../tick"
+import { useThree } from "@react-three/fiber"
+import THREE from "three"
 
 export type SceneProps = {
   time_id: TimeID
@@ -48,8 +50,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
   if (!panel_ref.current?.container_ref.current) {
     return null
   }
-  const frame = current_frame.current.get(time_id)
-  useImperativeHandle(ref, () => {
+  useImperativeHandle(ref,()=>{
     return {
       canOrbit(can_orbit) {
         setOrbitControl(can_orbit)
@@ -61,6 +62,8 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
   })
   return (
     <View track={panel_ref.current!.container_ref.current!.track}>
+      <color />
+      <color attach="background" args={['#020617']} />
       <World
         tick={tickBuilder(
           time_id,

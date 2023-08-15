@@ -20,9 +20,15 @@ type SpanNode = {
 
 export type SpanTree = {
     root : SpanNode | undefined
+    binder : Map<number,Span>
 }
 
 export function insert(tree:SpanTree,low:number,high:number,data:SpanData){
+    tree.binder.set(data.idx,{
+        low,
+        high,
+        data,
+    })
     tree.root = insertRec(tree.root,{
         low,
         high,

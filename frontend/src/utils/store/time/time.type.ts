@@ -9,18 +9,10 @@ export enum TimeKind {
   walk,
   once,
 }
-export enum TimeDirection {
-  forward,
-  backward,
-}
-export enum TimeState {
-  paused,
-  stopped,
-  playing,
-  pinning,
-  surfing,
-  ready,
-  zero,
+
+export enum TimeController {
+  monthly,
+  geologic,
 }
 
 export enum TimeSpeed {
@@ -96,7 +88,7 @@ export type TimeID = number
 export type CollectionID = number
 
 export type TimeConf = {
-  direction: TimeDirection
+  controller : TimeController
   kind: TimeKind
   speed: number
   mode: TimeMode

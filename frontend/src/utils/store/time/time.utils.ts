@@ -1,7 +1,7 @@
 import { gsap } from "gsap"
 import {
   TimeConf,
-  TimeDirection,
+  TimeController,
   TimeFrame,
   TimeFrameState,
   TimeKind,
@@ -44,7 +44,7 @@ export function buildTimeConf(config?: Partial<TimeConf>): TimeConf {
       break
   }
   return {
-    direction: config?.direction ?? TimeDirection.forward,
+    controller : config?.controller ?? TimeController.monthly,
     kind: config?.kind ?? TimeKind.circular,
     speed: speed,
     mode: config?.mode ?? TimeMode.ts,
@@ -238,12 +238,15 @@ export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
   const rounded_to = Math.round(to)
   const duration = 5 // 5s
   return gsap.to(frame, {
-    ease: "power1.inOut",
+    ease: "power2.out",
     duration: duration,
     weight: rounded_to,
     onCompleteParams: [frame],
     onComplete: (frame: TimeFrame) => {
-      //pin(frame, onComplete)
+      frame.swap_flag = true
+      if(onComplete){
+        onComplete()
+      }
     },
     onUpdateParams: [frame, state],
     onUpdate: (frame: TimeFrame, state: { previous_idx: number }) => {
@@ -308,8 +311,8 @@ export function circular(
   return gsap.to(frame, {
     duration: duration,
     ease: "none",
-    weight: to - 1,
-    onCompleteParams: [frame, tween_ref, world_data],
+    weight: to,
+    onCompleteParams: [frame, tween_ref,world_data],
     onComplete: (
       frame: TimeFrame,
       tween_ref: MutableRefObject<gsap.core.Tween | undefined>,

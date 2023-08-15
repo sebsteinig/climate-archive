@@ -2,7 +2,7 @@
 import { searchPublication } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
-import { TimeKind, TimeMode, TimeSpeed } from "@/utils/store/time/time.type"
+import { TimeController, TimeMode, TimeSpeed } from "@/utils/store/time/time.type"
 import { Publication } from "@/utils/types"
 import dynamic from "next/dynamic"
 import { useEffect } from "react"
@@ -27,8 +27,10 @@ async function loadValdesEtAl2021() {
 
 export default function PaleoClimatePage() {
   const addTime = useClusterStore((state) => state.time.add)
+  const clear = useClusterStore((state) => state.time.clear)
   const addCollection = useClusterStore((state) => state.addCollection)
   useEffect(() => {
+    clear()
     loadValdesEtAl2021()
       .then(async (publication) => {
         await database_provider.loadAll({
@@ -43,6 +45,7 @@ export default function PaleoClimatePage() {
         addTime(publication, {
           mode: TimeMode.mean,
           speed: TimeSpeed.very_fast,
+          controller : TimeController.geologic,
         })
       })
       .catch((e) => {
