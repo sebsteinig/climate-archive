@@ -19,7 +19,12 @@ export function useFrameRef() {
     get(time_id) {
       return this.map.get(time_id)
     },
-    async init(time_id, exp: Experiment, active_variables: EVarID[],world_data:WorldData) {
+    async init(
+      time_id,
+      exp: Experiment,
+      active_variables: EVarID[],
+      world_data: WorldData,
+    ) {
       const data = this.map.get(time_id)
       console.log(`init`)
       const frame: TimeFrame = {
@@ -34,7 +39,7 @@ export function useFrameRef() {
       frame.timesteps = max_ts
       const variables = new Map()
       for (let variable of active_variables) {
-        variables.set(variable, await sync(frame, variable,world_data))
+        variables.set(variable, await sync(frame, variable, world_data))
       }
       current_frame.current.update(frame, time_id)
     },

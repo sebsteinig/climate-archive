@@ -53,15 +53,13 @@ export function TimeProvider(props: Props) {
 
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
-    init(time_slots, current_frame, active_variables).then(
-      () => {
-        if(pathname.includes("publication")) {
-          const search_params = resolveURLparams(time_slots)
-          search_params.set("reload","false")
-          router.push(pathname+"?"+search_params.toString())
-        }
+    init(time_slots, current_frame, active_variables).then(() => {
+      if (pathname.includes("publication")) {
+        const search_params = resolveURLparams(time_slots)
+        search_params.set("reload", "false")
+        router.push(pathname + "?" + search_params.toString())
       }
-    )
+    })
   }, [time_slots, active_variables])
   const router = useRouter()
   const pathname = usePathname()
@@ -145,7 +143,7 @@ async function init(
   active_variables: EVarID[],
 ) {
   for (let [time_id, data] of slots) {
-    const exp = (data.exp ?? data.collection.exps[0])
-    await current_frame.current.init(time_id, exp, active_variables,data)
+    const exp = data.exp ?? data.collection.exps[0]
+    await current_frame.current.init(time_id, exp, active_variables, data)
   }
 }

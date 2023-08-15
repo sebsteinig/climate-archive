@@ -44,13 +44,10 @@ export function ContainerConf({
 
   return (
     <div
-    
       className={` shadow-lg shadow-slate-950 w-fit overflow-y-auto overflow-x-hidden
       z-20 group bg-slate-700 max-h-[90%] grid grid-cols-1 place-items-center
       
-      rounded-full p-2   ${
-        className ?? ""
-         }`}
+      rounded-full p-2   ${className ?? ""}`}
     >
       {is_expanded ? (
         <ArrowDownIcon
@@ -69,30 +66,36 @@ export function ContainerConf({
           <FullScreenBtn />
           <AnchorBtn />
           <ScreenshotBtn />
-          <WorldBtn 
+          <WorldBtn
             onClick={(time_id, is_spheric) => {
-            const frame = current_frame.current.get(time_id)
-            if(!frame) return;
-            if(scene_ref.current) {
-              scene_ref.current.canOrbit(is_spheric)
-            }
-            const to = is_spheric ? 1 : 0
-            gsap.to(frame,{uSphereWrapAmount:to,duration:1, ease: "none"})
-          }} time_id={time_id} />
+              const frame = current_frame.current.get(time_id)
+              if (!frame) return
+              if (scene_ref.current) {
+                scene_ref.current.canOrbit(is_spheric)
+              }
+              const to = is_spheric ? 1 : 0
+              gsap.to(frame, {
+                uSphereWrapAmount: to,
+                duration: 1,
+                ease: "none",
+              })
+            }}
+            time_id={time_id}
+          />
           <RotateBtn />
-          <GridBtn/>
+          <GridBtn />
           <PinBtn />
         </>
       )}
       <CamBtn
-        onClick={(time_id,linked) => {
-          if(scene_ref.current) {
+        onClick={(time_id, linked) => {
+          if (scene_ref.current) {
             scene_ref.current.linkCamera(linked)
           }
         }}
         time_id={time_id}
       />
-      <DupBtn time_id={time_id} current_frame={current_frame}/>
+      <DupBtn time_id={time_id} current_frame={current_frame} />
       <InfoBtn onClick={displayCollection} collection={data.collection} />
     </div>
   )
@@ -116,21 +119,21 @@ function InfoBtn({ onClick, collection }: InfoBtnProps) {
 
 type DupBtnProps = {
   time_id: TimeID
-  current_frame : TimeFrameRef
+  current_frame: TimeFrameRef
 }
 
-function DupBtn({ time_id ,current_frame}: DupBtnProps) {
+function DupBtn({ time_id, current_frame }: DupBtnProps) {
   const router = useRouter()
   const pathname = usePathname()
   const dup = useClusterStore((state) => state.time.dup)
 
   return (
-      <DuplicateIcon
-        className="w-10 h-10   cursor-pointer p-2 text-slate-400 child:fill-slate-400"
-        onClick={() => {
-          dup(time_id)
-        }}
-      />
+    <DuplicateIcon
+      className="w-10 h-10   cursor-pointer p-2 text-slate-400 child:fill-slate-400"
+      onClick={() => {
+        dup(time_id)
+      }}
+    />
   )
 }
 
@@ -139,7 +142,7 @@ type CamBtnProps = {
   time_id: TimeID
 }
 
-function CamBtn({onClick, time_id }: CamBtnProps) {
+function CamBtn({ onClick, time_id }: CamBtnProps) {
   const [is_linked, link] = useState(true)
   return (
     <CameraIcon
@@ -211,7 +214,11 @@ function WorldBtn({ onClick, time_id }: WorldBtnProps) {
 type RotateBtnProps = {}
 
 function RotateBtn(params: RotateBtnProps) {
-  return <RotateIcon className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`} />
+  return (
+    <RotateIcon
+      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+    />
+  )
 }
 
 type GridBtnProps = {}

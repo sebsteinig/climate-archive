@@ -1,10 +1,11 @@
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import { TimeController, TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
 import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import { Container, ContainerRef } from "./Container"
 import { Collection } from "@/utils/store/collection.store"
 import { SceneRef } from "./Scene"
 import { MonthlyController } from "../time_controllers/MonthlyController"
 import { IControllerRef } from "../time_controllers/controller.types"
+import { GeoTimeScaleController } from "../time_controllers/GeoTimeScaleController"
 
 export type PanelProps = {
   displayCollection: (collection: Collection) => void
@@ -21,7 +22,7 @@ export type PanelRef = {
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data, time_id, grid_id, current_frame, displayCollection ,scene_ref},
+  { data, time_id, grid_id, current_frame, displayCollection, scene_ref },
   refs,
 ) {
   const controller_ref = useRef<IControllerRef>(null)
@@ -48,20 +49,10 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
         />
       </div>
       <div className="z-10">
-        <MonthlyController ref={controller_ref} time_id={time_id} data={data} current_frame={current_frame} />
-        {/* <TimeController
-          current_frame={current_frame}
-          time_id={time_id}
-          data={data}
-          ref={controller_ref}
-        />
-        <TimeSlider
-          current_frame={current_frame}
-          data={data}
-          time_id={time_id}
-          className="w-full"
-          ref={input_ref}
-        /> */}
+        {data.time.controller === TimeController.monthly &&
+          <MonthlyController ref={controller_ref} time_id={time_id} data={data} current_frame={current_frame} />}
+        {data.time.controller === TimeController.geologic &&
+          <GeoTimeScaleController ref={controller_ref} current_frame={current_frame} data={data} time_id={time_id} />}
       </div>
     </div>
   )

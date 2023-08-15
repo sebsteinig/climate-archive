@@ -9,18 +9,10 @@ export enum TimeKind {
   walk,
   once,
 }
-export enum TimeDirection {
-  forward,
-  backward,
-}
-export enum TimeState {
-  paused,
-  stopped,
-  playing,
-  pinning,
-  surfing,
-  ready,
-  zero,
+
+export enum TimeController {
+  monthly,
+  geologic,
 }
 
 export enum TimeSpeed {
@@ -53,7 +45,7 @@ export type TimeFrameStateMean = {
   current: {
     info: TextureInfo
     exp: Experiment
-    idx : number
+    idx: number
   }
   next: {
     info: TextureInfo
@@ -64,8 +56,8 @@ export type TimeFrameStateMean = {
 }
 
 export type TimeFrameState = {
-  ts ?: TimeFrameStateTS
-  mean ?: TimeFrameStateMean
+  ts?: TimeFrameStateTS
+  mean?: TimeFrameStateMean
 }
 
 export type TimeFrame = {
@@ -86,7 +78,7 @@ export type TimeFrameHolder = {
     time_id: TimeID,
     exp: Experiment,
     active_variables: EVarID[],
-    world_data:WorldData,
+    world_data: WorldData,
   ) => Promise<void>
 }
 
@@ -96,10 +88,10 @@ export type TimeID = number
 export type CollectionID = number
 
 export type TimeConf = {
-  direction: TimeDirection
+  controller : TimeController
   kind: TimeKind
   speed: number
-  mode : TimeMode
+  mode: TimeMode
 }
 
 export type WorldConf = {
@@ -112,7 +104,7 @@ export type WorldData = {
   //conf: WorldConf
   collection: Collection
   time: TimeConf
-  exp ?: Experiment
+  exp?: Experiment
 }
 
 export type Slots = Map<TimeID, WorldData>

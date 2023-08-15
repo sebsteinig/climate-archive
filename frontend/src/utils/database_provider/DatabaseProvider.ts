@@ -131,7 +131,7 @@ class DatabaseProvider {
       extension: requested_textures.extension,
       lossless: requested_textures.lossless,
       rx: requested_textures.resolution?.x,
-      ry: requested_textures.resolution?.y
+      ry: requested_textures.resolution?.y,
       /** TODO : nan_value_encoding, chunks, threshold */
     })
     const res = await Promise.all(

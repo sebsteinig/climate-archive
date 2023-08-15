@@ -10,7 +10,12 @@ import {
   useRef,
   useState,
 } from "react"
-import { TimeFrameRef, TimeID, TimeMode, WorldData } from "@/utils/store/time/time.type"
+import {
+  TimeFrameRef,
+  TimeID,
+  TimeMode,
+  WorldData,
+} from "@/utils/store/time/time.type"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import Select from "@/components/inputs/Select"
 import { Collection } from "@/utils/store/collection.store"
@@ -81,16 +86,15 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
-          <div className="absolute top-0 left-0 flex m-2">
-            <CrossIcon
-              className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
-              onClick={() => {
-                current_frame.current.map.delete(time_id)
-                remove(time_id)
-              }}
-            />
-            {
-            data.time.mode === TimeMode.ts &&            
+        <div className="absolute top-0 left-0 flex m-2">
+          <CrossIcon
+            className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
+            onClick={() => {
+              current_frame.current.map.delete(time_id)
+              remove(time_id)
+            }}
+          />
+          {data.time.mode === TimeMode.ts && (
             <Select
               className="ml-5"
               defaultValue={data.exp?.id}
@@ -98,13 +102,9 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
                 const idx = e.target.selectedIndex
                 const exp = data.collection.exps[idx]
 
-                database_provider.load({exp_id:exp.id})
-                .then(
-                  async () => {
-                    changeExp(time_id,exp)
-                  }
-                )
-
+                database_provider.load({ exp_id: exp.id }).then(async () => {
+                  changeExp(time_id, exp)
+                })
               }}
             >
               {data.collection?.exps.map((e) => {
@@ -116,9 +116,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
                 )
               })}
             </Select>
-            }
-          </div>
-        
+          )}
+        </div>
 
         <ContainerConf
           className="absolute bottom-0 right-0 m-2 "

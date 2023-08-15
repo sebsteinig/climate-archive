@@ -52,7 +52,7 @@ type Props = {}
 export type AtmosphereLayerRef = {
   type: RefObject<SphereType>
   updateTextures: (data: TickData) => void
-  tick: (weight: number,uSphereWrapAmount:number) => void
+  tick: (weight: number, uSphereWrapAmount: number) => void
 }
 
 const AtmosphereLayer = memo(
@@ -104,7 +104,7 @@ const AtmosphereLayer = memo(
       }
     }, [])
 
-    function tick(weight: number,uSphereWrapAmount:number) {
+    function tick(weight: number, uSphereWrapAmount: number) {
       materialRef.current.uniforms.uFrameWeight.value = weight % 1
       materialRef.current.uniforms.uSphereWrapAmount.value = uSphereWrapAmount
     }

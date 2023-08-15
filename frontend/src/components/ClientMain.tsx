@@ -13,9 +13,7 @@ import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 import { HomeButton } from "./buttons/HomeButton"
 
-type Props = {
-
-}
+type Props = {}
 
 export default function ClientMain({}: Props) {
   // const addCollection = useClusterStore((state) => state.addCollection)
