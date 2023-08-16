@@ -18,7 +18,6 @@ import THREE from "three"
 
 type Props = {
   displayCollection: (collection: Collection) => void
-  displayGraph: { fn: () => void }
 }
 
 export function WorldManager(props: Props) {

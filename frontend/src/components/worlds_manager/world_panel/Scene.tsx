@@ -21,6 +21,7 @@ import { tickBuilder } from "../tick"
 import { ThreeEvent, useThree } from "@react-three/fiber"
 import THREE from "three"
 import { AtmosphereLayerRef } from "@/components/3D_components/AtmosphereLayer"
+import { Coordinate } from "@/utils/store/graph/graph.type"
 
 export type SceneProps = {
   time_id: TimeID
@@ -58,7 +59,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
       },
     }
   })
-  function handleClickOnWorld(lat:number,lon:number) {
+  function handleClickOnWorld({lat,lon}:Coordinate) {
     panel_ref.current?.container_ref.current?.showClickPanel(data,{lat,lon})
   }
   if (!panel_ref.current?.container_ref.current) {

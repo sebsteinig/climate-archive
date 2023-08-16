@@ -23,6 +23,8 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { ContainerConf } from "./ContainerConf"
 import { SceneRef } from "./Scene"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
+import { Coordinate } from "@/utils/store/graph/graph.type"
+import { formatCoordinates } from "@/utils/store/graph/graph.utils"
 
 type Props = {
   className?: string
@@ -36,7 +38,7 @@ type Props = {
 
 export type ContainerRef = {
   track: MutableRefObject<HTMLDivElement>
-  showClickPanel : (data:WorldData,x:{lat:number,lon:number}) => void
+  showClickPanel : (data:WorldData,coordinate : Coordinate) => void
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
@@ -72,13 +74,13 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
       return {
         track: div_ref,
         showClickPanel(data, {lat,lon}) {
-            setPopupData({data,lat,lon})
+            setPopupData({data,coordinate:{lat,lon}})
         },
       }
     })
 
     const frame = current_frame.current.get(time_id)
-    const [popup_data,setPopupData] = useState<{data:WorldData,lat:number,lon:number}|undefined>(undefined)
+    const [popup_data,setPopupData] = useState<{data:WorldData,coordinate:Coordinate}|undefined>(undefined)
     return (
       <div
         className={`relative overflow-hidden w-full h-full ${className ?? ""}`}
@@ -131,8 +133,8 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
                   setPopupData(undefined)
                 }} 
                 data={popup_data.data}
-                lat={popup_data.lat} 
-                lon={popup_data.lon}/>
+                coordinate={popup_data.coordinate}
+                />
             </div>
           )
         }
@@ -152,12 +154,11 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
 
 type PopupProps = {
   data : WorldData
-  lat : number
-  lon : number
+  coordinate : Coordinate
   close : () => void
 }
 
-function Popup({data,lat,lon,close}:PopupProps) {
+function Popup({data,coordinate,close}:PopupProps) {
   let id_label :{
     id: string;
     label: string;
@@ -165,11 +166,12 @@ function Popup({data,lat,lon,close}:PopupProps) {
   if(data.exp) {
     id_label = getTitleOfExp(data.exp)
   }
-  const {f_lat,f_lon} = formatCoordinates(lat,lon)
+  const {f_lat,f_lon} = formatCoordinates(coordinate)
+  const add = useClusterStore(state => state.graph.add)
   return (
     <div className="p-5 flex flex-row rounded-lg items-center text-slate-900 bg-slate-200 shadow-md shadow-slate-900">
       <CrossIcon
-        className="w-10 h-10 mr-5 cursor-pointer text-slate-800 hover:tex-slate-700"
+        className="grow-0 w-10 h-10 mr-5 cursor-pointer text-slate-800 hover:tex-slate-700"
         onClick={() => {
           close()
         }}
@@ -186,7 +188,10 @@ function Popup({data,lat,lon,close}:PopupProps) {
       <ButtonSecondary 
         className="small-caps shadow-md shadow-slate-800" 
         onClick={() => {
-        
+          add({
+
+          })
+          close()
         }}
       >plot
       </ButtonSecondary>
@@ -194,20 +199,3 @@ function Popup({data,lat,lon,close}:PopupProps) {
   )
 }
 
-type FormattedCoordinates = {
-  f_lat: string;
-  f_lon: string;
-};
-
-function formatCoordinates(lat : number,lon : number): FormattedCoordinates {
-  const lat_direction = lat >= 0 ? 'N' : 'S';
-  const lon_direction = lon >= 0 ? 'E' : 'W';
-
-  const formatted_latitude = `${Math.abs(lat).toFixed(1)}° ${lat_direction}`;
-  const formatted_longitude = `${Math.abs(lon).toFixed(1)}° ${lon_direction}`;
-
-  return {
-    f_lat: formatted_latitude,
-    f_lon: formatted_longitude
-  };
-}

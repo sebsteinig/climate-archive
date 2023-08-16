@@ -8,10 +8,11 @@ import Lights from "./Lights"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { TickFn } from "../worlds_manager/tick"
+import { Coordinate } from "@/utils/store/graph/graph.type"
 
 type Props = {
   tick: TickFn
-  onClick : (lat:number,lon:number) => void
+  onClick : (coordinate:Coordinate) => void
 }
 
 export function World({ tick , onClick }: Props) {
@@ -21,14 +22,14 @@ export function World({ tick , onClick }: Props) {
   useFrame((state, delta) => {
     tick(delta).then((res) => {
       //console.log(res.update_texture);
-      if (atmosphere_layer_ref.current) {
-        atmosphere_layer_ref.current.tick(res.weight, res.uSphereWrapAmount)
-      }
+      atmosphere_layer_ref.current?.tick(res.weight, res.uSphereWrapAmount)
+      
+      if (res.variables.size === 0) return;
       for (let [variable, data] of res.variables) {
         switch (variable) {
           case EVarID.pr: {
-            if (atmosphere_layer_ref.current && res.update_texture) {
-              atmosphere_layer_ref.current.updateTextures(data)
+            if (res.update_texture) {
+              atmosphere_layer_ref.current?.updateTextures(data)
             }
             break
           }
@@ -56,7 +57,7 @@ export function World({ tick , onClick }: Props) {
 
 type OuterSphereRef = THREE.Mesh<THREE.BufferGeometry<THREE.NormalBufferAttributes>>;
 type OuterSphereProps = {
-  onClick : (lat:number,lon:number) => void
+  onClick : (coordinate:Coordinate) => void
 }
 
 function OuterSphere({onClick}:OuterSphereProps) {
@@ -72,10 +73,10 @@ function OuterSphere({onClick}:OuterSphereProps) {
       if (intersects.length > 0) {
         const intersect = intersects[0];
         if(intersect.uv) {
-          var cursorLongitude = intersect.uv.x * 360. - 180.
-          var cursorLatitude = intersect.uv.y * 180. - 90.
+          const lon = intersect.uv.x * 360. - 180.
+          const lat = intersect.uv.y * 180. - 90.
         
-          onClick(cursorLatitude,cursorLongitude)
+          onClick({lat,lon})
         }
     }}
     }>

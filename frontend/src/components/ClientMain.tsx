@@ -36,11 +36,9 @@ export default function ClientMain({}: Props) {
   //   }
   // }, [])
   const [search_bar_visible, displaySearchBar] = useState(false)
-  const [display_graph, displayGraph] = useState<boolean>(true)
   const [collection, setCollection] = useState<Collection | undefined>()
-  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
-    undefined,
-  )
+  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(undefined)
+
   return (
     <>
       <div className="flex flex-row w-full h-full gap-5">
@@ -87,7 +85,6 @@ export default function ClientMain({}: Props) {
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
                 <WorldManager
-                  displayGraph={{ fn: () => displayGraph((prev) => !prev) }}
                   displayCollection={(collection) => {
                     setCollection(collection)
                   }}
@@ -103,14 +100,7 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
-
-        {/* <div
-          className={`absolute flex flex-col top-0 right-0 z-30 w-[48%] h-full`}
-        >
-           {display_graph && (
-            <Graph onClose={{ fn: () => displayGraph(false) }} />
-          )} 
-        </div> */}
+        <Graph /> 
       </div>
     </>
   )

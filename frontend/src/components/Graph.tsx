@@ -1,6 +1,6 @@
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import DownloadIcon from "$/assets/icons/download.svg"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,6 +15,7 @@ import {
 } from "chart.js"
 import { Line } from "react-chartjs-2"
 import { ChartJSOrUndefined } from "react-chartjs-2/dist/types"
+import { useClusterStore } from "@/utils/store/cluster.store"
 
 //defaults.font.family ='Montserrat'
 
@@ -44,18 +45,34 @@ const labels = [
 ]
 
 type Props = {
-  onClose: { fn: () => void }
-  //data
 }
-export default function Graph(props: Props) {
+export default function Graph({}: Props) {
+
+  const show = useClusterStore(state => state.graph.show)
+  const graphs = useClusterStore(state => state.graph.graphs)
+  const visible = useClusterStore(state => state.graph.visible)
+  const stored_active_variables = useClusterStore(
+    (state) => state.active_variables,
+  )
+  const active_variables = useMemo(() => {
+    let actives = []
+    for (let [key, active] of stored_active_variables.entries()) {
+      if (active) actives.push(key)
+    }
+    return actives
+  }, [stored_active_variables])
+
+  
+
+  if(!visible) return null;
   return (
-    <div className="flex-grow flex flex-row my-5">
+    <div className="flex-grow flex flex-row">
       <div
-        className={`p-5 h-full flex-grow w-full mx-5 rounded-md bg-gray-900`}
+        className={`p-5 h-full flex-grow w-full rounded-md bg-gray-900`}
       >
         <CrossIcon
           className="w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-600"
-          onClick={() => props.onClose.fn()}
+          onClick={() => show(false)}
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
           {<LineChart />}
