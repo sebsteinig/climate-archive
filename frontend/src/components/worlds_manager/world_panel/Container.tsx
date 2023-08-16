@@ -188,9 +188,7 @@ function Popup({data,coordinate,close}:PopupProps) {
       <ButtonSecondary 
         className="small-caps shadow-md shadow-slate-800" 
         onClick={() => {
-          add({
-
-          })
+          add({lat : coordinate.lat, lon:coordinate.lon, data : data})
           close()
         }}
       >plot

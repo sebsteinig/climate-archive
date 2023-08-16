@@ -16,6 +16,11 @@ import {
 import { Line } from "react-chartjs-2"
 import { ChartJSOrUndefined } from "react-chartjs-2/dist/types"
 import { useClusterStore } from "@/utils/store/cluster.store"
+import { Graph } from "@/utils/store/graph/graph.type"
+import { isPublication } from "@/utils/types.utils"
+import { EVarID } from "@/utils/store/variables/variable.types"
+import { titleOf, unitOf } from "./sidebar/variables/utils"
+import { getChartData } from "@/utils/api/api"
 
 //defaults.font.family ='Montserrat'
 
@@ -75,14 +80,17 @@ export default function Graph({}: Props) {
           onClick={() => show(false)}
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
-          {<LineChart />}
+          {active_variables.map((variable, id) => <LineChart key={id} variable = {variable} graphs = {graphs}/>)}
         </div>
       </div>
     </div>
   )
 }
 
-type LineChartProps = {}
+type LineChartProps = {
+  graphs : Graph[]
+  variable : EVarID
+}
 
 enum FormatID {
   png,
@@ -95,18 +103,21 @@ type ToDownload = {
   href: string
   filename: string
 }
-function LineChart(props: LineChartProps) {
+
+function LineChart({graphs, variable}: LineChartProps) {
   const chartRef = useRef<ChartJSOrUndefined<"line", number[], string>>()
   const [download, setDownload] = useState<ToDownload>({
     format: FormatID.png,
     href: chartRef.current ? chartRef.current.toBase64Image() : "",
     filename: "file.png",
   })
-
+  console.log(graphs[0].data.exp?.id);
+  
   const options = {
+    //maintainAspectRatio: false ,
     scales: {
       y: {
-        title: { display: true, text: "Temperature [ °C ]" },
+        title: { display: true, text: `${titleOf(variable)} [ ${unitOf(variable)} ]` },
         // ticks: {
         //   // Include unit in the ticks
         //   callback: function(value : any, index: any, ticks : any) {
@@ -123,7 +134,7 @@ function LineChart(props: LineChartProps) {
       tooltip: {
         enabled: true,
         callbacks: {
-          label: (item: any) => `${item.raw} °C`,
+          label: (item: any) => `${item.raw} ${unitOf(variable)}`,
         },
       },
       legend: {
@@ -132,7 +143,7 @@ function LineChart(props: LineChartProps) {
       },
       title: {
         display: true,
-        text: "Variable Precipitation for experiments ...",
+        text: `Variable ${titleOf(variable)} for experiments ...`,
       },
     },
   }
@@ -144,29 +155,39 @@ function LineChart(props: LineChartProps) {
 
   const data = {
     labels,
-    datasets: [
-      {
-        label: "Present day",
-        data: d1,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-      {
-        label: "Dataset 2",
-        data: d2,
-        borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
-    ],
+    datasets: graphs.map((graph, id) =>{
+      return{
+        label : "",
+        data : getChartData(graph),
+        borderColor : `rgb(255, ${(99 + id )%255}, 132)`,
+        backgroundColor: `rgba(255, ${(99 + id)%255}, 132, 0.5)`,
+      }
+    })
   }
+
+  // datasets: [
+  //   {
+  //     label: "Present day",
+  //     data: d1,
+  //     borderColor: "rgb(255, 99, 132)",
+  //     backgroundColor: "rgba(255, 99, 132, 0.5)",
+  //   },
+  //   {
+  //     label: "Dataset 2",
+  //     data: d2,
+  //     borderColor: "rgb(53, 162, 235)",
+  //     backgroundColor: "rgba(53, 162, 235, 0.5)",
+  //   },
+  // ],
 
   return (
     <div className="p-3">
-      <div className="bg-slate-200">
+      <div className="bg-slate-200  w-[40vw]">
         <Line ref={chartRef} options={options} data={data} />
       </div>
       <div className="flex flex-row justify-between items-center p-2">
-        <h5>source : Valdes et al (2021)</h5>
+        <h5>source : {getGraphTitle(graphs)}
+        </h5>
 
         <div className="flex flex-row items-center gap-2">
           <ButtonFormat
@@ -268,4 +289,13 @@ function toCSV(data: {
 
   // Returning the array joining with new line
   return csvRows.join("\n")
+}
+
+
+function getGraphTitle(graphs : Graph[] ){
+  return (
+    isPublication(graphs[0].data.collection)?
+    `${graphs[0].data.collection.authors_short} (${graphs[0].data.collection.year})`
+    :`${graphs[0].data.exp?.id}`
+  )
 }

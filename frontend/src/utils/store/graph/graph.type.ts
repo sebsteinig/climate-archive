@@ -1,3 +1,4 @@
+import { WorldData } from "../time/time.type";
 
 
 export type Coordinate = {
@@ -10,6 +11,6 @@ export type FormattedCoordinates = {
     f_lon: string;
 }
   
-export type Graph = {
-    
+export type Graph = Coordinate & {
+    data : WorldData
 }
