@@ -1,4 +1,9 @@
-import { TimeController, TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import {
+  TimeController,
+  TimeFrameRef,
+  TimeID,
+  WorldData,
+} from "@/utils/store/time/time.type"
 import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import { Container, ContainerRef } from "./Container"
 import { Collection } from "@/utils/store/collection.store"
@@ -18,7 +23,7 @@ export type PanelProps = {
 
 export type PanelRef = {
   container_ref: RefObject<ContainerRef>
-  controller_ref : RefObject<IControllerRef>
+  controller_ref: RefObject<IControllerRef>
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
@@ -49,10 +54,22 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
         />
       </div>
       <div className="z-10">
-        {data.time.controller === TimeController.monthly &&
-          <MonthlyController ref={controller_ref} time_id={time_id} data={data} current_frame={current_frame} />}
-        {data.time.controller === TimeController.geologic &&
-          <GeoTimeScaleController ref={controller_ref} current_frame={current_frame} data={data} time_id={time_id} />}
+        {data.time.controller === TimeController.monthly && (
+          <MonthlyController
+            ref={controller_ref}
+            time_id={time_id}
+            data={data}
+            current_frame={current_frame}
+          />
+        )}
+        {data.time.controller === TimeController.geologic && (
+          <GeoTimeScaleController
+            ref={controller_ref}
+            current_frame={current_frame}
+            data={data}
+            time_id={time_id}
+          />
+        )}
       </div>
     </div>
   )

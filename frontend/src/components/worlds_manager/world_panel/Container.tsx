@@ -22,6 +22,9 @@ import { Collection } from "@/utils/store/collection.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { ContainerConf } from "./ContainerConf"
 import { SceneRef } from "./Scene"
+import ButtonSecondary from "@/components/buttons/ButtonSecondary"
+import { Coordinate } from "@/utils/store/graph/graph.type"
+import { formatCoordinates } from "@/utils/store/graph/graph.utils"
 
 type Props = {
   className?: string
@@ -35,6 +38,7 @@ type Props = {
 
 export type ContainerRef = {
   track: MutableRefObject<HTMLDivElement>
+  showClickPanel : (data:WorldData,coordinate : Coordinate) => void
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
@@ -69,11 +73,14 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     useImperativeHandle(ref, () => {
       return {
         track: div_ref,
+        showClickPanel(data, {lat,lon}) {
+            setPopupData({data,coordinate:{lat,lon}})
+        },
       }
     })
 
     const frame = current_frame.current.get(time_id)
-
+    const [popup_data,setPopupData] = useState<{data:WorldData,coordinate:Coordinate}|undefined>(undefined)
     return (
       <div
         className={`relative overflow-hidden w-full h-full ${className ?? ""}`}
@@ -82,7 +89,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         {children}
 
         {data.collection && isPublication(data.collection) && (
-          <p className="absolute bottom-0 left-0 italic m-4 text-slate-400 text-sm">
+          <p className="absolute bottom-0 left-0 select-none italic m-4 text-slate-400 text-sm">
             {data.collection.authors_short}, {data.collection.year}
           </p>
         )}
@@ -118,6 +125,19 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             </Select>
           )}
         </div>
+        {
+          popup_data && (
+            <div className="absolute z-20 bottom-0 m-5 left-1/2 -translate-x-1/2">
+              <Popup
+                close={() => {
+                  setPopupData(undefined)
+                }} 
+                data={popup_data.data}
+                coordinate={popup_data.coordinate}
+                />
+            </div>
+          )
+        }
 
         <ContainerConf
           className="absolute bottom-0 right-0 m-2 "
@@ -131,3 +151,52 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     )
   },
 )
+
+type PopupProps = {
+  data : WorldData
+  coordinate : Coordinate
+  close : () => void
+}
+
+function Popup({data,coordinate,close}:PopupProps) {
+  let id_label :{
+    id: string;
+    label: string;
+  } | undefined = undefined
+  id_label = useMemo(() =>{
+    if(data.exp) {
+      return getTitleOfExp(data.exp)
+    }
+  }, [data.exp])
+  
+  const {f_lat,f_lon} = formatCoordinates(coordinate)
+  const add = useClusterStore(state => state.graph.add)
+  return (
+    <div className="p-5 flex flex-row rounded-lg items-center text-slate-900 bg-slate-200 shadow-md shadow-slate-900">
+      <CrossIcon
+        className="grow-0 w-10 h-10 mr-5 cursor-pointer text-slate-800 hover:tex-slate-700"
+        onClick={() => {
+          close()
+        }}
+      />
+      <div className="grow flex flex-col pr-5">
+        <div className="italic">
+          {isPublication(data.collection) && `${data.collection.authors_short} (${data.collection.year})`}
+        </div>
+        <div className="flex flex-row justify-between">
+          <div className="mr-5">Location : {f_lat} / {f_lon}</div>
+          {id_label && <div>{id_label.id} | {id_label.label}</div>}
+        </div>
+      </div>
+      <ButtonSecondary 
+        className="small-caps shadow-md shadow-slate-800" 
+        onClick={() => {
+          add({lat : coordinate.lat, lon:coordinate.lon, data : data, id_label : id_label})
+          close()
+        }}
+      >plot
+      </ButtonSecondary>
+    </div>
+  )
+}
+

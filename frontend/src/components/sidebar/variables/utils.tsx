@@ -25,7 +25,7 @@ type Props = VariableProps & {
   title: EVarID
 }
 
-function titleOf(name: EVarID) {
+export function titleOf(name: EVarID) {
   switch (name) {
     case EVarID.currents:
       return "Currents"
@@ -43,6 +43,26 @@ function titleOf(name: EVarID) {
       return ""
   }
 }
+
+export function unitOf(name: EVarID) {
+  switch (name) {
+    case EVarID.currents:
+      return ""
+    case EVarID.pr:
+      return "mm/day"
+    case EVarID.height:
+      return ""
+    case EVarID.winds:
+      return ""
+    case EVarID.tos:
+      return "°C"
+    case EVarID.pfts:
+      return ""
+    default:
+      return ""
+  }
+}
+
 
 function IconOf({
   name,

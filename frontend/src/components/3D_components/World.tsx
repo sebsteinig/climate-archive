@@ -1,42 +1,35 @@
 "use client"
-import { useFrame } from "@react-three/fiber"
-import { useControls } from "leva"
+import { useFrame, useThree } from "@react-three/fiber"
 import { Perf } from "r3f-perf"
-import { useRef, forwardRef, RefObject } from "react"
+import { useRef} from "react"
 
 import * as THREE from "three"
-import { Title } from "./Title"
 import Lights from "./Lights"
-import Controls from "./Controls"
-import { Plane } from "./Plane"
-import { Surface } from "./Surface"
-import { ATM_2D, ATM_2D_Ref } from "./ATM_2D"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
-import { useClusterStore } from "@/utils/store/cluster.store"
 import { EVarID } from "@/utils/store/variables/variable.types"
-import { TextureInfo } from "@/utils/database/database.types"
-import { TickFn } from "../time_provider/tick"
+import { TickFn } from "../worlds_manager/tick"
+import { Coordinate } from "@/utils/store/graph/graph.type"
 
 type Props = {
   tick: TickFn
+  onClick : (coordinate:Coordinate) => void
 }
 
-export function World({ tick }: Props) {
+export function World({ tick , onClick }: Props) {
   console.log("creating World component")
 
   const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
-
   useFrame((state, delta) => {
     tick(delta).then((res) => {
       //console.log(res.update_texture);
-      if (atmosphere_layer_ref.current) {
-        atmosphere_layer_ref.current.tick(res.weight, res.uSphereWrapAmount)
-      }
+      atmosphere_layer_ref.current?.tick(res.weight, res.uSphereWrapAmount)
+      
+      if (res.variables.size === 0) return;
       for (let [variable, data] of res.variables) {
         switch (variable) {
           case EVarID.pr: {
-            if (atmosphere_layer_ref.current && res.update_texture) {
-              atmosphere_layer_ref.current.updateTextures(data)
+            if (res.update_texture) {
+              atmosphere_layer_ref.current?.updateTextures(data)
             }
             break
           }
@@ -55,7 +48,40 @@ export function World({ tick }: Props) {
       {/* <ATM_2D ref={atm2DRef} /> */}
       <AtmosphereLayer ref={atmosphere_layer_ref} />
 
+      <OuterSphere onClick={onClick}/>
       <Perf position="bottom-right" />
     </>
   )
+}
+
+
+type OuterSphereRef = THREE.Mesh<THREE.BufferGeometry<THREE.NormalBufferAttributes>>;
+type OuterSphereProps = {
+  onClick : (coordinate:Coordinate) => void
+}
+
+function OuterSphere({onClick}:OuterSphereProps) {
+  const outer_spher_ref = useRef<OuterSphereRef>(null)
+  const {camera,raycaster,mouse} = useThree()
+
+  return (
+    <mesh ref={outer_spher_ref} onDoubleClick={(e) => {
+      raycaster.setFromCamera(mouse, camera);
+      
+      const intersects = raycaster.intersectObject(outer_spher_ref.current!);
+
+      if (intersects.length > 0) {
+        const intersect = intersects[0];
+        if(intersect.uv) {
+          const lon = intersect.uv.x * 360. - 180.
+          const lat = intersect.uv.y * 180. - 90.
+        
+          onClick({lat,lon})
+        }
+    }}
+    }>
+      <sphereGeometry args={[1.1, 64, 32]} />
+      <meshStandardMaterial visible={false} />
+    </mesh>
+  )   
 }

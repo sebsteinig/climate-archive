@@ -237,13 +237,10 @@ function PinBtn(params: PinBtnProps) {
   )
 }
 
-
 type AnchorBtnProps = {}
 
 function AnchorBtn(params: PinBtnProps) {
   return (
-    <AnchorIcon
-      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 `}
-    />
+    <AnchorIcon className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 `} />
   )
 }

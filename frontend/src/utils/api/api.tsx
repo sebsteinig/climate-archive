@@ -9,6 +9,8 @@ import {
   SelectCollectionResult,
 } from "./api.types"
 import { Publication } from "../types"
+import { Graph } from "../store/graph/graph.type"
+import { EVarID } from "../store/variables/variable.types"
 
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
@@ -149,4 +151,31 @@ export async function getJournals() {
   let data = await axios.get(url.href)
   let journals = data.data.map((e: { journal: string }) => e.journal)
   return journals as string[]
+}
+
+export async function getChartData(graph : Graph, variable : EVarID){
+  //let url = new URL("")
+  //let data = await axios.get(url.href)
+  let data = mockData()
+  return data
+}
+
+function mockData(){
+  
+const labels = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+]
+
+  return labels.map((_n: string, i: number) => Math.random() * 25)
 }

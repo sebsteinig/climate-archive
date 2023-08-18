@@ -1,7 +1,7 @@
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { CanvasRef } from "./useCanvas"
-import { PanelRef } from "./time_panel/Panel"
+import { PanelRef } from "./world_panel/Panel"
 import { MutableRefObject, RefObject } from "react"
 import { update } from "@/utils/store/time/time.utils"
 import { TextureInfo } from "@/utils/database/database.types"

@@ -1,5 +1,5 @@
 "use client"
-import { TimeProvider } from "./time_provider/WorldsManager"
+import { WorldManager } from "./worlds_manager/WorldsManager"
 import SideBar from "./sidebar/SideBar"
 import { useClusterStore } from "@/utils/store/cluster.store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -7,11 +7,12 @@ import { useEffect, useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
-import { ViewCollection } from "./ViewCollection"
 import { usePathname } from "next/navigation"
 import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
+import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
+import { CollectionView } from "./CollectionView"
 
 type Props = {}
 
@@ -36,9 +37,8 @@ export default function ClientMain({}: Props) {
   // }, [])
   const [search_bar_visible, displaySearchBar] = useState(false)
   const [collection, setCollection] = useState<Collection | undefined>()
-  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
-    undefined,
-  )
+  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(undefined)
+
   return (
     <>
       <div className="flex flex-row w-full h-full gap-5">
@@ -84,14 +84,14 @@ export default function ClientMain({}: Props) {
           <div className="overflow-y-auto flex-grow ">
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>
-                <TimeProvider
+                <WorldManager
                   displayCollection={(collection) => {
                     setCollection(collection)
                   }}
                 />
               </div>
               {collection && (
-                <ViewCollection
+                <CollectionView
                   onClose={{ fn: () => setCollection(undefined) }}
                   onReturn={onReturn}
                   collection={collection}
@@ -100,6 +100,7 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
+        <Graph /> 
       </div>
     </>
   )
