@@ -163,9 +163,12 @@ function Popup({data,coordinate,close}:PopupProps) {
     id: string;
     label: string;
   } | undefined = undefined
-  if(data.exp) {
-    id_label = getTitleOfExp(data.exp)
-  }
+  id_label = useMemo(() =>{
+    if(data.exp) {
+      return getTitleOfExp(data.exp)
+    }
+  }, [data.exp])
+  
   const {f_lat,f_lon} = formatCoordinates(coordinate)
   const add = useClusterStore(state => state.graph.add)
   return (
@@ -188,7 +191,7 @@ function Popup({data,coordinate,close}:PopupProps) {
       <ButtonSecondary 
         className="small-caps shadow-md shadow-slate-800" 
         onClick={() => {
-          add({lat : coordinate.lat, lon:coordinate.lon, data : data})
+          add({lat : coordinate.lat, lon:coordinate.lon, data : data, id_label : id_label})
           close()
         }}
       >plot

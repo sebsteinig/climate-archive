@@ -10,6 +10,7 @@ import {
 } from "./api.types"
 import { Publication } from "../types"
 import { Graph } from "../store/graph/graph.type"
+import { EVarID } from "../store/variables/variable.types"
 
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
@@ -152,8 +153,8 @@ export async function getJournals() {
   return journals as string[]
 }
 
-export async function getChartData(graph : Graph){
-  let url = new URL("")
+export async function getChartData(graph : Graph, variable : EVarID){
+  //let url = new URL("")
   //let data = await axios.get(url.href)
   let data = mockData()
   return data
@@ -176,5 +177,5 @@ const labels = [
   "December",
 ]
 
-  return labels.map((_n: string, i: number) => Math.random() * 2)
+  return labels.map((_n: string, i: number) => Math.random() * 25)
 }

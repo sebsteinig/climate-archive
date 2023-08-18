@@ -11,6 +11,12 @@ export type FormattedCoordinates = {
     f_lon: string;
 }
   
-export type Graph = Coordinate & {
+
+export type GraphInfo = Coordinate &{
     data : WorldData
+    id_label : {id: string, label: string} | undefined
+}
+
+export type Graph = GraphInfo & {
+    color : string
 }

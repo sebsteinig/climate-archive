@@ -1,6 +1,8 @@
 
 import { StateCreator } from "zustand"
-import { Graph } from "./graph.type"
+import { Graph, GraphInfo } from "./graph.type"
+import { Color } from "three"
+
 
 
 export interface GraphSlice {
@@ -8,7 +10,7 @@ export interface GraphSlice {
         graphs : Graph[]
         visible : boolean
         show : (visibility : boolean) => void
-        add : (graph:Graph) => void
+        add : (x:GraphInfo) => void
         remove : (idx:number) => void
         clear : () => void
     }
@@ -29,9 +31,20 @@ GraphSlice,
                 state.graph.visible = visibility
             })
         },
-        add(graph) {
+        add(graph_info) {
             set(state => {
                 state.graph.visible = true
+                const rgb = new Color()
+                rgb.setRGB( Math.random(), Math.random()*0.8, Math.random()*0.3)
+                
+                let graph : Graph = {
+                    lat : graph_info.lat,
+                    lon : graph_info.lon,
+                    data : graph_info.data,
+                    id_label : graph_info.id_label,
+                    color : `#${rgb.getHexString()}`
+                }
+                
                 state.graph.graphs.push(graph)
             })
         },
