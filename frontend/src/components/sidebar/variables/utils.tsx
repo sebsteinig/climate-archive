@@ -128,6 +128,7 @@ export function Variable({
              ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]"
              : ""
          }`}
+        onClick={() => (current_variable_controls != title)?? activate(title)}
     >
       <div className="grow-0">
         <IconOf

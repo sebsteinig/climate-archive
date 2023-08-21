@@ -42,21 +42,21 @@ export default function ClientMain({}: Props) {
   return (
     <>
       <div className="flex flex-row w-full h-full gap-5">
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col justify-between gap-5 h-full">
           <div className="grow-0 ">
             <SearchButton
               search_bar_visible={search_bar_visible}
               displaySearchBar={displaySearchBar}
             />
           </div>
-          <div className="flex-grow flex relative">
-            <div className=" h-full flex  items-center absolute">
+          <div className="flex-grow flex relative h-full">
+            <div className="absolute top-0  h-[90%] flex items-center z-40">
               <SideBar journals={<></>} />
             </div>
-            <div className="absolute bottom-5 flex flex-col gap-5">
-              <HelpButton />
-              <HomeButton />
-            </div>
+          </div>
+          <div className="flex flex-col gap-5">
+            <HelpButton />
+            <HomeButton />
           </div>
         </div>
         <div className="flex-grow flex flex-col">
