@@ -25,6 +25,8 @@ import { SceneRef } from "./Scene"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import { Coordinate } from "@/utils/store/graph/graph.type"
 import { formatCoordinates } from "@/utils/store/graph/graph.utils"
+import { ControllerRef, TimeController } from "../time_controllers/utils/TimeController"
+import { IControllerRef } from "../time_controllers/controller.types"
 
 type Props = {
   className?: string
@@ -39,6 +41,7 @@ type Props = {
 export type ContainerRef = {
   track: MutableRefObject<HTMLDivElement>
   showClickPanel : (data:WorldData,coordinate : Coordinate) => void
+  controller : ControllerRef,
 }
 
 export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
@@ -69,6 +72,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     }, [stored_active_variables])
 
     const div_ref = useRef<HTMLDivElement>(null!)
+    const controller_ref = useRef<ControllerRef>(null)
 
     useImperativeHandle(ref, () => {
       return {
@@ -76,6 +80,7 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
         showClickPanel(data, {lat,lon}) {
             setPopupData({data,coordinate:{lat,lon}})
         },
+        controller : controller_ref.current!
       }
     })
 
@@ -83,27 +88,21 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
     const [popup_data,setPopupData] = useState<{data:WorldData,coordinate:Coordinate}|undefined>(undefined)
     return (
       <div
-        className={`relative overflow-hidden w-full h-full ${className ?? ""}`}
+        className={`flex flex-col justify-between select-none  p-5 overflow-hidden w-full h-full ${className ?? ""}`}
         ref={div_ref}
       >
         {children}
-
-        {data.collection && isPublication(data.collection) && (
-          <p className="absolute bottom-0 left-0 select-none italic m-4 text-slate-400 text-sm">
-            {data.collection.authors_short}, {data.collection.year}
-          </p>
-        )}
-        <div className="absolute top-0 left-0 flex m-2">
+        <div className="flex flex-row">
           <CrossIcon
-            className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
-            onClick={() => {
-              current_frame.current.map.delete(time_id)
-              remove(time_id)
-            }}
-          />
+              className="w-10 h-10 cursor-pointer text-slate-400 hover:tex-slate-300"
+              onClick={() => {
+                current_frame.current.map.delete(time_id)
+                remove(time_id)
+              }}
+            />
           {data.time.mode === TimeMode.ts && (
             <Select
-              className="ml-5"
+              className="ml-5 w-fit"
               defaultValue={data.exp?.id}
               onChange={(e) => {
                 const idx = e.target.selectedIndex
@@ -125,28 +124,45 @@ export const Container = forwardRef<ContainerRef, PropsWithChildren<Props>>(
             </Select>
           )}
         </div>
-        {
-          popup_data && (
-            <div className="absolute z-20 bottom-0 m-5 left-1/2 -translate-x-1/2">
-              <Popup
-                close={() => {
-                  setPopupData(undefined)
-                }} 
-                data={popup_data.data}
-                coordinate={popup_data.coordinate}
-                />
+        <div>
+          <div className="flex flex-row ">
+            <div className="grow flex flex-col justify-end">
+              {
+                popup_data && (
+                  <div className="w-1/2 m-5 self-center">
+                    <Popup
+                      close={() => {
+                        setPopupData(undefined)
+                      }} 
+                      data={popup_data.data}
+                      coordinate={popup_data.coordinate}
+                      />
+                  </div>
+                )
+              }
+              <TimeController
+                current_frame={current_frame}
+                time_id={time_id}
+                data={data}
+                ref={controller_ref}
+              />
+              {data.collection && isPublication(data.collection) && (
+                <p className="select-none italic text-slate-400 text-sm">
+                  {data.collection.authors_short}, {data.collection.year}
+                </p>
+              )}
             </div>
-          )
-        }
+            <ContainerConf
+                className=""
+                data={data}
+                current_frame={current_frame}
+                displayCollection={displayCollection}
+                time_id={time_id}
+                scene_ref={scene_ref}
+              />
+          </div>
 
-        <ContainerConf
-          className="absolute bottom-0 right-0 m-2 "
-          data={data}
-          current_frame={current_frame}
-          displayCollection={displayCollection}
-          time_id={time_id}
-          scene_ref={scene_ref}
-        />
+        </div>
       </div>
     )
   },

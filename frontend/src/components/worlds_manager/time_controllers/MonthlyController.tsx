@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from "react"
+import { RefObject, forwardRef, useImperativeHandle, useRef, useState } from "react"
 import { ControllerRef, TimeController } from "./utils/TimeController"
 import { IControllerRef } from "./controller.types"
 import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
@@ -9,13 +9,14 @@ type MonthlyControllerProps = {
   data: WorldData
   current_frame: TimeFrameRef
   time_id: TimeID
+  controller_ref : ControllerRef | undefined
 }
 
 export const MonthlyController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
->(function MonthlyController({ current_frame, time_id, data }, ref) {
-  const controller_ref = useRef<ControllerRef>(null)
+>(function MonthlyController({ current_frame, time_id, controller_ref,}, ref) {
+  
   const progress_bar_ref = useRef<ProgessBarRef>(null)
   const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
     undefined,
@@ -24,7 +25,7 @@ export const MonthlyController = forwardRef<
   useImperativeHandle(ref, () => {
     return {
       onChange(frame) {
-        controller_ref.current?.onChange(frame)
+        
       },
       onWeightUpdate(frame) {
         progress_bar_ref.current?.update(frame.weight / (frame.timesteps ?? 12))
@@ -33,12 +34,6 @@ export const MonthlyController = forwardRef<
   })
   return (
     <div className="w-full pt-5 px-5">
-      <TimeController
-        current_frame={current_frame}
-        time_id={time_id}
-        data={data}
-        ref={controller_ref}
-      />
       <div className="w-full my-2">
         <ProgressBar ref={progress_bar_ref} />
       </div>
@@ -78,7 +73,7 @@ export const MonthlyController = forwardRef<
                     return idx
                   })
                 }
-                controller_ref.current?.pause()
+                controller_ref?.pause()
                 goto(frame, idx)
               }}
             />

@@ -129,7 +129,7 @@ function DupBtn({ time_id, current_frame }: DupBtnProps) {
 
   return (
     <DuplicateIcon
-      className="w-10 h-10   cursor-pointer p-2 text-slate-400 child:fill-slate-400"
+      className="cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400 "
       onClick={() => {
         dup(time_id)
       }}

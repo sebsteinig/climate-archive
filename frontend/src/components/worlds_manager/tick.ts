@@ -71,6 +71,7 @@ export function tickBuilder(
           }
         }
         panel_ref.current?.controller_ref.current?.onChange(frame)
+        panel_ref.current?.container_ref.current?.controller.onChange(frame)
         frame.swapping = false
         frame.swap_flag = false
       }

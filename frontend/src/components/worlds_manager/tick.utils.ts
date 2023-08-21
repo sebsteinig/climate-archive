@@ -168,6 +168,7 @@ export async function compute(
   canvas: CanvasRef,
   world_data: WorldData,
 ): Promise<TickData | undefined> {
+  
   const paths = getPath(world_data.time.mode, data, 0)
   if (
     !canvas.current ||
@@ -176,6 +177,7 @@ export async function compute(
   ) {
     return
   }
+  
   let current_frame: number
   let next_frame: number
   let current_info: TextureInfo
