@@ -53,6 +53,7 @@ type Props = {
 
 export type AtmosphereLayerRef = {
   type: RefObject<SphereType>
+  cleanTextures : () => void
   updateTextures: (data: TickData) => void
   tick: (weight: number, uSphereWrapAmount: number) => void
 }
@@ -133,11 +134,16 @@ const AtmosphereLayer = memo(
       //materialRef.current.uniforms.colorMap.value =  ???? `public/assets/colormaps/${prRef.current?.colormap ?? "ipccPrecip.png"}`
     }
 
+    function cleanTextures() {
+      materialRef.current.uniforms.thisDataFrame.value = null
+      materialRef.current.uniforms.nextDataFrame.value = null
+    }
     useImperativeHandle(ref, () => {
       return {
         type: atmosphere_layer_ref,
         tick,
         updateTextures,
+        cleanTextures,
       }
     })
     return (

@@ -42,7 +42,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="grow border-2 border-slate-900 rounded-md">
+      <div className="grow border-2 border-slate-950 rounded-lg overflow-hidden">
         <Container
           displayCollection={displayCollection}
           current_frame={current_frame}

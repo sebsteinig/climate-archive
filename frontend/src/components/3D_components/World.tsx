@@ -6,7 +6,7 @@ import { useRef} from "react"
 import * as THREE from "three"
 import Lights from "./Lights"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
-import { EVarID } from "@/utils/store/variables/variable.types"
+import { ALL_VARIABLES, EVarID } from "@/utils/store/variables/variable.types"
 import { TickFn } from "../worlds_manager/tick"
 import { Coordinate } from "@/utils/store/graph/graph.type"
 
@@ -21,17 +21,29 @@ export function World({ tick , onClick }: Props) {
   const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
   useFrame((state, delta) => {
     tick(delta).then((res) => {
+      
       //console.log(res.update_texture);
       atmosphere_layer_ref.current?.tick(res.weight, res.uSphereWrapAmount)
       
-      if (res.variables.size === 0) return;
-      for (let [variable, data] of res.variables) {
-        switch (variable) {
-          case EVarID.pr: {
-            if (res.update_texture) {
-              atmosphere_layer_ref.current?.updateTextures(data)
+      //if (res.variables.size === 0) return;
+      if (res.update_texture) {
+        for(let variable of ALL_VARIABLES) {
+          if(!res.variables.has(variable)) {
+            switch (variable) {
+              case EVarID.pr: {
+                  atmosphere_layer_ref.current?.cleanTextures()
+                }
+                break
             }
-            break
+          }
+        }
+
+        for (let [variable, data] of res.variables) {
+          switch (variable) {
+            case EVarID.pr: {
+                atmosphere_layer_ref.current?.updateTextures(data)
+              }
+              break
           }
         }
       }
