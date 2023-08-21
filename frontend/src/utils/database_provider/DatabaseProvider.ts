@@ -65,15 +65,23 @@ class DatabaseProvider {
     )
   }
 
-  private async _loadFromSingleResult(res: SelectSingleResult) {
+  private async _loadFromSingleResult(res: SelectSingleResult,only_mean?:boolean) {
     const info: TextureInfo = {
       ...res,
       variable: res.variable_name,
       /** TODO : resolutions */
     }
 
-    await this._loadPaths(info.paths_ts.paths, info)
-    await this._loadPaths(info.paths_mean.paths, info)
+    if(!only_mean) {
+      await this._loadPaths(info.paths_ts.paths, info)
+    }
+    // TODO : REVERT WHEN NIMBUS BUGS IS FIXED
+    // await this._loadPaths(info.paths_mean.paths, info)
+    await this._loadPaths(info.paths_mean.paths.map(({grid}) => {
+      return {
+        grid : grid.map((arr) => arr.map(e => e.replaceAll(".ts.", ".avg.")))
+      }
+    }), info)
 
     try {
       const is_already = await this.database.textures_info.get([
@@ -102,7 +110,7 @@ class DatabaseProvider {
       ts: leaf_ts,
     }
   }
-  async load(requested_texture: RequestTexture) {
+  async load(requested_texture: RequestTexture, only_mean?:boolean) {
     const texture_infos = await this.database.textures_info
       .where("exp_id")
       .equals(requested_texture.exp_id)
@@ -118,12 +126,12 @@ class DatabaseProvider {
     })
     return Promise.all(
       response.map(async (res) => {
-        return this._loadFromSingleResult(res)
+        return this._loadFromSingleResult(res,only_mean)
       }),
     )
   }
 
-  async loadAll(requested_textures: RequestMultipleTexture) {
+  async loadAll(requested_textures: RequestMultipleTexture, only_mean?:boolean) {
     const response = await selectAll({
       vars: requested_textures.variables,
       ids: requested_textures.exp_ids,
@@ -139,7 +147,7 @@ class DatabaseProvider {
         const [_, single_result_arr] = tmp
         const res = await Promise.all(
           single_result_arr.map(async (res) => {
-            return this._loadFromSingleResult(res)
+            return this._loadFromSingleResult(res,only_mean)
           }),
         )
 

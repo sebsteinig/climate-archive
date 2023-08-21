@@ -40,7 +40,7 @@ export default function PaleoClimatePage() {
         await database_provider.loadAll({
           exp_ids: publication.exps.map((exp) => exp.id),
           extension: "webp",
-        })
+        },true)
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
         return publication
