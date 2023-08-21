@@ -164,6 +164,12 @@ export async function update(
   active_variables: EVarID[],
   data: WorldData,
 ) {
+  // clean the frame of unused variables
+  for(let variable of frame.variables.keys()) {
+    if(!active_variables.includes(variable)) {
+      frame.variables.delete(variable)
+    }
+  }
   const current_time = Math.floor(frame.weight)
   let next_time = current_time + 1
   for (let variable of active_variables) {

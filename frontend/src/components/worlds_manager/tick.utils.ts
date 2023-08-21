@@ -39,7 +39,18 @@ export function getPath(
     return res
   } else {
     return data.ts!.info.paths_ts.paths.map((path) => {
-      const paths = path.grid[vertical]
+      let paths : string[];
+      if(path.grid.length > vertical) {
+        paths = path.grid[vertical]
+      }else {
+        paths = path.grid[0]
+      }
+      if (paths.length === 1) {
+        return {
+          current_path: paths[0],
+          next_path: paths[0],
+        }
+      }
       return {
         current_path: paths[data.ts!.current.time_chunk],
         next_path: paths[data.ts!.next.time_chunk],
@@ -109,7 +120,9 @@ function processInfo(
       const average = sum / matrix[z].length
       return average
     } else {
-      return parseFloat(matrix[z][t].min)
+        const _z = matrix.length > z ? z : 0
+        const _t = matrix[_z].length > t ? t : 0
+        return parseFloat(matrix[_z][_t].min)
     }
   })
   const max = bound_matrices.map((matrix) => {
@@ -118,7 +131,9 @@ function processInfo(
       const average = sum / matrix[z].length
       return average
     } else {
-      return parseFloat(matrix[z][t].max)
+      const _z = matrix.length > z ? z : 0
+      const _t = matrix[_z].length > t ? t : 0
+      return parseFloat(matrix[_z][_t].max)
     }
   })
   return {
@@ -170,6 +185,7 @@ export async function compute(
 ): Promise<TickData | undefined> {
   
   const paths = getPath(world_data.time.mode, data, 0)
+  
   if (
     !canvas.current ||
     !canvas.current.current.ctx ||

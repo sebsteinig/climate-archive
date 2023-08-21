@@ -19,7 +19,6 @@ import {
   TimeID,
   TimeKind,
   TimeMode,
-  TimeState,
   WorldData,
 } from "@/utils/store/time/time.type"
 import { useClusterStore } from "@/utils/store/cluster.store"
@@ -44,6 +43,22 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const time_title_ref = useRef<HTMLDivElement>(null)
     const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
+
+    const stored_active_variables = useClusterStore(
+      (state) => state.active_variables,
+    )
+    const active_variables = useMemo(() => {
+      let actives = []
+      for (let [key, active] of stored_active_variables.entries()) {
+        if (active) actives.push(key)
+      }
+      return actives
+    }, [stored_active_variables])
+
+    useEffect(() => {
+      pause(tween_ref, setPlaying)
+    },[active_variables])
+
     useImperativeHandle(ref, () => {
       return {
         play() {
@@ -52,7 +67,9 @@ export const TimeController = forwardRef<ControllerRef, Props>(
         pause() {
           pause(tween_ref, setPlaying)
         },
-        stop() {},
+        stop() {
+          stop(data, time_id, current_frame, tween_ref, setPlaying)
+        },
         onChange: (frame: TimeFrame) => {
           let id: string
           let label: string
@@ -114,13 +131,17 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             <Play
               className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
-                play(data, time_id, current_frame, tween_ref, setPlaying)
+                if(active_variables.length > 0) {
+                  play(data, time_id, current_frame, tween_ref, setPlaying)
+                }
               }}
             />
           )}
           <Stop
             className={`cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`}
-            onClick={() => {}}
+            onClick={() => {
+              stop(data, time_id, current_frame, tween_ref, setPlaying)
+            }}
           />
         </div>
         <div className="flex-grow"></div>
@@ -136,7 +157,20 @@ function pause(
   tween_ref.current?.kill()
   setPlaying(false)
 }
-
+function stop(
+  data: WorldData,
+  time_id: TimeID,
+  current_frame: TimeFrameRef,
+  tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
+  setPlaying: Dispatch<SetStateAction<boolean>>,
+) {
+  const frame = current_frame.current.get(time_id)
+  if (!frame) return
+  frame.weight = 0
+  frame.swap_flag = true
+  tween_ref.current?.kill()
+  setPlaying(false)
+}
 function play(
   data: WorldData,
   time_id: TimeID,

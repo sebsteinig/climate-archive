@@ -37,10 +37,15 @@ export function useFrameRef() {
       }
       const max_ts = await getMaxTimesteps(frame)
       frame.timesteps = max_ts
-      const variables = new Map()
-      for (let variable of active_variables) {
-        variables.set(variable, await sync(frame, variable, world_data))
+      for(let variable of frame.variables.keys()) {
+        if(!active_variables.includes(variable)) {
+          frame.variables.delete(variable)
+        }
       }
+      for (let variable of active_variables) {
+        frame.variables.set(variable, await sync(frame, variable, world_data))
+      }
+      
       current_frame.current.update(frame, time_id)
     },
   })

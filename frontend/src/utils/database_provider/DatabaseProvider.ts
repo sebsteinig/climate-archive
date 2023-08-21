@@ -196,9 +196,11 @@ class DatabaseProvider {
   }
 
   async getTexture(path: string) {
+    if(!path) throw Error("undefinied path")
     let texture = this.cache.get(path)
     if (!texture) {
       texture = await this.database.textures.get({ path: path })
+      
       this.cache.set(path, texture)
     }
     if (!texture) {
