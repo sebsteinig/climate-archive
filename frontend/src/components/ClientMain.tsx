@@ -43,14 +43,14 @@ export default function ClientMain({}: Props) {
     <>
       <div className="flex flex-row w-full h-full gap-5">
         <div className="flex flex-col justify-between gap-5 h-full">
-          <div className="grow-0 ">
+          <div className="grow-0">
             <SearchButton
               search_bar_visible={search_bar_visible}
               displaySearchBar={displaySearchBar}
             />
           </div>
-          <div className="flex-grow flex relative h-full">
-            <div className="absolute top-0  h-[90%] flex items-center z-40">
+          <div className=" relative basis-[61%]">
+            <div className="absolute top-0  h-full flex items-center z-40">
               <SideBar journals={<></>} />
             </div>
           </div>
