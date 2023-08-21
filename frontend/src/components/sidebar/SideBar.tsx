@@ -11,17 +11,13 @@ type Props = {
 }
 
 export default function SideBar({ journals }: Props) {
-  const [search_bar_visible, setSearchBarVisible] = useState(false)
-  const [current_data_details, setCurrentDataDetails] = useState(false)
+  
   const [current_variable_controls, setCurrentVariableControls] =
     useState<EVarID>()
   return (
-    <div>
-      <Variables
-        setCurrentDataDetails={setCurrentDataDetails}
-        current_variable_controls={current_variable_controls}
-        setCurrentVariableControls={setCurrentVariableControls}
-      />
-    </div>
+    <Variables
+      current_variable_controls={current_variable_controls}
+      setCurrentVariableControls={(e : EVarID) => setCurrentVariableControls(e)}
+    />
   )
 }

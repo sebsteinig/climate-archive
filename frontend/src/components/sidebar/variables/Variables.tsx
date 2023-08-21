@@ -14,17 +14,15 @@ import { Winds } from "./supported/winds"
 
 type Props = {
   current_variable_controls: EVarID | undefined
-  setCurrentVariableControls: Function
-  setCurrentDataDetails: Function
+  setCurrentVariableControls: ( e : EVarID )=> void
 }
 
 export function Variables({
   current_variable_controls,
   setCurrentVariableControls,
-  setCurrentDataDetails,
 }: Props) {
   return (
-    <div className="h-2/3" onMouseOver={() => setCurrentDataDetails(false)}>
+    <div className="h-full">
       <div className="overflow-y-auto overflow-x-hidden max-h-full">
         <div className="flex flex-col gap-5">
           <Winds
