@@ -11,19 +11,18 @@ type MonthlyControllerProps = {
   data: WorldData
   current_frame: TimeFrameRef
   time_id: TimeID
+  controller_ref : ControllerRef | undefined
 }
 
 export const GeoTimeScaleController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
->(function GeoTimeScaleController({ current_frame, time_id, data }, ref) {
-  const controller_ref = useRef<ControllerRef>(null)
+>(function GeoTimeScaleController({ current_frame, time_id, data, controller_ref }, ref) {
   const progress_bar_ref = useRef<ProgessBarRef>(null)
   const [tree, exp_span_tree] = useGeologicTree()
   useImperativeHandle(ref, () => {
     return {
       onChange(frame) {
-        controller_ref.current?.onChange(frame)
         const age =
           exp_span_tree.binder.get(Math.floor(frame.weight))?.high ?? 0
         progress_bar_ref.current?.update(
@@ -38,12 +37,6 @@ export const GeoTimeScaleController = forwardRef<
   })
   return (
     <div className="w-full pt-5 px-5">
-      <TimeController
-        current_frame={current_frame}
-        time_id={time_id}
-        data={data}
-        ref={controller_ref}
-      />
       <div className="w-full my-2">
         <ProgressBar ref={progress_bar_ref} />
       </div>
@@ -51,6 +44,7 @@ export const GeoTimeScaleController = forwardRef<
         onChange={(idx, exp_id) => {
           const frame = current_frame.current.get(time_id)
           if (!frame) return
+          controller_ref?.pause()
           goto(frame, idx, () => {})
         }}
       />
