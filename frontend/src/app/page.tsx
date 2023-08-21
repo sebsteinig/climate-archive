@@ -37,7 +37,7 @@ export default function Home() {
   return (
     <main id="root" className="w-full h-full">
       {/* <ClientMain /> */}
-      <div className="flex flex-col w-full h-full gap-5">
+      <div className="w-full h-full flex flex-col gap-5">
         <nav className="flex flex-row justify-between">
           <SearchButtonComplete />
 
@@ -52,7 +52,7 @@ export default function Home() {
               <h2 className="text-slate-300 tracking-[.5em] small-caps">
                 paleoclimate
               </h2>
-              <div className="">
+              <div className=" w-1/2">
                 <Image
                   width={499}
                   height={466}
@@ -77,8 +77,8 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col gap-5">
-            <div className="grow grid grid-rows-2 gap-5">
-              <div className="w-full">
+            <div className="grow flex flex-col gap-5 ">
+              <div className="grow w-full">
                 <div className="border-l-4 border-sky-500 bg-slate-900 w-full p-5">
                   <h2 className="text-slate-300 tracking-[.5em] small-caps">
                     prediction
@@ -104,12 +104,12 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              {/* <div className="border-2 border-blue-500">
+              {/* <div className=" border-blue-500">
 
               </div> */}
-              <div className="">
+              <div className="grow">
                 <div className="p-5 rounded-lg h-full bg-slate-700">
-                  <div className="grid grid-cols-2 gap-5 w-full h-full">
+                  <div className="flex flex-row gap-5 w-full">
                     <div className="flex flex-col gap-5">
                       <h2 className="text-slate-300 tracking-[.5em] small-caps">
                         fantasy worlds
@@ -122,19 +122,20 @@ export default function Home() {
                         veniam beatae alias.
                       </p>
                     </div>
-                    <div
-                      className="w-full h-full bg-center bg-no-repeat"
-                      style={{
-                        backgroundImage: `url("/assets/world-test.png")`,
-                        backgroundSize: "contain",
-                      }}
-                    ></div>
+                    <div className="w-full h-fit">
+                      <Image
+                        width={499}
+                        height={466}
+                        alt=""
+                        src={"/assets/world-test.png"}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="grow-0 shrink-0">
-              <footer className="rounded-lg bg-slate-900 flex flex-row gap-5 p-5 justify-evenly">
+            <div className="grow-0 shrink-0  ">
+              <div className="rounded-lg bg-slate-900 flex flex-row gap-5 p-5 justify-evenly">
                 <Link
                   href={""}
                   className="tracking-[.5em] uppercase text-slate-300"
@@ -153,7 +154,7 @@ export default function Home() {
                 >
                   BRIDGE COMMUNITY
                 </Link>
-              </footer>
+              </div>
             </div>
           </div>
         </div>
