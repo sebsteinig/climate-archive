@@ -11,23 +11,12 @@ import { ALL_VARIABLES, EVarID } from "../store/variables/variable.types"
 import { SelectSingleResult } from "../api/api.types"
 import { Experiment, Experiments, Publication } from "../types"
 import { collectionEquals } from "../types.utils"
-
-class TextureNotFound extends Error {
-  texture!: TextureInfo
-  constructor(searched_texture: TextureInfo) {
-    super()
-    this.texture = searched_texture
-  }
-}
-class TextureMustBeLoaded extends Error {
-  path!: string | TextureInfo | { exp_id: string; variable: EVarID }
-  constructor(
-    path: string | TextureInfo | { exp_id: string; variable: EVarID },
-  ) {
-    super()
-    this.path = path
-  }
-}
+import {
+  PathError,
+  PublicationError,
+  TextureMustBeLoaded,
+  TextureNotFound,
+} from "../errors/errors"
 
 class DatabaseProvider {
   database!: Database
@@ -45,35 +34,55 @@ class DatabaseProvider {
   }
 
   private async _loadPaths(paths: { grid: string[][] }[], info: TextureInfo) {
-    await Promise.all(
-      paths.flatMap(({ grid }) => {
-        return grid.flatMap((row) => {
-          return row.map(async (path) => {
-            let texture = await this.loadFromDb(path)
+    try {
+      await Promise.all(
+        paths.flatMap(({ grid }) => {
+          return grid.flatMap((row) => {
+            return row.map(async (path) => {
+              let texture = await this.loadFromDb(path)
 
-            if (!texture) {
-              // texture is undefined => not in the db, must be fetched and inserted in db
-              texture = await this.loadFromServer(path)
-            }
-            if (!texture) {
-              throw new TextureNotFound(info)
-            }
-            this.cache.set(path, texture)
+              if (!texture) {
+                // texture is undefined => not in the db, must be fetched and inserted in db
+                texture = await this.loadFromServer(path)
+              }
+              if (!texture) {
+                throw new TextureNotFound(info)
+              }
+              this.cache.set(path, texture)
+            })
           })
-        })
-      }),
-    )
+        }),
+      )
+    } catch (error) {
+      throw error
+    }
   }
 
-  private async _loadFromSingleResult(res: SelectSingleResult) {
+  private async _loadFromSingleResult(
+    res: SelectSingleResult,
+    only_mean?: boolean,
+  ) {
     const info: TextureInfo = {
       ...res,
       variable: res.variable_name,
       /** TODO : resolutions */
     }
 
-    await this._loadPaths(info.paths_ts.paths, info)
-    await this._loadPaths(info.paths_mean.paths, info)
+    if (!only_mean) {
+      await this._loadPaths(info.paths_ts.paths, info)
+    }
+    // TODO : REVERT WHEN NIMBUS BUGS IS FIXED
+    // await this._loadPaths(info.paths_mean.paths, info)
+    await this._loadPaths(
+      info.paths_mean.paths.map(({ grid }) => {
+        return {
+          grid: grid.map((arr) =>
+            arr.map((e) => e.replaceAll(".ts.", ".avg.")),
+          ),
+        }
+      }),
+      info,
+    )
 
     try {
       const is_already = await this.database.textures_info.get([
@@ -84,46 +93,32 @@ class DatabaseProvider {
         this.database.textures_info.add(info)
       }
     } catch (error) {
-      console.log("ERROR ----")
-
-      console.log({ info })
-    }
-
-    const leaf_ts = {
-      paths: info.paths_ts.paths,
-    }
-    const leaf_mean = {
-      paths: info.paths_mean.paths,
-    }
-    return {
-      exp_id: info.exp_id,
-      variable: EVarID[info.variable as keyof typeof EVarID],
-      mean: leaf_mean,
-      ts: leaf_ts,
+      throw error
     }
   }
-  async load(requested_texture: RequestTexture) {
+  async load(requested_texture: RequestTexture, only_mean?: boolean) {
     const texture_infos = await this.database.textures_info
       .where("exp_id")
       .equals(requested_texture.exp_id)
       .toArray()
 
-    if (texture_infos.length === ALL_VARIABLES.length) {
-      return undefined
-    }
+    if (texture_infos.length === ALL_VARIABLES.length) return
 
     const response = await select(requested_texture.exp_id, {
       vars: requested_texture.variables,
       /** TODO : resolutions */
     })
-    return Promise.all(
+    await Promise.all(
       response.map(async (res) => {
-        return this._loadFromSingleResult(res)
+        await this._loadFromSingleResult(res, only_mean)
       }),
     )
   }
 
-  async loadAll(requested_textures: RequestMultipleTexture) {
+  async loadAll(
+    requested_textures: RequestMultipleTexture,
+    only_mean?: boolean,
+  ) {
     const response = await selectAll({
       vars: requested_textures.variables,
       ids: requested_textures.exp_ids,
@@ -134,19 +129,16 @@ class DatabaseProvider {
       ry: requested_textures.resolution?.y,
       /** TODO : nan_value_encoding, chunks, threshold */
     })
-    const res = await Promise.all(
+    await Promise.all(
       Object.entries(response).flatMap(async (tmp) => {
         const [_, single_result_arr] = tmp
-        const res = await Promise.all(
+        await Promise.all(
           single_result_arr.map(async (res) => {
-            return this._loadFromSingleResult(res)
+            await this._loadFromSingleResult(res, only_mean)
           }),
         )
-
-        return res
       }),
     )
-    return res
   }
 
   async loadFromDb(path: string) {
@@ -155,15 +147,18 @@ class DatabaseProvider {
   }
 
   async loadFromServer(path: string) {
-    const image_blob = await getImageArrayBuffer(path)
-
-    const texture = {
-      path,
-      image: image_blob,
-    } as Texture
-    const is_already = await this.database.textures.get({ path })
-    if (!is_already) {
+    let texture = await this.database.textures.get({ path })
+    if (texture) return texture
+    try {
+      const image_blob = await getImageArrayBuffer(path)
+      texture = {
+        path,
+        image: image_blob,
+      } as Texture
       this.database.textures.add(texture)
+    } catch (error) {
+      console.warn(error)
+      throw error
     }
     return texture!
   }
@@ -188,57 +183,59 @@ class DatabaseProvider {
       ])
     }
     if (!texture_info) {
-      console.log("GET INFO ERROR ")
-      console.log({ variable, exp_id })
       throw new TextureMustBeLoaded({ variable, exp_id })
     }
     return texture_info
   }
 
   async getTexture(path: string) {
+    if (!path) throw new PathError("undefinied path")
     let texture = this.cache.get(path)
     if (!texture) {
       texture = await this.database.textures.get({ path: path })
+      if (!texture) {
+        texture = await this.loadFromServer(path)
+      }
       this.cache.set(path, texture)
-    }
-    if (!texture) {
-      texture = await this.loadFromServer(path)
     }
     return texture!
   }
 
   async loadAllColections() {
     const collections = await this.database.collections.toArray()
-
     return collections
   }
 
   async addPublicationToDb(publication: Publication) {
-    const collections_array = await this.database.collections
-      .filter((e) => {
-        return collectionEquals(publication, e.data)
-      })
-      .toArray()
-
-    if (!collections_array || collections_array.length === 0) {
-      return await this.database.collections.add({
-        data: publication,
-        date: new Date().toISOString(),
-      })
-    } else {
-      const map_experiments = new Map<string, Experiment>()
-      for (let exp of publication.exps) {
-        map_experiments.set(exp.id, exp)
-      }
-      for (let exp of collections_array[0].data.exps) {
-        map_experiments.set(exp.id, exp)
-      }
-
-      return await this.database.collections
+    try {
+      const collections_array = await this.database.collections
         .filter((e) => {
           return collectionEquals(publication, e.data)
         })
-        .modify({ "data.exps": Array.from(map_experiments).map((v) => v[1]) })
+        .toArray()
+
+      if (!collections_array || collections_array.length === 0) {
+        return await this.database.collections.add({
+          data: publication,
+          date: new Date().toISOString(),
+        })
+      } else {
+        const map_experiments = new Map<string, Experiment>()
+        for (let exp of publication.exps) {
+          map_experiments.set(exp.id, exp)
+        }
+        for (let exp of collections_array[0].data.exps) {
+          map_experiments.set(exp.id, exp)
+        }
+
+        return await this.database.collections
+          .filter((e) => {
+            return collectionEquals(publication, e.data)
+          })
+          .modify({ "data.exps": Array.from(map_experiments).map((v) => v[1]) })
+      }
+    } catch (error) {
+      throw new PublicationError()
     }
   }
 }

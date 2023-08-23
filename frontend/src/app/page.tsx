@@ -2,23 +2,24 @@
 import dynamic from "next/dynamic"
 import styles from "./page.module.css"
 import SelectJournal from "@/components/searchbar/filters/SelectJournals"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import { usePathname } from "next/navigation"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useRouter } from "next/router"
 import { SearchButton } from "@/components/searchbar/SearchButton"
-import { SearchButtonComplete } from "@/components/searchbar/SearchButtonComplete"
+import { SearchButtonStatic } from "@/components/searchbar/SearchButtonStatic"
 import Link from "next/link"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import Image from "next/image"
+import { Reset } from "@/components/Reset"
 
 // const ClientMain = dynamic(() => import("@/components/ClientMain"), {
 //   ssr: false,
 // })
 export default function Home() {
-  // const addCollection = useClusterStore((state) => state.addCollection)
-  // const add = useClusterStore((state) => state.time.add)
-  // const clear = useClusterStore((state) => state.time.clear)
+  // const addCollection = useStore((state) => state.addCollection)
+  // const add = useStore((state) => state.worlds.add)
+  // const clear = useStore((state) => state.worlds.clear)
   // useEffect(() => {
   //   clear()
   //   Promise.all([database_provider.loadAllColections()]).then(([e]) => {
@@ -36,14 +37,18 @@ export default function Home() {
 
   return (
     <main id="root" className="w-full h-full">
+      <Reset />
       {/* <ClientMain /> */}
-      <div className="w-full h-full flex flex-col gap-5">
+      <div className="w-full h-full overflow-hidden flex flex-col gap-5">
         <nav className="flex flex-row justify-between">
-          <SearchButtonComplete />
+          <SearchButtonStatic />
 
-          <div className="h-14 cursor-pointer flex items-center">
+          <Link
+            href={"/"}
+            className="overflow-hidden h-14 cursor-pointer flex items-center"
+          >
             <h1 className="">CLIMATE ARCHIVE</h1>
-          </div>
+          </Link>
         </nav>
 
         <div className="grow grid grid-cols-2 gap-5">
@@ -107,30 +112,30 @@ export default function Home() {
               {/* <div className=" border-blue-500">
 
               </div> */}
-              <div className="grow">
-                <div className="p-5 rounded-lg h-full bg-slate-700">
-                  <div className="flex flex-row gap-5 w-full">
-                    <div className="flex flex-col gap-5">
-                      <h2 className="text-slate-300 tracking-[.5em] small-caps">
-                        fantasy worlds
-                      </h2>
-                      <p className="text-slate-400">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Consequatur neque assumenda ex sapiente repudiandae ab
-                        odit voluptates corrupti dolore perferendis, praesentium
-                        recusandae dicta quisquam, nulla laudantium placeat,
-                        veniam beatae alias.
-                      </p>
-                    </div>
-                    <div className="w-full h-fit">
-                      <Image
-                        width={499}
-                        height={466}
-                        alt=""
-                        src={"/assets/world-test.png"}
-                      />
-                    </div>
-                  </div>
+              <div
+                className="grow overflow-hidden 
+                  flex flex-row gap-5 w-full p-5 
+                  rounded-lg h-full bg-slate-700"
+              >
+                <div className="flex flex-col gap-5">
+                  <h2 className="text-slate-300 tracking-[.5em] small-caps">
+                    fantasy worlds
+                  </h2>
+                  <p className="text-slate-400">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Consequatur neque assumenda ex sapiente repudiandae ab odit
+                    voluptates corrupti dolore perferendis, praesentium
+                    recusandae dicta quisquam, nulla laudantium placeat, veniam
+                    beatae alias.
+                  </p>
+                </div>
+                <div className="w-full h-fit">
+                  <Image
+                    width={499}
+                    height={466}
+                    alt=""
+                    src={"/assets/world-test.png"}
+                  />
                 </div>
               </div>
             </div>

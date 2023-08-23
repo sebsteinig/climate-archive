@@ -1,7 +1,9 @@
 "use client"
 import { WorldManager } from "./worlds_manager/WorldsManager"
 import SideBar from "./sidebar/SideBar"
-import { useState } from "react"
+import { useStore } from "@/utils/store/store"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { useEffect, useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
@@ -9,13 +11,16 @@ import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
 import { CollectionView } from "./CollectionView"
+import { useErrorBoundary } from "react-error-boundary"
 
 type Props = {}
 
 export default function ClientMain({}: Props) {
   const [search_bar_visible, displaySearchBar] = useState(false)
   const [collection, setCollection] = useState<Collection | undefined>()
-  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(undefined)
+  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
+    undefined,
+  )
 
   return (
     <>
@@ -78,7 +83,7 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
-        <Graph /> 
+        <Graph />
       </div>
     </>
   )

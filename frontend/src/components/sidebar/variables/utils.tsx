@@ -10,7 +10,7 @@ import EyeClosed from "$/assets/icons/eye-closed-slate-500.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
 import { EVarID } from "@/utils/store/variables/variable.types"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
 import Checkbox from "@/components/inputs/Checkbox"
@@ -62,7 +62,6 @@ export function unitOf(name: EVarID) {
       return ""
   }
 }
-
 
 function IconOf({
   name,
@@ -117,8 +116,8 @@ export function Variable({
   setCurrentVariableControls,
   children,
 }: PropsWithChildren<Props>) {
-  const active_variables = useClusterStore((state) => state.active_variables)
-  const activate = useClusterStore((state) => state.activate)
+  const active_variables = useStore((state) => state.active_variables)
+  const activate = useStore((state) => state.activate)
   return (
     <div
       className={`group flex flex-row 
@@ -128,9 +127,9 @@ export function Variable({
              ? "shadow-[-1px_4px_4px_rgba(74,222,128,_0.2)]"
              : ""
          }`}
-        onClick={() => (current_variable_controls != title)?? activate(title)}
+      onClick={() => current_variable_controls != title ?? activate(title)}
     >
-      <div className="grow-0">
+      <div className="shrink-0 grow-0 ">
         <IconOf
           name={title}
           active={active_variables.get(title)!}
@@ -155,8 +154,6 @@ export function Variable({
             )}
           </div>
         </div>
-
-        
 
         {controls && (
           <div
@@ -198,11 +195,11 @@ export function Label({
   children,
   className,
   onClick,
-}: PropsWithChildren<{ className?: string, onClick ?: (() => void) }>) {
+}: PropsWithChildren<{ className?: string; onClick?: () => void }>) {
   return (
     <>
       <h5
-        onClick={() => onClick ? onClick() : {}}
+        onClick={() => (onClick ? onClick() : {})}
         className={`flex-grow capitalize truncate whitespace-nowrap ${
           className ?? ""
         }`}
@@ -270,41 +267,60 @@ export function Rows({ children }: PropsWithChildren<{}>) {
   return <div className="flex flex-col gap-5">{children}</div>
 }
 
-type ColorMapRowProps ={
-  colormap_name:string
+type ColorMapRowProps = {
+  colormap_name: string
   onChange: (number: string) => void
-
 }
 
-export function ColorMapRow({colormap_name, onChange} : ColorMapRowProps){
+export function ColorMapRow({ colormap_name, onChange }: ColorMapRowProps) {
   const [display_color_maps, displayColorMaps] = useState<boolean>(false)
-  const colormaps_test = ["cbrewerSpeed3.png", "cmapHaxby.png", "ipccPrecip.png", "cmoceanThermal.png"]
-  return(
+  const colormaps_test = [
+    "cbrewerSpeed3.png",
+    "cmapHaxby.png",
+    "ipccPrecip.png",
+    "cmoceanThermal.png",
+  ]
+  return (
     <Row>
-      <Label onClick={() => {displayColorMaps((prev) => !prev)}}>Select color map</Label>
-      <div className="w-[16rem] ml-1 grid grid-cols-1 gap-1 
+      <Label
+        onClick={() => {
+          displayColorMaps((prev) => !prev)
+        }}
+      >
+        Select color map
+      </Label>
+      <div
+        className="w-[16rem] ml-1 grid grid-cols-1 gap-1 
         max-h-20 overflow-y-auto overflow-x-hidden
-        rounded-md border-emerald-400 border-2">
-        
-        {!display_color_maps && <img onClick={() => displayColorMaps(true)}
-          src = {`/assets/colormaps/${colormap_name}`}
-          key={0}
-          className="w-fit h-9 p-2">
-        </img>}
-        {display_color_maps && colormaps_test.filter((v => v!=colormap_name)).map((name : string, i : number) => 
-          <div 
-            onClick={()=>{
-              displayColorMaps(false)
-              onChange(name)
-            }} 
-            className="hover:bg-slate-800">
-            <img key={i+1} src={`/assets/colormaps/${name}`}
-              className="w-fit h-9 p-2"
-            />
-          </div>
+        rounded-md border-emerald-400 border-2"
+      >
+        {!display_color_maps && (
+          <img
+            onClick={() => displayColorMaps(true)}
+            src={`/assets/colormaps/${colormap_name}`}
+            key={0}
+            className="w-fit h-9 p-2"
+          ></img>
         )}
+        {display_color_maps &&
+          colormaps_test
+            .filter((v) => v != colormap_name)
+            .map((name: string, i: number) => (
+              <div
+                onClick={() => {
+                  displayColorMaps(false)
+                  onChange(name)
+                }}
+                className="hover:bg-slate-800"
+              >
+                <img
+                  key={i + 1}
+                  src={`/assets/colormaps/${name}`}
+                  className="w-fit h-9 p-2"
+                />
+              </div>
+            ))}
       </div>
-      
     </Row>
   )
 }

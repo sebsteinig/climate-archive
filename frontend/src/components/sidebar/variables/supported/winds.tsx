@@ -6,7 +6,7 @@ import {
   Variable,
   VariableProps,
 } from "../utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import InputNumber from "@/components/inputs/InputNumber"
 import Slider from "@/components/inputs/Slider"
 import Checkbox from "@/components/inputs/Checkbox"
@@ -15,7 +15,7 @@ export function Winds({
   current_variable_controls,
   setCurrentVariableControls,
 }: VariableProps) {
-  const winds = useClusterStore((state) => state.variables.winds)
+  const winds = useStore((state) => state.variables.winds)
   return (
     <Variable
       title={winds.name}
@@ -25,8 +25,8 @@ export function Winds({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {winds.colormap}
-          onChange = {(n) => winds.updateColormap(n)}
+          colormap_name={winds.colormap}
+          onChange={(n) => winds.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

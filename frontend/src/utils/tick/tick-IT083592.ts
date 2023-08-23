@@ -1,9 +1,13 @@
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import {
+  TimeFrameRef,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
-import { CanvasRef } from "./useCanvas"
-import { PanelRef } from "./world_panel/Panel"
+import { CanvasRef } from "../hooks/useCanvas"
+import { PanelRef } from "../../components/worlds_manager/world_panel/Panel"
 import { MutableRefObject, RefObject } from "react"
-import { update } from "@/utils/store/time/time.utils"
+import { update } from "@/utils/store/worlds/world.utils"
 import { TextureInfo } from "@/utils/database/database.types"
 import { compute, getPath } from "./tick.utils"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -39,7 +43,7 @@ export type TickFn = (delta: number) => Promise<{
 }>
 
 export function tickBuilder(
-  time_id: TimeID,
+  world_id: WorldID,
   panel_ref: RefObject<PanelRef>,
   world_data: WorldData,
   current_frame: TimeFrameRef,
@@ -48,7 +52,7 @@ export function tickBuilder(
 ): TickFn {
   return async function tick(delta: number) {
     const res: Map<EVarID, TickData> = new Map()
-    let frame = current_frame.current.get(time_id)
+    let frame = current_frame.current.get(world_id)
     if (!frame)
       return {
         weight: 0,

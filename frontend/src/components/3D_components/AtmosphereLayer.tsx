@@ -11,10 +11,10 @@ import * as THREE from "three"
 import vertexShader from "$/shaders/precipitationVert.glsl"
 import fragmentShader from "$/shaders/precipitationFrag.glsl"
 import { createColormapTexture } from "../../utils/three/colormapTexture.js"
-import { useClusterStore } from "@/utils/store/cluster.store"
-import { TickData } from "../worlds_manager/tick.js"
+import { TickData } from "../../utils/tick/tick.js"
 import { PrSlice } from "@/utils/store/variables/variable.types"
 import { ThreeEvent, useThree } from "@react-three/fiber"
+import { useStore } from "@/utils/store/store"
 
 type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 
@@ -48,11 +48,11 @@ const geometry = new THREE.PlaneGeometry(4, 2, 64, 32)
 //   },
 // })
 
-type Props = {
-}
+type Props = {}
 
 export type AtmosphereLayerRef = {
   type: RefObject<SphereType>
+  cleanTextures: () => void
   updateTextures: (data: TickData) => void
   tick: (weight: number, uSphereWrapAmount: number) => void
 }
@@ -93,7 +93,7 @@ const AtmosphereLayer = memo(
     useEffect(() => {
       console.log("subscribe")
       // Subscribe to store updates and update prRef.current whenever variables.pr changes
-      const unsubscribe = useClusterStore.subscribe(
+      const unsubscribe = useStore.subscribe(
         (state) => {
           prRef.current = state.variables.pr
           materialRef.current.uniforms.uUserMinValue.value =
@@ -133,11 +133,16 @@ const AtmosphereLayer = memo(
       //materialRef.current.uniforms.colorMap.value =  ???? `public/assets/colormaps/${prRef.current?.colormap ?? "ipccPrecip.png"}`
     }
 
+    function cleanTextures() {
+      materialRef.current.uniforms.thisDataFrame.value = null
+      materialRef.current.uniforms.nextDataFrame.value = null
+    }
     useImperativeHandle(ref, () => {
       return {
         type: atmosphere_layer_ref,
         tick,
         updateTextures,
+        cleanTextures,
       }
     })
     return (

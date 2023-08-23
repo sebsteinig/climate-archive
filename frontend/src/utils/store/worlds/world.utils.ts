@@ -57,26 +57,6 @@ export function chunksDetails(info: TextureInfo): [number, number] {
   return [cs, fs]
 }
 
-// function computeRatio(ref: TimeFrameState): number {
-//   const [_, fpc] = chunksDetails(ref.info)
-//   const ts = ref.info.timesteps
-//   const f = ref.current.frame
-//   const c = ref.current.time_chunk
-
-//   return (f + c * fpc) / ts
-// }
-
-// function computeFramePos(
-//   ratio: number,
-//   timesteps: number,
-//   fpc: number,
-// ): [number, number] {
-//   const tmp_frame = Math.floor(timesteps * ratio)
-//   const time_chunk = Math.floor(tmp_frame / fpc)
-//   const frame = tmp_frame % fpc
-//   return [frame, time_chunk]
-// }
-
 export async function getMaxTimesteps(frame: TimeFrame) {
   const ts = await Promise.all(
     ALL_VARIABLES.map(async (variable) => {
@@ -164,6 +144,12 @@ export async function update(
   active_variables: EVarID[],
   data: WorldData,
 ) {
+  // clean the frame of unused variables
+  for (let variable of frame.variables.keys()) {
+    if (!active_variables.includes(variable)) {
+      frame.variables.delete(variable)
+    }
+  }
   const current_time = Math.floor(frame.weight)
   let next_time = current_time + 1
   for (let variable of active_variables) {

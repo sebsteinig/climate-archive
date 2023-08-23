@@ -10,10 +10,10 @@ import Cross from "$/assets/icons/cross-small-emerald-300.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
 import { Experiments } from "../../../utils/types"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import Link from "next/link"
-import { TimeMode } from "@/utils/store/time/time.type"
+import { TimeMode } from "@/utils/store/worlds/time.type"
 import { useSearchParams } from "next/navigation"
 type Exp = {
   id: string

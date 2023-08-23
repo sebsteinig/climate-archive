@@ -3,8 +3,8 @@ import {
   TimeFrameHolder,
   TimeFrameState,
   WorldData,
-} from "@/utils/store/time/time.type"
-import { getMaxTimesteps, sync } from "@/utils/store/time/time.utils"
+} from "@/utils/store/worlds/time.type"
+import { getMaxTimesteps, sync } from "@/utils/store/worlds/world.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { Experiment } from "@/utils/types"
 import { useRef } from "react"
@@ -12,20 +12,20 @@ import { useRef } from "react"
 export function useFrameRef() {
   const current_frame = useRef<TimeFrameHolder>({
     map: new Map(),
-    update(frame, time_id) {
-      this.map.set(time_id, frame)
+    update(frame, world_id) {
+      this.map.set(world_id, frame)
       return frame
     },
-    get(time_id) {
-      return this.map.get(time_id)
+    get(world_id) {
+      return this.map.get(world_id)
     },
     async init(
-      time_id,
+      world_id,
       exp: Experiment,
       active_variables: EVarID[],
       world_data: WorldData,
     ) {
-      const data = this.map.get(time_id)
+      const data = this.map.get(world_id)
       console.log(`init`)
       const frame: TimeFrame = {
         exp: exp,
@@ -37,11 +37,16 @@ export function useFrameRef() {
       }
       const max_ts = await getMaxTimesteps(frame)
       frame.timesteps = max_ts
-      const variables = new Map()
-      for (let variable of active_variables) {
-        variables.set(variable, await sync(frame, variable, world_data))
+      for (let variable of frame.variables.keys()) {
+        if (!active_variables.includes(variable)) {
+          frame.variables.delete(variable)
+        }
       }
-      current_frame.current.update(frame, time_id)
+      for (let variable of active_variables) {
+        frame.variables.set(variable, await sync(frame, variable, world_data))
+      }
+
+      current_frame.current.update(frame, world_id)
     },
   })
   return current_frame

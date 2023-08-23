@@ -1,53 +1,58 @@
 import { StateCreator } from "zustand"
-import {
-  TimeID,
-  CollectionID,
-  WorldData,
-  Slots,
-  TimeConf,
-} from "./time.type"
+import { WorldID, CollectionID, WorldData, Slots, TimeConf } from "./time.type"
 
 import { Collection } from "../collection.store"
-import { buildTimeConf, buildWorldConf } from "./time.utils"
+import { buildTimeConf, buildWorldConf } from "./world.utils"
 import { Experiment, Publication } from "@/utils/types"
 
-export interface TimeSlice {
-  time: {
+export interface WorldSlice {
+  worlds: {
     __auto_increment: number
     slots: Slots
-
-    add: (collection: Collection, config?: Partial<TimeConf>) => void
+    reload_flag: boolean
+    reload: (flag: boolean) => void
+    add: (
+      collection: Collection,
+      config?: Partial<TimeConf>,
+      exp?: Experiment,
+    ) => void
     addAll: (
       collection: { publication: Publication; exp_id: string }[],
       config?: Partial<TimeConf>,
     ) => void
     clear: () => void
     replace: (collection: Collection) => void
-    remove: (id: TimeID) => void
-    dup: (time_id: TimeID) => void
+    remove: (id: WorldID) => void
+    dup: (world_id: WorldID) => void
 
-    changeExp: (id: TimeID, exp: Experiment) => void
+    changeExp: (id: WorldID, exp: Experiment) => void
   }
 }
 
-export const createTimeSlice: StateCreator<
-  TimeSlice,
+export const createWorldSlice: StateCreator<
+  WorldSlice,
   [["zustand/immer", never]],
   [],
-  TimeSlice
+  WorldSlice
 > = (set) => {
   return {
-    time: {
+    worlds: {
       __auto_increment: -1,
       slots: new Map(),
-
-      add(collection, config) {
+      reload_flag: true,
+      reload(flag) {
         set((state) => {
-          state.time.__auto_increment += 1
-          state.time.slots.set(state.time.__auto_increment, {
+          state.worlds.reload_flag = flag
+        })
+      },
+      add(collection, config, exp) {
+        set((state) => {
+          state.worlds.__auto_increment += 1
+          state.worlds.slots.set(state.worlds.__auto_increment, {
             collection,
             //conf: buildWorldConf(),
             time: buildTimeConf(config),
+            exp,
           })
         })
       },
@@ -55,8 +60,8 @@ export const createTimeSlice: StateCreator<
       addAll(collections, config) {
         set((state) => {
           for (let collection of collections) {
-            state.time.__auto_increment += 1
-            state.time.slots.set(state.time.__auto_increment, {
+            state.worlds.__auto_increment += 1
+            state.worlds.slots.set(state.worlds.__auto_increment, {
               collection: collection.publication,
               exp: collection.publication.exps.find(
                 (exp) => exp.id === collection.exp_id,
@@ -69,9 +74,9 @@ export const createTimeSlice: StateCreator<
       },
       replace(collection) {
         set((state) => {
-          state.time.__auto_increment += 1
-          state.time.slots.clear()
-          state.time.slots.set(state.time.__auto_increment, {
+          state.worlds.__auto_increment += 1
+          state.worlds.slots.clear()
+          state.worlds.slots.set(state.worlds.__auto_increment, {
             collection,
             //conf: buildWorldConf(),
             time: buildTimeConf(),
@@ -80,27 +85,27 @@ export const createTimeSlice: StateCreator<
       },
       clear() {
         set((state) => {
-          state.time.__auto_increment = 0
-          state.time.slots.clear()
+          state.worlds.__auto_increment = 0
+          state.worlds.slots.clear()
         })
       },
-      dup(time_id) {
+      dup(world_id) {
         set((state) => {
-          const data = state.time.slots.get(time_id)
+          const data = state.worlds.slots.get(world_id)
           if (!data) return
-          state.time.__auto_increment += 1
-          state.time.slots.set(state.time.__auto_increment, data)
+          state.worlds.__auto_increment += 1
+          state.worlds.slots.set(state.worlds.__auto_increment, data)
         })
       },
       remove(id) {
         set((state) => {
-          state.time.slots.delete(id)
+          state.worlds.slots.delete(id)
         })
       },
 
       changeExp(id, exp) {
         set((state) => {
-          const data = state.time.slots.get(id)
+          const data = state.worlds.slots.get(id)
           if (!data) return
           data.exp = exp
         })

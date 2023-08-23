@@ -1,23 +1,30 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from "react"
 import { ControllerRef, TimeController } from "./utils/TimeController"
 import { IControllerRef } from "./controller.types"
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import {
+  TimeFrameRef,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time.type"
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
-import { goto } from "@/utils/store/time/time.utils"
+import { goto } from "@/utils/store/worlds/world.utils"
 import { TimeScale } from "@/components/geologic_timescale/TimeScale"
 import { useGeologicTree } from "@/components/geologic_timescale/geologic_tree"
 
 type MonthlyControllerProps = {
   data: WorldData
   current_frame: TimeFrameRef
-  time_id: TimeID
-  controller_ref : ControllerRef | undefined
+  world_id: WorldID
+  controller_ref: ControllerRef | undefined
 }
 
 export const GeoTimeScaleController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
->(function GeoTimeScaleController({ current_frame, time_id, data, controller_ref }, ref) {
+>(function GeoTimeScaleController(
+  { current_frame, world_id, data, controller_ref },
+  ref,
+) {
   const progress_bar_ref = useRef<ProgessBarRef>(null)
   const [tree, exp_span_tree] = useGeologicTree()
   useImperativeHandle(ref, () => {
@@ -42,7 +49,7 @@ export const GeoTimeScaleController = forwardRef<
       </div>
       <TimeScale
         onChange={(idx, exp_id) => {
-          const frame = current_frame.current.get(time_id)
+          const frame = current_frame.current.get(world_id)
           if (!frame) return
           controller_ref?.pause()
           goto(frame, idx, () => {})

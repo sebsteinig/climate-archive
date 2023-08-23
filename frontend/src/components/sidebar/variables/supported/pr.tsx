@@ -1,5 +1,11 @@
-import { ColorMapRow, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import {
+  ColorMapRow,
+  RowWithSlider,
+  Rows,
+  Variable,
+  VariableProps,
+} from "../utils"
+import { useStore } from "@/utils/store/store"
 
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -8,7 +14,7 @@ export function Pr({
   current_variable_controls,
   setCurrentVariableControls,
 }: VariableProps) {
-  const pr = useClusterStore((state) => state.variables.pr)
+  const pr = useStore((state) => state.variables.pr)
   return (
     <Variable
       title={pr.name}
@@ -18,8 +24,8 @@ export function Pr({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {pr.colormap}
-          onChange = {(n) => pr.updateColormap(n)}
+          colormap_name={pr.colormap}
+          onChange={(n) => pr.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

@@ -38,7 +38,7 @@ export type Currents = Variable & {
   arrows_size: number
   scale_by_magnitude: boolean
   color_by_magnitude: boolean
-  colormap : string
+  colormap: string
 }
 export interface CurrentsSlice extends Currents {
   updateColormap: (value: string) => void
@@ -51,12 +51,11 @@ export interface CurrentsSlice extends Currents {
 }
 
 export type Clt = Variable & {}
-export interface CltSlice extends Clt {
-}
+export interface CltSlice extends Clt {}
 
 export type Height = Variable & {
   diplacement: number
-  colormap : string
+  colormap: string
 }
 export interface HeightSlice extends Height {
   updateColormap: (value: string) => void
@@ -64,21 +63,18 @@ export interface HeightSlice extends Height {
 }
 
 export type Liconc = Variable & {}
-export interface LiconcSlice extends Liconc {
-}
+export interface LiconcSlice extends Liconc {}
 
 export type Mlotst = Variable & {}
-export interface MlotstSlice extends Mlotst {
-}
+export interface MlotstSlice extends Mlotst {}
 
 export type Pfts = Variable & {}
-export interface PftsSlice extends Pfts {
-}
+export interface PftsSlice extends Pfts {}
 
 export type Pr = Variable & {
   min: number
   max: number
-  colormap : string
+  colormap: string
 }
 export interface PrSlice extends Pr {
   updateColormap: (value: string) => void
@@ -87,16 +83,13 @@ export interface PrSlice extends Pr {
 }
 
 export type Sic = Variable & {}
-export interface SicSlice extends Sic {
-}
+export interface SicSlice extends Sic {}
 
 export type Snc = Variable & {}
-export interface SncSlice extends Snc {
-}
+export interface SncSlice extends Snc {}
 
 export type Tas = Variable & {}
-export interface TasSlice extends Tas {
-}
+export interface TasSlice extends Tas {}
 
 export type Tos = Variable & {
   min: number
@@ -104,7 +97,7 @@ export type Tos = Variable & {
   anomaly_range: number
   anomalies_lower_bound: number
   sea_ice: boolean
-  colormap : string
+  colormap: string
 }
 export interface TosSlice extends Tos {
   updateColormap: (value: string) => void
@@ -123,7 +116,7 @@ export type Winds = Variable & {
   arrows_size: number
   scale_by_magnitude: boolean
   color_by_magnitude: boolean
-  colormap : string
+  colormap: string
 }
 export interface WindsSlice extends Winds {
   updateColormap: (value: string) => void

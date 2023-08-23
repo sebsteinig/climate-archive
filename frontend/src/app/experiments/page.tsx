@@ -1,46 +1,47 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Experiments } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useClusterStore } from "@/utils/store/cluster.store"
-import { useSearchParams } from "next/navigation"
+import { useStore } from "@/utils/store/store"
+import { usePathname, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
 import { Loading, useLoading } from "@/utils/useLoading"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
+import { ErrorBoundary } from "react-error-boundary"
+import { ErrorView } from "@/components/ErrorView"
+import { useRouter } from "next/router"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
+
+async function loadExperiments(request: RequestMultipleTexture) {
+  await database_provider.loadAll(request)
+  const collection = {
+    exps: request.exp_ids!.map((exp: string) => {
+      return { id: exp, metadata: [] }
+    }),
+  } as Experiments
+  return collection
+}
+
 export default function ExperimentsPage() {
-  const add = useClusterStore((state) => state.time.add)
-  const clearGraph = useClusterStore((state) => state.graph.clear)
   const loading_ref = useLoading()
-  const searchParams = useSearchParams()
-  const clear = useClusterStore((state) => state.time.clear)
-
-  const reload = useMemo(() => {
-    if (!searchParams.has("reload")) return false
-    return searchParams.get("reload") == "true"
-  }, [searchParams])
-
-  const loadExperiments = async (request: RequestMultipleTexture) => {
-    await database_provider.loadAll(request)
-    const collection = {
-      exps: request.exp_ids!.map((exp: string) => {
-        return { id: exp, metadata: [] }
-      }),
-    } as Experiments
-    add(collection)
-  }
+  const add = useStore((state) => state.worlds.add)
+  const search_params = useSearchParams()
+  const clear = useStore((state) => state.worlds.clear)
+  const clearGraph = useStore((state) => state.graph.clear)
+  const pathname = usePathname()
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     loading_ref.current?.start()
     clear()
     clearGraph()
     var request: RequestMultipleTexture = { exp_ids: [] }
-    for (let [key, value] of searchParams.entries()) {
+    for (let [key, value] of search_params.entries()) {
       if (key == "reload") continue
       switch (key) {
         case "resolution":
@@ -72,11 +73,22 @@ export default function ExperimentsPage() {
     }
     loading_ref.current?.finish()
     loadExperiments(request)
-  }, [reload])
-
+      .then((collection) => {
+        add(collection)
+      })
+      .catch(() => {
+        setError(true)
+      })
+  }, [])
+  if (error)
+    return <ErrorView try_again_path={pathname + "?" + search_params} />
   return (
-    <Loading ref={loading_ref} fallback={<LoadingSpinner/>}>
-      <ClientMain />
-    </Loading>
+    <ErrorBoundary
+      fallback={<ErrorView try_again_path={pathname + "?" + search_params} />}
+    >
+      <Loading ref={loading_ref} fallback={<LoadingSpinner />}>
+        <ClientMain />
+      </Loading>
+    </ErrorBoundary>
   )
 }

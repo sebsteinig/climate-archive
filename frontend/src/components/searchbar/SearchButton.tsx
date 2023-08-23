@@ -13,7 +13,7 @@ export function SearchButton({ search_bar_visible, displaySearchBar }: Props) {
           p-2 h-fit w-fit`}
     >
       <SearchIcon
-        className={`w-10 h-10 cursor-pointer ${
+        className={`shrink-0 grow-0 w-10 h-10 cursor-pointer ${
           search_bar_visible
             ? "text-emerald-400 child:fill-emerald-400"
             : "text-slate-300 child:fill-slate-300"

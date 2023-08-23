@@ -1,16 +1,20 @@
 "use client"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
+import { ErrorView } from "@/components/ErrorView"
 import { searchPublication } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import {
   TimeController,
   TimeMode,
   TimeSpeed,
-} from "@/utils/store/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { Loading, useLoading } from "@/utils/useLoading"
+import { Publication } from "@/utils/types"
 import dynamic from "next/dynamic"
-import { useEffect } from "react"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { ErrorBoundary } from "react-error-boundary"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
@@ -32,43 +36,47 @@ async function loadValdesEtAl2021() {
 }
 
 export default function PaleoClimatePage() {
-  const addTime = useClusterStore((state) => state.time.add)
-  const clearGraph = useClusterStore((state) => state.graph.clear)
-  const clear = useClusterStore((state) => state.time.clear)
-  const addCollection = useClusterStore((state) => state.addCollection)
   const loading_ref = useLoading()
-
+  const addTime = useStore((state) => state.worlds.add)
+  const clear = useStore((state) => state.worlds.clear)
+  const clearGraph = useStore((state) => state.graph.clear)
+  const addCollection = useStore((state) => state.addCollection)
+  const [error, setError] = useState(false)
   useEffect(() => {
-    loading_ref.current?.start()    
+    loading_ref.current?.start()
     clear()
     clearGraph()
     loadValdesEtAl2021()
       .then(async (publication) => {
-        await database_provider.loadAll({
-          exp_ids: publication.exps.map((exp) => exp.id),
-          extension: "webp",
-        })
+        await database_provider.loadAll(
+          {
+            exp_ids: publication.exps.map((exp) => exp.id),
+            extension: "webp",
+          },
+          true,
+        )
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
         return publication
       })
       .then((publication) => {
-        loading_ref.current?.finish()        
+        loading_ref.current?.finish()
         addTime(publication, {
           mode: TimeMode.mean,
           speed: TimeSpeed.very_fast,
           controller: TimeController.geologic,
         })
       })
-      .catch((e) => {
-        console.log(e)
+      .catch(() => {
+        setError(true)
       })
   }, [])
+  if (error) return <ErrorView try_again_path="/paleoclimate" />
   return (
-    <>
-      <Loading ref={loading_ref} fallback={<LoadingSpinner/>}>
+    <ErrorBoundary fallback={<ErrorView try_again_path="/paleoclimate" />}>
+      <Loading ref={loading_ref} fallback={<LoadingSpinner />}>
         <ClientMain />
       </Loading>
-    </>
+    </ErrorBoundary>
   )
 }

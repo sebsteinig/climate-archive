@@ -9,11 +9,11 @@
   body {
     @apply bg-slate-800 min-w-full min-h-screen w-screen h-screen
       p-5 antialiased text-slate-300 
-      font-rubik  m-0 tracking-wider;
+      font-rubik overflow-hidden m-0 tracking-wider;
   }
-  div{    
-      scrollbar-width:thin !important;
-      scrollbar-color: #9ca3af #4b5563 !important;
+  div {
+    scrollbar-width: thin !important;
+    scrollbar-color: #9ca3af #4b5563 !important;
   }
   h1 {
     @apply text-2xl tracking-[.5em];
@@ -38,23 +38,23 @@
     stroke: currentColor;
     /* fill : currentColor */
   }
-  
-  ::-webkit-scrollbar{
-    width:5px;
+
+  ::-webkit-scrollbar {
+    width: 5px;
     border-radius: 0.375rem;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: #4b5563;
     border-radius: 0.375rem;
   }
-  
+
   /* Handle */
   ::-webkit-scrollbar-thumb {
     background: #9ca3af;
     border-radius: 0.375rem;
   }
-  
+
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;

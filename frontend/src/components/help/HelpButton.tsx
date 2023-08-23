@@ -12,7 +12,7 @@ export function HelpButton({ className }: Props) {
       }`}
       title="Need Help ?"
     >
-      <HelpIcon className="w-10 h-10 text-slate-300 " />
+      <HelpIcon className="shrink-0 grow-0 w-10 h-10 text-slate-300 " />
     </button>
   )
 }

@@ -14,7 +14,7 @@ import { Winds } from "./supported/winds"
 
 type Props = {
   current_variable_controls: EVarID | undefined
-  setCurrentVariableControls: ( e : EVarID )=> void
+  setCurrentVariableControls: (e: EVarID) => void
 }
 
 export function Variables({

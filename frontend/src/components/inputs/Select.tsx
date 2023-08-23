@@ -22,9 +22,9 @@ export default function Select({
 }: PropsWithChildren<Props>) {
   return (
     <select
-      className={`bg-slate-600  px-5 py-2 border-r-slate-500        border-l-slate-500 border-x-4 placeholder:text-slate-300/80 outline-none ${
-          className ?? ""
-        }`}
+      className={`bg-slate-600  px-5 py-2 border-r-slate-500 truncate w-full border-l-slate-500 border-x-4 placeholder:text-slate-300/80 outline-none ${
+        className ?? ""
+      }`}
       onChange={(e) => onChange(e)}
       title={title}
       defaultValue={defaultValue}
