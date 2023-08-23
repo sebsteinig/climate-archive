@@ -1,14 +1,10 @@
 "use client"
 import { WorldManager } from "./worlds_manager/WorldsManager"
 import SideBar from "./sidebar/SideBar"
-import { useClusterStore } from "@/utils/store/cluster.store"
-import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
-import { usePathname } from "next/navigation"
-import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
@@ -17,24 +13,6 @@ import { CollectionView } from "./CollectionView"
 type Props = {}
 
 export default function ClientMain({}: Props) {
-  // const addCollection = useClusterStore((state) => state.addCollection)
-  // const add = useClusterStore((state) => state.time.add)
-  // const pathname = usePathname()
-  // useEffect(() => {
-  //   if (!pathname.includes("publication")) {
-  //     Promise.all([database_provider.loadAllColections()]).then(([e]) => {
-  //       e.map((element) => {
-  //         addCollection(element.id!, element.data)
-  //       })
-  //       const most_recent = e.sort(
-  //         (a, b) => Date.parse(b.date) - Date.parse(a.date),
-  //       )[0]
-  //       if (most_recent) {
-  //         add(most_recent.data)
-  //       }
-  //     })
-  //   }
-  // }, [])
   const [search_bar_visible, displaySearchBar] = useState(false)
   const [collection, setCollection] = useState<Collection | undefined>()
   const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(undefined)

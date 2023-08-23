@@ -86,7 +86,7 @@ export default function Graph({}: Props) {
   )
   
   return (
-    <div className="flex-grow flex flex-row w-[40vw]">
+    <div className="flex-grow flex flex-row w-[50vw]">
       <div
         className={`p-5 h-full flex-grow w-full rounded-md bg-gray-900`}
       >

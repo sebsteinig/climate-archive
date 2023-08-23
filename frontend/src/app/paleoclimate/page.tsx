@@ -1,4 +1,5 @@
 "use client"
+import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { searchPublication } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useClusterStore } from "@/utils/store/cluster.store"
@@ -7,13 +8,14 @@ import {
   TimeMode,
   TimeSpeed,
 } from "@/utils/store/time/time.type"
-import { Publication } from "@/utils/types"
+import { Loading, useLoading } from "@/utils/useLoading"
 import dynamic from "next/dynamic"
 import { useEffect } from "react"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
+
 class PublicationNotFound extends Error {
   constructor() {
     super()
@@ -31,10 +33,15 @@ async function loadValdesEtAl2021() {
 
 export default function PaleoClimatePage() {
   const addTime = useClusterStore((state) => state.time.add)
+  const clearGraph = useClusterStore((state) => state.graph.clear)
   const clear = useClusterStore((state) => state.time.clear)
   const addCollection = useClusterStore((state) => state.addCollection)
+  const loading_ref = useLoading()
+
   useEffect(() => {
+    loading_ref.current?.start()    
     clear()
+    clearGraph()
     loadValdesEtAl2021()
       .then(async (publication) => {
         await database_provider.loadAll({
@@ -46,6 +53,7 @@ export default function PaleoClimatePage() {
         return publication
       })
       .then((publication) => {
+        loading_ref.current?.finish()        
         addTime(publication, {
           mode: TimeMode.mean,
           speed: TimeSpeed.very_fast,
@@ -58,7 +66,9 @@ export default function PaleoClimatePage() {
   }, [])
   return (
     <>
-      <ClientMain />
+      <Loading ref={loading_ref} fallback={<LoadingSpinner/>}>
+        <ClientMain />
+      </Loading>
     </>
   )
 }

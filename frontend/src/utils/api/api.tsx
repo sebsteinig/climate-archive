@@ -11,6 +11,7 @@ import {
 import { Publication } from "../types"
 import { Graph } from "../store/graph/graph.type"
 import { EVarID } from "../store/variables/variable.types"
+import useSWR from "swr"
 
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
@@ -34,6 +35,23 @@ export async function searchPublication(query: SearchPublication) {
     return await getData<Publication[]>(url.href)
   }
   return []
+}
+
+export function useSearchPublication(query : SearchPublication){
+  let href = null
+  if (query.title || query.journal || query.authors_short) {
+    let url = new URL("search/publication/", URL_API)
+    Object.entries(query).map((bind) => {
+      const [key, value] = bind
+      if (value) {
+        url.searchParams.append(key, JSON.stringify(value))
+      }
+    })
+    href = url.href
+  }
+  const fetcher = (url : string) => axios.get(url).then(res => res.data)
+  const {data, error, isLoading} = useSWR<Publication[], Error>(href, fetcher)
+  return {data : data, error : error, isLoading : isLoading}
 }
 
 /**

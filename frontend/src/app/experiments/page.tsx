@@ -7,12 +7,16 @@ import { useClusterStore } from "@/utils/store/cluster.store"
 import { useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
+import { Loading, useLoading } from "@/utils/useLoading"
+import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
 export default function ExperimentsPage() {
   const add = useClusterStore((state) => state.time.add)
+  const clearGraph = useClusterStore((state) => state.graph.clear)
+  const loading_ref = useLoading()
   const searchParams = useSearchParams()
   const clear = useClusterStore((state) => state.time.clear)
 
@@ -32,7 +36,9 @@ export default function ExperimentsPage() {
   }
 
   useEffect(() => {
+    loading_ref.current?.start()
     clear()
+    clearGraph()
     var request: RequestMultipleTexture = { exp_ids: [] }
     for (let [key, value] of searchParams.entries()) {
       if (key == "reload") continue
@@ -64,12 +70,13 @@ export default function ExperimentsPage() {
           break
       }
     }
+    loading_ref.current?.finish()
     loadExperiments(request)
   }, [reload])
 
   return (
-    <>
+    <Loading ref={loading_ref} fallback={<LoadingSpinner/>}>
       <ClientMain />
-    </>
+    </Loading>
   )
 }
