@@ -53,26 +53,26 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
           scene_ref={scene_ref}
         />
       </div>
-        <div className="z-10">
-          {data.time.controller === TimeController.monthly && (
-            <MonthlyController
-              ref={controller_ref}
-              world_id={world_id}
-              data={data}
-              controller_ref={container_ref.current?.controller}
-              current_frame={current_frame}
-            />
-          )}
-          {data.time.controller === TimeController.geologic && (
-            <GeoTimeScaleController
-              ref={controller_ref}
-              current_frame={current_frame}
-              data={data}
-              controller_ref={container_ref.current?.controller}
-              world_id={world_id}
-            />
-          )}
-        </div>
+      <div className="z-10">
+        {data.time.controller === TimeController.monthly && (
+          <MonthlyController
+            ref={controller_ref}
+            world_id={world_id}
+            data={data}
+            controller_ref={container_ref.current?.controller}
+            current_frame={current_frame}
+          />
+        )}
+        {data.time.controller === TimeController.geologic && (
+          <GeoTimeScaleController
+            ref={controller_ref}
+            current_frame={current_frame}
+            data={data}
+            controller_ref={container_ref.current?.controller}
+            world_id={world_id}
+          />
+        )}
+      </div>
     </div>
   )
 })

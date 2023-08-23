@@ -1,4 +1,8 @@
-import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
+import {
+  TimeFrameRef,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { CanvasRef } from "../hooks/useCanvas"
 import { PanelRef } from "../../components/worlds_manager/world_panel/Panel"

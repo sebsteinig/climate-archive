@@ -39,10 +39,10 @@ export function getPath(
     return res
   } else {
     return data.ts!.info.paths_ts.paths.map((path) => {
-      let paths : string[];
-      if(path.grid.length > vertical) {
+      let paths: string[]
+      if (path.grid.length > vertical) {
         paths = path.grid[vertical]
-      }else {
+      } else {
         paths = path.grid[0]
       }
       if (paths.length === 1) {
@@ -120,9 +120,9 @@ function processInfo(
       const average = sum / matrix[z].length
       return average
     } else {
-        const _z = matrix.length > z ? z : 0
-        const _t = matrix[_z].length > t ? t : 0
-        return parseFloat(matrix[_z][_t].min)
+      const _z = matrix.length > z ? z : 0
+      const _t = matrix[_z].length > t ? t : 0
+      return parseFloat(matrix[_z][_t].min)
     }
   })
   const max = bound_matrices.map((matrix) => {
@@ -183,9 +183,8 @@ export async function compute(
   canvas: CanvasRef,
   world_data: WorldData,
 ): Promise<TickData | undefined> {
-  
   const paths = getPath(world_data.time.mode, data, 0)
-  
+
   if (
     !canvas.current ||
     !canvas.current.current.ctx ||
@@ -193,7 +192,7 @@ export async function compute(
   ) {
     return
   }
-  
+
   let current_frame: number
   let next_frame: number
   let current_info: TextureInfo

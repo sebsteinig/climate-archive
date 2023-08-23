@@ -55,16 +55,12 @@ const labels = [
   "December",
 ]
 
-type Props = {
-}
+type Props = {}
 export default function Graph({}: Props) {
-
-  const show = useStore(state => state.graph.show)
-  const graphs = useStore(state => state.graph.graphs)
-  const visible = useStore(state => state.graph.visible)
-  const stored_active_variables = useStore(
-    (state) => state.active_variables,
-  )
+  const show = useStore((state) => state.graph.show)
+  const graphs = useStore((state) => state.graph.graphs)
+  const visible = useStore((state) => state.graph.visible)
+  const stored_active_variables = useStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
     let actives = []
     for (let [key, active] of stored_active_variables.entries()) {
@@ -72,75 +68,89 @@ export default function Graph({}: Props) {
     }
     return actives
   }, [stored_active_variables])
-  
 
-  if (graphs.length == 0 || active_variables.length == 0) return null;
+  if (graphs.length == 0 || active_variables.length == 0) return null
 
-  if(!visible) return (
-    <div className="absolute right-7 top-7 rounded-full w-fit h-fit bg-slate-700 p-4">
-      <ChartIcon
-        className="w-9 h-9 cursor-pointer text-slate-400 child:fill-slate-400"
-        onClick={() => {show(true)}}
-      />
-    </div>
-  )
-  
+  if (!visible)
+    return (
+      <div className="absolute right-7 top-7 rounded-full w-fit h-fit bg-slate-700 p-4">
+        <ChartIcon
+          className="w-9 h-9 cursor-pointer text-slate-400 child:fill-slate-400"
+          onClick={() => {
+            show(true)
+          }}
+        />
+      </div>
+    )
+
   return (
-    <div className="flex-grow flex flex-row w-[40vw]">
-      <div
-        className={`p-5 h-full flex-grow w-full rounded-md bg-gray-900`}
-      >
+    <div className="flex-grow flex flex-row w-[50vw]">
+      <div className={`p-5 h-full flex-grow w-full rounded-md bg-gray-900`}>
         <CrossIcon
           className="w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-600"
-          onClick={() => {show(false)}}
+          onClick={() => {
+            show(false)
+          }}
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
-
           <div className="w-full p-3">
-            <GraphTitles graphs={graphs}/>
+            <GraphTitles graphs={graphs} />
           </div>
 
-          {active_variables.map((variable, id : number) => <LineChart key={id}
-              variable = {variable} 
-              graphs = {graphs}/>)}
+          {active_variables.map((variable, id: number) => (
+            <LineChart key={id} variable={variable} graphs={graphs} />
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
-function GraphTitles({graphs}:{graphs : Graph[]}){
-  const remove = useStore(state => state.graph.remove)
-  return( 
+function GraphTitles({ graphs }: { graphs: Graph[] }) {
+  const remove = useStore((state) => state.graph.remove)
+  return (
     <div className="w-full p-2">
       <p className="text-slate-500 tracking-widest text-lg">Locations</p>
       <div className="flex flex-col"></div>
-      {graphs.map((graph, id) =>        
-        <div key={id} className="flex flex-row items-center gap-2 py-2 justify-between">
+      {graphs.map((graph, id) => (
+        <div
+          key={id}
+          className="flex flex-row items-center gap-2 py-2 justify-between"
+        >
           {/* <PinIcon
             className="w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500 hover:text-slate-600"
           /> */}
-          <p className="text-xs tracking-widest" style={{color:graph.color}}>{graphLabel(graph).coordinates}</p>
+          <p className="text-xs tracking-widest" style={{ color: graph.color }}>
+            {graphLabel(graph).coordinates}
+          </p>
           <div className="flex flex-row items-center gap-5">
-            <p className="text-xs tracking-widest" style={{color:graph.color}}>{graphLabel(graph).id}</p>
-            <p className="text-xs  italic" style={{color:graph.color}}> {getGraphTitle(graph)}</p>
+            <p
+              className="text-xs tracking-widest"
+              style={{ color: graph.color }}
+            >
+              {graphLabel(graph).id}
+            </p>
+            <p className="text-xs  italic" style={{ color: graph.color }}>
+              {" "}
+              {getGraphTitle(graph)}
+            </p>
           </div>
-          <BinIcon 
+          <BinIcon
             className="shrink-0 grow-0 w-8 h-8 cursor-pointer text-slate-500 hover:text-slate-600"
             onClick={() => remove(id)}
           />
         </div>
-      )}
+      ))}
       <div className="w-full px-5 pt-6">
-        <SmSeparator className="w-full bg-slate-500"/>
+        <SmSeparator className="w-full bg-slate-500" />
       </div>
     </div>
   )
 }
 
 type LineChartProps = {
-  graphs : Graph[]
-  variable : EVarID
+  graphs: Graph[]
+  variable: EVarID
 }
 
 enum FormatID {
@@ -155,7 +165,7 @@ type ToDownload = {
   filename: string
 }
 
-function LineChart({graphs, variable}: LineChartProps) {
+function LineChart({ graphs, variable }: LineChartProps) {
   const chartRef = useRef<ChartJSOrUndefined<"line", number[], string>>()
   const [download, setDownload] = useState<ToDownload>({
     format: FormatID.png,
@@ -163,32 +173,38 @@ function LineChart({graphs, variable}: LineChartProps) {
     filename: `${filename(graphs, titleOf(variable))}.png`,
   })
 
-  
   const [chart_data, setChartData] = useState<number[][]>([])
 
   useEffect(() => {
-    let all_data : number[][] = []
-    graphs.map((e) => getChartData(e, variable).then((data) => all_data.push(data)))
-    setChartData(all_data)  
+    let all_data: number[][] = []
+    graphs.map((e) =>
+      getChartData(e, variable).then((data) => all_data.push(data)),
+    )
+    setChartData(all_data)
   }, [graphs, variable])
 
-  const data = {labels : labels,
-      datasets: graphs.map(
-      (graph, id) =>{
-        return{
-          label : `${graphLabel(graph).id} | ${graphLabel(graph).label} (${graphLabel(graph).coordinates})`,
-          data : chart_data[id],
-          borderColor : `${graph.color}`,
-          backgroundColor: `${graph.color}80`,
-        }
-      })
-    }
+  const data = {
+    labels: labels,
+    datasets: graphs.map((graph, id) => {
+      return {
+        label: `${graphLabel(graph).id} | ${graphLabel(graph).label} (${
+          graphLabel(graph).coordinates
+        })`,
+        data: chart_data[id],
+        borderColor: `${graph.color}`,
+        backgroundColor: `${graph.color}80`,
+      }
+    }),
+  }
 
   const options = {
     //maintainAspectRatio: false ,
     scales: {
       y: {
-        title: { display: true, text: `${titleOf(variable)} [ ${unitOf(variable)} ]` },
+        title: {
+          display: true,
+          text: `${titleOf(variable)} [ ${unitOf(variable)} ]`,
+        },
         // ticks: {
         //   // Include unit in the ticks
         //   callback: function(value : any, index: any, ticks : any) {
@@ -219,7 +235,7 @@ function LineChart({graphs, variable}: LineChartProps) {
     },
   }
 
-  if (!data) return null;
+  if (!data) return null
 
   return (
     <div className="p-3 w-full">
@@ -227,8 +243,7 @@ function LineChart({graphs, variable}: LineChartProps) {
         <Line ref={chartRef} options={options} data={data} />
       </div>
       <div className="flex flex-row justify-between items-center p-2">
-        <h5>source : {getTitleMultipleSources(graphs)}
-        </h5>
+        <h5>source : {getTitleMultipleSources(graphs)}</h5>
 
         <div className="flex flex-row items-center gap-2">
           <ButtonFormat
@@ -313,10 +328,8 @@ function ButtonFormat(props: {
   )
 }
 
-function toCSV(
-  data : ChartData<"line", number[], string>
-) {
-  if (!data.labels) return "";
+function toCSV(data: ChartData<"line", number[], string>) {
+  if (!data.labels) return ""
   let csvRows = []
   csvRows.push("labels," + data.labels.join(","))
   for (const dataset of data.datasets) {
@@ -327,35 +340,32 @@ function toCSV(
   return csvRows.join("\n")
 }
 
-
-function getGraphTitle(graph : Graph ){
-    return (
-      isPublication(graph.data.collection)?
-      `${graph.data.collection.authors_short} (${graph.data.collection.year})`
-      :`${graph.data.exp?.id}`
-    )
+function getGraphTitle(graph: Graph) {
+  return isPublication(graph.data.collection)
+    ? `${graph.data.collection.authors_short} (${graph.data.collection.year})`
+    : `${graph.data.exp?.id}`
 }
 
-function filename(graphs : Graph[], var_name : string){
+function filename(graphs: Graph[], var_name: string) {
   let ids = ""
-  for (let graph of graphs){
-    ids += `${graph.id_label? graph.id_label.id : "exp"}.`
+  for (let graph of graphs) {
+    ids += `${graph.id_label ? graph.id_label.id : "exp"}.`
   }
   return `climatearchive.${var_name}.${ids}${getGraphTitle(graphs[0])}`
 }
 
-function graphLabel(graph : Graph){
+function graphLabel(graph: Graph) {
   const id = graph.id_label ? `${graph.id_label.id}` : ""
-  const label =  graph.id_label ?`${graph.id_label.label}`:""
-  const {f_lon, f_lat} = formatCoordinates({lon:graph.lon, lat:graph.lat})
-  return {id : id, label: label, coordinates :`${f_lon} / ${f_lat}`}
+  const label = graph.id_label ? `${graph.id_label.label}` : ""
+  const { f_lon, f_lat } = formatCoordinates({ lon: graph.lon, lat: graph.lat })
+  return { id: id, label: label, coordinates: `${f_lon} / ${f_lat}` }
 }
 
-function getTitleMultipleSources(graphs : Graph[]){
-  let titles : string[] = []
-  for (let graph of graphs){
-    if(isPublication(graph.data.collection)){
-      if(!titles.includes(getGraphTitle(graph))){
+function getTitleMultipleSources(graphs: Graph[]) {
+  let titles: string[] = []
+  for (let graph of graphs) {
+    if (isPublication(graph.data.collection)) {
+      if (!titles.includes(getGraphTitle(graph))) {
         titles.push(getGraphTitle(graph))
       }
     }

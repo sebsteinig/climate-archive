@@ -25,8 +25,8 @@ export function Winds({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {winds.colormap}
-          onChange = {(n) => winds.updateColormap(n)}
+          colormap_name={winds.colormap}
+          onChange={(n) => winds.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

@@ -11,6 +11,7 @@ import {
 import { Publication } from "../types"
 import { Graph } from "../store/graph/graph.type"
 import { EVarID } from "../store/variables/variable.types"
+import useSWR from "swr"
 import { ApiError } from "../errors/errors"
 
 // const URL_API = "http://localhost:3000/"
@@ -32,13 +33,30 @@ export async function searchPublication(query: SearchPublication) {
           url.searchParams.append(key, JSON.stringify(value))
         }
       })
-  
+
       return await getData<Publication[]>(url.href)
     }
     return []
   } catch (error) {
     throw new ApiError()
   }
+}
+
+export function useSearchPublication(query: SearchPublication) {
+  let href = null
+  if (query.title || query.journal || query.authors_short) {
+    let url = new URL("search/publication/", URL_API)
+    Object.entries(query).map((bind) => {
+      const [key, value] = bind
+      if (value) {
+        url.searchParams.append(key, JSON.stringify(value))
+      }
+    })
+    href = url.href
+  }
+  const fetcher = (url: string) => axios.get(url).then((res) => res.data)
+  const { data, error, isLoading } = useSWR<Publication[], Error>(href, fetcher)
+  return { data: data, error: error, isLoading: isLoading }
 }
 
 /**
@@ -148,10 +166,10 @@ export async function getJournals() {
   }
 }
 
-export async function getChartData(graph : Graph, variable : EVarID){
+export async function getChartData(graph: Graph, variable: EVarID) {
   //let url = new URL("")
   //let data = await axios.get(url.href)
-  try {    
+  try {
     let data = mockData()
     return data
   } catch (error) {
@@ -159,22 +177,21 @@ export async function getChartData(graph : Graph, variable : EVarID){
   }
 }
 
-function mockData(){
-  
-const labels = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-]
+function mockData() {
+  const labels = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ]
 
   return labels.map((_n: string, i: number) => Math.random() * 25)
 }

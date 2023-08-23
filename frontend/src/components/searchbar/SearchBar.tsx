@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef, SetStateAction, Dispatch } from "react"
-import { searchPublication } from "@/utils/api/api"
+import { searchPublication, useSearchPublication } from "@/utils/api/api"
 import FilterPublication from "./filters/FilterPublication"
 import FilterLabels from "./filters/FilterLabels"
 import FilterAdvanced from "./filters/FilterAdvanced"
@@ -14,6 +14,9 @@ import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import { FullWidthSeparator, MdSeparator } from "../separators/separators"
 import { PropsWithChildren } from "react"
 import { Collection } from "@/utils/store/collection.store"
+import axios from "axios"
+import useSWR from "swr"
+import LoadingSpinner from "../loadings/LoadingSpinner"
 
 // function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
 //     useEffect(() => {
@@ -70,7 +73,7 @@ export default function SearchBar({
   children,
 }: PropsWithChildren<Props>) {
   const [search_panel_visible, setSearchPanelVisible] = useState(true)
-  const [searched_content, setSearchContent] = useState<string>("")
+  const [searched_content, setSearchContent] = useState<string>(" ")
   const search_panel_ref = useRef<HTMLDivElement>(null)
   const [publications, setPublications] = useState<Publication[]>([])
   const [display_more_options, setDisplayMoreOptions] = useState(false)
@@ -81,25 +84,22 @@ export default function SearchBar({
   //     setSearchPanelVisible(false)
   //     setSearchContent("")
   // });
+  const { data, error, isLoading } = useSearchPublication({
+    ...requestFilters,
+    title: searched_content,
+  }) ?? { data: null, error: null }
 
   useEffect(() => {
     let ignore = false
-    if (searched_content !== "") {
-      searchPublication({
-        ...requestFilters,
-        title: searched_content,
-      })
-        ?.then((data) => setPublications(data))
-        .catch(() => {
-
-        })
+    if (data) {
+      setPublications(data)
     } else {
       setPublications([])
     }
     return () => {
       ignore = true
     }
-  }, [searched_content, requestFilters])
+  }, [data])
 
   return (
     <div

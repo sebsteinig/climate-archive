@@ -7,6 +7,8 @@ import { useStore } from "@/utils/store/store"
 import { usePathname, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
+import { Loading, useLoading } from "@/utils/useLoading"
+import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorView } from "@/components/ErrorView"
 import { useRouter } from "next/router"
@@ -26,17 +28,18 @@ async function loadExperiments(request: RequestMultipleTexture) {
 }
 
 export default function ExperimentsPage() {
+  const loading_ref = useLoading()
   const add = useStore((state) => state.worlds.add)
   const search_params = useSearchParams()
   const clear = useStore((state) => state.worlds.clear)
+  const clearGraph = useStore((state) => state.graph.clear)
   const pathname = usePathname()
-  const [error,setError] = useState(false)
-
-
-
+  const [error, setError] = useState(false)
 
   useEffect(() => {
+    loading_ref.current?.start()
     clear()
+    clearGraph()
     var request: RequestMultipleTexture = { exp_ids: [] }
     for (let [key, value] of search_params.entries()) {
       if (key == "reload") continue
@@ -68,17 +71,24 @@ export default function ExperimentsPage() {
           break
       }
     }
+    loading_ref.current?.finish()
     loadExperiments(request)
-    .then((collection) => {
-      add(collection)
-    }).catch(()=>{
-      setError(true)
-    })
+      .then((collection) => {
+        add(collection)
+      })
+      .catch(() => {
+        setError(true)
+      })
   }, [])
-  if(error) return  <ErrorView try_again_path={pathname + "?" + search_params}/>
+  if (error)
+    return <ErrorView try_again_path={pathname + "?" + search_params} />
   return (
-    <ErrorBoundary fallback={<ErrorView try_again_path={pathname + "?" + search_params}/>}>
-      <ClientMain />
+    <ErrorBoundary
+      fallback={<ErrorView try_again_path={pathname + "?" + search_params} />}
+    >
+      <Loading ref={loading_ref} fallback={<LoadingSpinner />}>
+        <ClientMain />
+      </Loading>
     </ErrorBoundary>
   )
 }

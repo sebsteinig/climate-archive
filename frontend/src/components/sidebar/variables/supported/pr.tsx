@@ -1,4 +1,10 @@
-import { ColorMapRow, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import {
+  ColorMapRow,
+  RowWithSlider,
+  Rows,
+  Variable,
+  VariableProps,
+} from "../utils"
 import { useStore } from "@/utils/store/store"
 
 import Slider from "@/components/inputs/Slider"
@@ -18,8 +24,8 @@ export function Pr({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {pr.colormap}
-          onChange = {(n) => pr.updateColormap(n)}
+          colormap_name={pr.colormap}
+          onChange={(n) => pr.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

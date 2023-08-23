@@ -11,13 +11,12 @@ type Props = {
 }
 
 export default function SideBar({ journals }: Props) {
-  
   const [current_variable_controls, setCurrentVariableControls] =
     useState<EVarID>()
   return (
     <Variables
       current_variable_controls={current_variable_controls}
-      setCurrentVariableControls={(e : EVarID) => setCurrentVariableControls(e)}
+      setCurrentVariableControls={(e: EVarID) => setCurrentVariableControls(e)}
     />
   )
 }

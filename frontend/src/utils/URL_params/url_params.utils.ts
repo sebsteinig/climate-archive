@@ -13,11 +13,11 @@ export function getContainers(sp: ReadonlyURLSearchParams) {
 
   for (let [key, value] of sp.entries()) {
     if (key == "reload") continue
-    if(!key.includes("*")) throw new Error("Incorrect query parameters")
+    if (!key.includes("*")) throw new Error("Incorrect query parameters")
 
     const [author, year] = key.split("*")
     let int_year = parseInt(year)
-    if (Number.isNaN(int_year))  throw new Error("Incorrect query parameters")
+    if (Number.isNaN(int_year)) throw new Error("Incorrect query parameters")
     containers.push({
       authors_short: author.replaceAll(".", " "),
       year: int_year,

@@ -1,4 +1,10 @@
-import { ColorMapRow, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
+import {
+  ColorMapRow,
+  RowWithSlider,
+  Rows,
+  Variable,
+  VariableProps,
+} from "../utils"
 import { useStore } from "@/utils/store/store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
@@ -17,8 +23,8 @@ export function Height({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {height.colormap}
-          onChange = {(n) => height.updateColormap(n)}
+          colormap_name={height.colormap}
+          onChange={(n) => height.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

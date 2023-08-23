@@ -68,7 +68,7 @@ export function CollectionDetails({
   const clear = useStore((state) => state.worlds.clear)
   const add = useStore((state) => state.worlds.add)
   const reload = useStore((state) => state.worlds.reload)
-  const { showBoundary } = useErrorBoundary();
+  const { showBoundary } = useErrorBoundary()
   const router = useRouter()
   const addCollection = useStore((state) => state.addCollection)
   if (!collection) return null
@@ -112,10 +112,12 @@ export function CollectionDetails({
                 const exp_id = collection.exps[0].id
                 try {
                   await database_provider.load({ exp_id })
-                  const idx = await database_provider.addPublicationToDb(collection)
+                  const idx = await database_provider.addPublicationToDb(
+                    collection,
+                  )
                   addCollection(idx, collection)
-                  add(collection,undefined,collection.exps[0])
-                }catch(e) {
+                  add(collection, undefined, collection.exps[0])
+                } catch (e) {
                   showBoundary(e)
                   return
                 }

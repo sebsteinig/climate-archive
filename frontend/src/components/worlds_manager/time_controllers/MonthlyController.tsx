@@ -1,7 +1,17 @@
-import { RefObject, forwardRef, useImperativeHandle, useRef, useState } from "react"
+import {
+  RefObject,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react"
 import { ControllerRef, TimeController } from "./utils/TimeController"
 import { IControllerRef } from "./controller.types"
-import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
+import {
+  TimeFrameRef,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time.type"
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
 import { goto } from "@/utils/store/worlds/world.utils"
 
@@ -9,14 +19,13 @@ type MonthlyControllerProps = {
   data: WorldData
   current_frame: TimeFrameRef
   world_id: WorldID
-  controller_ref : ControllerRef | undefined
+  controller_ref: ControllerRef | undefined
 }
 
 export const MonthlyController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
->(function MonthlyController({ current_frame, world_id, controller_ref,}, ref) {
-  
+>(function MonthlyController({ current_frame, world_id, controller_ref }, ref) {
   const progress_bar_ref = useRef<ProgessBarRef>(null)
   const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
     undefined,
@@ -24,9 +33,7 @@ export const MonthlyController = forwardRef<
   const [focus, setFocus] = useState<number | undefined>(undefined)
   useImperativeHandle(ref, () => {
     return {
-      onChange(frame) {
-        
-      },
+      onChange(frame) {},
       onWeightUpdate(frame) {
         progress_bar_ref.current?.update(frame.weight / (frame.timesteps ?? 12))
       },

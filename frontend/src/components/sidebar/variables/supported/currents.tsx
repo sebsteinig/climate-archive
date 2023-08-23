@@ -25,8 +25,8 @@ export function Currents({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {currents.colormap}
-          onChange = {(n) => currents.updateColormap(n)}
+          colormap_name={currents.colormap}
+          onChange={(n) => currents.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

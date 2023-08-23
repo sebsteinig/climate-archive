@@ -74,9 +74,9 @@ export const createVariableSlice: StateCreator<
         color_by_magnitude: false,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
-        set((state) => {
-          state.variables.currents.colormap = value
-        }),
+          set((state) => {
+            state.variables.currents.colormap = value
+          }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {
             state.variables.currents.animation_speed = value
@@ -112,9 +112,9 @@ export const createVariableSlice: StateCreator<
         diplacement: 0.2,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
-        set((state) => {
-          state.variables.height.colormap = value
-        }),
+          set((state) => {
+            state.variables.height.colormap = value
+          }),
         updateDiplacement: (value: number) =>
           set((state) => {
             state.variables.height.diplacement = value
@@ -135,9 +135,9 @@ export const createVariableSlice: StateCreator<
         max: 12,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
-        set((state) => {
-          state.variables.pr.colormap = value
-        }),
+          set((state) => {
+            state.variables.pr.colormap = value
+          }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.pr.min = value
@@ -165,9 +165,9 @@ export const createVariableSlice: StateCreator<
         name: EVarID.tos,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
-        set((state) => {
-          state.variables.tos.colormap = value
-        }),
+          set((state) => {
+            state.variables.tos.colormap = value
+          }),
         updateMin: (value: number) =>
           set((state) => {
             state.variables.tos.min = value
@@ -200,9 +200,9 @@ export const createVariableSlice: StateCreator<
         color_by_magnitude: true,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
-        set((state) => {
-          state.variables.winds.colormap = value
-        }),
+          set((state) => {
+            state.variables.winds.colormap = value
+          }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {
             state.variables.winds.animation_speed = value

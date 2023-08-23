@@ -11,7 +11,7 @@ import { useStore } from "@/utils/store/store"
 export function SearchButtonStatic() {
   const [search_bar_visible, displaySearchBar] = useState(false)
   const router = useRouter()
-  const reload = useStore(state => state.worlds.reload)
+  const reload = useStore((state) => state.worlds.reload)
   return (
     <>
       <SearchButton

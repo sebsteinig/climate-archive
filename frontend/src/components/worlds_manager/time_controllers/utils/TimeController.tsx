@@ -44,9 +44,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
 
-    const stored_active_variables = useStore(
-      (state) => state.active_variables,
-    )
+    const stored_active_variables = useStore((state) => state.active_variables)
     const active_variables = useMemo(() => {
       let actives = []
       for (let [key, active] of stored_active_variables.entries()) {
@@ -57,7 +55,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
 
     useEffect(() => {
       pause(tween_ref, setPlaying)
-    },[active_variables])
+    }, [active_variables])
 
     useImperativeHandle(ref, () => {
       return {
@@ -131,7 +129,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             <Play
               className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
-                if(active_variables.length > 0) {
+                if (active_variables.length > 0) {
                   play(data, world_id, current_frame, tween_ref, setPlaying)
                 }
               }}

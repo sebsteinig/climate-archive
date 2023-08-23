@@ -11,7 +11,12 @@ import { ALL_VARIABLES, EVarID } from "../store/variables/variable.types"
 import { SelectSingleResult } from "../api/api.types"
 import { Experiment, Experiments, Publication } from "../types"
 import { collectionEquals } from "../types.utils"
-import { PathError, PublicationError, TextureMustBeLoaded, TextureNotFound } from "../errors/errors"
+import {
+  PathError,
+  PublicationError,
+  TextureMustBeLoaded,
+  TextureNotFound,
+} from "../errors/errors"
 
 class DatabaseProvider {
   database!: Database
@@ -29,13 +34,13 @@ class DatabaseProvider {
   }
 
   private async _loadPaths(paths: { grid: string[][] }[], info: TextureInfo) {
-    try { 
+    try {
       await Promise.all(
         paths.flatMap(({ grid }) => {
           return grid.flatMap((row) => {
             return row.map(async (path) => {
               let texture = await this.loadFromDb(path)
-  
+
               if (!texture) {
                 // texture is undefined => not in the db, must be fetched and inserted in db
                 texture = await this.loadFromServer(path)
@@ -48,28 +53,36 @@ class DatabaseProvider {
           })
         }),
       )
-    }catch(error) {
+    } catch (error) {
       throw error
     }
   }
 
-  private async _loadFromSingleResult(res: SelectSingleResult,only_mean?:boolean) {
+  private async _loadFromSingleResult(
+    res: SelectSingleResult,
+    only_mean?: boolean,
+  ) {
     const info: TextureInfo = {
       ...res,
       variable: res.variable_name,
       /** TODO : resolutions */
     }
 
-    if(!only_mean) {
+    if (!only_mean) {
       await this._loadPaths(info.paths_ts.paths, info)
     }
     // TODO : REVERT WHEN NIMBUS BUGS IS FIXED
     // await this._loadPaths(info.paths_mean.paths, info)
-    await this._loadPaths(info.paths_mean.paths.map(({grid}) => {
-      return {
-        grid : grid.map((arr) => arr.map(e => e.replaceAll(".ts.", ".avg.")))
-      }
-    }), info)
+    await this._loadPaths(
+      info.paths_mean.paths.map(({ grid }) => {
+        return {
+          grid: grid.map((arr) =>
+            arr.map((e) => e.replaceAll(".ts.", ".avg.")),
+          ),
+        }
+      }),
+      info,
+    )
 
     try {
       const is_already = await this.database.textures_info.get([
@@ -83,7 +96,7 @@ class DatabaseProvider {
       throw error
     }
   }
-  async load(requested_texture: RequestTexture, only_mean?:boolean) {
+  async load(requested_texture: RequestTexture, only_mean?: boolean) {
     const texture_infos = await this.database.textures_info
       .where("exp_id")
       .equals(requested_texture.exp_id)
@@ -97,12 +110,15 @@ class DatabaseProvider {
     })
     await Promise.all(
       response.map(async (res) => {
-        await this._loadFromSingleResult(res,only_mean)
+        await this._loadFromSingleResult(res, only_mean)
       }),
     )
   }
 
-  async loadAll(requested_textures: RequestMultipleTexture, only_mean?:boolean) {
+  async loadAll(
+    requested_textures: RequestMultipleTexture,
+    only_mean?: boolean,
+  ) {
     const response = await selectAll({
       vars: requested_textures.variables,
       ids: requested_textures.exp_ids,
@@ -118,7 +134,7 @@ class DatabaseProvider {
         const [_, single_result_arr] = tmp
         await Promise.all(
           single_result_arr.map(async (res) => {
-            await this._loadFromSingleResult(res,only_mean)
+            await this._loadFromSingleResult(res, only_mean)
           }),
         )
       }),
@@ -132,7 +148,7 @@ class DatabaseProvider {
 
   async loadFromServer(path: string) {
     let texture = await this.database.textures.get({ path })
-    if(texture) return texture
+    if (texture) return texture
     try {
       const image_blob = await getImageArrayBuffer(path)
       texture = {
@@ -140,7 +156,7 @@ class DatabaseProvider {
         image: image_blob,
       } as Texture
       this.database.textures.add(texture)
-    }catch(error) {
+    } catch (error) {
       console.warn(error)
       throw error
     }
@@ -173,7 +189,7 @@ class DatabaseProvider {
   }
 
   async getTexture(path: string) {
-    if(!path) throw new PathError("undefinied path")
+    if (!path) throw new PathError("undefinied path")
     let texture = this.cache.get(path)
     if (!texture) {
       texture = await this.database.textures.get({ path: path })
@@ -193,10 +209,10 @@ class DatabaseProvider {
   async addPublicationToDb(publication: Publication) {
     try {
       const collections_array = await this.database.collections
-      .filter((e) => {
-        return collectionEquals(publication, e.data)
-      })
-      .toArray()
+        .filter((e) => {
+          return collectionEquals(publication, e.data)
+        })
+        .toArray()
 
       if (!collections_array || collections_array.length === 0) {
         return await this.database.collections.add({
@@ -218,7 +234,7 @@ class DatabaseProvider {
           })
           .modify({ "data.exps": Array.from(map_experiments).map((v) => v[1]) })
       }
-    }catch(error) {
+    } catch (error) {
       throw new PublicationError()
     }
   }

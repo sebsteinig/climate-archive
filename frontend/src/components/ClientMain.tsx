@@ -7,22 +7,21 @@ import { useEffect, useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection.store"
-import { usePathname } from "next/navigation"
-import { Publication } from "@/utils/types"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
 import { CollectionView } from "./CollectionView"
-import { useErrorBoundary } from "react-error-boundary";
+import { useErrorBoundary } from "react-error-boundary"
 
-type Props = {
-}
+type Props = {}
 
 export default function ClientMain({}: Props) {
   const [search_bar_visible, displaySearchBar] = useState(false)
   const [collection, setCollection] = useState<Collection | undefined>()
-  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(undefined)
-  
+  const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
+    undefined,
+  )
+
   return (
     <>
       <div className="flex flex-row w-full h-full gap-5">
@@ -84,7 +83,7 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
-        <Graph /> 
+        <Graph />
       </div>
     </>
   )

@@ -25,8 +25,8 @@ export function Tos({
     >
       <Rows>
         <ColorMapRow
-          colormap_name = {tos.colormap}
-          onChange = {(n) => tos.updateColormap(n)}
+          colormap_name={tos.colormap}
+          onChange={(n) => tos.updateColormap(n)}
         />
         <RowWithSlider
           onChange={(n) => {

@@ -145,8 +145,8 @@ export async function update(
   data: WorldData,
 ) {
   // clean the frame of unused variables
-  for(let variable of frame.variables.keys()) {
-    if(!active_variables.includes(variable)) {
+  for (let variable of frame.variables.keys()) {
+    if (!active_variables.includes(variable)) {
       frame.variables.delete(variable)
     }
   }

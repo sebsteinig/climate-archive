@@ -23,9 +23,7 @@ type Props = {
 export function WorldManager(props: Props) {
   const worlds_slots = useStore((state) => state.worlds.slots)
 
-  const stored_active_variables = useStore(
-    (state) => state.active_variables,
-  )
+  const stored_active_variables = useStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
     let actives = []
     for (let [key, active] of stored_active_variables.entries()) {
@@ -36,26 +34,28 @@ export function WorldManager(props: Props) {
 
   const current_frame = useFrameRef()
   const canvas = useCanvas()
-  
-  const { showBoundary } = useErrorBoundary();
-  const [is_empty,setEmpty] = useState<undefined | boolean>(undefined)
+
+  const { showBoundary } = useErrorBoundary()
+  const [is_empty, setEmpty] = useState<undefined | boolean>(undefined)
   useEffect(() => {
-    if(worlds_slots.size === 0 && is_empty !== undefined) {
+    if (worlds_slots.size === 0 && is_empty !== undefined) {
       setEmpty(true)
-    }else {
+    } else {
       setEmpty(false)
     }
-  },[worlds_slots.size])
+  }, [worlds_slots.size])
   useEffect(() => {
     // PREPARE EACH TIME FRAMES
-    init(worlds_slots, current_frame, active_variables).then(() => {
-      if (pathname.includes("publication")) {
-        const search_params = resolveURLparams(worlds_slots)
-        router.push(pathname + "?" + search_params.toString())
-      }
-    }).catch((e) => {
-      showBoundary(e)
-    })
+    init(worlds_slots, current_frame, active_variables)
+      .then(() => {
+        if (pathname.includes("publication")) {
+          const search_params = resolveURLparams(worlds_slots)
+          router.push(pathname + "?" + search_params.toString())
+        }
+      })
+      .catch((e) => {
+        showBoundary(e)
+      })
   }, [worlds_slots, active_variables])
   const router = useRouter()
   const pathname = usePathname()
@@ -75,20 +75,35 @@ export function WorldManager(props: Props) {
     scene_refs.current[world_id] = React.createRef<SceneRef>()
   }
 
-  if(is_empty ) {
+  if (is_empty) {
     return (
       <div className="w-full h-full flex flex-col">
         <div className="grow-0 self-end">
-          <Link href={"/"} className="overflow-hidden h-14 cursor-pointer flex items-center">
+          <Link
+            href={"/"}
+            className="overflow-hidden h-14 cursor-pointer flex items-center"
+          >
             <h1 className="">CLIMATE ARCHIVE</h1>
           </Link>
         </div>
         <div className="w-full h-full flex justify-center items-center">
           <div>
             <h1 className="font-bold text-center small-caps text-5xl">
-              Nothing to see here !</h1>
+              Nothing to see here !
+            </h1>
             <br />
-            <p className="text-center">Try searching for the publication using our handy search bar up top,<br/> or simply head back to our <Link href={"/"} className="cursor-pointer text-emerald-500 tracking-widest small-caps">homepage</Link>. Safe travels! </p>
+            <p className="text-center">
+              Try searching for the publication using our handy search bar up
+              top,
+              <br /> or simply head back to our{" "}
+              <Link
+                href={"/"}
+                className="cursor-pointer text-emerald-500 tracking-widest small-caps"
+              >
+                homepage
+              </Link>
+              . Safe travels!{" "}
+            </p>
           </div>
         </div>
       </div>
@@ -96,7 +111,7 @@ export function WorldManager(props: Props) {
   }
 
   return (
-    <>  
+    <>
       <div className={`flex flex-grow h-full`}>
         <div
           ref={container_ref}
@@ -108,16 +123,16 @@ export function WorldManager(props: Props) {
         >
           {Array.from(worlds_slots, ([world_id, data], idx) => {
             return (
-                <Panel
-                  displayCollection={props.displayCollection}
-                  grid_id={idx}
-                  current_frame={current_frame}
-                  key={world_id}
-                  data={data}
-                  world_id={world_id}
-                  ref={panel_refs.current[world_id]!}
-                  scene_ref={scene_refs.current[world_id]!}
-                />
+              <Panel
+                displayCollection={props.displayCollection}
+                grid_id={idx}
+                current_frame={current_frame}
+                key={world_id}
+                data={data}
+                world_id={world_id}
+                ref={panel_refs.current[world_id]!}
+                scene_ref={scene_refs.current[world_id]!}
+              />
             )
           })}
         </div>
@@ -135,16 +150,16 @@ export function WorldManager(props: Props) {
         >
           {Array.from(worlds_slots, ([world_id, data]) => {
             return (
-                <Scene
-                  key={world_id}
-                  world_id={world_id}
-                  data={data}
-                  current_frame={current_frame}
-                  canvas={canvas}
-                  active_variables={active_variables}
-                  panel_ref={panel_refs.current[world_id]}
-                  ref={scene_refs.current[world_id]!}
-                />
+              <Scene
+                key={world_id}
+                world_id={world_id}
+                data={data}
+                current_frame={current_frame}
+                canvas={canvas}
+                active_variables={active_variables}
+                panel_ref={panel_refs.current[world_id]}
+                ref={scene_refs.current[world_id]!}
+              />
             )
           })}
         </Canvas>

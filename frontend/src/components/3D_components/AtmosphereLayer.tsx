@@ -48,12 +48,11 @@ const geometry = new THREE.PlaneGeometry(4, 2, 64, 32)
 //   },
 // })
 
-type Props = {
-}
+type Props = {}
 
 export type AtmosphereLayerRef = {
   type: RefObject<SphereType>
-  cleanTextures : () => void
+  cleanTextures: () => void
   updateTextures: (data: TickData) => void
   tick: (weight: number, uSphereWrapAmount: number) => void
 }

@@ -43,7 +43,10 @@ export default function Home() {
         <nav className="flex flex-row justify-between">
           <SearchButtonStatic />
 
-          <Link href={"/"} className="overflow-hidden h-14 cursor-pointer flex items-center">
+          <Link
+            href={"/"}
+            className="overflow-hidden h-14 cursor-pointer flex items-center"
+          >
             <h1 className="">CLIMATE ARCHIVE</h1>
           </Link>
         </nav>
@@ -109,30 +112,32 @@ export default function Home() {
               {/* <div className=" border-blue-500">
 
               </div> */}
-              <div className="grow overflow-hidden 
+              <div
+                className="grow overflow-hidden 
                   flex flex-row gap-5 w-full p-5 
-                  rounded-lg h-full bg-slate-700">
-                  <div className="flex flex-col gap-5">
-                    <h2 className="text-slate-300 tracking-[.5em] small-caps">
-                      fantasy worlds
-                    </h2>
-                    <p className="text-slate-400">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Consequatur neque assumenda ex sapiente repudiandae ab
-                      odit voluptates corrupti dolore perferendis, praesentium
-                      recusandae dicta quisquam, nulla laudantium placeat,
-                      veniam beatae alias.
-                    </p>
-                  </div>
-                  <div className="w-full h-fit">
-                    <Image
-                      width={499}
-                      height={466}
-                      alt=""
-                      src={"/assets/world-test.png"}
-                    />
-                  </div>
+                  rounded-lg h-full bg-slate-700"
+              >
+                <div className="flex flex-col gap-5">
+                  <h2 className="text-slate-300 tracking-[.5em] small-caps">
+                    fantasy worlds
+                  </h2>
+                  <p className="text-slate-400">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Consequatur neque assumenda ex sapiente repudiandae ab odit
+                    voluptates corrupti dolore perferendis, praesentium
+                    recusandae dicta quisquam, nulla laudantium placeat, veniam
+                    beatae alias.
+                  </p>
                 </div>
+                <div className="w-full h-fit">
+                  <Image
+                    width={499}
+                    height={466}
+                    alt=""
+                    src={"/assets/world-test.png"}
+                  />
+                </div>
+              </div>
             </div>
             <div className="grow-0 shrink-0  ">
               <div className="rounded-lg bg-slate-900 flex flex-row gap-5 p-5 justify-evenly">

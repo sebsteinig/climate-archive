@@ -1,23 +1,21 @@
 import { StateCreator } from "zustand"
-import {
-  WorldID,
-  CollectionID,
-  WorldData,
-  Slots,
-  TimeConf,
-} from "./time.type"
+import { WorldID, CollectionID, WorldData, Slots, TimeConf } from "./time.type"
 
 import { Collection } from "../collection.store"
 import { buildTimeConf, buildWorldConf } from "./world.utils"
 import { Experiment, Publication } from "@/utils/types"
 
 export interface WorldSlice {
-  worlds : {
+  worlds: {
     __auto_increment: number
     slots: Slots
-    reload_flag : boolean
-    reload : (flag:boolean) => void
-    add: (collection: Collection, config?: Partial<TimeConf>,exp?:Experiment) => void
+    reload_flag: boolean
+    reload: (flag: boolean) => void
+    add: (
+      collection: Collection,
+      config?: Partial<TimeConf>,
+      exp?: Experiment,
+    ) => void
     addAll: (
       collection: { publication: Publication; exp_id: string }[],
       config?: Partial<TimeConf>,
@@ -41,13 +39,13 @@ export const createWorldSlice: StateCreator<
     worlds: {
       __auto_increment: -1,
       slots: new Map(),
-      reload_flag : true,
+      reload_flag: true,
       reload(flag) {
-          set(state => {
-            state.worlds.reload_flag = flag
-          })
+        set((state) => {
+          state.worlds.reload_flag = flag
+        })
       },
-      add(collection, config,exp) {
+      add(collection, config, exp) {
         set((state) => {
           state.worlds.__auto_increment += 1
           state.worlds.slots.set(state.worlds.__auto_increment, {

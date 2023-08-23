@@ -1,4 +1,8 @@
-import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
+import {
+  TimeFrameRef,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { World } from "@/components/3D_components/World"
 import {
@@ -59,15 +63,14 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
       },
     }
   })
-  function handleClickOnWorld({lat,lon}:Coordinate) {
-    panel_ref.current?.container_ref.current?.showClickPanel(data,{lat,lon})
+  function handleClickOnWorld({ lat, lon }: Coordinate) {
+    panel_ref.current?.container_ref.current?.showClickPanel(data, { lat, lon })
   }
   if (!panel_ref.current?.container_ref.current) {
     return null
   }
   return (
-    <View track={panel_ref.current!.container_ref.current!.track} 
-    >
+    <View track={panel_ref.current!.container_ref.current!.track}>
       <color attach="background" args={["#020617"]} />
       <World
         onClick={handleClickOnWorld}

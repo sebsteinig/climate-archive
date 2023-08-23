@@ -15,7 +15,11 @@ import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import InfoIcon from "$/assets/icons/info.svg"
 import { Collection } from "@/utils/store/collection.store"
-import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
+import {
+  TimeFrameRef,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time.type"
 import Link from "next/link"
 import { useStore } from "@/utils/store/store"
 import { gsap } from "gsap"
@@ -224,7 +228,11 @@ function RotateBtn(params: RotateBtnProps) {
 type GridBtnProps = {}
 
 function GridBtn(params: GridBtnProps) {
-  return <GridIcon className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400`} />
+  return (
+    <GridIcon
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400`}
+    />
+  )
 }
 
 type PinBtnProps = {}
