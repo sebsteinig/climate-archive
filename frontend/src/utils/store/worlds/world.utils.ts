@@ -57,26 +57,6 @@ export function chunksDetails(info: TextureInfo): [number, number] {
   return [cs, fs]
 }
 
-// function computeRatio(ref: TimeFrameState): number {
-//   const [_, fpc] = chunksDetails(ref.info)
-//   const ts = ref.info.timesteps
-//   const f = ref.current.frame
-//   const c = ref.current.time_chunk
-
-//   return (f + c * fpc) / ts
-// }
-
-// function computeFramePos(
-//   ratio: number,
-//   timesteps: number,
-//   fpc: number,
-// ): [number, number] {
-//   const tmp_frame = Math.floor(timesteps * ratio)
-//   const time_chunk = Math.floor(tmp_frame / fpc)
-//   const frame = tmp_frame % fpc
-//   return [frame, time_chunk]
-// }
-
 export async function getMaxTimesteps(frame: TimeFrame) {
   const ts = await Promise.all(
     ALL_VARIABLES.map(async (variable) => {

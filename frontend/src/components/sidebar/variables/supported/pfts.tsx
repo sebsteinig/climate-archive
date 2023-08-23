@@ -1,11 +1,11 @@
 import { Variable, VariableProps } from "../utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 
 export function Pfts({
   current_variable_controls,
   setCurrentVariableControls,
 }: VariableProps) {
-  const pfts = useClusterStore((state) => state.variables.pfts)
+  const pfts = useStore((state) => state.variables.pfts)
   return (
     <Variable
       title={pfts.name}

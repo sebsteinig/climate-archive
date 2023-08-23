@@ -1,9 +1,9 @@
 import {
   TimeController,
   TimeFrameRef,
-  TimeID,
+  WorldID,
   WorldData,
-} from "@/utils/store/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import { Container, ContainerRef } from "./Container"
 import { Collection } from "@/utils/store/collection.store"
@@ -14,7 +14,7 @@ import { GeoTimeScaleController } from "../time_controllers/GeoTimeScaleControll
 
 export type PanelProps = {
   displayCollection: (collection: Collection) => void
-  time_id: TimeID
+  world_id: WorldID
   grid_id: number
   data: WorldData
   current_frame: TimeFrameRef
@@ -27,7 +27,7 @@ export type PanelRef = {
 }
 
 export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
-  { data, time_id, grid_id, current_frame, displayCollection, scene_ref },
+  { data, world_id, grid_id, current_frame, displayCollection, scene_ref },
   refs,
 ) {
   const controller_ref = useRef<IControllerRef>(null)
@@ -48,7 +48,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
           current_frame={current_frame}
           grid_id={grid_id}
           ref={container_ref}
-          time_id={time_id}
+          world_id={world_id}
           data={data}
           scene_ref={scene_ref}
         />
@@ -57,7 +57,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
           {data.time.controller === TimeController.monthly && (
             <MonthlyController
               ref={controller_ref}
-              time_id={time_id}
+              world_id={world_id}
               data={data}
               controller_ref={container_ref.current?.controller}
               current_frame={current_frame}
@@ -69,7 +69,7 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
               current_frame={current_frame}
               data={data}
               controller_ref={container_ref.current?.controller}
-              time_id={time_id}
+              world_id={world_id}
             />
           )}
         </div>

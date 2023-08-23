@@ -1,40 +1,44 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Experiments } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useClusterStore } from "@/utils/store/cluster.store"
-import { useSearchParams } from "next/navigation"
+import { useStore } from "@/utils/store/store"
+import { usePathname, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
+import { ErrorBoundary } from "react-error-boundary"
+import { ErrorView } from "@/components/ErrorView"
+import { useRouter } from "next/router"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
 })
+
+async function loadExperiments(request: RequestMultipleTexture) {
+  await database_provider.loadAll(request)
+  const collection = {
+    exps: request.exp_ids!.map((exp: string) => {
+      return { id: exp, metadata: [] }
+    }),
+  } as Experiments
+  return collection
+}
+
 export default function ExperimentsPage() {
-  const add = useClusterStore((state) => state.time.add)
-  const searchParams = useSearchParams()
-  const clear = useClusterStore((state) => state.time.clear)
+  const add = useStore((state) => state.worlds.add)
+  const search_params = useSearchParams()
+  const clear = useStore((state) => state.worlds.clear)
+  const pathname = usePathname()
+  const [error,setError] = useState(false)
 
-  const reload = useMemo(() => {
-    if (!searchParams.has("reload")) return false
-    return searchParams.get("reload") == "true"
-  }, [searchParams])
 
-  const loadExperiments = async (request: RequestMultipleTexture) => {
-    await database_provider.loadAll(request)
-    const collection = {
-      exps: request.exp_ids!.map((exp: string) => {
-        return { id: exp, metadata: [] }
-      }),
-    } as Experiments
-    add(collection)
-  }
+
 
   useEffect(() => {
     clear()
     var request: RequestMultipleTexture = { exp_ids: [] }
-    for (let [key, value] of searchParams.entries()) {
+    for (let [key, value] of search_params.entries()) {
       if (key == "reload") continue
       switch (key) {
         case "resolution":
@@ -65,11 +69,16 @@ export default function ExperimentsPage() {
       }
     }
     loadExperiments(request)
-  }, [reload])
-
+    .then((collection) => {
+      add(collection)
+    }).catch(()=>{
+      setError(true)
+    })
+  }, [])
+  if(error) return  <ErrorView try_again_path={pathname + "?" + search_params}/>
   return (
-    <>
+    <ErrorBoundary fallback={<ErrorView try_again_path={pathname + "?" + search_params}/>}>
       <ClientMain />
-    </>
+    </ErrorBoundary>
   )
 }

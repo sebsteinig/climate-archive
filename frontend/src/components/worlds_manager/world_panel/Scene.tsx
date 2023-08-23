@@ -1,4 +1,4 @@
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { World } from "@/components/3D_components/World"
 import {
@@ -7,7 +7,6 @@ import {
   PerspectiveCamera,
   View,
 } from "@react-three/drei"
-import { CanvasRef } from "../useCanvas"
 import { PanelRef } from "./Panel"
 import {
   MutableRefObject,
@@ -17,14 +16,15 @@ import {
   useRef,
   useState,
 } from "react"
-import { tickBuilder } from "../tick"
+import { tickBuilder } from "../../../utils/tick/tick"
 import { ThreeEvent, useThree } from "@react-three/fiber"
 import THREE from "three"
 import { AtmosphereLayerRef } from "@/components/3D_components/AtmosphereLayer"
 import { Coordinate } from "@/utils/store/graph/graph.type"
+import { CanvasRef } from "@/utils/hooks/useCanvas"
 
 export type SceneProps = {
-  time_id: TimeID
+  world_id: WorldID
   panel_ref: RefObject<PanelRef>
   data: WorldData
   current_frame: TimeFrameRef
@@ -37,7 +37,7 @@ export type SceneRef = {
 }
 export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
   {
-    time_id,
+    world_id,
     panel_ref,
     data,
     current_frame,
@@ -72,7 +72,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
       <World
         onClick={handleClickOnWorld}
         tick={tickBuilder(
-          time_id,
+          world_id,
           panel_ref,
           data,
           current_frame,

@@ -7,8 +7,9 @@ import * as THREE from "three"
 import Lights from "./Lights"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
 import { ALL_VARIABLES, EVarID } from "@/utils/store/variables/variable.types"
-import { TickFn } from "../worlds_manager/tick"
+import { TickFn } from "../../utils/tick/tick"
 import { Coordinate } from "@/utils/store/graph/graph.type"
+import { useErrorBoundary } from "react-error-boundary"
 
 type Props = {
   tick: TickFn
@@ -17,6 +18,7 @@ type Props = {
 
 export function World({ tick , onClick }: Props) {
   console.log("creating World component")
+  const { showBoundary } = useErrorBoundary();
 
   const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
   useFrame((state, delta) => {
@@ -47,6 +49,8 @@ export function World({ tick , onClick }: Props) {
           }
         }
       }
+    }).catch((e) => {
+      showBoundary(e)
     })
   })
 

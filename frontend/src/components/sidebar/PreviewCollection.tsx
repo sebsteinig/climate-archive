@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import DotsIcon from "$/assets/icons/dots-slate-500.svg"
 import ArrowDown from "$/assets/icons/arrow-down-gray-50.svg"
 import ArrowUp from "$/assets/icons/arrow-up-gray-50.svg"
@@ -8,7 +8,7 @@ import { EditCollection } from "./EditCollection"
 import { MdSeparator } from "@/components/separators/separators"
 import { isPublication } from "@/utils/types.utils"
 import { Experiment, Experiments, Publication } from "@/utils/types"
-import { TimeMode } from "@/utils/store/time/time.type"
+import { TimeMode } from "@/utils/store/worlds/time.type"
 import { CollectionDetails } from "../CollectionView"
 
 // type Props = {
@@ -24,8 +24,8 @@ import { CollectionDetails } from "../CollectionView"
 //   setDisplayDetails,
 //   setCurrentVariableControls,
 // }: Props) {
-//   const collections = useClusterStore((state) => state.collections)
-//   const binder = useClusterStore((state) => state.time.slots.lookup)
+//   const collections = useStore((state) => state.collections)
+//   const binder = useStore((state) => state.worlds.slots.lookup)
 
 //   const [display_all, displayAll] = useState(false)
 //   return (

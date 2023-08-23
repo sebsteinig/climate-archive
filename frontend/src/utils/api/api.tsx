@@ -11,6 +11,7 @@ import {
 import { Publication } from "../types"
 import { Graph } from "../store/graph/graph.type"
 import { EVarID } from "../store/variables/variable.types"
+import { ApiError } from "../errors/errors"
 
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
@@ -22,18 +23,22 @@ const URL_IMAGE = "http://51.89.165.226:3005/"
  * @returns experiments from publication as json
  */
 export async function searchPublication(query: SearchPublication) {
-  let url = new URL("search/publication/", URL_API)
-  if (query.title || query.journal || query.authors_short) {
-    Object.entries(query).map((bind) => {
-      const [key, value] = bind
-      if (value) {
-        url.searchParams.append(key, JSON.stringify(value))
-      }
-    })
-
-    return await getData<Publication[]>(url.href)
+  try {
+    let url = new URL("search/publication/", URL_API)
+    if (query.title || query.journal || query.authors_short) {
+      Object.entries(query).map((bind) => {
+        const [key, value] = bind
+        if (value) {
+          url.searchParams.append(key, JSON.stringify(value))
+        }
+      })
+  
+      return await getData<Publication[]>(url.href)
+    }
+    return []
+  } catch (error) {
+    throw new ApiError()
   }
-  return []
 }
 
 /**
@@ -41,9 +46,13 @@ export async function searchPublication(query: SearchPublication) {
  * @returns labels
  */
 export function searchLooking(query: { for: string }) {
-  let url = new URL("search/looking/", URL_API)
-  url.searchParams.append("for", JSON.stringify(query.for))
-  return getData(url.href)
+  try {
+    let url = new URL("search/looking/", URL_API)
+    url.searchParams.append("for", JSON.stringify(query.for))
+    return getData(url.href)
+  } catch (error) {
+    throw new ApiError()
+  }
 }
 
 /**
@@ -51,19 +60,23 @@ export function searchLooking(query: { for: string }) {
  * @returns experiments with these characteristics
  */
 export function search(query: SearchExperiment) {
-  if (
-    !Object.values(query).every((value, index, number) => {
-      value == null
-    })
-  ) {
-    let url = new URL("search/", URL_API)
-    Object.entries(query).map((bind) => {
-      const [key, value] = bind
-      if (value) {
-        url.searchParams.append(key, JSON.stringify(value))
-      }
-    })
-    return getData(url.href)
+  try {
+    if (
+      !Object.values(query).every((value, index, number) => {
+        value == null
+      })
+    ) {
+      let url = new URL("search/", URL_API)
+      Object.entries(query).map((bind) => {
+        const [key, value] = bind
+        if (value) {
+          url.searchParams.append(key, JSON.stringify(value))
+        }
+      })
+      return getData(url.href)
+    }
+  } catch (error) {
+    throw new ApiError()
   }
 }
 
@@ -72,56 +85,34 @@ async function getData<T>(url: string) {
   return data.data as T
 }
 
-export async function selectCollection(query: SelectCollectionParameter) {
-  let url = new URL("select/collection/", URL_API)
-  Object.entries(query).forEach((bind) => {
-    const [key, value] = bind
-    if (value) {
-      url.searchParams.append(key, JSON.stringify(value))
-    }
-  })
-  return getData(url.href)
-}
-
 export async function select(id: string, query: SelectSingleParameter) {
-  let url = new URL(`select/${id}/`, URL_API)
-  Object.entries(query).forEach((bind) => {
-    const [key, value] = bind
-    if (value) {
-      url.searchParams.append(key, JSON.stringify(value))
-    }
-  })
-  let data = await axios.get(url.href)
-  return data.data as SelectSingleResult[]
+  try {
+    let url = new URL(`select/${id}/`, URL_API)
+    Object.entries(query).forEach((bind) => {
+      const [key, value] = bind
+      if (value) {
+        url.searchParams.append(key, JSON.stringify(value))
+      }
+    })
+    let data = await axios.get(url.href)
+    return data.data as SelectSingleResult[]
+  } catch (error) {
+    throw new ApiError()
+  }
 }
 export async function selectAll(query: SelectCollectionParameter) {
-  let url = new URL(`select/collection/`, URL_API)
-  Object.entries(query).forEach((bind) => {
-    const [key, value] = bind
-    if (value) {
-      url.searchParams.append(key, JSON.stringify(value))
-    }
-  })
-  let data = await axios.get(url.href)
-  return data.data as SelectCollectionResult
-}
-
-export async function getImage(path: string) {
-  let url = new URL(trimRoutes(path, 7), URL_IMAGE)
   try {
-    let data = await axios.get(url.href, {
-      responseType: "arraybuffer",
+    let url = new URL(`select/collection/`, URL_API)
+    Object.entries(query).forEach((bind) => {
+      const [key, value] = bind
+      if (value) {
+        url.searchParams.append(key, JSON.stringify(value))
+      }
     })
-
-    const base64 = btoa(
-      new Uint8Array(data.data).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        "",
-      ),
-    )
-    return base64
+    let data = await axios.get(url.href)
+    return data.data as SelectCollectionResult
   } catch (error) {
-    throw error
+    throw new ApiError()
   }
 }
 
@@ -141,23 +132,31 @@ export async function getImageArrayBuffer(path: string) {
 
     return res.data as ArrayBuffer
   } catch (error) {
-    throw error
+    throw new ApiError()
   }
 }
 
 export async function getJournals() {
   //console.log("FECTH JOURNAL <getJournals>")
-  let url = new URL("select/journal/", URL_API)
-  let data = await axios.get(url.href)
-  let journals = data.data.map((e: { journal: string }) => e.journal)
-  return journals as string[]
+  try {
+    let url = new URL("select/journal/", URL_API)
+    let data = await axios.get(url.href)
+    let journals = data.data.map((e: { journal: string }) => e.journal)
+    return journals as string[]
+  } catch (error) {
+    throw new ApiError()
+  }
 }
 
 export async function getChartData(graph : Graph, variable : EVarID){
   //let url = new URL("")
   //let data = await axios.get(url.href)
-  let data = mockData()
-  return data
+  try {    
+    let data = mockData()
+    return data
+  } catch (error) {
+    throw new ApiError()
+  }
 }
 
 function mockData(){

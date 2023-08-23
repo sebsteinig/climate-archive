@@ -1,21 +1,21 @@
 import { RefObject, forwardRef, useImperativeHandle, useRef, useState } from "react"
 import { ControllerRef, TimeController } from "./utils/TimeController"
 import { IControllerRef } from "./controller.types"
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
-import { goto } from "@/utils/store/time/time.utils"
+import { goto } from "@/utils/store/worlds/world.utils"
 
 type MonthlyControllerProps = {
   data: WorldData
   current_frame: TimeFrameRef
-  time_id: TimeID
+  world_id: WorldID
   controller_ref : ControllerRef | undefined
 }
 
 export const MonthlyController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
->(function MonthlyController({ current_frame, time_id, controller_ref,}, ref) {
+>(function MonthlyController({ current_frame, world_id, controller_ref,}, ref) {
   
   const progress_bar_ref = useRef<ProgessBarRef>(null)
   const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
@@ -62,7 +62,7 @@ export const MonthlyController = forwardRef<
               month={month}
               color={MONTHS_COLOR[idx]}
               onChange={(idx, focus) => {
-                const frame = current_frame.current.get(time_id)
+                const frame = current_frame.current.get(world_id)
                 if (!frame) return
                 setHighLightMonth(idx)
                 if (focus) {

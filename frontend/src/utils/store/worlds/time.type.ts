@@ -71,11 +71,11 @@ export type TimeFrame = {
 }
 
 export type TimeFrameHolder = {
-  map: Map<TimeID, TimeFrame>
-  update: (frame: TimeFrame, time_id: TimeID) => TimeFrame
-  get: (time_id: TimeID) => TimeFrame | undefined
+  map: Map<WorldID, TimeFrame>
+  update: (frame: TimeFrame, world_id: WorldID) => TimeFrame
+  get: (world_id: WorldID) => TimeFrame | undefined
   init: (
-    time_id: TimeID,
+    world_id: WorldID,
     exp: Experiment,
     active_variables: EVarID[],
     world_data: WorldData,
@@ -84,7 +84,7 @@ export type TimeFrameHolder = {
 
 export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
 
-export type TimeID = number
+export type WorldID = number
 export type CollectionID = number
 
 export type TimeConf = {
@@ -107,4 +107,4 @@ export type WorldData = {
   exp?: Experiment
 }
 
-export type Slots = Map<TimeID, WorldData>
+export type Slots = Map<WorldID, WorldData>

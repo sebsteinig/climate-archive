@@ -4,12 +4,12 @@ import {
   TimeFrameState,
   TimeMode,
   WorldData,
-} from "@/utils/store/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { LRUCache } from "lru-cache"
-import { CanvasRef } from "./useCanvas"
+import { CanvasRef } from "./hooks/useCanvas"
 import { TickData, TickDataState } from "./tick"
 import { EVarID } from "@/utils/store/variables/variable.types"
-import { chunksDetails } from "@/utils/store/time/time.utils"
+import { chunksDetails } from "@/utils/store/worlds/world.utils"
 
 export function getPath(
   mode: TimeMode,
