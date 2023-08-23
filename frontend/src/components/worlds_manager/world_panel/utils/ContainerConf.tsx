@@ -15,19 +15,19 @@ import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import InfoIcon from "$/assets/icons/info.svg"
 import { Collection } from "@/utils/store/collection.store"
-import { TimeFrameRef, TimeID, WorldData } from "@/utils/store/time/time.type"
+import { TimeFrameRef, WorldID, WorldData } from "@/utils/store/worlds/time.type"
 import Link from "next/link"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import { gsap } from "gsap"
 import { usePathname, useRouter } from "next/navigation"
 import { resolveURLparams } from "@/utils/URL_params/url_params.utils"
-import { SceneRef } from "./Scene"
+import { SceneRef } from "../Scene"
 
 type Props = {
   className?: string
   displayCollection: (collection: Collection) => void
   data: WorldData
-  time_id: TimeID
+  world_id: WorldID
   current_frame: TimeFrameRef
   scene_ref: RefObject<SceneRef>
 }
@@ -37,7 +37,7 @@ export function ContainerConf({
   displayCollection,
   data,
   current_frame,
-  time_id,
+  world_id,
   scene_ref,
 }: Props) {
   const [is_expanded, expand] = useState(false)
@@ -51,12 +51,12 @@ export function ContainerConf({
     >
       {is_expanded ? (
         <ArrowDownIcon
-          className="p-2 w-10 h-10  cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
+          className="shrink-0 grow-0 p-2 w-10 h-10  cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
           onClick={() => expand(false)}
         />
       ) : (
         <ArrowUpIcon
-          className="p-2 w-10 h-10  cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
+          className="shrink-0 grow-0 p-2 w-10 h-10  cursor-pointer text-align:center text-slate-400 child:fill-slate-400"
           onClick={() => expand(true)}
         />
       )}
@@ -67,8 +67,8 @@ export function ContainerConf({
           <AnchorBtn />
           <ScreenshotBtn />
           <WorldBtn
-            onClick={(time_id, is_spheric) => {
-              const frame = current_frame.current.get(time_id)
+            onClick={(world_id, is_spheric) => {
+              const frame = current_frame.current.get(world_id)
               if (!frame) return
               if (scene_ref.current) {
                 scene_ref.current.canOrbit(is_spheric)
@@ -80,7 +80,7 @@ export function ContainerConf({
                 ease: "none",
               })
             }}
-            time_id={time_id}
+            world_id={world_id}
           />
           <RotateBtn />
           <GridBtn />
@@ -88,14 +88,14 @@ export function ContainerConf({
         </>
       )}
       <CamBtn
-        onClick={(time_id, linked) => {
+        onClick={(world_id, linked) => {
           if (scene_ref.current) {
             scene_ref.current.linkCamera(linked)
           }
         }}
-        time_id={time_id}
+        world_id={world_id}
       />
-      <DupBtn time_id={time_id} current_frame={current_frame} />
+      <DupBtn world_id={world_id} current_frame={current_frame} />
       <InfoBtn onClick={displayCollection} collection={data.collection} />
     </div>
   )
@@ -109,7 +109,7 @@ type InfoBtnProps = {
 function InfoBtn({ onClick, collection }: InfoBtnProps) {
   return (
     <InfoIcon
-      className="w-12 h-12  cursor-pointer p-2 text-slate-400"
+      className="shrink-0 grow-0 w-12 h-12  cursor-pointer p-2 text-slate-400"
       onClick={() => {
         onClick(collection)
       }}
@@ -118,39 +118,39 @@ function InfoBtn({ onClick, collection }: InfoBtnProps) {
 }
 
 type DupBtnProps = {
-  time_id: TimeID
+  world_id: WorldID
   current_frame: TimeFrameRef
 }
 
-function DupBtn({ time_id, current_frame }: DupBtnProps) {
+function DupBtn({ world_id, current_frame }: DupBtnProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const dup = useClusterStore((state) => state.time.dup)
+  const dup = useStore((state) => state.worlds.dup)
 
   return (
     <DuplicateIcon
-      className="w-7 h-7 cursor-pointer my-2 text-slate-400"
+      className="shrink-0 grow-0 w-7 h-7 cursor-pointer my-2 text-slate-400"
       onClick={() => {
-        dup(time_id)
+        dup(world_id)
       }}
     />
   )
 }
 
 type CamBtnProps = {
-  onClick: (id: TimeID, linked: boolean) => void
-  time_id: TimeID
+  onClick: (id: WorldID, linked: boolean) => void
+  world_id: WorldID
 }
 
-function CamBtn({ onClick, time_id }: CamBtnProps) {
+function CamBtn({ onClick, world_id }: CamBtnProps) {
   const [is_linked, link] = useState(true)
   return (
     <CameraIcon
-      className={`cursor-pointer  w-5 h-5 my-2 ${
+      className={`shrink-0 grow-0 cursor-pointer  w-5 h-5 my-2 ${
         is_linked ? "text-slate-400" : "text-emerald-400"
       }`}
       onClick={() => {
-        onClick(time_id, !is_linked)
+        onClick(world_id, !is_linked)
         link((prev) => !prev)
       }}
     />
@@ -162,7 +162,7 @@ type RecenterBtnProps = {}
 function RecenterBtn(params: RecenterBtnProps) {
   return (
     <RecenterIcon
-      className={`cursor-pointer w-6 h-6   my-2 text-slate-400 child:fill-slate-400`}
+      className={`shrink-0 grow-0 cursor-pointer w-6 h-6   my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }
@@ -172,7 +172,7 @@ type FullScreenBtnProps = {}
 function FullScreenBtn(params: FullScreenBtnProps) {
   return (
     <FullScreenIcon
-      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }
@@ -182,30 +182,30 @@ type ScreenshotBtnProps = {}
 function ScreenshotBtn(params: ScreenshotBtnProps) {
   return (
     <ScreenshotIcon
-      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400 `}
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400 `}
     />
   )
 }
 
 type WorldBtnProps = {
-  onClick: (id: TimeID, is_spheric: boolean) => void
-  time_id: TimeID
+  onClick: (id: WorldID, is_spheric: boolean) => void
+  world_id: WorldID
 }
 
-function WorldBtn({ onClick, time_id }: WorldBtnProps) {
+function WorldBtn({ onClick, world_id }: WorldBtnProps) {
   const [is_spheric, setSpheric] = useState(true)
   return (
     <WorldIcon
-      className={`cursor-pointer  w-6 h-6 my-2 
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 
         ${
           is_spheric
             ? "text-emerald-400 child:fill-emerald-400"
             : "text-slate-400 child:fill-slate-400"
         }`}
       onClick={() => {
-        onClick(time_id, !is_spheric)
+        onClick(world_id, !is_spheric)
         setSpheric((prev) => !prev)
-        //canOrbit(time_id,!is_spheric)
+        //canOrbit(world_id,!is_spheric)
       }}
     />
   )
@@ -216,7 +216,7 @@ type RotateBtnProps = {}
 function RotateBtn(params: RotateBtnProps) {
   return (
     <RotateIcon
-      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }
@@ -224,7 +224,7 @@ function RotateBtn(params: RotateBtnProps) {
 type GridBtnProps = {}
 
 function GridBtn(params: GridBtnProps) {
-  return <GridIcon className={`cursor-pointer  w-6 h-6 my-2 text-slate-400`} />
+  return <GridIcon className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400`} />
 }
 
 type PinBtnProps = {}
@@ -232,7 +232,7 @@ type PinBtnProps = {}
 function PinBtn(params: PinBtnProps) {
   return (
     <PinIcon
-      className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 text-slate-400 child:fill-slate-400`}
     />
   )
 }

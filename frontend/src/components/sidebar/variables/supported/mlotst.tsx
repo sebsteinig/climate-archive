@@ -1,9 +1,9 @@
 import { Variable } from "../utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 
 type Props = {}
 
 export function Mlotst({}: Props) {
-  const mlotst = useClusterStore((state) => state.variables.mlotst)
+  const mlotst = useStore((state) => state.variables.mlotst)
   return <></>
 }

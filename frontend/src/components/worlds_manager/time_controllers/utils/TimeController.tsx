@@ -16,18 +16,18 @@ import {
   TimeFrame,
   TimeFrameRef,
   TimeFrameState,
-  TimeID,
+  WorldID,
   TimeKind,
   TimeMode,
   WorldData,
-} from "@/utils/store/time/time.type"
-import { useClusterStore } from "@/utils/store/cluster.store"
-import { circular, goto, once, walk } from "@/utils/store/time/time.utils"
+} from "@/utils/store/worlds/time.type"
+import { useStore } from "@/utils/store/store"
+import { circular, goto, once, walk } from "@/utils/store/worlds/world.utils"
 import { getTitleOfExp } from "@/utils/types.utils"
 
 type Props = {
   className?: string
-  time_id: TimeID
+  world_id: WorldID
   data: WorldData
   current_frame: TimeFrameRef
 }
@@ -39,12 +39,12 @@ export type ControllerRef = {
 }
 
 export const TimeController = forwardRef<ControllerRef, Props>(
-  function TimeController({ className, current_frame, time_id, data }, ref) {
+  function TimeController({ className, current_frame, world_id, data }, ref) {
     const time_title_ref = useRef<HTMLDivElement>(null)
     const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
 
-    const stored_active_variables = useClusterStore(
+    const stored_active_variables = useStore(
       (state) => state.active_variables,
     )
     const active_variables = useMemo(() => {
@@ -62,13 +62,13 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     useImperativeHandle(ref, () => {
       return {
         play() {
-          play(data, time_id, current_frame, tween_ref, setPlaying)
+          play(data, world_id, current_frame, tween_ref, setPlaying)
         },
         pause() {
           pause(tween_ref, setPlaying)
         },
         stop() {
-          stop(data, time_id, current_frame, tween_ref, setPlaying)
+          stop(data, world_id, current_frame, tween_ref, setPlaying)
         },
         onChange: (frame: TimeFrame) => {
           let id: string
@@ -106,8 +106,8 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     })
     const [is_playing, setPlaying] = useState(false)
     return (
-      <div className={`grid grid-cols-3 grid-rows-1 gap-5 ${className ?? ""}`}>
-        <div className="cursor-default col-span-2 overflow-hidden flex flex-col justify-between">
+      <div className={`flex flex-row flex-wrap gap-5 ${className ?? ""}`}>
+        <div className="grow-[3] cursor-default col-span-2 overflow-hidden flex flex-col justify-between">
           <div
             className="text-emerald-600 font-semibold small-caps tracking-[.5em] my-auto"
             ref={time_title_ref}
@@ -117,11 +117,11 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             ref={exp_title_ref}
           ></div>
         </div>
-        <div className="col-start-3 flex gap-5 justify-center">
+        <div className="grow flex flex-wrap gap-5 justify-center">
           {is_playing ? (
             // PAUSE BUTTON
             <Pause
-              className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
+              className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 pause(tween_ref, setPlaying)
               }}
@@ -129,18 +129,18 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           ) : (
             // PLAY BUTTON
             <Play
-              className={`cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
+              className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 if(active_variables.length > 0) {
-                  play(data, time_id, current_frame, tween_ref, setPlaying)
+                  play(data, world_id, current_frame, tween_ref, setPlaying)
                 }
               }}
             />
           )}
           <Stop
-            className={`cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`}
+            className={`shrink-0 grow-0 cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`}
             onClick={() => {
-              stop(data, time_id, current_frame, tween_ref, setPlaying)
+              stop(data, world_id, current_frame, tween_ref, setPlaying)
             }}
           />
         </div>
@@ -159,12 +159,12 @@ function pause(
 }
 function stop(
   data: WorldData,
-  time_id: TimeID,
+  world_id: WorldID,
   current_frame: TimeFrameRef,
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
   setPlaying: Dispatch<SetStateAction<boolean>>,
 ) {
-  const frame = current_frame.current.get(time_id)
+  const frame = current_frame.current.get(world_id)
   if (!frame) return
   frame.weight = 0
   frame.swap_flag = true
@@ -173,12 +173,12 @@ function stop(
 }
 function play(
   data: WorldData,
-  time_id: TimeID,
+  world_id: WorldID,
   current_frame: TimeFrameRef,
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
   setPlaying: Dispatch<SetStateAction<boolean>>,
 ) {
-  const frame = current_frame.current.get(time_id)
+  const frame = current_frame.current.get(world_id)
   if (!frame) return
   switch (data.time.kind) {
     case TimeKind.circular:

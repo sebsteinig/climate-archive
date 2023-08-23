@@ -2,7 +2,7 @@ import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import { useMemo } from "react"
 import { Publication, Experiments } from "../../utils/types"
 import { isPublication } from "../../utils/types.utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 
 type Props = {
   display_details: boolean
@@ -15,7 +15,7 @@ export function EditCollection({
   current_details,
   hover,
 }: Props) {
-  const collections = useClusterStore((state) => state.collections)
+  const collections = useStore((state) => state.collections)
   const other_collections = useMemo(
     () =>
       Array.from(collections).filter(([k, _v]) => k !== current_details.idx),

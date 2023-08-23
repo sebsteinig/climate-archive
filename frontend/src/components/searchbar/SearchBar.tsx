@@ -90,7 +90,9 @@ export default function SearchBar({
         title: searched_content,
       })
         ?.then((data) => setPublications(data))
-        .catch()
+        .catch(() => {
+
+        })
     } else {
       setPublications([])
     }
@@ -126,14 +128,14 @@ export default function SearchBar({
         }}
       >
         <CrossIcon
-          className={`w-8 h-8 absolute top-0 right-0 m-5 text-emerald-400 cursor-pointer`}
+          className={`shrink-0 grow-0 w-8 h-8 absolute top-0 right-0 m-5 text-emerald-400 cursor-pointer`}
           onClick={() => {
             setSearchContent("")
             displaySearchBar(false)
           }}
         />
         <SearchIcon
-          className={`w-8 h-8 lg:invisible text-emerald-400 lg:hidden ${
+          className={`shrink-0 grow-0 w-8 h-8 lg:invisible text-emerald-400 lg:hidden ${
             search_panel_visible ? "hidden" : ""
           }`}
         />

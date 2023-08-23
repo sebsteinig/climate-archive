@@ -1,4 +1,4 @@
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import {
   forwardRef,
   useEffect,
@@ -10,17 +10,17 @@ import {
   TimeFrame,
   TimeFrameRef,
   TimeFrameState,
-  TimeID,
+  WorldID,
   TimeMode,
   TimeState,
   WorldData,
-} from "@/utils/store/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { Collection } from "@/utils/store/collection.store"
-import { goto } from "@/utils/store/time/time.utils"
+import { goto } from "@/utils/store/worlds/world.utils"
 
 type Props = {
   className?: string
-  time_id: TimeID
+  world_id: WorldID
   data: WorldData
   current_frame: TimeFrameRef
 }
@@ -31,7 +31,7 @@ export type InputRef = {
 }
 
 export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
-  { time_id, className, current_frame, data }: Props,
+  { world_id, className, current_frame, data }: Props,
   ref,
 ) {
   const input_ref = useRef<HTMLInputElement>(null!)
@@ -57,11 +57,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
     if (data.time.mode === TimeMode.mean) {
       return data.collection.exps.length
     } else {
-      const frame = current_frame.current.get(time_id)
+      const frame = current_frame.current.get(world_id)
       const timestep = frame?.timesteps
       return timestep ?? 0
     }
-  }, [current_frame.current.get(time_id)])
+  }, [current_frame.current.get(world_id)])
 
   return (
     <div className={className}>
@@ -77,7 +77,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           is_changing.current = true
         }}
         onPointerUp={() => {
-          const frame = current_frame.current.get(time_id)
+          const frame = current_frame.current.get(world_id)
           if (!frame) return
           const to = Math.round(destination.current)
           if (!to) return

@@ -1,5 +1,5 @@
 import { ColorMapRow, RowWithSlider, Rows, Variable, VariableProps } from "../utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
 
@@ -7,7 +7,7 @@ export function Height({
   current_variable_controls,
   setCurrentVariableControls,
 }: VariableProps) {
-  const height = useClusterStore((state) => state.variables.height)
+  const height = useStore((state) => state.variables.height)
   return (
     <Variable
       title={height.name}

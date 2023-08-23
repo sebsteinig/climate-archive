@@ -1,5 +1,5 @@
 import { ReadonlyURLSearchParams } from "next/navigation"
-import { Slots, TimeFrameRef } from "../store/time/time.type"
+import { Slots, TimeFrameRef } from "../store/worlds/time.type"
 import { isPublication } from "../types.utils"
 
 export type UP_ContainerDesc = {
@@ -13,10 +13,14 @@ export function getContainers(sp: ReadonlyURLSearchParams) {
 
   for (let [key, value] of sp.entries()) {
     if (key == "reload") continue
+    if(!key.includes("*")) throw new Error("Incorrect query parameters")
+
     const [author, year] = key.split("*")
+    let int_year = parseInt(year)
+    if (Number.isNaN(int_year))  throw new Error("Incorrect query parameters")
     containers.push({
       authors_short: author.replaceAll(".", " "),
-      year: parseInt(year),
+      year: int_year,
       exp_id: value,
     })
   }
@@ -41,7 +45,7 @@ export function toggleReload(sp: URLSearchParams, reload?: boolean) {
 
 export function resolveURLparams(slots: Slots) {
   const sp = new URLSearchParams()
-  for (let [time_id, data] of slots) {
+  for (let [world_id, data] of slots) {
     const publication = data.collection
     if (!isPublication(publication)) continue
 

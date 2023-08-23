@@ -10,7 +10,7 @@ import EyeClosed from "$/assets/icons/eye-closed-slate-500.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
 import { EVarID } from "@/utils/store/variables/variable.types"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
 import Checkbox from "@/components/inputs/Checkbox"
@@ -117,8 +117,8 @@ export function Variable({
   setCurrentVariableControls,
   children,
 }: PropsWithChildren<Props>) {
-  const active_variables = useClusterStore((state) => state.active_variables)
-  const activate = useClusterStore((state) => state.activate)
+  const active_variables = useStore((state) => state.active_variables)
+  const activate = useStore((state) => state.activate)
   return (
     <div
       className={`group flex flex-row 
@@ -130,7 +130,7 @@ export function Variable({
          }`}
         onClick={() => (current_variable_controls != title)?? activate(title)}
     >
-      <div className="grow-0">
+      <div className="shrink-0 grow-0 ">
         <IconOf
           name={title}
           active={active_variables.get(title)!}

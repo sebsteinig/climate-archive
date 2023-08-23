@@ -6,7 +6,7 @@ import {
   Variable,
   VariableProps,
 } from "../utils"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import Slider from "@/components/inputs/Slider"
 import InputNumber from "@/components/inputs/InputNumber"
 import Checkbox from "@/components/inputs/Checkbox"
@@ -15,7 +15,7 @@ export function Tos({
   current_variable_controls,
   setCurrentVariableControls,
 }: VariableProps) {
-  const tos = useClusterStore((state) => state.variables.tos)
+  const tos = useStore((state) => state.variables.tos)
   return (
     <Variable
       title={tos.name}

@@ -1,15 +1,18 @@
 "use client"
+import { ErrorView } from "@/components/ErrorView"
 import { searchPublication } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import {
   TimeController,
   TimeMode,
   TimeSpeed,
-} from "@/utils/store/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { Publication } from "@/utils/types"
 import dynamic from "next/dynamic"
-import { useEffect } from "react"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { ErrorBoundary } from "react-error-boundary"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
@@ -30,9 +33,10 @@ async function loadValdesEtAl2021() {
 }
 
 export default function PaleoClimatePage() {
-  const addTime = useClusterStore((state) => state.time.add)
-  const clear = useClusterStore((state) => state.time.clear)
-  const addCollection = useClusterStore((state) => state.addCollection)
+  const addTime = useStore((state) => state.worlds.add)
+  const clear = useStore((state) => state.worlds.clear)
+  const addCollection = useStore((state) => state.addCollection)
+  const [error,setError] = useState(false) 
   useEffect(() => {
     clear()
     loadValdesEtAl2021()
@@ -51,14 +55,14 @@ export default function PaleoClimatePage() {
           speed: TimeSpeed.very_fast,
           controller: TimeController.geologic,
         })
-      })
-      .catch((e) => {
-        console.log(e)
+      }).catch(() => {
+        setError(true)
       })
   }, [])
+  if(error) return  <ErrorView try_again_path="/paleoclimate"/>
   return (
-    <>
+    <ErrorBoundary fallback={<ErrorView try_again_path="/paleoclimate"/>}>
       <ClientMain />
-    </>
+    </ErrorBoundary>
   )
 }

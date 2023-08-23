@@ -19,7 +19,7 @@ import {
 } from "chart.js"
 import { Line } from "react-chartjs-2"
 import { ChartJSOrUndefined } from "react-chartjs-2/dist/types"
-import { useClusterStore } from "@/utils/store/cluster.store"
+import { useStore } from "@/utils/store/store"
 import { Graph } from "@/utils/store/graph/graph.type"
 import { isPublication } from "@/utils/types.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
@@ -59,10 +59,10 @@ type Props = {
 }
 export default function Graph({}: Props) {
 
-  const show = useClusterStore(state => state.graph.show)
-  const graphs = useClusterStore(state => state.graph.graphs)
-  const visible = useClusterStore(state => state.graph.visible)
-  const stored_active_variables = useClusterStore(
+  const show = useStore(state => state.graph.show)
+  const graphs = useStore(state => state.graph.graphs)
+  const visible = useStore(state => state.graph.visible)
+  const stored_active_variables = useStore(
     (state) => state.active_variables,
   )
   const active_variables = useMemo(() => {
@@ -110,7 +110,7 @@ export default function Graph({}: Props) {
 }
 
 function GraphTitles({graphs}:{graphs : Graph[]}){
-  const remove = useClusterStore(state => state.graph.remove)
+  const remove = useStore(state => state.graph.remove)
   return( 
     <div className="w-full p-2">
       <p className="text-slate-500 tracking-widest text-lg">Locations</p>
@@ -126,7 +126,7 @@ function GraphTitles({graphs}:{graphs : Graph[]}){
             <p className="text-xs  italic" style={{color:graph.color}}> {getGraphTitle(graph)}</p>
           </div>
           <BinIcon 
-            className="w-8 h-8 cursor-pointer text-slate-500 hover:text-slate-600"
+            className="shrink-0 grow-0 w-8 h-8 cursor-pointer text-slate-500 hover:text-slate-600"
             onClick={() => remove(id)}
           />
         </div>

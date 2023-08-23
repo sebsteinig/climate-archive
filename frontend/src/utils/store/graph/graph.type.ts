@@ -1,4 +1,4 @@
-import { WorldData } from "../time/time.type";
+import { WorldData } from "../worlds/time.type";
 
 
 export type Coordinate = {

@@ -11,6 +11,9 @@ import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import { useRouter, useSearchParams } from "next/navigation"
 import { upPush } from "@/utils/URL_params/url_params.utils"
+import { useStore } from "@/utils/store/store"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+import { useErrorBoundary } from "react-error-boundary"
 
 type Props = {
   collection: Collection
@@ -28,13 +31,13 @@ export function CollectionView({ collection, onClose, onReturn }: Props) {
         <div className="flex-grow-0 h-10 w-full">
           {!onReturn && onClose && (
             <CrossIcon
-              className="w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-300"
+              className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-300"
               onClick={() => onClose.fn()}
             />
           )}
           {onReturn && (
             <ArrowLeft
-              className="w-4 h-4 cursor-pointer text-emerald-400 child:fill-emerald-400"
+              className="shrink-0 grow-0 w-4 h-4 cursor-pointer text-emerald-400 child:fill-emerald-400"
               onClick={() => onReturn.fn()}
             />
           )}
@@ -62,12 +65,12 @@ export function CollectionDetails({
   load,
   onClose,
 }: CollectionProps) {
-  const searchParams = useSearchParams()
-  const reload = useMemo(() => {
-    if (!searchParams.has("reload")) return true
-    return searchParams.get("reload") == "true"
-  }, [searchParams])
+  const clear = useStore((state) => state.worlds.clear)
+  const add = useStore((state) => state.worlds.add)
+  const reload = useStore((state) => state.worlds.reload)
+  const { showBoundary } = useErrorBoundary();
   const router = useRouter()
+  const addCollection = useStore((state) => state.addCollection)
   if (!collection) return null
 
   if (!isPublication(collection)) {
@@ -104,20 +107,20 @@ export function CollectionDetails({
         <div className="row-start-5 flex justify-center">
           {load && (
             <ButtonPrimary
-              onClick={() => {
-                const search_params = new URLSearchParams()
-
-                upPush(search_params, {
-                  authors_short: collection.authors_short,
-                  year: collection.year,
-                  exp_id: collection.exps[0].id,
-                })
-                router.push(
-                  "/publication/?" +
-                    search_params.toString() +
-                    "&reload=" +
-                    !reload,
-                )
+              onClick={async () => {
+                clear()
+                const exp_id = collection.exps[0].id
+                try {
+                  await database_provider.load({ exp_id })
+                  const idx = await database_provider.addPublicationToDb(collection)
+                  addCollection(idx, collection)
+                  add(collection,undefined,collection.exps[0])
+                }catch(e) {
+                  showBoundary(e)
+                  return
+                }
+                reload(false)
+                router.push("/publication")
                 if (onClose) {
                   onClose.fn()
                 }
@@ -145,13 +148,13 @@ function ExperimentsTab({ exps }: { exps: Experiment[] }) {
             <tr className="rounded-lg">
               <th
                 scope="col"
-                className="px-10 py-3 small-caps tracking-[.5em] font-semibold text-lg border border-slate-700 rounded-lg"
+                className="truncate px-10 py-3 small-caps tracking-[.5em] font-semibold text-lg border border-slate-700"
               >
                 Experiments
               </th>
               <th
                 scope="col"
-                className="px-10 py-3 small-caps tracking-[.5em] font-semibold text-lg border border-slate-700 rounded-lg"
+                className="truncate px-10 py-3 small-caps tracking-[.5em] font-semibold text-lg border border-slate-700 "
               >
                 Age
               </th>

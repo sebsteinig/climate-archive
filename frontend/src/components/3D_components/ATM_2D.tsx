@@ -7,8 +7,8 @@ import { useControls } from "leva"
 import vertexShader from "$/shaders/precipitationVert.glsl"
 import fragmentShader from "$/shaders/precipitationFrag.glsl"
 import { createColormapTexture } from "@/utils/three/colormapTexture.js"
-import { useClusterStore } from "@/utils/store/cluster.store"
-import { TickData } from "../worlds_manager/tick"
+import { useStore } from "@/utils/store/store"
+import { TickData } from "../../utils/tick/tick"
 
 type SphereType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 
@@ -52,7 +52,7 @@ const ATM_2D = forwardRef<ATM_2D_Ref, Props>(({}, ref) => {
   const sphere_type_ref = useRef<SphereType>(null)
   const materialRef = useRef<typeof DataMaterial>(null!)
 
-  const pr = useClusterStore((state) => state.variables.pr)
+  const pr = useStore((state) => state.variables.pr)
 
   // materialRef.current.uniforms.uUserMinValue.value = parseFloat(pr.min)
   // materialRef.current.uniforms.uUserMaxValue.value = parseFloat(pr.max)
