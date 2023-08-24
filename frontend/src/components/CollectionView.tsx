@@ -14,14 +14,17 @@ import { upPush } from "@/utils/URL_params/url_params.utils"
 import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useErrorBoundary } from "react-error-boundary"
+import { Loading, useLoading } from "@/utils/hooks/useLoading"
+import {Spinner} from "./loadings/LoadingSpinner"
 
 type Props = {
   collection: Collection
   onClose?: { fn: () => void }
   onReturn?: { fn: () => void }
+  resetSearchbar : () => void
 }
 
-export function CollectionView({ collection, onClose, onReturn }: Props) {
+export function CollectionView({ collection, onClose, onReturn, resetSearchbar }: Props) {
   return (
     <div className="h-full">
       <div
@@ -44,6 +47,7 @@ export function CollectionView({ collection, onClose, onReturn }: Props) {
         </div>
         <div className={`max-h-full overflow-y-auto flex flex-grow h-full`}>
           <CollectionDetails
+            resetSearchbar={resetSearchbar}
             collection={collection}
             load={onReturn !== undefined}
             onClose={onClose}
@@ -58,12 +62,14 @@ type CollectionProps = {
   collection: Publication | Experiments | undefined
   load: boolean
   onClose?: { fn: () => void }
+  resetSearchbar : () => void
 }
 
 export function CollectionDetails({
   collection,
   load,
   onClose,
+  resetSearchbar
 }: CollectionProps) {
   const clear = useStore((state) => state.worlds.clear)
   const add = useStore((state) => state.worlds.add)
@@ -71,6 +77,7 @@ export function CollectionDetails({
   const { showBoundary } = useErrorBoundary()
   const router = useRouter()
   const addCollection = useStore((state) => state.addCollection)
+  const loading_ref = useLoading()
   if (!collection) return null
 
   if (!isPublication(collection)) {
@@ -104,32 +111,37 @@ export function CollectionDetails({
         <div className="row-span-4 h-full overflow-hidden">
           <ExperimentsTab exps={collection.exps} />
         </div>
-        <div className="row-start-5 flex justify-center">
+        <div className="row-start-5 flex justify-center ">
           {load && (
-            <ButtonPrimary
-              onClick={async () => {
-                clear()
-                const exp_id = collection.exps[0].id
-                try {
-                  await database_provider.load({ exp_id })
-                  const idx = await database_provider.addPublicationToDb(
-                    collection,
-                  )
-                  addCollection(idx, collection)
-                  add(collection, undefined, collection.exps[0])
-                } catch (e) {
-                  showBoundary(e)
-                  return
-                }
-                reload(false)
-                router.push("/publication")
-                if (onClose) {
-                  onClose.fn()
-                }
-              }}
-            >
-              Discover
-            </ButtonPrimary>
+            <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
+              <ButtonPrimary
+                onClick={async () => {
+                  clear()
+                  loading_ref.current?.start()
+                  const exp_id = collection.exps[0].id
+                  try {
+                    await database_provider.load({ exp_id })
+                    const idx = await database_provider.addPublicationToDb(
+                      collection,
+                    )
+                    addCollection(idx, collection)
+                    add(collection, undefined, collection.exps[0])
+                  } catch (e) {
+                    showBoundary(e)
+                    return
+                  }
+                  reload(false)
+                  resetSearchbar()
+                  router.push("/publication")
+                  if (onClose) {
+                    onClose.fn()
+                  }
+                  loading_ref.current?.finish()
+                }}
+              >
+                Discover
+              </ButtonPrimary>
+            </Loading>
           )}
         </div>
       </div>

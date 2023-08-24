@@ -75,6 +75,9 @@ export default function ClientMain({}: Props) {
               </div>
               {collection && (
                 <CollectionView
+                  resetSearchbar={() => {
+                    buildReturn(undefined)
+                  }}
                   onClose={{ fn: () => setCollection(undefined) }}
                   onReturn={onReturn}
                   collection={collection}

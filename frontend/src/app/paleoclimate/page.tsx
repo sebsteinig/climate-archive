@@ -9,7 +9,7 @@ import {
   TimeMode,
   TimeSpeed,
 } from "@/utils/store/worlds/time.type"
-import { Loading, useLoading } from "@/utils/useLoading"
+import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import { Publication } from "@/utils/types"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
