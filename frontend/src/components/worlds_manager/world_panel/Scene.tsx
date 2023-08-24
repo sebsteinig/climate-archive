@@ -13,7 +13,6 @@ import {
 } from "@react-three/drei"
 import { PanelRef } from "./Panel"
 import {
-  MutableRefObject,
   RefObject,
   forwardRef,
   useImperativeHandle,
@@ -21,9 +20,6 @@ import {
   useState,
 } from "react"
 import { tickBuilder } from "../../../utils/tick/tick"
-import { ThreeEvent, useThree } from "@react-three/fiber"
-import THREE from "three"
-import { AtmosphereLayerRef } from "@/components/3D_components/AtmosphereLayer"
 import { Coordinate } from "@/utils/store/graph/graph.type"
 import { CanvasRef } from "@/utils/hooks/useCanvas"
 
@@ -34,6 +30,7 @@ export type SceneProps = {
   current_frame: TimeFrameRef
   active_variables: EVarID[]
   canvas: CanvasRef
+  showPopup : (data : WorldData, {lat, lon} : {lat : number, lon : number}, world_id : number) => void  
 }
 export type SceneRef = {
   canOrbit: (can_orbit: boolean) => void
@@ -47,6 +44,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
     current_frame,
     active_variables,
     canvas,
+    showPopup
   }: SceneProps,
   ref,
 ) {
@@ -64,7 +62,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
     }
   })
   function handleClickOnWorld({ lat, lon }: Coordinate) {
-    panel_ref.current?.container_ref.current?.showClickPanel(data, { lat, lon })
+    showPopup(data, {lat, lon}, world_id)
   }
   if (!panel_ref.current?.container_ref.current) {
     return null

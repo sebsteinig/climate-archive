@@ -12,6 +12,7 @@ export type FormattedCoordinates = {
 
 export type GraphInfo = Coordinate & {
   data: WorldData
+  world_id : number
   id_label: { id: string; label: string } | undefined
 }
 

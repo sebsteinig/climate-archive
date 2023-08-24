@@ -1,6 +1,4 @@
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
-import BinIcon from "$/assets/icons/bin.svg"
-import PinIcon from "$/assets/icons/place.svg"
 import ChartIcon from "$/assets/icons/chart.svg"
 import DownloadIcon from "$/assets/icons/download.svg"
 import React, { useEffect, useMemo, useRef, useState } from "react"
@@ -21,11 +19,11 @@ import { Line } from "react-chartjs-2"
 import { ChartJSOrUndefined } from "react-chartjs-2/dist/types"
 import { useStore } from "@/utils/store/store"
 import { Graph } from "@/utils/store/graph/graph.type"
-import { isPublication } from "@/utils/types.utils"
+import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { titleOf, unitOf } from "./sidebar/variables/utils"
 import { getChartData } from "@/utils/api/api"
-import { formatCoordinates } from "@/utils/store/graph/graph.utils"
+import { formatCoordinates, getRandomHexColor } from "@/utils/store/graph/graph.utils"
 import { SmSeparator } from "./separators/separators"
 
 //defaults.font.family ='Montserrat'
@@ -59,6 +57,7 @@ type Props = {}
 export default function Graph({}: Props) {
   const show = useStore((state) => state.graph.show)
   const graphs = useStore((state) => state.graph.graphs)
+  const worlds = useStore((state) => state.worlds.slots)
   const visible = useStore((state) => state.graph.visible)
   const stored_active_variables = useStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
@@ -68,6 +67,26 @@ export default function Graph({}: Props) {
     }
     return actives
   }, [stored_active_variables])
+
+  const lines = useMemo(() => {
+    let res = []
+    for(let g of graphs){
+      for (let w of worlds){
+        if (!(w[1].exp)) continue;
+        const same = res.filter((l) => l.data.exp?.id == w[1].exp?.id && l.lat == g.lat && l.lon == g.lon )
+        if (same.length != 0) continue;
+        res.push({
+          data : w[1],
+          world_id : w[0],
+          color : getRandomHexColor(),
+          id_label : getTitleOfExp(w[1].exp),
+          lat : g.lat,
+          lon : g.lon
+        })
+      }
+    }
+    return res
+  }, [graphs, worlds])
 
   if (graphs.length == 0 || active_variables.length == 0) return null
 
@@ -94,11 +113,11 @@ export default function Graph({}: Props) {
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
           <div className="w-full p-3">
-            <GraphTitles graphs={graphs} />
+            <GraphTitles lines={lines} graphs = {graphs}/>
           </div>
 
           {active_variables.map((variable, id: number) => (
-            <LineChart key={id} variable={variable} graphs={graphs} />
+            <LineChart key={id} variable={variable} graphs={lines} />
           ))}
         </div>
       </div>
@@ -106,39 +125,45 @@ export default function Graph({}: Props) {
   )
 }
 
-function GraphTitles({ graphs }: { graphs: Graph[] }) {
+
+function GraphTitles({ graphs, lines }: { graphs: Graph[], lines : Graph[] }) {
   const remove = useStore((state) => state.graph.remove)
   return (
-    <div className="w-full p-2">
+    <div className="w-full p-2 m-5">
       <p className="text-slate-500 tracking-widest text-lg">Locations</p>
-      <div className="flex flex-col"></div>
       {graphs.map((graph, id) => (
         <div
           key={id}
-          className="flex flex-row items-center gap-2 py-2 justify-between"
+          className="flex flex-row gap-20 py-2 items-start"
         >
-          {/* <PinIcon
-            className="w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500 hover:text-slate-600"
-          /> */}
-          <p className="text-xs tracking-widest" style={{ color: graph.color }}>
-            {graphLabel(graph).coordinates}
-          </p>
-          <div className="flex flex-row items-center gap-5">
-            <p
-              className="text-xs tracking-widest"
-              style={{ color: graph.color }}
-            >
-              {graphLabel(graph).id}
-            </p>
-            <p className="text-xs  italic" style={{ color: graph.color }}>
-              {" "}
-              {getGraphTitle(graph)}
+          <div className="flex flex-row gap-4 items-center">
+            <CrossIcon
+              className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-600"
+              onClick={() => {
+                remove(id)
+              }}
+            />            
+            <p className="text-s tracking-widest">
+              {graphLabel(graph).coordinates}
             </p>
           </div>
-          <BinIcon
-            className="shrink-0 grow-0 w-8 h-8 cursor-pointer text-slate-500 hover:text-slate-600"
-            onClick={() => remove(id)}
-          />
+
+          <div className="flex flex-col">
+            {lines.filter((line) => line.lat == graph.lat && line.lon == graph.lon).map((line) => 
+              <div className="flex flex-row items-center gap-5">
+                <p
+                  className="text-s tracking-widest"
+                  style={{ color: line.color }}
+                >
+                  {graphLabel(line).id}
+                </p>
+                <p className="text-s  italic" style={{ color: line.color }}>
+                  {" "}
+                  {getGraphTitle(line)}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       ))}
       <div className="w-full px-5 pt-6">

@@ -1,4 +1,5 @@
 import { Coordinate, FormattedCoordinates } from "./graph.type"
+import { Color } from "three"
 
 export function formatCoordinates({
   lat,
@@ -14,4 +15,11 @@ export function formatCoordinates({
     f_lat: formatted_latitude,
     f_lon: formatted_longitude,
   }
+}
+
+
+export function getRandomHexColor(){
+  const rgb = new Color()
+  rgb.setRGB(Math.random(), Math.random() * 0.8, Math.random() * 0.3)
+  return `#${rgb.getHexString()}`
 }

@@ -53,7 +53,6 @@ export default function PublicationPage() {
           authors_short,
           year: [year],
         })
-        console.log(publication)
 
         if (!publication) return
         await database_provider.load({ exp_id })
