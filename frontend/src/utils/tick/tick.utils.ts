@@ -6,10 +6,10 @@ import {
   WorldData,
 } from "@/utils/store/worlds/time.type"
 import { LRUCache } from "lru-cache"
-import { CanvasRef } from "./hooks/useCanvas"
 import { TickData, TickDataState } from "./tick"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { chunksDetails } from "@/utils/store/worlds/world.utils"
+import { CanvasRef } from "../hooks/useCanvas"
 
 export function getPath(
   mode: TimeMode,
@@ -17,6 +17,7 @@ export function getPath(
   vertical: number,
 ): { current_path: string; next_path: string }[] {
   if (mode === TimeMode.mean) {
+    if(!data.mean?.current || !data.mean.next) return []
     const currents = data.mean!.current.info.paths_mean.paths.map((path) => {
       const paths = path.grid[vertical]
       return {
@@ -38,6 +39,7 @@ export function getPath(
     }
     return res
   } else {
+    if(!data.ts?.current || !data.ts.next) return []
     return data.ts!.info.paths_ts.paths.map((path) => {
       let paths: string[]
       if (path.grid.length > vertical) {
@@ -184,7 +186,7 @@ export async function compute(
   world_data: WorldData,
 ): Promise<TickData | undefined> {
   const paths = getPath(world_data.time.mode, data, 0)
-
+  if (paths.length === 0) return
   if (
     !canvas.current ||
     !canvas.current.current.ctx ||

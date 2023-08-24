@@ -26,7 +26,6 @@ export function Selector({ world_id, data }: SelectorProps) {
         onChange={(e) => {
           const idx = e.target.selectedIndex
           const exp = data.collection.exps[idx]
-          loading_ref.current?.start()
           database_provider
             .load({ exp_id: exp.id })
             .then(async () => {
@@ -35,7 +34,6 @@ export function Selector({ world_id, data }: SelectorProps) {
             .catch((e) => {
               showBoundary(e)
             })
-          loading_ref.current?.finish()
         }}
       >
         {data.collection?.exps.map((e) => {

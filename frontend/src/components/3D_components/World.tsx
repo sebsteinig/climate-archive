@@ -53,6 +53,8 @@ export function World({ tick, onClick }: Props) {
         }
       })
       .catch((e) => {
+        console.warn(e);
+        
         showBoundary(e)
       })
   })

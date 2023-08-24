@@ -48,6 +48,9 @@ export function buildTimeConf(config?: Partial<TimeConf>): TimeConf {
     kind: config?.kind ?? TimeKind.circular,
     speed: speed,
     mode: config?.mode ?? TimeMode.ts,
+    mode_state : config?.mode_state ?? {
+      is_writable : false,
+    },
   }
 }
 

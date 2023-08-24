@@ -65,6 +65,10 @@ export default function PaleoClimatePage() {
           mode: TimeMode.mean,
           speed: TimeSpeed.very_fast,
           controller: TimeController.geologic,
+          mode_state : {
+            is_writable : true,
+            previous : TimeMode.mean,
+          },
         })
       })
       .catch(() => {
