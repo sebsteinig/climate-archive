@@ -68,6 +68,7 @@ export type TimeFrame = {
   weight: number
   swap_flag: boolean
   swapping: boolean
+  mode ?: TimeMode
 }
 
 export type TimeFrameHolder = {
@@ -92,6 +93,10 @@ export type TimeConf = {
   kind: TimeKind
   speed: number
   mode: TimeMode
+  mode_state : {
+    is_writable : boolean,
+    previous ?: TimeMode
+  }
 }
 
 export type WorldConf = {

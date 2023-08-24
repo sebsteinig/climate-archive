@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand"
-import { WorldID, CollectionID, WorldData, Slots, TimeConf } from "./time.type"
+import { WorldID, CollectionID, WorldData, Slots, TimeConf, TimeMode, TimeController } from "./time.type"
 
 import { Collection } from "../collection.store"
 import { buildTimeConf, buildWorldConf } from "./world.utils"
@@ -24,7 +24,7 @@ export interface WorldSlice {
     replace: (collection: Collection) => void
     remove: (id: WorldID) => void
     dup: (world_id: WorldID) => void
-
+    switchTimeMode : (world_id:WorldID, exp: Experiment) => void
     changeExp: (id: WorldID, exp: Experiment) => void
   }
 }
@@ -102,7 +102,18 @@ export const createWorldSlice: StateCreator<
           state.worlds.slots.delete(id)
         })
       },
-
+      switchTimeMode(world_id,exp) {
+          set(state => {
+            const data = state.worlds.slots.get(world_id)
+            if (!data) return
+            if(data.time.mode_state.is_writable) {
+              data.time.mode_state.previous = data.time.mode
+              data.time.mode = data.time.mode === TimeMode.ts ? TimeMode.mean : TimeMode.ts
+              data.time.controller = data.time.controller === TimeController.geologic ? TimeController.monthly : TimeController.geologic
+              data.exp = exp
+            }
+          })
+      },
       changeExp(id, exp) {
         set((state) => {
           const data = state.worlds.slots.get(id)

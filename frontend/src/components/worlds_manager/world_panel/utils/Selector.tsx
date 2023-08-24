@@ -22,7 +22,6 @@ export function Selector({ world_id, data }: SelectorProps) {
       onChange={(e) => {
         const idx = e.target.selectedIndex
         const exp = data.collection.exps[idx]
-
         database_provider
           .load({ exp_id: exp.id })
           .then(async () => {

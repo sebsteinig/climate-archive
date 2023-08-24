@@ -59,7 +59,7 @@ export function TimeScale({ onChange }: TimeScaleProps) {
   const [is_focus, setFocus] = useState<boolean>(false)
   return (
     <div
-      className="w-full border-4 border-slate-200 rounded-md"
+      className="w-full border-4 border-slate-200 rounded-md bg-slate-900"
       onMouseLeave={() => {
         if (!is_focus) {
           setSelection(undefined)
@@ -83,7 +83,7 @@ export function TimeScale({ onChange }: TimeScaleProps) {
         appearance={BlockAppereance.full}
         highlight={true}
       />
-      <div className="w-full flex flex-row max-w-full overflow-hidden transition-all duration-100 ease-in-out ">
+      <div className="w-full flex flex-row max-w-full overflow-hidden transition-all duration-300 ease-in-out ">
         {Array.from(tree.root.branches).map(([id, branch]) => {
           const next_selection = nextSelection(id, tree.root.id, selection)
 
@@ -133,8 +133,6 @@ const Block = memo(function Block({
   }
   const grow_span = useMemo(()=>{
     const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from) 
-    console.log({span,parent_span,grow_span:Math.floor((span/parent_span) * 100)});
-    
     return Math.floor((span/parent_span) * 100)
   },[parent_span])
   if (branch.branches.size === 0) {
@@ -162,7 +160,7 @@ const Block = memo(function Block({
                 ? "w-[2em] h-10"
                 : ""
             }
-            truncate transition-all duration-100 ease-in-out `}
+            truncate transition-all duration-300 ease-in-out `}
       key={branch.id}
     >
       <Cell
@@ -174,7 +172,7 @@ const Block = memo(function Block({
         appearance={status.appearance}
         highlight={status.highlight}
       />
-      <div className="w-full flex flex-row truncate transition-all duration-100 ease-in-out ">
+      <div className="w-full flex flex-row truncate transition-all duration-300 ease-in-out ">
         {Array.from(branch.branches).map(([sub_id, sub_branch]) => {
           const next_selection = nextSelection(sub_id, branch.id, selection)
           return (
@@ -220,7 +218,7 @@ const Cell = memo(function Cell({
       className={`cursor-pointer truncate text-clip tracking-widest 
             small-caps py-1 text-slate-900 text-center ${className ?? ""}
             border border-slate-200 ${!highlight ? "brightness-50" : ""}
-            transition-all duration-100 ease-in-out 
+            transition-all duration-300 ease-in-out 
             `}
       style={{ backgroundColor: branch.data.color, flexGrow : grow_span ?? 1}}
       onMouseOver={() => {
