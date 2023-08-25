@@ -143,27 +143,11 @@ function GraphTitles({ graphs, lines }: { graphs: Graph[], lines : Graph[] }) {
                 remove(id)
               }}
             />            
-            <p className="text-s tracking-widest">
+            <p className="tracking-widest">
               {graphLabel(graph).coordinates}
             </p>
           </div>
-
-          <div className="flex flex-col">
-            {lines.filter((line) => line.lat == graph.lat && line.lon == graph.lon).map((line) => 
-              <div className="flex flex-row items-center gap-5">
-                <p
-                  className="text-s tracking-widest"
-                  style={{ color: line.color }}
-                >
-                  {graphLabel(line).id}
-                </p>
-                <p className="text-s  italic" style={{ color: line.color }}>
-                  {" "}
-                  {getGraphTitle(line)}
-                </p>
-              </div>
-            )}
-          </div>
+          <ExperimentTitles lines={lines.filter((line) => line.lat == graph.lat && line.lon == graph.lon)}/>          
         </div>
       ))}
       <div className="w-full px-5 pt-6">
@@ -172,6 +156,42 @@ function GraphTitles({ graphs, lines }: { graphs: Graph[], lines : Graph[] }) {
     </div>
   )
 }
+
+
+
+
+function ExperimentTitles({lines} : {lines : Graph[]}){
+  const exp_map = new Map()
+  lines.map((l) => {
+    const line_info = exp_map.get(getGraphTitle(l))
+    if(line_info){
+      exp_map.set(getGraphTitle(l), [...line_info, {exp_id : graphLabel(l).id, color : l.color}])
+    } else {
+      exp_map.set(getGraphTitle(l), [{exp_id : graphLabel(l).id, color : l.color}])
+    }
+  })
+  
+  return(
+      <div className="flex flex-col">
+        {Array.from(exp_map.entries()).map((element, id) => 
+          <div key={id} className="flex flex-row items-center gap-5">
+            
+            <p className="italic">
+              {" "}
+              {element[0]}
+            </p>
+            <p>
+            {element[1].map((exp : {exp_id : string, color : string}, i : number) =>
+              <span className="tracking-widest" key={i} style={{ color: exp.color }}>{exp.exp_id}{i < element[1].length-1 && ", "}</span>              
+            )}
+            </p>
+          </div>
+        )}
+      </div>
+  )
+}
+
+
 
 type LineChartProps = {
   graphs: Graph[]
@@ -366,6 +386,7 @@ function toCSV(data: ChartData<"line", number[], string>) {
 }
 
 function getGraphTitle(graph: Graph) {
+  
   return isPublication(graph.data.collection)
     ? `${graph.data.collection.authors_short} (${graph.data.collection.year})`
     : `${graph.data.exp?.id}`

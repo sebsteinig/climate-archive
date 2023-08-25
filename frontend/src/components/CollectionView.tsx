@@ -111,7 +111,7 @@ export function CollectionDetails({
         <div className="row-span-4 h-full overflow-hidden">
           <ExperimentsTab exps={collection.exps} />
         </div>
-        <div className="row-start-5 flex justify-center ">
+        <div className="row-start-5 flex glex-row justify-around">
           {load && (
             <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
               <ButtonPrimary
@@ -139,10 +139,43 @@ export function CollectionDetails({
                   loading_ref.current?.finish()
                 }}
               >
-                Discover
+                Replace
               </ButtonPrimary>
             </Loading>
           )}
+
+          {load && (
+            <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
+              <ButtonPrimary
+                onClick={async () => {
+                  loading_ref.current?.start()
+                  const exp_id = collection.exps[0].id
+                  try {
+                    await database_provider.load({ exp_id })
+                    const idx = await database_provider.addPublicationToDb(
+                      collection,
+                    )
+                    addCollection(idx, collection)
+                    add(collection, undefined, collection.exps[0])
+                  } catch (e) {
+                    showBoundary(e)
+                    return
+                  }
+                  reload(false)
+                  resetSearchbar()
+                  router.push("/publication")
+                  if (onClose) {
+                    onClose.fn()
+                  }
+                  loading_ref.current?.finish()
+                }}
+              >
+                Add
+              </ButtonPrimary>
+            </Loading>
+          )}
+
+
         </div>
       </div>
     </div>
