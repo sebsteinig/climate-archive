@@ -14,7 +14,7 @@ import {
   TimeMode,
   WorldData,
 } from "@/utils/store/worlds/time.type"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 import { goto } from "@/utils/store/worlds/world.utils"
 
 type Props = {
