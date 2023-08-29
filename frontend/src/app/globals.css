@@ -34,6 +34,10 @@
     stroke: currentColor;
     /* fill : currentColor; */
   }
+  circle {
+    stroke: currentColor;
+    /* fill : currentColor; */
+  }
   path {
     stroke: currentColor;
     /* fill : currentColor */
