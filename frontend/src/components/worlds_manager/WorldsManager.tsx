@@ -2,7 +2,7 @@
 import { Canvas } from "@react-three/fiber"
 import { useEffect, useRef, useMemo, RefObject, useState } from "react"
 import { useStore } from "@/utils/store/store"
-import { TimeFrameRef, Slots, WorldID } from "@/utils/store/worlds/time.type"
+import { TimeFrameRef, Slots, WorldID, WorldData } from "@/utils/store/worlds/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { gridOf } from "@/utils/types.utils"
 import { Panel, PanelRef } from "./world_panel/Panel"
@@ -15,14 +15,19 @@ import { useFrameRef } from "@/utils/hooks/useFrameRef"
 import { useCanvas } from "@/utils/hooks/useCanvas"
 import { ErrorBoundary, useErrorBoundary } from "react-error-boundary"
 import Link from "next/link"
+import { Popup, PopupInfo } from "./world_panel/utils/Popup"
+import { Coordinate } from "@/utils/store/graph/graph.type"
 
 type Props = {
   displayCollection: (collection: Collection) => void
 }
 
+
 export function WorldManager(props: Props) {
   const worlds_slots = useStore((state) => state.worlds.slots)
-
+  const [display_popup, displayPopup] = useState<boolean>(false)
+  const [popup_info, setPopupInfo] = useState<PopupInfo | undefined>(undefined)
+  
   const stored_active_variables = useStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
     let actives = []
@@ -112,6 +117,16 @@ export function WorldManager(props: Props) {
 
   return (
     <>
+      {display_popup && (popup_info != undefined) && 
+        <div className="max-w-full w-fit grow self-center pointer-events-auto">
+            <Popup
+              close = {() => displayPopup(false)}
+              data={popup_info.data}
+              coordinate = {popup_info.coordinate}
+              world_id = {popup_info.world_id}
+            />
+        </div>
+      }
       <div className={`flex flex-grow h-full`}>
         <div
           ref={container_ref}
@@ -159,6 +174,10 @@ export function WorldManager(props: Props) {
                 active_variables={active_variables}
                 panel_ref={panel_refs.current[world_id]}
                 ref={scene_refs.current[world_id]!}
+                showPopup={(data : WorldData, x:Coordinate, world_id : number) => {
+                  setPopupInfo({data : data, world_id : world_id, coordinate : x})
+                  displayPopup(true)
+                }}
               />
             )
           })}

@@ -2,6 +2,8 @@ import { Experiment, Experiments, Publication } from "@/utils/types"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo, useState } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
+import PlusIcon from "$/assets/icons/plus.svg"
+import EarthIcon from "$/assets/icons/earth.svg"
 import LeftPage from "$/assets/icons/left-page.svg"
 import RightPage from "$/assets/icons/right-page.svg"
 import FirstPage from "$/assets/icons/first-page.svg"
@@ -41,7 +43,10 @@ export function CollectionView({ collection, onClose, onReturn, resetSearchbar }
           {onReturn && (
             <ArrowLeft
               className="shrink-0 grow-0 w-4 h-4 cursor-pointer text-emerald-400 child:fill-emerald-400"
-              onClick={() => onReturn.fn()}
+              onClick={() => {
+                onReturn.fn()
+                resetSearchbar()
+              }}
             />
           )}
         </div>
@@ -107,11 +112,47 @@ export function CollectionDetails({
           </p>
         </div>
       </div>
-      <div className="grid grid-rows-2 h-full">
-        <div className="row-span-4 h-full overflow-hidden">
+      <div className="flex flex-col gap-2 h-full">
+        <div className="self-end">
+        {load && 
+          <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
+            <div onClick={async () => {
+                  loading_ref.current?.start()
+                  const exp_id = collection.exps[0].id
+                  try {
+                    await database_provider.load({ exp_id })
+                    const idx = await database_provider.addPublicationToDb(
+                      collection,
+                    )
+                    addCollection(idx, collection)
+                    add(collection, undefined, collection.exps[0])
+                  } catch (e) {
+                    showBoundary(e)
+                    return
+                  }
+                  reload(false)
+                  resetSearchbar()
+                  router.push("/publication")
+                  if (onClose) {
+                    onClose.fn()
+                  }
+                  loading_ref.current?.finish()
+              }} className="flex flex-row px-2 mr-5 items-center group cursor-pointer rounded-md bg-gray-800"
+            >
+              <span className="tracking-widest uppercase text-lg cursor-pointer px-2 text-slate-500 group-hover:text-slate-300">
+                Add world
+              </span>
+              <EarthIcon className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 group-hover:text-slate-300 "/>
+              <PlusIcon className="shrink-0 grow-0 w-14 h-14 cursor-pointer text-slate-500  group-hover:text-slate-300"/>
+            </div>
+          </Loading>    
+        }
+        </div>
+
+        <div className=" h-full overflow-hidden">
           <ExperimentsTab exps={collection.exps} />
         </div>
-        <div className="row-start-5 flex justify-center ">
+        <div className="flex justify-center">
           {load && (
             <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
               <ButtonPrimary
@@ -143,6 +184,8 @@ export function CollectionDetails({
               </ButtonPrimary>
             </Loading>
           )}
+          
+
         </div>
       </div>
     </div>
