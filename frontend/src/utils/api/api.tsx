@@ -83,8 +83,7 @@ export function useSearchPublication(query: SearchPublication) {
     href = url.href
   }
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)
-  const { data, error, isLoading } = useSWR<Publication[], Error>(href, fetcher)
-  return { data: data, error: error, isLoading: isLoading }
+ return useSWR<Publication[], Error>(href, fetcher)
 }
 
 /**

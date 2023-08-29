@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react"
 import ButtonSecondary from "../buttons/ButtonSecondary"
 import { Publication, Experiment } from "../../utils/types"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 
 type Props = {
   publications: Publication[]
@@ -12,7 +12,6 @@ export function Publications({ publications, displayCollection }: Props) {
   useState<Publication>()
   return (
     <div>
-      <div>
         {publications.length > 0 &&
           publications.map((publication: Publication, idx: number) => {
             return (
@@ -39,7 +38,6 @@ export function Publications({ publications, displayCollection }: Props) {
               </div>
             )
           })}
-      </div>
     </div>
   )
 }
