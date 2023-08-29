@@ -1,7 +1,7 @@
 import { StateCreator } from "zustand"
 import { WorldID, CollectionID, WorldData, Slots, TimeConf, TimeMode, TimeController } from "./time.type"
 
-import { Collection } from "../collection.store"
+import { Collection } from "../collection/collection.store"
 import { buildTimeConf, buildWorldConf } from "./world.utils"
 import { Experiment, Publication } from "@/utils/types"
 

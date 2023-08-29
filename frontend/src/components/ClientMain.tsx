@@ -6,7 +6,7 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useEffect, useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
@@ -57,9 +57,7 @@ export default function ClientMain({}: Props) {
                   },
                 })
               }}
-            >
-              {<></>}
-            </SearchBar>
+            />
             {/* <div className="h-14 cursor-pointer flex items-center">
               <h1 className="">CLIMATE ARCHIVE</h1>
             </div> */}
