@@ -42,6 +42,16 @@ export async function searchPublication(query: SearchPublication) {
   }
 }
 
+export function useSelectJournal(){
+  let url = new URL("select/journal/", URL_API)
+  const fetcher = (url: string) => axios.get(url).then((res) =>
+    res.data.map(
+    (e: { journal: string }) => e.journal)
+  )
+  const { data, error, isLoading } = useSWR<string[], Error>(url.href, fetcher)
+  return { data: data, error: error, isLoading: isLoading }
+}
+
 export function useSearchPublication(query: SearchPublication) {
   let href = null
   if (query.title || query.journal || query.authors_short) {
@@ -79,20 +89,15 @@ export function searchLooking(query: { for: string }) {
  */
 export function search(query: SearchExperiment) {
   try {
-    if (
-      !Object.values(query).every((value, index, number) => {
-        value == null
-      })
-    ) {
-      let url = new URL("search/", URL_API)
-      Object.entries(query).map((bind) => {
-        const [key, value] = bind
-        if (value) {
-          url.searchParams.append(key, JSON.stringify(value))
-        }
-      })
-      return getData(url.href)
-    }
+    let url = new URL("search/", URL_API)
+    if (!query.like) return;
+    Object.entries(query).map((bind) => {
+      const [key, value] = bind
+      if (value) {
+        url.searchParams.append(key, JSON.stringify(value))
+      }
+    })
+    return getData(url.href)
   } catch (error) {
     throw new ApiError()
   }

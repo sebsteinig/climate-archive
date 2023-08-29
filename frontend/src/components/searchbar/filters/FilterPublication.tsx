@@ -5,6 +5,9 @@ import Select from "@/components/inputs/Select"
 import { SearchPublication } from "@/utils/api/api.types"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
+import { getJournals, useSelectJournal } from "@/utils/api/api"
+import LoadingSpinner from "@/components/loadings/LoadingSpinner"
+import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 
 const DEFAULT_LOWER = "jurassic"
 const DEFAULT_UPPER = "now"
@@ -172,15 +175,18 @@ function Period({
 export default function FilterPublication({
   filters,
   children,
+  triggerFilter,
   setRequestFilters,
 }: {
+  triggerFilter : () => void
   filters: SearchPublication
   children: React.ReactNode
   setRequestFilters: (filters: SearchPublication) => void
 }) {
   const [display_filters, setDisplayFilters] = useState(true)
-  const [journal, setJournal] = useState(filters.journal ?? "")
   const [author, setAuthor] = useState(filters.authors_short ?? "")
+ 
+  
   if (!display_filters) {
     return (
       <span
@@ -213,26 +219,9 @@ export default function FilterPublication({
           }}
         />
 
-        <div className="flex flex-wrap items-center gap-3 pt-3 ">
-          <div className="w-1/6">
-            <h4>Journal : </h4>
-          </div>
-          <div className="w-3/4">
-            <Select
-              defaultValue={journal}
-              title={journal}
-              onChange={(e: any) => {
-                setJournal(e.target.value)
-                setRequestFilters({ journal: e.target.value })
-              }}
-            >
-              <option disabled selected value={""}>
-                Select a journal ...
-              </option>
-              {children}
-            </Select>
-          </div>
-        </div>
+        <SelectJournal 
+            setRequestFilters={(v :  string) => setRequestFilters({journal : v}) }
+        />
 
         <div className="flex flex-wrap items-center gap-3 pt-3 pb-3 ">
           <div className="w-1/6">
@@ -247,6 +236,21 @@ export default function FilterPublication({
                 setRequestFilters({ authors_short: e.target.value })
               }}
             ></InputField>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 pt-3">
+          <ButtonSecondary
+            onClick={() => triggerFilter()}
+          >
+            Filter
+          </ButtonSecondary>
+          <div className="flex flex-row gap-1 group items-center cursor-pointer"
+            onClick={() => setRequestFilters({})}
+          >
+            <CrossIcon
+              className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-300"
+            />
+            <span className="group-hover:underline text-slate-500">Clear Filters</span>
           </div>
         </div>
       </>
@@ -271,4 +275,50 @@ function rangeYear(
     }
   }
   return res
+}
+
+type SelectJournalProps = {
+  setRequestFilters : (v : string) => void
+}
+
+function SelectJournal({setRequestFilters} : SelectJournalProps) {
+  const { data, error, isLoading } = useSelectJournal()
+  const [journal, setJournal] = useState("")
+  const [journals, setJournals] = useState<string[]>([])
+  useEffect(() => {
+    if(data){
+      setJournals(data)
+    }
+  }, [data])
+
+  if (isLoading) return <LoadingSpinner/>;
+  
+  if(journals.length == 0) return null;
+
+  return(
+    <div className="flex flex-wrap items-center gap-3 pt-3 ">
+          <div className="w-1/6">
+            <h4>Journal : </h4>
+          </div>
+          <div className="w-3/4">
+            <Select
+              defaultValue={"default"}
+              title={journal}
+              onChange={(e: any) => {
+                setJournal(e.target.value)
+                setRequestFilters( e.target.value )
+              }}
+            >
+              <option disabled value={"default"}>
+                Select a journal ...
+              </option>
+              {journals.map((journal: string, index:number) => (
+                <option key={index} title={journal} value={journal}>
+                  {journal.length > 29 ? journal.slice(0, 29) + "..." : journal}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </div>
+  )
 }

@@ -14,9 +14,6 @@ import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import { FullWidthSeparator, MdSeparator } from "../separators/separators"
 import { PropsWithChildren } from "react"
 import { Collection } from "@/utils/store/collection.store"
-import axios from "axios"
-import useSWR from "swr"
-import LoadingSpinner from "../loadings/LoadingSpinner"
 
 // function useOutsideClick(ref: HTMLDivElement, onClickOut: () => void){
 //     useEffect(() => {
@@ -33,6 +30,8 @@ import LoadingSpinner from "../loadings/LoadingSpinner"
 // }
 
 type MoreOptionsProps = {
+  filter_publication : boolean
+  triggerFilter : () => void
   filters: SearchPublication
   displaySearchBar: Dispatch<SetStateAction<boolean>>
   setRequestFilters: (filters: SearchPublication) => void
@@ -40,6 +39,8 @@ type MoreOptionsProps = {
 
 function MoreOptions({
   filters,
+  filter_publication,
+  triggerFilter,
   setRequestFilters,
   displaySearchBar,
   children,
@@ -48,6 +49,7 @@ function MoreOptions({
     <div>
       <FilterPublication
         filters={filters}
+        triggerFilter = {triggerFilter}
         setRequestFilters={setRequestFilters}
       >
         {children}
@@ -77,7 +79,7 @@ export default function SearchBar({
   const search_panel_ref = useRef<HTMLDivElement>(null)
   const [publications, setPublications] = useState<Publication[]>([])
   const [display_more_options, setDisplayMoreOptions] = useState(false)
-
+  const [filter_publication, triggerFilterPublication] = useState(false)
   const [requestFilters, setRequestFilters] = useState<SearchPublication>({})
 
   // useOutsideClick(search_panel_ref.current!, () => {
@@ -90,7 +92,7 @@ export default function SearchBar({
   }) ?? { data: null, error: null }
 
   useEffect(() => {
-    let ignore = false
+    let ignore = false    
     if (data) {
       setPublications(data)
     } else {
@@ -99,7 +101,7 @@ export default function SearchBar({
     return () => {
       ignore = true
     }
-  }, [data])
+  }, [searched_content, filter_publication])
 
   return (
     <div
@@ -185,6 +187,11 @@ export default function SearchBar({
 
               {display_more_options && (
                 <MoreOptions
+                  filter_publication = {filter_publication}
+                  triggerFilter = {() => {
+                    triggerFilterPublication((prev) => !prev)
+                    setSearchContent(" ")
+                  }}
                   displaySearchBar={displaySearchBar}
                   filters={requestFilters}
                   setRequestFilters={(filters: SearchPublication) => {
