@@ -4,7 +4,7 @@ import InputField from "@/components/inputs/InputField"
 import MultiSelect from "@/components/inputs/MultiSelect"
 import Select from "@/components/inputs/Select"
 import { DefaultParameter } from "@/utils/api/api.types"
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo, useState } from "react"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import Cross from "$/assets/icons/cross-small-emerald-300.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
@@ -15,6 +15,7 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import Link from "next/link"
 import { TimeMode } from "@/utils/store/worlds/time.type"
 import { useSearchParams } from "next/navigation"
+import { useSearch } from "@/utils/api/api"
 type Exp = {
   id: string
   display: boolean
@@ -76,6 +77,43 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
     if (!searchParams.has("reload")) return true
     return searchParams.get("reload") == "true"
   }, [searchParams])
+  
+
+  const {data, error, isLoading} = useSearch({
+    config_name:config,
+    extension:extension,
+    lossless:lossless,
+    rx:resolution.x,
+    ry:resolution.y,
+    like:exp_ids.search
+  })
+
+  function addExperiment(value ?: string){
+    setExpIds((prev) => {
+      let exps = []
+      if(value) {
+        exps = [{id : value, display:true}]
+      }else{
+        exps = prev.search
+          .replaceAll(",", " ")
+          .split(" ")
+          .filter((e) => e)
+          .map((id) => {
+            return { id, display: true }
+          }).filter((e) =>!prev.exp_ids.includes(e))
+        const reel_exps = data?.map((e) => e.exp_id)
+        if (!reel_exps) return prev;
+        exps = exps.filter((e) => reel_exps.includes(e.id))    
+      }      
+      return {
+        search: "",
+        exp_ids: [
+          ...prev.exp_ids,
+          ...exps
+        ],
+      }
+    })
+  }
 
   if (!display) {
     return (
@@ -120,9 +158,9 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
         })}
       </span>
 
-      <div className="grid grid-flow-col auto-cols-max items-center">
+      <div className="grid pt-2 grid-flow-col auto-cols-max gap-2 items-center">
         <h4 className="w-40"> Experiments :</h4>
-        <span className="pt-3 grid grid-flow-col auto-cols-max gap-3 items-center">
+        
           <InputField
             name="expid_input"
             value={exp_ids.search}
@@ -131,7 +169,6 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
             onChange={(e: any) => {
               setExpIds((prev) => {
                 return {
-                  ...prev,
                   search: e.target.value,
                   exp_ids: prev.exp_ids.filter((e) => e.display),
                 }
@@ -139,25 +176,17 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
             }}
             onKeyDown={(e: any) => {
               if (e.key === "Enter") {
-                setExpIds((prev) => {
-                  return {
-                    search: "",
-                    exp_ids: [
-                      ...prev.exp_ids,
-                      ...prev.search
-                        .replaceAll(",", " ")
-                        .split(" ")
-                        .filter((e) => e)
-                        .map((id) => {
-                          return { id, display: true }
-                        }),
-                    ],
-                  }
-                })
+                addExperiment()
               }
             }}
           ></InputField>
-        </span>
+          
+        {data && <Select defaultValue="default" onChange={(e) => addExperiment(e.target.value)}>
+          <option value="default" disabled>Select a valid id</option>
+          {data?.map((e, i) =>
+            <option value={e.exp_id} key={i}>{e.exp_id}</option>
+          )}
+        </Select>}
       </div>
 
       <div className="grid grid-flow-col auto-cols-max items-center">
