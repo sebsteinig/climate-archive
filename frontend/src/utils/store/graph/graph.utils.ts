@@ -17,8 +17,7 @@ export function formatCoordinates({
   }
 }
 
-
-export function getRandomHexColor(){
+export function getRandomHexColor() {
   const rgb = new Color()
   rgb.setRGB(Math.random(), Math.random() * 0.8, Math.random() * 0.3)
   return `#${rgb.getHexString()}`

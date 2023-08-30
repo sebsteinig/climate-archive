@@ -1,17 +1,16 @@
 import { useStore } from "@/utils/store/store"
 import { Coordinate } from "@/utils/store/graph/graph.type"
 import { formatCoordinates } from "@/utils/store/graph/graph.utils"
-import { WorldData } from "@/utils/store/worlds/time.type"
+import { WorldData } from "@/utils/store/worlds/time/time.type"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 
-
 export type PopupInfo = {
   data: WorldData
-  world_id : number
-  coordinate : Coordinate
+  world_id: number
+  coordinate: Coordinate
 }
 
 type PopupProps = PopupInfo & {
@@ -63,7 +62,7 @@ export function Popup({ data, coordinate, world_id, close }: PopupProps) {
             lon: coordinate.lon,
             data: data,
             id_label: id_label,
-            world_id : world_id
+            world_id: world_id,
           })
           close()
         }}

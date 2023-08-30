@@ -89,7 +89,9 @@ export function TimeScale({ onChange }: TimeScaleProps) {
 
           return (
             <Block
-              parent_span={Math.abs(tree.root.data.age_span.to - tree.root.data.age_span.from)}
+              parent_span={Math.abs(
+                tree.root.data.age_span.to - tree.root.data.age_span.from,
+              )}
               key={id}
               onSelect={onSelect}
               status={statusOf(branch, next_selection)}
@@ -105,7 +107,7 @@ export function TimeScale({ onChange }: TimeScaleProps) {
 }
 
 type BlockProps = {
-  parent_span : number
+  parent_span: number
   branch: GeoBranch
   selection: Selection | undefined
   onSelect: (param: Selection) => void
@@ -131,10 +133,10 @@ const Block = memo(function Block({
       child: param,
     })
   }
-  const grow_span = useMemo(()=>{
-    const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from) 
-    return Math.floor((span/parent_span) * 100)
-  },[parent_span])
+  const grow_span = useMemo(() => {
+    const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from)
+    return Math.floor((span / parent_span) * 100)
+  }, [parent_span])
   if (branch.branches.size === 0) {
     return (
       <Cell
@@ -151,7 +153,7 @@ const Block = memo(function Block({
 
   return (
     <div
-      style={{flexGrow:grow_span}}
+      style={{ flexGrow: grow_span }}
       className={`
             ${status.appearance === BlockAppereance.full ? "" : ""}
             ${status.appearance === BlockAppereance.hidden ? "hidden" : ""}
@@ -177,7 +179,9 @@ const Block = memo(function Block({
           const next_selection = nextSelection(sub_id, branch.id, selection)
           return (
             <Block
-              parent_span={Math.abs(branch.data.age_span.to - branch.data.age_span.from)}
+              parent_span={Math.abs(
+                branch.data.age_span.to - branch.data.age_span.from,
+              )}
               key={sub_id}
               onSelect={b_onSelect}
               status={statusOf(sub_branch, next_selection)}
@@ -193,7 +197,7 @@ const Block = memo(function Block({
 })
 
 type CellProps = {
-  grow_span ?: number
+  grow_span?: number
   className?: string
   branch: GeoBranch
   onSelect: (param: Selection) => void
@@ -220,7 +224,7 @@ const Cell = memo(function Cell({
             border border-slate-200 ${!highlight ? "brightness-50" : ""}
             transition-all duration-300 ease-in-out 
             `}
-      style={{ backgroundColor: branch.data.color, flexGrow : grow_span ?? 1}}
+      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1 }}
       onMouseOver={() => {
         if (appearance === BlockAppereance.full && !is_focus) {
           onSelect({

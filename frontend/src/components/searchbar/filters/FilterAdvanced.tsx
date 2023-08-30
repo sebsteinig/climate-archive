@@ -13,7 +13,7 @@ import { Experiments } from "../../../utils/types"
 import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import Link from "next/link"
-import { TimeMode } from "@/utils/store/worlds/time.type"
+import { TimeMode } from "@/utils/store/worlds/time/time.type"
 import { useSearchParams } from "next/navigation"
 type Exp = {
   id: string

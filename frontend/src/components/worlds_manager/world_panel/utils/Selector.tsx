@@ -2,7 +2,11 @@ import Select from "@/components/inputs/Select"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useStore } from "@/utils/store/store"
-import { WorldID, TimeMode, WorldData } from "@/utils/store/worlds/time.type"
+import {
+  WorldID,
+  TimeMode,
+  WorldData,
+} from "@/utils/store/worlds/time/time.type"
 import { getTitleOfExp } from "@/utils/types.utils"
 import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import { useErrorBoundary } from "react-error-boundary"

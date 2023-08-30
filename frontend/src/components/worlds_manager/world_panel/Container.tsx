@@ -5,13 +5,13 @@ import {
   RefObject,
   forwardRef,
   useImperativeHandle,
-  useRef
+  useRef,
 } from "react"
 import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time.type"
+} from "@/utils/store/worlds/time/time.type"
 import { isPublication } from "@/utils/types.utils"
 import { Collection } from "@/utils/store/collection.store"
 import { ContainerConf } from "./utils/ContainerConf"

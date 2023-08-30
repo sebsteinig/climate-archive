@@ -2,7 +2,12 @@
 import { Canvas } from "@react-three/fiber"
 import { useEffect, useRef, useMemo, RefObject, useState } from "react"
 import { useStore } from "@/utils/store/store"
-import { TimeFrameRef, Slots, WorldID, WorldData } from "@/utils/store/worlds/time.type"
+import {
+  TimeFrameRef,
+  Slots,
+  WorldID,
+  WorldData,
+} from "@/utils/store/worlds/time/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { gridOf } from "@/utils/types.utils"
 import { Panel, PanelRef } from "./world_panel/Panel"
@@ -17,17 +22,17 @@ import { ErrorBoundary, useErrorBoundary } from "react-error-boundary"
 import Link from "next/link"
 import { Popup, PopupInfo } from "./world_panel/utils/Popup"
 import { Coordinate } from "@/utils/store/graph/graph.type"
+import { useInit } from "@/utils/hooks/useInit"
 
 type Props = {
   displayCollection: (collection: Collection) => void
 }
 
-
 export function WorldManager(props: Props) {
   const worlds_slots = useStore((state) => state.worlds.slots)
   const [display_popup, displayPopup] = useState<boolean>(false)
   const [popup_info, setPopupInfo] = useState<PopupInfo | undefined>(undefined)
-  
+
   const stored_active_variables = useStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
     let actives = []
@@ -40,30 +45,9 @@ export function WorldManager(props: Props) {
   const current_frame = useFrameRef()
   const canvas = useCanvas()
 
-  const { showBoundary } = useErrorBoundary()
   const [is_empty, setEmpty] = useState<undefined | boolean>(undefined)
-  useEffect(() => {
-    if (worlds_slots.size === 0 && is_empty !== undefined) {
-      setEmpty(true)
-    } else {
-      setEmpty(false)
-    }
-  }, [worlds_slots.size])
-  useEffect(() => {
-    // PREPARE EACH TIME FRAMES
-    init(worlds_slots, current_frame, active_variables)
-      .then(() => {
-        if (pathname.includes("publication")) {
-          const search_params = resolveURLparams(worlds_slots)
-          router.push(pathname + "?" + search_params.toString())
-        }
-      })
-      .catch((e) => {
-        showBoundary(e)
-      })
-  }, [worlds_slots, active_variables])
-  const router = useRouter()
-  const pathname = usePathname()
+
+  useInit(worlds_slots, current_frame, active_variables)
 
   const grid = useMemo(() => {
     return gridOf(worlds_slots.size)
@@ -117,16 +101,16 @@ export function WorldManager(props: Props) {
 
   return (
     <>
-      {display_popup && (popup_info != undefined) && 
+      {display_popup && popup_info != undefined && (
         <div className="max-w-full w-fit grow self-center pointer-events-auto">
-            <Popup
-              close = {() => displayPopup(false)}
-              data={popup_info.data}
-              coordinate = {popup_info.coordinate}
-              world_id = {popup_info.world_id}
-            />
+          <Popup
+            close={() => displayPopup(false)}
+            data={popup_info.data}
+            coordinate={popup_info.coordinate}
+            world_id={popup_info.world_id}
+          />
         </div>
-      }
+      )}
       <div className={`flex flex-grow h-full`}>
         <div
           ref={container_ref}
@@ -174,8 +158,16 @@ export function WorldManager(props: Props) {
                 active_variables={active_variables}
                 panel_ref={panel_refs.current[world_id]}
                 ref={scene_refs.current[world_id]!}
-                showPopup={(data : WorldData, x:Coordinate, world_id : number) => {
-                  setPopupInfo({data : data, world_id : world_id, coordinate : x})
+                showPopup={(
+                  data: WorldData,
+                  x: Coordinate,
+                  world_id: number,
+                ) => {
+                  setPopupInfo({
+                    data: data,
+                    world_id: world_id,
+                    coordinate: x,
+                  })
                   displayPopup(true)
                 }}
               />
@@ -185,15 +177,4 @@ export function WorldManager(props: Props) {
       </div>
     </>
   )
-}
-
-async function init(
-  slots: Slots,
-  current_frame: TimeFrameRef,
-  active_variables: EVarID[],
-) {
-  for (let [world_id, data] of slots) {
-    const exp = data.exp ?? data.collection.exps[0]
-    await current_frame.current.init(world_id, exp, active_variables, data)
-  }
 }

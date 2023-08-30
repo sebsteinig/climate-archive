@@ -1,8 +1,9 @@
 import { TextureInfo } from "@/utils/database/database.types"
-import { EVarID } from "../variables/variable.types"
+import { EVarID } from "../../variables/variable.types"
 import { Experiment } from "@/utils/types"
 import { MutableRefObject } from "react"
-import { Collection } from "../collection.store"
+import { Collection } from "../../collection.store"
+import { TickData } from "@/utils/tick/tick"
 
 export enum TimeKind {
   circular,
@@ -68,12 +69,35 @@ export type TimeFrame = {
   weight: number
   swap_flag: boolean
   swapping: boolean
-  mode ?: TimeMode
+  mode?: TimeMode
 }
 
 export type TimeFrameHolder = {
   map: Map<WorldID, TimeFrame>
-  update: (frame: TimeFrame, world_id: WorldID) => TimeFrame
+  _observed_id: WorldID | undefined
+  _waiters: Map<
+    WorldID,
+    {
+      resolve: (value: void | PromiseLike<void>) => void
+      reject: (reason?: any) => void
+    }
+  >
+  _lock: {
+    lock: boolean
+    handle:
+      | {
+          resolve: (value: void | PromiseLike<void>) => void
+          reject: (reason?: any) => void
+        }
+      | undefined
+  }
+  reference: Map<EVarID, TickData> | undefined
+  saveReference: (reference: Map<EVarID, TickData>) => void
+  update: (
+    world_id: WorldID,
+    world_data: WorldData,
+    active_variables: EVarID[],
+  ) => Promise<TimeFrame>
   get: (world_id: WorldID) => TimeFrame | undefined
   init: (
     world_id: WorldID,
@@ -81,6 +105,10 @@ export type TimeFrameHolder = {
     active_variables: EVarID[],
     world_data: WorldData,
   ) => Promise<void>
+  observe: (world_id: WorldID | undefined) => void
+  notify: () => Promise<void>
+  lock: (world_id: WorldID) => Promise<void>
+  wait: (world_id: WorldID) => Promise<void>
 }
 
 export type TimeFrameRef = MutableRefObject<TimeFrameHolder>
@@ -93,9 +121,9 @@ export type TimeConf = {
   kind: TimeKind
   speed: number
   mode: TimeMode
-  mode_state : {
-    is_writable : boolean,
-    previous ?: TimeMode
+  mode_state: {
+    is_writable: boolean
+    previous?: TimeMode
   }
 }
 

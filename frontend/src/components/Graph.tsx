@@ -23,7 +23,10 @@ import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { titleOf, unitOf } from "./sidebar/variables/utils"
 import { getChartData } from "@/utils/api/api"
-import { formatCoordinates, getRandomHexColor } from "@/utils/store/graph/graph.utils"
+import {
+  formatCoordinates,
+  getRandomHexColor,
+} from "@/utils/store/graph/graph.utils"
 import { SmSeparator } from "./separators/separators"
 
 //defaults.font.family ='Montserrat'
@@ -70,18 +73,21 @@ export default function Graph({}: Props) {
 
   const lines = useMemo(() => {
     let res = []
-    for(let g of graphs){
-      for (let w of worlds){
-        if (!(w[1].exp)) continue;
-        const same = res.filter((l) => l.data.exp?.id == w[1].exp?.id && l.lat == g.lat && l.lon == g.lon )
-        if (same.length != 0) continue;
+    for (let g of graphs) {
+      for (let w of worlds) {
+        if (!w[1].exp) continue
+        const same = res.filter(
+          (l) =>
+            l.data.exp?.id == w[1].exp?.id && l.lat == g.lat && l.lon == g.lon,
+        )
+        if (same.length != 0) continue
         res.push({
-          data : w[1],
-          world_id : w[0],
-          color : getRandomHexColor(),
-          id_label : getTitleOfExp(w[1].exp),
-          lat : g.lat,
-          lon : g.lon
+          data: w[1],
+          world_id: w[0],
+          color: getRandomHexColor(),
+          id_label: getTitleOfExp(w[1].exp),
+          lat: g.lat,
+          lon: g.lon,
         })
       }
     }
@@ -113,7 +119,7 @@ export default function Graph({}: Props) {
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
           <div className="w-full p-3">
-            <GraphTitles lines={lines} graphs = {graphs}/>
+            <GraphTitles lines={lines} graphs={graphs} />
           </div>
 
           {active_variables.map((variable, id: number) => (
@@ -125,29 +131,27 @@ export default function Graph({}: Props) {
   )
 }
 
-
-function GraphTitles({ graphs, lines }: { graphs: Graph[], lines : Graph[] }) {
+function GraphTitles({ graphs, lines }: { graphs: Graph[]; lines: Graph[] }) {
   const remove = useStore((state) => state.graph.remove)
   return (
     <div className="w-full p-2 m-5">
       <p className="text-slate-500 tracking-widest text-lg">Locations</p>
       {graphs.map((graph, id) => (
-        <div
-          key={id}
-          className="flex flex-row gap-20 py-2 items-start"
-        >
+        <div key={id} className="flex flex-row gap-20 py-2 items-start">
           <div className="flex flex-row gap-4 items-center">
             <CrossIcon
               className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-600"
               onClick={() => {
                 remove(id)
               }}
-            />            
-            <p className="tracking-widest">
-              {graphLabel(graph).coordinates}
-            </p>
+            />
+            <p className="tracking-widest">{graphLabel(graph).coordinates}</p>
           </div>
-          <ExperimentTitles lines={lines.filter((line) => line.lat == graph.lat && line.lon == graph.lon)}/>          
+          <ExperimentTitles
+            lines={lines.filter(
+              (line) => line.lat == graph.lat && line.lon == graph.lon,
+            )}
+          />
         </div>
       ))}
       <div className="w-full px-5 pt-6">
@@ -157,41 +161,46 @@ function GraphTitles({ graphs, lines }: { graphs: Graph[], lines : Graph[] }) {
   )
 }
 
-
-
-
-function ExperimentTitles({lines} : {lines : Graph[]}){
+function ExperimentTitles({ lines }: { lines: Graph[] }) {
   const exp_map = new Map()
   lines.map((l) => {
     const line_info = exp_map.get(getGraphTitle(l))
-    if(line_info){
-      exp_map.set(getGraphTitle(l), [...line_info, {exp_id : graphLabel(l).id, color : l.color}])
+    if (line_info) {
+      exp_map.set(getGraphTitle(l), [
+        ...line_info,
+        { exp_id: graphLabel(l).id, color: l.color },
+      ])
     } else {
-      exp_map.set(getGraphTitle(l), [{exp_id : graphLabel(l).id, color : l.color}])
+      exp_map.set(getGraphTitle(l), [
+        { exp_id: graphLabel(l).id, color: l.color },
+      ])
     }
   })
-  
-  return(
-      <div className="flex flex-col">
-        {Array.from(exp_map.entries()).map((element, id) => 
-          <div key={id} className="flex flex-row items-center gap-5">
-            
-            <p className="italic">
-              {" "}
-              {element[0]}
-            </p>
-            <p>
-            {element[1].map((exp : {exp_id : string, color : string}, i : number) =>
-              <span className="tracking-widest" key={i} style={{ color: exp.color }}>{exp.exp_id}{i < element[1].length-1 && ", "}</span>              
+
+  return (
+    <div className="flex flex-col">
+      {Array.from(exp_map.entries()).map((element, id) => (
+        <div key={id} className="flex flex-row items-center gap-5">
+          <p className="italic"> {element[0]}</p>
+          <p>
+            {element[1].map(
+              (exp: { exp_id: string; color: string }, i: number) => (
+                <span
+                  className="tracking-widest"
+                  key={i}
+                  style={{ color: exp.color }}
+                >
+                  {exp.exp_id}
+                  {i < element[1].length - 1 && ", "}
+                </span>
+              ),
             )}
-            </p>
-          </div>
-        )}
-      </div>
+          </p>
+        </div>
+      ))}
+    </div>
   )
 }
-
-
 
 type LineChartProps = {
   graphs: Graph[]
@@ -386,7 +395,6 @@ function toCSV(data: ChartData<"line", number[], string>) {
 }
 
 function getGraphTitle(graph: Graph) {
-  
   return isPublication(graph.data.collection)
     ? `${graph.data.collection.authors_short} (${graph.data.collection.year})`
     : `${graph.data.exp?.id}`
