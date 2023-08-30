@@ -13,7 +13,7 @@ import {
   WorldData,
 } from "@/utils/store/worlds/time/time.type"
 import { isPublication } from "@/utils/types.utils"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 import { ContainerConf } from "./utils/ContainerConf"
 import { SceneRef } from "./Scene"
 import {

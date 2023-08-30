@@ -14,7 +14,7 @@ import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import CameraIcon from "$/assets/icons/camera.svg"
 import PinIcon from "$/assets/icons/place.svg"
 import InfoIcon from "$/assets/icons/info.svg"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 import {
   TimeFrameRef,
   WorldID,

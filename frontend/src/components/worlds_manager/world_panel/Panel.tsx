@@ -6,7 +6,7 @@ import {
 } from "@/utils/store/worlds/time/time.type"
 import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import { Container, ContainerRef } from "./Container"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 import { SceneRef } from "./Scene"
 import { MonthlyController } from "../time_controllers/MonthlyController"
 import { IControllerRef } from "../time_controllers/controller.types"

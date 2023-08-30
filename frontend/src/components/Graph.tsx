@@ -418,10 +418,8 @@ function graphLabel(graph: Graph) {
 function getTitleMultipleSources(graphs: Graph[]) {
   let titles: string[] = []
   for (let graph of graphs) {
-    if (isPublication(graph.data.collection)) {
-      if (!titles.includes(getGraphTitle(graph))) {
+    if (!titles.includes(getGraphTitle(graph))) {
         titles.push(getGraphTitle(graph))
-      }
     }
   }
   return titles.join(" & ")

@@ -2,9 +2,8 @@ import { TextureInfo } from "@/utils/database/database.types"
 import { EVarID } from "../../variables/variable.types"
 import { Experiment } from "@/utils/types"
 import { MutableRefObject } from "react"
-import { Collection } from "../../collection.store"
 import { TickData } from "@/utils/tick/tick"
-
+import { Collection } from "../../collection/collection.store"
 export enum TimeKind {
   circular,
   walk,

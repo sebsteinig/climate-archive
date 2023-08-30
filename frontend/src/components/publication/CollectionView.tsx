@@ -8,7 +8,7 @@ import LeftPage from "$/assets/icons/left-page.svg"
 import RightPage from "$/assets/icons/right-page.svg"
 import FirstPage from "$/assets/icons/first-page.svg"
 import LastPage from "$/assets/icons/last-page.svg"
-import { Collection } from "@/utils/store/collection.store"
+import { Collection } from "@/utils/store/collection/collection.store"
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -17,7 +17,7 @@ import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useErrorBoundary } from "react-error-boundary"
 import { Loading, useLoading } from "@/utils/hooks/useLoading"
-import { Spinner } from "./loadings/LoadingSpinner"
+import { Spinner } from "../loadings/LoadingSpinner"
 
 type Props = {
   collection: Collection
