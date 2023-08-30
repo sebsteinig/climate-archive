@@ -1,10 +1,10 @@
 "use client"
-import { useState, useEffect, useRef, SetStateAction, Dispatch } from "react"
-import { searchPublication, useSearchPublication } from "@/utils/api/api"
+import { useState, SetStateAction, Dispatch } from "react"
+import { useSearchPublication } from "@/utils/api/api"
 import FilterPublication from "./filters/publication/filter.publication"
 import FilterAdvanced from "./filters/advanced/filter.advanced"
-import { Publications } from "./publication"
-import { DefaultParameter, SearchPublication } from "@/utils/api/api.types"
+import { Publications } from "../publication/publication"
+import { SearchPublication } from "@/utils/api/api.types"
 import SearchIcon from "$/assets/icons/magnifying-glass-emerald-400.svg"
 import ArrowUp from "$/assets/icons/arrow-up-emerald-400.svg"
 import ArrowDown from "$/assets/icons/arrow-down-emerald-400.svg"
@@ -26,9 +26,11 @@ export default function SearchBar({
   displaySearchBar,
   displayCollection,
   is_visible,
-}: PropsWithChildren<Props>) {const [searched_content, setSearchContent] = useState<string>("")
+}: PropsWithChildren<Props>) {
+  const [searched_content, setSearchContent] = useState<string>("")
   const [display_options, displayOptions] = useState(false)
   const publication_filters = useStore(state => state.search.filter.publication)
+  const clearFiltersPublication =  useStore(state => state.search.clearFiltersPublication)
   const { data, error, isLoading } = useSearchPublication({
     ...buildRequest(publication_filters),
     title: searched_content,
@@ -63,6 +65,7 @@ export default function SearchBar({
           className={`shrink-0 grow-0 w-8 h-8 absolute top-0 right-0 m-5 text-emerald-400 cursor-pointer`}
           onClick={() => {
             setSearchContent("")
+            clearFiltersPublication()
             displaySearchBar(false)
           }}
         />

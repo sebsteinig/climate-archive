@@ -17,7 +17,7 @@ import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useErrorBoundary } from "react-error-boundary"
 import { Loading, useLoading } from "@/utils/hooks/useLoading"
-import {Spinner} from "./loadings/LoadingSpinner"
+import {Spinner} from "../loadings/LoadingSpinner"
 
 type Props = {
   collection: Collection

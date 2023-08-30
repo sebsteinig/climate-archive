@@ -10,7 +10,7 @@ import { Collection } from "@/utils/store/collection/collection.store"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
-import { CollectionView } from "./CollectionView"
+import { CollectionView } from "./publication/CollectionView"
 import { useErrorBoundary } from "react-error-boundary"
 
 type Props = {}

@@ -27,8 +27,8 @@ export function SelectJournal({} : SelectJournalProps) {
         <Row >
             <Label>Journal</Label>
             <Select
-                defaultValue={"default"}
                 title={journal || undefined}
+                value={journal?journal:"default"}
                 onChange={(e: any) => {
                     setJournal(e.target.value)
                 }}

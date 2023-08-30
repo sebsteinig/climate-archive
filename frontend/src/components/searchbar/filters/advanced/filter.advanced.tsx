@@ -9,12 +9,9 @@ import Link from "next/link"
 import { Label, Row, Section } from "../filter.utils"
 import { useStore } from "@/utils/store/store"
 import { ExperimentFilters } from "@/utils/store/search/search.store"
-type Exp = {
-  id: string
-  display: boolean
-}
+import { useSearch } from "@/utils/api/api"
 
-const SUPPORTED_EXTENSION = ["png", "webp", "jpg"] as const
+const SUPPORTED_EXTENSION = [ "webp", "png", "jpg"] as const
 const SUPPORTED_RESOLUTION = ["default", 1, 2] as const
 const SUPPORTED_VARIABLES = [
   "clt",
@@ -31,22 +28,19 @@ const SUPPORTED_VARIABLES = [
   "winds",
 ] as const
 
-function ExpButton({ exp, remove }: { exp: Exp; remove: Function }) {
-  if (exp.display) {
-    return (
-      <div
-        className="label mt-2 bg-slate-600 w-fit p-2 border-x-4 border-x-slate-500 
-                grid grid-cols-2 gap-1 items-center"
-      >
-        <p>{exp.id}</p>
-        <Cross
-          className={`w-6 h-6 text-slate-500 cursor-pointer`}
-          onClick={() => remove()}
-        />
-      </div>
-    )
-  }
-  return null
+function ExpButton({ exp, remove }: { exp: string; remove: Function }) {
+  return (
+    <div
+      className="label mt-2 bg-slate-600 w-fit p-2 border-x-4 border-x-slate-500 
+              grid grid-cols-2 gap-1 items-center"
+    >
+      <p>{exp}</p>
+      <Cross
+        className={`w-6 h-6 text-slate-500 cursor-pointer`}
+        onClick={() => remove()}
+      />
+    </div>
+  )
 }
 
 type Props = {
@@ -66,6 +60,8 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
   const toggleLossless = useStore(state => state.search.toggleLossless)
   const setResolution = useStore(state => state.search.setResolution)
   const setConfig = useStore(state => state.search.setConfig)
+  
+  const {data, error, isLoading} = useSearch(searched_exp)
 
   useEffect(() => {
     if(x && y){
@@ -77,6 +73,19 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
 
   return (
     <Section title="Advanced filters">
+      {filters.exp_ids && filters.exp_ids?.length>0 &&
+        <Row>
+          {filters.exp_ids.map((exp, idx) => 
+            <ExpButton
+              exp={exp}
+              key={idx}
+              remove={() => {
+                removeExp(exp)
+              }}
+            />
+          )}
+        </Row>
+      }
       <Row>
         <Label>Experiments</Label>
         <InputField
@@ -88,11 +97,19 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
               setSearchedExp(e)
             }}
             onKeyDown={(e) => {
-              if (e === "Enter") {
-
+              if (e === "Enter" && data?.map((e) => e.exp_id).includes(searched_exp)) {
+                pushExp(searched_exp)
               }
             }}
           />
+        {data && !isLoading &&
+          <Select defaultValue="default" onChange={(e) => pushExp(e.target.value)}>
+            <option value="default" disabled>Select a valid id</option>
+            {data?.map((e, i) =>
+              <option value={e.exp_id} key={i}>{e.exp_id}</option>
+            )}
+          </Select>
+        }
       </Row>
       <Row>
         <Label>Variables</Label>
@@ -111,7 +128,7 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
                 </option>
               )
             })}
-          </MultiSelect>
+        </MultiSelect>
       </Row>
       <Row>
         <Label>Extension</Label>
@@ -180,7 +197,7 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
             onChange={
               (e: any) => {
                 const y = e.target.value == SUPPORTED_RESOLUTION[0] ? '0' : e.target.value
-                setX(y)
+                setY(y)
               }
             }
           >
@@ -195,18 +212,11 @@ export default function FilterAdvanced({ displaySearchBar }: Props) {
       </Row>
       {filters.exp_ids && filters.exp_ids.length > 0 ? 
       (
-        <Link
-          href={buildHref(filters)}
-        >
-          <ButtonSecondary
-            disabled={filters.exp_ids.length == 0}
-            onClick={async () => {
-              displaySearchBar(false)
-            }}
-          >
+        <a href={buildHref(filters)}>
+          <div className="bg-slate-600 text-slate-300 rounded-lg outline-none px-5 py-2 tracking-widest shadow w-fit">
             Load
-          </ButtonSecondary>
-        </Link>
+          </div>
+        </a>
       ) : null}
     </Section>
   )

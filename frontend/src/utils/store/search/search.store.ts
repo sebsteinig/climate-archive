@@ -36,6 +36,7 @@ export interface SearchSlice {
         toggleLossless : () => void
         setResolution : (x:number,y:number) => void,
         setConfig : (config:string) => void,
+        clearFiltersPublication : () => void
     }
 }
   
@@ -60,7 +61,7 @@ export const createSearchSlice: StateCreator<
                 experiment : {
                     exp_ids : null,
                     config : null,
-                    extension : null,
+                    extension : "webp",
                     lossless : null,
                     resolution : null,
                     variables : null,
@@ -103,7 +104,7 @@ export const createSearchSlice: StateCreator<
             removeExp(exp_id) {
                 set(state => {
                     const idx = state.search.filter.experiment.exp_ids?.indexOf(exp_id)
-                    if(idx) {
+                    if(idx !== undefined) {
                         state.search.filter.experiment.exp_ids?.splice(idx,1)
                     }
                     if(state.search.filter.experiment.exp_ids?.length === 0) {
@@ -154,6 +155,17 @@ export const createSearchSlice: StateCreator<
                     state.search.filter.experiment.lossless = !state.search.filter.experiment.lossless
                 })
             },
+            clearFiltersPublication(){
+                set(state => {
+                    state.search.filter.publication.author = null
+                    state.search.filter.publication.year_span = {
+                        from : null,
+                        to : null,
+                        period : true,
+                    }
+                    state.search.filter.publication.journal = null
+                })
+            }
         }
     }
   }

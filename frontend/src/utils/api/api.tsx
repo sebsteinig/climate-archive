@@ -52,16 +52,11 @@ export function useSelectJournal(){
   return { data: data, error: error, isLoading: isLoading }
 }
 
-export function useSearch(query : SearchExperiment){
+export function useSearch(like : string){
   let href = null
-  if (query.like){
+  if (like !== ""){
     let url = new URL("search/", URL_API) 
-    Object.entries(query).map((bind) => {
-      const [key, value] = bind
-      if (value) {
-        url.searchParams.append(key, JSON.stringify(value))
-      }
-    })
+    url.searchParams.append("like", JSON.stringify(like))
     href = url.href
   }    
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)

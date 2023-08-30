@@ -1,6 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react"
-import ButtonSecondary from "../buttons/ButtonSecondary"
-import { Publication, Experiment } from "../../utils/types"
+import { Publication } from "../../utils/types"
 import { Collection } from "@/utils/store/collection/collection.store"
 
 type Props = {
@@ -9,7 +7,6 @@ type Props = {
 }
 
 export function Publications({ publications, displayCollection }: Props) {
-  useState<Publication>()
   return (
     <div>
         {publications.length > 0 &&
@@ -29,12 +26,6 @@ export function Publications({ publications, displayCollection }: Props) {
                   {publication.title}
                 </p>
                 <p className="italic text-right text-slate-400">{`${publication.authors_short} (${publication.year})`}</p>
-                {/* <ButtonSecondary
-                  className="hidden group-hover:block"
-                  onClick={() => {}}
-                >
-                  See Details
-                </ButtonSecondary> */}
               </div>
             )
           })}

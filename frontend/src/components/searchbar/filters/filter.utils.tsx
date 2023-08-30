@@ -35,7 +35,7 @@ export function Label({
       <>
         <h5
           onClick={() => (onClick ? onClick() : {})}
-          className={`shrink-0 grow-0 capitalize truncate whitespace-nowrap ${
+          className={`shrink-0 grow-0 capitalize truncate whitespace-nowrap basis-1/4 ${
             className ?? ""
           }`}
         >
@@ -46,7 +46,7 @@ export function Label({
   }
   
   export function Row({ children }: PropsWithChildren<{}>) {
-    return <div className="flex flex-row gap-5 justify-start">{children}</div>
+    return <div className="flex flex-row gap-5 items-center justify-start pr-2">{children}</div>
   }
   
   
