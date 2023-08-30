@@ -1,19 +1,23 @@
 import { useStore } from "@/utils/store/store"
 import { Coordinate } from "@/utils/store/graph/graph.type"
 import { formatCoordinates } from "@/utils/store/graph/graph.utils"
-import { WorldData } from "@/utils/store/worlds/time.type"
+import { WorldData } from "@/utils/store/worlds/time/time.type"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 
-type PopupProps = {
+export type PopupInfo = {
   data: WorldData
+  world_id: number
   coordinate: Coordinate
+}
+
+type PopupProps = PopupInfo & {
   close: () => void
 }
 
-export function Popup({ data, coordinate, close }: PopupProps) {
+export function Popup({ data, coordinate, world_id, close }: PopupProps) {
   let id_label:
     | {
         id: string
@@ -30,7 +34,7 @@ export function Popup({ data, coordinate, close }: PopupProps) {
   const add = useStore((state) => state.graph.add)
   return (
     <div
-      className="p-5 flex max-h-1/2 max-w-full overflow-auto 
+      className="fixed top-5 left-1/2 -translate-x-1/2 z-50 p-5 flex max-h-1/2 max-w-full overflow-auto 
       flex-wrap rounded-lg items-center gap-5 justify-between
       text-slate-900 bg-slate-200 shadow-md shadow-slate-900"
     >
@@ -58,6 +62,7 @@ export function Popup({ data, coordinate, close }: PopupProps) {
             lon: coordinate.lon,
             data: data,
             id_label: id_label,
+            world_id: world_id,
           })
           close()
         }}

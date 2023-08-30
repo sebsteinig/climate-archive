@@ -2,35 +2,24 @@ import { useStore } from "@/utils/store/store"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import {
   MutableRefObject,
-  PropsWithChildren,
   RefObject,
   forwardRef,
   useImperativeHandle,
-  useMemo,
   useRef,
-  useState,
 } from "react"
 import {
   TimeFrameRef,
   WorldID,
-  TimeMode,
   WorldData,
-} from "@/utils/store/worlds/time.type"
-import { getTitleOfExp, isPublication } from "@/utils/types.utils"
-import Select from "@/components/inputs/Select"
-import { Collection } from "@/utils/store/collection.store"
-import { database_provider } from "@/utils/database_provider/DatabaseProvider"
+} from "@/utils/store/worlds/time/time.type"
+import { isPublication } from "@/utils/types.utils"
+import { Collection } from "@/utils/store/collection/collection.store"
 import { ContainerConf } from "./utils/ContainerConf"
 import { SceneRef } from "./Scene"
-import ButtonSecondary from "@/components/buttons/ButtonSecondary"
-import { Coordinate } from "@/utils/store/graph/graph.type"
-import { formatCoordinates } from "@/utils/store/graph/graph.utils"
 import {
   ControllerRef,
   TimeController,
 } from "../time_controllers/utils/TimeController"
-import { IControllerRef } from "../time_controllers/controller.types"
-import { Popup } from "./utils/Popup"
 import { Selector } from "./utils/Selector"
 
 type Props = {
@@ -45,7 +34,6 @@ type Props = {
 
 export type ContainerRef = {
   track: MutableRefObject<HTMLDivElement>
-  showClickPanel: (data: WorldData, coordinate: Coordinate) => void
   controller: ControllerRef
 }
 
@@ -69,15 +57,10 @@ export const Container = forwardRef<ContainerRef, Props>(function Container(
   useImperativeHandle(ref, () => {
     return {
       track: div_ref,
-      showClickPanel(data, { lat, lon }) {
-        setPopupData({ data, coordinate: { lat, lon } })
-      },
       controller: controller_ref.current!,
     }
   })
-  const [popup_data, setPopupData] = useState<
-    { data: WorldData; coordinate: Coordinate } | undefined
-  >(undefined)
+
   return (
     <div
       className={`relative select-none p-5 flex flex-col justify-between
@@ -99,17 +82,6 @@ export const Container = forwardRef<ContainerRef, Props>(function Container(
       </div>
 
       <div className="pointer-events-none max-h-full justify-end mr-20 flex flex-col gap-5">
-        {popup_data ? (
-          <div className="max-w-full w-fit grow self-center pointer-events-auto">
-            <Popup
-              close={() => {
-                setPopupData(undefined)
-              }}
-              data={popup_data.data}
-              coordinate={popup_data.coordinate}
-            />
-          </div>
-        ) : null}
         <TimeController
           className="grow-0 shrink-0"
           current_frame={current_frame}

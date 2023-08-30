@@ -8,8 +8,8 @@ import {
   TimeController,
   TimeMode,
   TimeSpeed,
-} from "@/utils/store/worlds/time.type"
-import { Loading, useLoading } from "@/utils/useLoading"
+} from "@/utils/store/worlds/time/time.type"
+import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import { Publication } from "@/utils/types"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
@@ -65,6 +65,10 @@ export default function PaleoClimatePage() {
           mode: TimeMode.mean,
           speed: TimeSpeed.very_fast,
           controller: TimeController.geologic,
+          mode_state: {
+            is_writable: true,
+            previous: TimeMode.mean,
+          },
         })
       })
       .catch(() => {

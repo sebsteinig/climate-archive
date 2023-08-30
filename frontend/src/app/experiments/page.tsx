@@ -7,11 +7,10 @@ import { useStore } from "@/utils/store/store"
 import { usePathname, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
-import { Loading, useLoading } from "@/utils/useLoading"
+import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { ErrorBoundary } from "react-error-boundary"
 import { ErrorView } from "@/components/ErrorView"
-import { useRouter } from "next/router"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
@@ -51,8 +50,8 @@ export default function ExperimentsPage() {
           }
           break
         case "exp_ids":
-          const ids = value.split(",")
-          if (ids[ids.length - 1] == "") ids.pop()
+          const ids = value.split(",").filter(e=>e).map(e=>e.trim())
+          //if (ids[ids.length - 1] == "") ids.pop()
           request.exp_ids = ids
           break
         case "lossless":
@@ -74,7 +73,7 @@ export default function ExperimentsPage() {
     loading_ref.current?.finish()
     loadExperiments(request)
       .then((collection) => {
-        add(collection)
+        add(collection, undefined, collection.exps[0])
       })
       .catch(() => {
         setError(true)

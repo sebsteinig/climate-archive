@@ -2,10 +2,9 @@ import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time.type"
+} from "@/utils/store/worlds/time/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { MutableRefObject, RefObject } from "react"
-import { update } from "@/utils/store/worlds/world.utils"
 import { TextureInfo } from "@/utils/database/database.types"
 import { compute, getPath } from "./tick.utils"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -40,6 +39,7 @@ export type TickFn = (delta: number) => Promise<{
   update_texture: boolean
   uSphereWrapAmount: number
   variables: Map<EVarID, TickData>
+  reference?: Map<EVarID, TickData>
 }>
 
 export function tickBuilder(
@@ -66,13 +66,21 @@ export function tickBuilder(
       if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
-        await update(frame, active_variables, world_data)
+        frame = await current_frame.current.update(
+          world_id,
+          world_data,
+          active_variables,
+        )
+        //await update(frame, active_variables, world_data)
 
         for (let [variable, state] of frame.variables) {
           const data = await compute(variable, state, canvas, world_data)
           if (data) {
             res.set(variable, data)
           }
+        }
+        if (world_id === current_frame.current._observed_id) {
+          current_frame.current.saveReference(res)
         }
         panel_ref.current?.controller_ref.current?.onChange(frame)
         panel_ref.current?.container_ref.current?.controller.onChange(frame)
@@ -86,6 +94,7 @@ export function tickBuilder(
       uSphereWrapAmount: frame.uSphereWrapAmount,
       update_texture: update_texture,
       variables: res,
+      reference: current_frame.current.reference,
     }
   }
 }

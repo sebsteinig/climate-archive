@@ -7,7 +7,7 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useStore } from "@/utils/store/store"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import dynamic from "next/dynamic"
-import { Loading, useLoading } from "@/utils/useLoading"
+import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import {
   UP_ContainerDesc,
   getContainers,
@@ -53,7 +53,6 @@ export default function PublicationPage() {
           authors_short,
           year: [year],
         })
-        console.log(publication)
 
         if (!publication) return
         await database_provider.load({ exp_id })
