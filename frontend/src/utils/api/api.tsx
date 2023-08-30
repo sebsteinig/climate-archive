@@ -1,9 +1,7 @@
 import axios from "axios"
 import {
   SearchPublication,
-  DefaultParameter,
   SelectCollectionParameter,
-  SearchExperiment,
   SelectSingleParameter,
   SelectSingleResult,
   SelectCollectionResult,
@@ -178,6 +176,6 @@ function mockData() {
     "November",
     "December",
   ]
-  return[5.0, 4.5, 4.0, 3.3, 2.6, 1.9,0.9, 1.4, 2.2, 2.7, 3, 4.8]
-  //return labels.map((_n: string, i: number) => Math.random() * 25)
+  //return[5.0, 4.5, 4.0, 3.3, 2.6, 1.9,0.9, 1.4, 2.2, 2.7, 3, 4.8]
+  return labels.map((_n: string, i: number) => Math.random() * 25)
 }

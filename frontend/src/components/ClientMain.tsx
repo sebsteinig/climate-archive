@@ -1,14 +1,12 @@
 "use client"
 import { WorldManager } from "./worlds_manager/WorldsManager"
 import SideBar from "./sidebar/SideBar"
-import { useStore } from "@/utils/store/store"
-import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
 import { Collection } from "@/utils/store/collection/collection.store"
 import { HelpButton } from "./help/HelpButton"
-import Graph from "./Graph"
+import GraphsManager from "./graphs_manager/GraphsManager"
 import { HomeButton } from "./buttons/HomeButton"
 import { CollectionView } from "./publication/CollectionView"
 import { useErrorBoundary } from "react-error-boundary"
@@ -84,7 +82,7 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
-        <Graph />
+        <GraphsManager />
       </div>
     </>
   )
