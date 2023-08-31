@@ -38,7 +38,7 @@ export default function ClientMain({}: Props) {
           </div>
           <div className=" relative basis-[61%]">
             <div className="absolute top-0  h-full flex items-center z-40">
-              <SideBar journals={<></>} />
+              <SideBar />
             </div>
           </div>
           <div className="flex flex-col gap-5">
