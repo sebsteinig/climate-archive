@@ -8,7 +8,7 @@ import {
 } from "@/utils/store/worlds/time/time.type"
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
 import { TimeScale } from "@/components/geologic_timescale/TimeScale"
-import { useGeologicTree } from "@/components/geologic_timescale/geologic_tree"
+import { useGeologicTree } from "@/utils/hooks/useGeologicTree"
 import { goto } from "@/utils/store/worlds/time/loop"
 
 type MonthlyControllerProps = {

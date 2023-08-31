@@ -1,13 +1,9 @@
-import {
-  ColorMapRow,
-  RowWithSlider,
-  Rows,
-  Variable,
-  VariableProps,
-} from "../utils"
+import { Variable, VariableProps } from "../Variable"
 import { useStore } from "@/utils/store/store"
-import Slider from "@/components/inputs/Slider"
-import InputNumber from "@/components/inputs/InputNumber"
+import { Rows } from "../utils/Rows"
+import { ColorMapRow } from "../utils/row.colormap"
+import { RowWithSlider } from "../utils/row.slider"
+import { RowWithCheckBox } from "../utils/row.checkbox"
 
 export function Height({
   current_variable_controls,

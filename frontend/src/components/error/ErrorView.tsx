@@ -1,4 +1,4 @@
-import { SearchButtonStatic } from "./searchbar/SearchButtonStatic"
+import { SearchButton } from "../searchbar/SearchButton"
 
 type ErrorViewProps = {
   try_again_path: string
@@ -9,7 +9,7 @@ export function ErrorView({ try_again_path }: ErrorViewProps) {
     <main className="w-full h-full flex flex-col gap-5">
       <div>
         <nav className="flex flex-row justify-between">
-          <SearchButtonStatic />
+          <SearchButton />
           <div className="h-14 cursor-pointer flex items-center">
             <h1 className="">CLIMATE ARCHIVE</h1>
           </div>

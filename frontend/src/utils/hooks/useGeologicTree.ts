@@ -1,8 +1,14 @@
 import { useMemo } from "react"
-import { GeoTree, buildTree } from "./utils/geologic_tree.utils"
-import { GeoTreeRepr } from "./utils/geo_tree"
-import { SpanTree, insert } from "./utils/span_tree"
-import { exps_span } from "./utils/scotese_02"
+import {
+  GeoTree,
+  buildTree,
+} from "../../components/geologic_timescale/utils/geologic_tree.utils"
+import { GeoTreeRepr } from "../../components/geologic_timescale/utils/geo_tree"
+import {
+  SpanTree,
+  insert,
+} from "../../components/geologic_timescale/utils/span_tree"
+import { exps_span } from "../../components/geologic_timescale/utils/scotese_02"
 
 export function useGeologicTree(): [GeoTree, SpanTree] {
   const tree = useMemo(() => {

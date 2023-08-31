@@ -9,12 +9,10 @@ import { HelpButton } from "./help/HelpButton"
 import GraphsManager from "./graphs_manager/GraphsManager"
 import { HomeButton } from "./buttons/HomeButton"
 import { CollectionView } from "./publication/CollectionView"
-import { useErrorBoundary } from "react-error-boundary"
 
 type Props = {}
 
 export default function ClientMain({}: Props) {
-  const [search_bar_visible, displaySearchBar] = useState(false)
   const [collection, setCollection] = useState<Collection | undefined>()
   const [onReturn, buildReturn] = useState<{ fn: () => void } | undefined>(
     undefined,
@@ -26,8 +24,16 @@ export default function ClientMain({}: Props) {
         <div className="flex flex-col justify-between gap-5 h-full">
           <div className="grow-0">
             <SearchButton
-              search_bar_visible={search_bar_visible}
-              displaySearchBar={displaySearchBar}
+              displayCollection={(collection, display) => {
+                setCollection(collection)
+                display(false)
+                buildReturn({
+                  fn: () => {
+                    setCollection(undefined)
+                    display(true)
+                  },
+                })
+              }}
             />
           </div>
           <div className=" relative basis-[61%]">
@@ -41,25 +47,6 @@ export default function ClientMain({}: Props) {
           </div>
         </div>
         <div className="flex-grow flex flex-col">
-          <div className="flex flex-grow-0 justify-end ">
-            <SearchBar
-              is_visible={search_bar_visible}
-              displaySearchBar={displaySearchBar}
-              displayCollection={(collection) => {
-                setCollection(collection)
-                displaySearchBar(false)
-                buildReturn({
-                  fn: () => {
-                    setCollection(undefined)
-                    displaySearchBar(true)
-                  },
-                })
-              }}
-            />
-            {/* <div className="h-14 cursor-pointer flex items-center">
-              <h1 className="">CLIMATE ARCHIVE</h1>
-            </div> */}
-          </div>
           <div className="overflow-y-auto flex-grow ">
             <div className="h-full">
               <div className={`h-full w-full ${collection ? "hidden" : ""}`}>

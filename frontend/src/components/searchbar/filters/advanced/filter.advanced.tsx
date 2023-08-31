@@ -37,23 +37,35 @@ export default function FilterAdvanced() {
   )
 }
 
-function buildKeyValue<T>(key:string,value:T | null) {
-  if(value) {
-    return `${key}=${value}` 
+function buildKeyValue<T>(key: string, value: T | null) {
+  if (value) {
+    return `${key}=${value}`
   }
-  return ''
+  return ""
 }
 
 function join(...args: string[]) {
-  return args.filter(e => e).join("&")
+  return args.filter((e) => e).join("&")
 }
 
-function buildHref(filters:ExperimentFilters) {
-  const exp_ids = buildKeyValue('exp_ids',filters.exp_ids)
-  const variables = buildKeyValue('variables',filters.variables)
-  const config = buildKeyValue('config_name',filters.config)
-  const extension = buildKeyValue('extension',filters.extension)
-  const lossless = buildKeyValue('lossless',filters.lossless)
-  const resolution = buildKeyValue('resolution',filters.resolution !== null ? `${filters.resolution.x}*${filters.resolution.y}`:null)
-  return `/experiments/?${join(exp_ids,variables,config,extension,lossless,resolution)}`
+function buildHref(filters: ExperimentFilters) {
+  const exp_ids = buildKeyValue("exp_ids", filters.exp_ids)
+  const variables = buildKeyValue("variables", filters.variables)
+  const config = buildKeyValue("config_name", filters.config)
+  const extension = buildKeyValue("extension", filters.extension)
+  const lossless = buildKeyValue("lossless", filters.lossless)
+  const resolution = buildKeyValue(
+    "resolution",
+    filters.resolution !== null
+      ? `${filters.resolution.x}*${filters.resolution.y}`
+      : null,
+  )
+  return `/experiments/?${join(
+    exp_ids,
+    variables,
+    config,
+    extension,
+    lossless,
+    resolution,
+  )}`
 }

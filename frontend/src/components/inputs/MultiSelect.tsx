@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react"
 type Props = {
   value?: string
   defaultValue?: string[]
-  onChange: (e:string) => void
+  onChange: (e: string) => void
   name?: string
   id?: string
 }

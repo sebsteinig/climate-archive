@@ -1,4 +1,4 @@
-import { Variable } from "../utils"
+import { Variable } from "../Variable"
 import MountainIcon from "$/assets/icons/mountain-slate-500.svg"
 import { useStore } from "@/utils/store/store"
 
