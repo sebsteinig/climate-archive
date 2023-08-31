@@ -4,7 +4,7 @@ import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { useSelectJournal } from "@/utils/api/api"
 import { useStore } from "@/utils/store/store"
 import { useEffect, useState } from "react"
-import { Label, Row } from "../filter.utils"
+import { Label, Row } from "../../filter.utils"
 
 type SelectJournalProps = {}
 

@@ -8,7 +8,7 @@ type Props = {
 
 export function Publications({ publications, displayCollection }: Props) {
   return (
-    <div>
+    <>
       {publications.length > 0 &&
         publications.map((publication: Publication, idx: number) => {
           return (
@@ -29,6 +29,6 @@ export function Publications({ publications, displayCollection }: Props) {
             </div>
           )
         })}
-    </div>
+    </>
   )
 }

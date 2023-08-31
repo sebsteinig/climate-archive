@@ -1,6 +1,6 @@
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
 import { useStore } from "@/utils/store/store"
-import { Label, Row } from "../filter.utils"
+import { Label, Row } from "../../filter.utils"
 import Select from "@/components/inputs/Select"
 
 const DEFAULT_LOWER = "jurassic"
