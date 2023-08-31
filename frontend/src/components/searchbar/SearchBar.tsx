@@ -130,7 +130,7 @@ export default function SearchBar({
               <>
                 <FilterPublication />
                 <br />
-                <FilterAdvanced displaySearchBar={displaySearchBar} />
+                <FilterAdvanced />
                 <br />
               </>
             )}
