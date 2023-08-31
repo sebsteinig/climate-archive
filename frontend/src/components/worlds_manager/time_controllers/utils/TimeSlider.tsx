@@ -38,12 +38,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
   const destination = useRef<number>(null!)
   useImperativeHandle(ref, () => {
     return {
-      onChange: (frame: TimeFrame) => {
-        // const timestep = frame.timesteps
-        // if (timestep && parseFloat(input_ref.current.max) !== timestep - 1) {
-        //   input_ref.current.max = (timestep - 1).toString()
-        // }
-      },
+      onChange: (frame: TimeFrame) => {},
       onWeightUpdate: (frame: TimeFrame) => {
         if (!is_changing.current) {
           input_ref.current.value = frame.weight.toFixed(1).toString()

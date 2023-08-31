@@ -1,5 +1,5 @@
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
-import React, {useMemo} from "react"
+import React, { useMemo } from "react"
 import { useStore } from "@/utils/store/store"
 import { getTitleOfExp } from "@/utils/types.utils"
 import { getRandomHexColor } from "@/utils/store/graph/graph.utils"
@@ -25,23 +25,25 @@ export default function GraphsManager() {
     return actives
   }, [stored_active_variables])
 
-
   /* graphs contains all the locations so we want as many lines as different worlds */
   /* lines contains the info for each line (one position and one experiment) */
   const lines = useMemo(() => {
     let res = []
-    for(let g of graphs){
-      for (let w of worlds){
-        if (!(w[1].exp)) continue;
-        const same = res.filter((l) => l.data.exp?.id == w[1].exp?.id && l.lat == g.lat && l.lon == g.lon )
-        if (same.length != 0) continue;
+    for (let g of graphs) {
+      for (let w of worlds) {
+        if (!w[1].exp) continue
+        const same = res.filter(
+          (l) =>
+            l.data.exp?.id == w[1].exp?.id && l.lat == g.lat && l.lon == g.lon,
+        )
+        if (same.length != 0) continue
         res.push({
-          data : w[1],
-          world_id : w[0],
-          color : getRandomHexColor(),
-          id_label : getTitleOfExp(w[1].exp),
-          lat : g.lat,
-          lon : g.lon
+          data: w[1],
+          world_id: w[0],
+          color: getRandomHexColor(),
+          id_label: getTitleOfExp(w[1].exp),
+          lat: g.lat,
+          lon: g.lon,
         })
       }
     }
@@ -50,7 +52,7 @@ export default function GraphsManager() {
 
   if (graphs.length == 0 || active_variables.length == 0) return null
 
-  if (!visible) return <GraphButton/>
+  if (!visible) return <GraphButton />
 
   return (
     <div className="flex-grow flex flex-row w-[50vw]">
@@ -63,7 +65,7 @@ export default function GraphsManager() {
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
           <div className="w-full p-3">
-            <GraphTitles lines={lines} graphs = {graphs}/>
+            <GraphTitles lines={lines} graphs={graphs} />
           </div>
 
           {active_variables.map((variable, id: number) => (

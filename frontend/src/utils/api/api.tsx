@@ -42,40 +42,43 @@ export async function searchPublication(query: SearchPublication) {
 }
 
 /**
- * SWR hook : this function retrieves the journals 
+ * SWR hook : this function retrieves the journals
  * and also returns error and loading states
  * @returns list of journals: string[], error : Error and loading : boolean
  */
-export function useSelectJournal(){
+export function useSelectJournal() {
   let url = new URL("select/journal/", URL_API)
-  const fetcher = (url: string) => axios.get(url).then((res) =>
-    res.data.map(
-    (e: { journal: string }) => e.journal)
-  )
+  const fetcher = (url: string) =>
+    axios
+      .get(url)
+      .then((res) => res.data.map((e: { journal: string }) => e.journal))
   const { data, error, isLoading } = useSWR<string[], Error>(url.href, fetcher)
   return { data: data, error: error, isLoading: isLoading }
 }
 
 /**
- * SWR hook : this function retrieves the experiments 
+ * SWR hook : this function retrieves the experiments
  * and also returns error and loading states
  * @param query like : string
  * @returns list of experiment info : ExperimentInfo[], error : Error and loading : boolean
  */
-export function useSearch(like : string){
+export function useSearch(like: string) {
   let href = null
-  if (like !== ""){
-    let url = new URL("search/", URL_API) 
+  if (like !== "") {
+    let url = new URL("search/", URL_API)
     url.searchParams.append("like", JSON.stringify(like))
     href = url.href
-  }    
+  }
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)
-  const { data, error, isLoading } = useSWR<ExperimentInfo[], Error>(href, fetcher)
+  const { data, error, isLoading } = useSWR<ExperimentInfo[], Error>(
+    href,
+    fetcher,
+  )
   return { data: data, error: error, isLoading: isLoading }
 }
 
 /**
- * SWR hook : this function retrieves the experiments 
+ * SWR hook : this function retrieves the experiments
  * and also returns error and loading states
  * @param query : SearchPublication
  * @returns list of publications : Publication[], error : Error and loading : boolean
@@ -93,7 +96,7 @@ export function useSearchPublication(query: SearchPublication) {
     href = url.href
   }
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)
- return useSWR<Publication[], Error>(href, fetcher)
+  return useSWR<Publication[], Error>(href, fetcher)
 }
 
 /**
@@ -146,7 +149,7 @@ export async function select(id: string, query: SelectSingleParameter) {
 
 /**
  * retrieves a collection of experiments
- * @param query : SelectCollectionParameter contains ids (the list of experiment ids) 
+ * @param query : SelectCollectionParameter contains ids (the list of experiment ids)
  * and other default parameters
  * @returns experiments
  */
@@ -195,7 +198,7 @@ export async function getImageArrayBuffer(path: string) {
  * function that retrieve netCDF data at a location to be displayed
  * @todo (MOCK DATA AT THE MOMENT)
  * @param graph : Graph containing experiments and position infos
- * @param variable : EVarID 
+ * @param variable : EVarID
  * @returns data for a period of time
  */
 export async function getChartData(graph: Graph, variable: EVarID) {
@@ -208,7 +211,6 @@ export async function getChartData(graph: Graph, variable: EVarID) {
     throw new ApiError()
   }
 }
-
 
 /**
  * temporary function
