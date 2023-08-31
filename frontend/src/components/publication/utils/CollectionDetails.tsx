@@ -1,4 +1,3 @@
-
 import { Experiments, Publication } from "@/utils/types"
 import { isPublication } from "@/utils/types.utils"
 import PlusIcon from "$/assets/icons/plus.svg"
@@ -12,13 +11,12 @@ import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import { Spinner } from "../../loadings/LoadingSpinner"
 import ExperimentsTab from "./ExperimentsTab"
 
-
 type CollectionProps = {
-    collection: Publication | Experiments | undefined
-    load: boolean
-    onClose?: { fn: () => void }
-    resetSearchbar: () => void
-  }
+  collection: Publication | Experiments | undefined
+  load: boolean
+  onClose?: { fn: () => void }
+  resetSearchbar: () => void
+}
 
 export default function CollectionDetails({
   collection,

@@ -126,36 +126,32 @@ export default function SearchBar({
               </p>
             </div>
 
-              {display_options && (
-                <>
-                  <FilterPublication />
-                  <br />
-                  <FilterAdvanced />
-                  <br />
-                </>
-              )}
-              {data && data.length > 0 && (
-                <>
-                  {display_options && (
-                    <FullWidthSeparator className="my-3" />
-                  )}
-                  <p className="text-slate-400">
-                    {`${data.length} result${
-                      data.length > 1 ? "s" : ""
-                    } ...`}
-                  </p>
-                  <br />
-                </>
-              )}
-            </>
-            {
-              isLoading ? 
-              <LoadingSpinner /> : 
-              <Publications
-                displayCollection={displayCollection}
-                publications={data ?? []}
-              />
-            }
+            {display_options && (
+              <>
+                <FilterPublication />
+                <br />
+                <FilterAdvanced />
+                <br />
+              </>
+            )}
+            {data && data.length > 0 && (
+              <>
+                {display_options && <FullWidthSeparator className="my-3" />}
+                <p className="text-slate-400">
+                  {`${data.length} result${data.length > 1 ? "s" : ""} ...`}
+                </p>
+                <br />
+              </>
+            )}
+          </>
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <Publications
+              displayCollection={displayCollection}
+              publications={data ?? []}
+            />
+          )}
         </div>
       </div>
     </div>

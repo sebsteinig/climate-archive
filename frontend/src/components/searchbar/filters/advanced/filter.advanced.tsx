@@ -1,4 +1,3 @@
-
 import { Section } from "../filter.utils"
 import { useStore } from "@/utils/store/store"
 import { ExperimentFilters } from "@/utils/store/search/search.store"
@@ -9,24 +8,20 @@ import { SelectExtension } from "./parameters/extension"
 import { InputConfiguration } from "./parameters/configuration"
 import { CheckLossless } from "./parameters/lossless"
 
-
-
 export default function FilterAdvanced() {
-  const filters = useStore(state => state.search.filter.experiment)
-  
+  const filters = useStore((state) => state.search.filter.experiment)
+
   return (
     <Section title="Advanced filters">
-      
-      <SelectedExperiments/>
-      <SelectExperiment/>
-      <SelectVariable/>
-      <SelectExtension/>
-      <InputConfiguration/>
-      <CheckLossless/>
-      <SelectResolution/>
+      <SelectedExperiments />
+      <SelectExperiment />
+      <SelectVariable />
+      <SelectExtension />
+      <InputConfiguration />
+      <CheckLossless />
+      <SelectResolution />
 
-      {filters.exp_ids && filters.exp_ids.length > 0 ? 
-      (
+      {filters.exp_ids && filters.exp_ids.length > 0 ? (
         <a href={buildHref(filters)}>
           <div className="bg-slate-600 text-slate-300 rounded-lg outline-none px-5 py-2 tracking-widest shadow w-fit">
             Load

@@ -9,14 +9,16 @@ import { InputAuthor } from "./parameters/author"
 type PublicationFiltersProps = {}
 
 export default function PublicationFilters({}: PublicationFiltersProps) {
-  const clearFiltersPublication =  useStore(state => state.search.clearFiltersPublication)
+  const clearFiltersPublication = useStore(
+    (state) => state.search.clearFiltersPublication,
+  )
 
   return (
     <Section title="Filter on publication">
       <Period />
       <SelectJournal />
-      <InputAuthor/>
-      
+      <InputAuthor />
+
       <div className="flex flex-row justify-end pr-3">
         <div
           className="flex flex-row gap-1 items-center group cursor-pointer"
@@ -28,7 +30,6 @@ export default function PublicationFilters({}: PublicationFiltersProps) {
           </span>
         </div>
       </div>
-      
     </Section>
   )
 }

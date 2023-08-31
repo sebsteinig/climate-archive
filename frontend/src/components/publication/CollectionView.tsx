@@ -1,4 +1,3 @@
-
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
 import { Collection } from "@/utils/store/collection/collection.store"
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
@@ -52,5 +51,3 @@ export function CollectionView({
     </div>
   )
 }
-
-
