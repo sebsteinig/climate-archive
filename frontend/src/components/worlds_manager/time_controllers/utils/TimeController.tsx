@@ -21,13 +21,13 @@ import {
   TimeKind,
   TimeMode,
   WorldData,
-} from "@/utils/store/worlds/time.type"
+} from "@/utils/store/worlds/time/time.type"
 import { useStore } from "@/utils/store/store"
-import { circular, goto, once, walk } from "@/utils/store/worlds/world.utils"
 import { getTitleOfExp } from "@/utils/types.utils"
 import { Experiment } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useErrorBoundary } from "react-error-boundary"
+import { circular, once, walk } from "@/utils/store/worlds/time/loop"
 
 type Props = {
   className?: string
@@ -47,8 +47,9 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const time_title_ref = useRef<HTMLDivElement>(null)
     const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
-    const switchTimeMode = useStore(state => state.worlds.switchTimeMode)
+    const switchTimeMode = useStore((state) => state.worlds.switchTimeMode)
     const stored_active_variables = useStore((state) => state.active_variables)
+    const observed_id = useStore((state) => state.worlds.observed_world)
     const active_variables = useMemo(() => {
       let actives = []
       for (let [key, active] of stored_active_variables.entries()) {
@@ -60,7 +61,9 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     useEffect(() => {
       pause(tween_ref, setPlaying)
     }, [active_variables])
-
+    useEffect(() => {
+      pause(tween_ref, setPlaying)
+    }, [observed_id])
     useImperativeHandle(ref, () => {
       return {
         play() {
@@ -95,7 +98,8 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             const t = getTitleOfExp(frame.exp)
             id = t.id
             label = t.label
-            title = titleOf(Math.round(frame.weight), frame.timesteps ?? 0) ?? ""
+            title =
+              titleOf(Math.round(frame.weight), frame.timesteps ?? 0) ?? ""
           }
           if (time_title_ref.current) {
             time_title_ref.current.innerText = title
@@ -108,7 +112,11 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     })
     const [is_playing, setPlaying] = useState(false)
     return (
-      <div className={`flex flex-row flex-wrap gap-5 ${className ?? ""}`}>
+      <div
+        className={`flex flex-row flex-wrap gap-5
+      ${observed_id === world_id ? "brightness-50 pointer-events-none" : ""}
+      ${className ?? ""}`}
+      >
         <div className="grow-[3] cursor-default col-span-2 overflow-hidden flex flex-col justify-between">
           <div
             className="text-emerald-600 font-semibold small-caps tracking-[.5em] my-auto"
@@ -123,7 +131,11 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           {is_playing ? (
             // PAUSE BUTTON
             <Pause
-              className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
+              className={`${
+                observed_id === world_id
+                  ? "pointer-events-none"
+                  : "pointer-events-auto"
+              } shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 pause(tween_ref, setPlaying)
               }}
@@ -131,7 +143,11 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           ) : (
             // PLAY BUTTON
             <Play
-              className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
+              className={`${
+                observed_id === world_id
+                  ? "pointer-events-none"
+                  : "pointer-events-auto"
+              } shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 if (active_variables.length > 0) {
                   play(data, world_id, current_frame, tween_ref, setPlaying)
@@ -140,34 +156,40 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             />
           )}
           <Stop
-            className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`}
+            className={`${
+              observed_id === world_id
+                ? "pointer-events-none"
+                : "pointer-events-auto"
+            } shrink-0 grow-0 cursor-pointer w-8 h-8 block text-slate-300 child:fill-slate-300`}
             onClick={() => {
               stop(data, world_id, current_frame, tween_ref, setPlaying)
             }}
           />
-          {data.time.mode_state.is_writable ? 
-          <Clock
-            className={`pointer-events-auto shrink-0 grow-0 cursor-pointer w-8 h-8 block text-slate-300`}
-            onClick={() => {
-              const frame = current_frame.current.get(world_id)
-              if(!frame) return
-              let exp:Experiment;
-              if(data.time.mode === TimeMode.mean) {
-                exp = data.collection.exps[Math.floor(frame.weight)]
-                database_provider
-                .load({ exp_id: exp.id })
-                .then(async () => {
-                  console.log("SWITCHING MODE");
-                  
-                  switchTimeMode(world_id,exp)
-                })
-              }else {
-                exp = data.exp ?? data.collection.exps[0]
-                switchTimeMode(world_id,exp)
-              }
-            }}
-          />
-          :null}
+          {data.time.mode_state.is_writable ? (
+            <Clock
+              className={`${
+                observed_id === world_id
+                  ? "pointer-events-none"
+                  : "pointer-events-auto"
+              } shrink-0 grow-0 cursor-pointer w-8 h-8 block text-slate-300`}
+              onClick={() => {
+                const frame = current_frame.current.get(world_id)
+                if (!frame) return
+                let exp: Experiment
+                if (data.time.mode === TimeMode.mean) {
+                  exp = data.collection.exps[Math.floor(frame.weight)]
+                  database_provider.load({ exp_id: exp.id }).then(async () => {
+                    console.log("SWITCHING MODE")
+
+                    switchTimeMode(world_id, exp)
+                  })
+                } else {
+                  exp = data.exp ?? data.collection.exps[0]
+                  switchTimeMode(world_id, exp)
+                }
+              }}
+            />
+          ) : null}
         </div>
         <div className="flex-grow"></div>
       </div>

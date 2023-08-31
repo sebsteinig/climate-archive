@@ -19,7 +19,7 @@ import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time.type"
+} from "@/utils/store/worlds/time/time.type"
 import Link from "next/link"
 import { useStore } from "@/utils/store/store"
 import { gsap } from "gsap"
@@ -64,33 +64,32 @@ export function ContainerConf({
           onClick={() => expand(true)}
         />
       )}
-      {is_expanded && (
-        <>
-          <RecenterBtn />
-          <FullScreenBtn />
-          <AnchorBtn />
-          <ScreenshotBtn />
-          <WorldBtn
-            onClick={(world_id, is_spheric) => {
-              const frame = current_frame.current.get(world_id)
-              if (!frame) return
-              if (scene_ref.current) {
-                scene_ref.current.canOrbit(is_spheric)
-              }
-              const to = is_spheric ? 1 : 0
-              gsap.to(frame, {
-                uSphereWrapAmount: to,
-                duration: 1,
-                ease: "none",
-              })
-            }}
-            world_id={world_id}
-          />
-          <RotateBtn />
-          <GridBtn />
-          <PinBtn />
-        </>
-      )}
+
+      <div className={`${is_expanded ? "visible" : "hidden"}`}>
+        <RecenterBtn />
+        <FullScreenBtn />
+        <AnchorBtn world_id={world_id} current_frame={current_frame} />
+        <ScreenshotBtn />
+        <WorldBtn
+          onClick={(world_id, is_spheric) => {
+            const frame = current_frame.current.get(world_id)
+            if (!frame) return
+            if (scene_ref.current) {
+              scene_ref.current.canOrbit(is_spheric)
+            }
+            const to = is_spheric ? 1 : 0
+            gsap.to(frame, {
+              uSphereWrapAmount: to,
+              duration: 1,
+              ease: "none",
+            })
+          }}
+          world_id={world_id}
+        />
+        <RotateBtn />
+        <GridBtn />
+        <PinBtn />
+      </div>
       <CamBtn
         onClick={(world_id, linked) => {
           if (scene_ref.current) {
@@ -245,10 +244,29 @@ function PinBtn(params: PinBtnProps) {
   )
 }
 
-type AnchorBtnProps = {}
+type AnchorBtnProps = {
+  world_id: WorldID
+  current_frame: TimeFrameRef
+}
 
-function AnchorBtn(params: PinBtnProps) {
+function AnchorBtn({ world_id, current_frame }: AnchorBtnProps) {
+  const observe = useStore((state) => state.worlds.observe)
+  const [is_anchored, set] = useState(false)
   return (
-    <AnchorIcon className={`cursor-pointer  w-6 h-6 my-2 text-slate-400 `} />
+    <AnchorIcon
+      onClick={() => {
+        if (!is_anchored) {
+          observe(world_id)
+          current_frame.current.observe(world_id)
+          set(true)
+        } else {
+          observe(undefined)
+          current_frame.current.observe(undefined)
+          set(false)
+        }
+      }}
+      className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 
+        ${is_anchored ? "text-emerald-400 " : "text-slate-400 "}`}
+    />
   )
 }

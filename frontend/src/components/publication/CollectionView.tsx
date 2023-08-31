@@ -17,16 +17,21 @@ import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useErrorBoundary } from "react-error-boundary"
 import { Loading, useLoading } from "@/utils/hooks/useLoading"
-import {Spinner} from "../loadings/LoadingSpinner"
+import { Spinner } from "../loadings/LoadingSpinner"
 
 type Props = {
   collection: Collection
   onClose?: { fn: () => void }
   onReturn?: { fn: () => void }
-  resetSearchbar : () => void
+  resetSearchbar: () => void
 }
 
-export function CollectionView({ collection, onClose, onReturn, resetSearchbar }: Props) {
+export function CollectionView({
+  collection,
+  onClose,
+  onReturn,
+  resetSearchbar,
+}: Props) {
   return (
     <div className="h-full">
       <div
@@ -67,14 +72,14 @@ type CollectionProps = {
   collection: Publication | Experiments | undefined
   load: boolean
   onClose?: { fn: () => void }
-  resetSearchbar : () => void
+  resetSearchbar: () => void
 }
 
 export function CollectionDetails({
   collection,
   load,
   onClose,
-  resetSearchbar
+  resetSearchbar,
 }: CollectionProps) {
   const clear = useStore((state) => state.worlds.clear)
   const add = useStore((state) => state.worlds.add)
@@ -114,9 +119,10 @@ export function CollectionDetails({
       </div>
       <div className="flex flex-col gap-2 h-full">
         <div className="self-end">
-        {load && 
-          <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
-            <div onClick={async () => {
+          {load && (
+            <Loading ref={loading_ref} fallback={<Spinner className="m-2" />}>
+              <div
+                onClick={async () => {
                   loading_ref.current?.start()
                   const exp_id = collection.exps[0].id
                   try {
@@ -137,16 +143,17 @@ export function CollectionDetails({
                     onClose.fn()
                   }
                   loading_ref.current?.finish()
-              }} className="flex flex-row px-2 mr-5 items-center group cursor-pointer rounded-md bg-gray-800"
-            >
-              <span className="tracking-widest uppercase text-lg cursor-pointer px-2 text-slate-500 group-hover:text-slate-300">
-                Add world
-              </span>
-              <EarthIcon className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 group-hover:text-slate-300 "/>
-              <PlusIcon className="shrink-0 grow-0 w-14 h-14 cursor-pointer text-slate-500  group-hover:text-slate-300"/>
-            </div>
-          </Loading>    
-        }
+                }}
+                className="flex flex-row px-2 mr-5 items-center group cursor-pointer rounded-md bg-gray-800"
+              >
+                <span className="tracking-widest uppercase text-lg cursor-pointer px-2 text-slate-500 group-hover:text-slate-300">
+                  Add world
+                </span>
+                <EarthIcon className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 group-hover:text-slate-300 " />
+                <PlusIcon className="shrink-0 grow-0 w-14 h-14 cursor-pointer text-slate-500  group-hover:text-slate-300" />
+              </div>
+            </Loading>
+          )}
         </div>
 
         <div className=" h-full overflow-hidden">
@@ -154,7 +161,7 @@ export function CollectionDetails({
         </div>
         <div className="flex justify-center">
           {load && (
-            <Loading ref={loading_ref} fallback={<Spinner className="m-2"/>}>
+            <Loading ref={loading_ref} fallback={<Spinner className="m-2" />}>
               <ButtonPrimary
                 onClick={async () => {
                   clear()
@@ -184,8 +191,6 @@ export function CollectionDetails({
               </ButtonPrimary>
             </Loading>
           )}
-          
-
         </div>
       </div>
     </div>

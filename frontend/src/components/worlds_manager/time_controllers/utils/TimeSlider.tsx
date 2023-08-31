@@ -13,9 +13,8 @@ import {
   WorldID,
   TimeMode,
   WorldData,
-} from "@/utils/store/worlds/time.type"
-import { Collection } from "@/utils/store/collection/collection.store"
-import { goto } from "@/utils/store/worlds/world.utils"
+} from "@/utils/store/worlds/time/time.type"
+import { goto } from "@/utils/store/worlds/time/loop"
 
 type Props = {
   className?: string
