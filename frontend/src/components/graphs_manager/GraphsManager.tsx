@@ -7,9 +7,11 @@ import Graph from "./Graph"
 import GraphButton from "./utils/GraphButton"
 import { GraphTitles } from "./utils/graph.legends"
 
-
-type Props = {}
-export default function GraphsManager({}: Props) {
+/**
+ * manages all the locations and different graphs displayed
+ * @returns component containing all the graphs and locations info
+ */
+export default function GraphsManager() {
   const show = useStore((state) => state.graph.show)
   const graphs = useStore((state) => state.graph.graphs)
   const worlds = useStore((state) => state.worlds.slots)
@@ -23,6 +25,9 @@ export default function GraphsManager({}: Props) {
     return actives
   }, [stored_active_variables])
 
+
+  /* graphs contains all the locations so we want as many lines as different worlds */
+  /* lines contains the info for each line (one position and one experiment) */
   const lines = useMemo(() => {
     let res = []
     for(let g of graphs){

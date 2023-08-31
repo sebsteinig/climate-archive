@@ -81,9 +81,7 @@ export default function Graph({ lines, variable }: LineChartProps) {
           backgroundColor: `${graph.color}80`,
         }
       }),
-    }
-    console.log(data);
-    
+    }    
   
     const options = {
       //maintainAspectRatio: false ,
@@ -132,11 +130,11 @@ export default function Graph({ lines, variable }: LineChartProps) {
         </div>
         <div className="flex flex-row justify-between items-center p-2">
           <h5>source : {getTitleMultipleSources(lines)}</h5>
-          <DownloadButtons 
+          {chartRef.current && data != undefined && <DownloadButtons 
                 csv_href = {toCSV(data)}
                 filename = {filename(lines, titleOf(variable))} 
                 png_href = {chartRef.current?chartRef.current.toBase64Image():""}
-          />          
+          />}          
         </div>
       </div>
     )

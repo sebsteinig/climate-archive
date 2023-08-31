@@ -80,7 +80,7 @@ export function filename(graphs: Graph[], var_name: string) {
     for (let graph of graphs) {
         ids += `${graph.id_label ? graph.id_label.id : "exp"}.`
     }
-    return `climatearchive.${var_name}.${ids}${getGraphTitle(graphs[0])}`
+    return `climatearchive.${var_name}.${ids}${getGraphTitle(graphs[0])}`.replaceAll(" ", "_")
 }
 
 export function graphLabel(graph: Graph) {

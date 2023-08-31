@@ -3,8 +3,6 @@ import { useState } from "react"
 import DownloadIcon from "$/assets/icons/download.svg"
 
 
-
-
 function ButtonFormat(props: {
     download: ToDownload
     format: FormatID
@@ -46,7 +44,7 @@ function ButtonFormat(props: {
           props.onClick(value)
         }}
       >
-        <span className="capitalize">{name}</span>
+        <span className="uppercase">{name}</span>
       </div>
     )
 }
@@ -57,7 +55,6 @@ export function toCSV(data: ChartData<"line", number[], string>) {
     let csvRows = []
     csvRows.push("labels," + data.labels.join(","))
     for (const dataset of data.datasets) {
-      console.log(dataset.data)
       csvRows.push(dataset.label + "," + dataset.data.join(","))
     }  
     // array joining with new line
@@ -85,39 +82,39 @@ type DownloadButtonsProps = {
 
 }
 
-export function DownloadButtons({png_href, filename, csv_href} : DownloadButtonsProps){
-    const [download, setDownload] = useState<ToDownload>({
-        format: FormatID.png,
-        href: png_href,
-        filename: `${filename}.png`,
-      })
-    return(
-        <div className="flex flex-row items-center gap-2">
-            {[FormatID.png, FormatID.svg, FormatID.csv].map((k, i) => 
-                <ButtonFormat
-                    key ={i}
-                    format={k}
-                    download={download}
-                    filename = {filename}
-                    csv_href = {csv_href}
-                    onClick={(value : ToDownload) => setDownload(value)}
-                    png_href={png_href}
-                />
-            )}
-  
-            {download.href!=="" && (
-              <a href={download.href} download={download.filename}>
-                <div
-                  className="border-2 w-fit h-fit p-1 border-slate-500
-                  hover:border-slate-600 rounded-md"
-                >
-                  <DownloadIcon
-                    className="w-7 h-7 cursor-pointer
-                  text-slate-500 child:fill-slate-500 hover:text-slate-600"
-                  />
-                </div>
-              </a>
-            )}
+export function DownloadButtons({png_href, csv_href, filename } : DownloadButtonsProps){
+  const [download, setDownload] = useState<ToDownload>({
+      format: FormatID.png,
+      href: png_href,
+      filename: `${filename}.png`,
+    })
+  return(
+    <div className="flex flex-row items-center gap-2">
+      {[FormatID.png, FormatID.svg, FormatID.csv].map((k, i) => 
+        <ButtonFormat
+            key ={i}
+            format={k}
+            download={download}
+            png_href={png_href}
+            csv_href = {csv_href}
+            filename = {filename}
+            onClick={(value : ToDownload) => setDownload(value)}
+        />
+      )}
+
+      {download.href!=="" && (
+        <a href={download.href} download={download.filename}>
+          <div
+            className="border-2 w-fit h-fit p-1 border-slate-500
+            hover:border-slate-600 rounded-md"
+          >
+            <DownloadIcon
+              className="w-7 h-7 cursor-pointer
+            text-slate-500 child:fill-slate-500 hover:text-slate-600"
+            />
           </div>
-    )
+        </a>
+      )}
+    </div>
+  )
 }
