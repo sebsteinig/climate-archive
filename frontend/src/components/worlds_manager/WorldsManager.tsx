@@ -23,6 +23,10 @@ import Link from "next/link"
 import { Popup, PopupInfo } from "./world_panel/utils/Popup"
 import { Coordinate } from "@/utils/store/graph/graph.type"
 import { useInit } from "@/utils/hooks/useInit"
+import { usePanels } from "@/utils/hooks/usePanels"
+import { useScenes } from "@/utils/hooks/useScenes"
+import { DefaultView } from "./DefaultView"
+import { useActiveVariables } from "@/utils/hooks/useActiveVariables"
 
 type Props = {
   displayCollection: (collection: Collection) => void
@@ -32,75 +36,22 @@ export function WorldManager(props: Props) {
   const worlds_slots = useStore((state) => state.worlds.slots)
   const [display_popup, displayPopup] = useState<boolean>(false)
   const [popup_info, setPopupInfo] = useState<PopupInfo | undefined>(undefined)
-
-  const stored_active_variables = useStore((state) => state.active_variables)
-  const active_variables = useMemo(() => {
-    let actives = []
-    for (let [key, active] of stored_active_variables.entries()) {
-      if (active) actives.push(key)
-    }
-    return actives
-  }, [stored_active_variables])
-
+  const active_variables = useActiveVariables()
   const current_frame = useFrameRef()
   const canvas = useCanvas()
-
-  const [is_empty, setEmpty] = useState<undefined | boolean>(undefined)
-
   useInit(worlds_slots, current_frame, active_variables)
 
   const grid = useMemo(() => {
     return gridOf(worlds_slots.size)
-  }, [gridOf(worlds_slots.size)])
+  }, [worlds_slots.size])
 
   const container_ref = useRef<HTMLDivElement>(null!)
 
-  const panel_refs = useRef<RefObject<PanelRef>[]>([])
-  for (let world_id of worlds_slots.keys()) {
-    panel_refs.current[world_id] = React.createRef<PanelRef>()
-  }
-  const scene_refs = useRef<RefObject<SceneRef>[]>([])
-  for (let world_id of worlds_slots.keys()) {
-    scene_refs.current[world_id] = React.createRef<SceneRef>()
-  }
-
-  if (is_empty) {
-    return (
-      <div className="w-full h-full flex flex-col">
-        <div className="grow-0 self-end">
-          <Link
-            href={"/"}
-            className="overflow-hidden h-14 cursor-pointer flex items-center"
-          >
-            <h1 className="">CLIMATE ARCHIVE</h1>
-          </Link>
-        </div>
-        <div className="w-full h-full flex justify-center items-center">
-          <div>
-            <h1 className="font-bold text-center small-caps text-5xl">
-              Nothing to see here !
-            </h1>
-            <br />
-            <p className="text-center">
-              Try searching for the publication using our handy search bar up
-              top,
-              <br /> or simply head back to our{" "}
-              <Link
-                href={"/"}
-                className="cursor-pointer text-emerald-500 tracking-widest small-caps"
-              >
-                homepage
-              </Link>
-              . Safe travels!{" "}
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const panel_refs = usePanels(worlds_slots)
+  const scene_refs = useScenes(worlds_slots)
 
   return (
-    <>
+    <DefaultView>
       {display_popup && popup_info != undefined && (
         <div className="max-w-full w-fit grow self-center pointer-events-auto">
           <Popup
@@ -175,6 +126,6 @@ export function WorldManager(props: Props) {
           })}
         </Canvas>
       </div>
-    </>
+    </DefaultView>
   )
 }

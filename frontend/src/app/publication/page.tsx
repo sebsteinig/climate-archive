@@ -14,7 +14,7 @@ import {
   resolveURLparams,
 } from "@/utils/URL_params/url_params.utils"
 import { ErrorBoundary } from "react-error-boundary"
-import { ErrorView } from "@/components/ErrorView"
+import { ErrorView } from "@/components/error/ErrorView"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,

@@ -1,6 +1,6 @@
 "use client"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
-import { ErrorView } from "@/components/ErrorView"
+import { ErrorView } from "@/components/error/ErrorView"
 import { searchPublication } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useStore } from "@/utils/store/store"

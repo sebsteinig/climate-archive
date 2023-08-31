@@ -1,47 +1,24 @@
 //'use client'
 import dynamic from "next/dynamic"
 import styles from "./page.module.css"
-import SelectJournal from "@/components/searchbar/filters/SelectJournals"
 import { useStore } from "@/utils/store/store"
 import { usePathname } from "next/navigation"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useRouter } from "next/router"
 import { SearchButton } from "@/components/searchbar/SearchButton"
-import { SearchButtonStatic } from "@/components/searchbar/SearchButtonStatic"
 import Link from "next/link"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import Image from "next/image"
 import { Reset } from "@/components/Reset"
 
-// const ClientMain = dynamic(() => import("@/components/ClientMain"), {
-//   ssr: false,
-// })
 export default function Home() {
-  // const addCollection = useStore((state) => state.addCollection)
-  // const add = useStore((state) => state.worlds.add)
-  // const clear = useStore((state) => state.worlds.clear)
-  // useEffect(() => {
-  //   clear()
-  //   Promise.all([database_provider.loadAllColections()]).then(([e]) => {
-  //     e.map((element) => {
-  //       addCollection(element.id!, element.data)
-  //     })
-  //     const most_recent = e.sort(
-  //       (a, b) => Date.parse(b.date) - Date.parse(a.date),
-  //     )[0]
-  //     if (most_recent) {
-  //       add(most_recent.data)
-  //     }
-  //   })
-  // }, [])
-
   return (
     <main id="root" className="w-full h-full">
       <Reset />
       {/* <ClientMain /> */}
       <div className="w-full h-full overflow-hidden flex flex-col gap-5">
         <nav className="flex flex-row justify-between">
-          <SearchButtonStatic />
+          <SearchButton />
 
           <Link
             href={"/"}

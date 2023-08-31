@@ -1,4 +1,4 @@
-import { SearchButtonStatic } from "@/components/searchbar/SearchButtonStatic"
+import { SearchButton } from "@/components/searchbar/SearchButton"
 import Link from "next/link"
 
 export default function NotFound() {
@@ -6,7 +6,7 @@ export default function NotFound() {
     <main className="w-full h-full flex flex-col gap-5">
       <div>
         <nav className="flex flex-row justify-between">
-          <SearchButtonStatic />
+          <SearchButton />
           <div className="h-14 cursor-pointer flex items-center">
             <h1 className="">CLIMATE ARCHIVE</h1>
           </div>

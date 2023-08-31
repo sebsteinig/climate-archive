@@ -26,8 +26,8 @@ import { useStore } from "@/utils/store/store"
 import { getTitleOfExp } from "@/utils/types.utils"
 import { Experiment } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { useErrorBoundary } from "react-error-boundary"
 import { circular, once, walk } from "@/utils/store/worlds/time/loop"
+import { useActiveVariables } from "@/utils/hooks/useActiveVariables"
 
 type Props = {
   className?: string
@@ -48,15 +48,8 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
     const switchTimeMode = useStore((state) => state.worlds.switchTimeMode)
-    const stored_active_variables = useStore((state) => state.active_variables)
     const observed_id = useStore((state) => state.worlds.observed_world)
-    const active_variables = useMemo(() => {
-      let actives = []
-      for (let [key, active] of stored_active_variables.entries()) {
-        if (active) actives.push(key)
-      }
-      return actives
-    }, [stored_active_variables])
+    const active_variables = useActiveVariables()
 
     useEffect(() => {
       pause(tween_ref, setPlaying)

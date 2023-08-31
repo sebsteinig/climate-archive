@@ -10,7 +10,7 @@ import { RequestMultipleTexture } from "@/utils/database_provider/database_provi
 import { Loading, useLoading } from "@/utils/hooks/useLoading"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { ErrorBoundary } from "react-error-boundary"
-import { ErrorView } from "@/components/ErrorView"
+import { ErrorView } from "@/components/error/ErrorView"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
@@ -50,7 +50,10 @@ export default function ExperimentsPage() {
           }
           break
         case "exp_ids":
-          const ids = value.split(",").filter(e=>e).map(e=>e.trim())
+          const ids = value
+            .split(",")
+            .filter((e) => e)
+            .map((e) => e.trim())
           //if (ids[ids.length - 1] == "") ids.pop()
           request.exp_ids = ids
           break

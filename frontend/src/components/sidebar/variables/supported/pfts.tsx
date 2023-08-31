@@ -1,4 +1,4 @@
-import { Variable, VariableProps } from "../utils"
+import { Variable, VariableProps } from "../Variable"
 import { useStore } from "@/utils/store/store"
 
 export function Pfts({

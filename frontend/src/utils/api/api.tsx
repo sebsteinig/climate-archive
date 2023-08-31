@@ -42,28 +42,30 @@ export async function searchPublication(query: SearchPublication) {
   }
 }
 
-export function useSelectJournal(){
+export function useSelectJournal() {
   let url = new URL("select/journal/", URL_API)
-  const fetcher = (url: string) => axios.get(url).then((res) =>
-    res.data.map(
-    (e: { journal: string }) => e.journal)
-  )
+  const fetcher = (url: string) =>
+    axios
+      .get(url)
+      .then((res) => res.data.map((e: { journal: string }) => e.journal))
   const { data, error, isLoading } = useSWR<string[], Error>(url.href, fetcher)
   return { data: data, error: error, isLoading: isLoading }
 }
 
-export function useSearch(like : string){
+export function useSearch(like: string) {
   let href = null
-  if (like !== ""){
-    let url = new URL("search/", URL_API) 
+  if (like !== "") {
+    let url = new URL("search/", URL_API)
     url.searchParams.append("like", JSON.stringify(like))
     href = url.href
-  }    
+  }
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)
-  const { data, error, isLoading } = useSWR<ExperimentInfo[], Error>(href, fetcher)
+  const { data, error, isLoading } = useSWR<ExperimentInfo[], Error>(
+    href,
+    fetcher,
+  )
   return { data: data, error: error, isLoading: isLoading }
 }
-
 
 export function useSearchPublication(query: SearchPublication) {
   let href = null
@@ -78,7 +80,7 @@ export function useSearchPublication(query: SearchPublication) {
     href = url.href
   }
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)
- return useSWR<Publication[], Error>(href, fetcher)
+  return useSWR<Publication[], Error>(href, fetcher)
 }
 
 /**
@@ -94,7 +96,6 @@ export function searchLooking(query: { for: string }) {
     throw new ApiError()
   }
 }
-
 
 async function getData<T>(url: string) {
   let data = await axios.get(url)
@@ -178,6 +179,6 @@ function mockData() {
     "November",
     "December",
   ]
-  return[5.0, 4.5, 4.0, 3.3, 2.6, 1.9,0.9, 1.4, 2.2, 2.7, 3, 4.8]
+  return [5.0, 4.5, 4.0, 3.3, 2.6, 1.9, 0.9, 1.4, 2.2, 2.7, 3, 4.8]
   //return labels.map((_n: string, i: number) => Math.random() * 25)
 }

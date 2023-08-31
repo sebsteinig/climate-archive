@@ -21,13 +21,14 @@ import { useStore } from "@/utils/store/store"
 import { Graph } from "@/utils/store/graph/graph.type"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
-import { titleOf, unitOf } from "./sidebar/variables/utils"
 import { getChartData } from "@/utils/api/api"
 import {
   formatCoordinates,
   getRandomHexColor,
 } from "@/utils/store/graph/graph.utils"
 import { SmSeparator } from "./separators/separators"
+import { useActiveVariables } from "@/utils/hooks/useActiveVariables"
+import { titleOf, unitOf } from "./sidebar/variables/variable.utils"
 
 //defaults.font.family ='Montserrat'
 
@@ -62,14 +63,7 @@ export default function Graph({}: Props) {
   const graphs = useStore((state) => state.graph.graphs)
   const worlds = useStore((state) => state.worlds.slots)
   const visible = useStore((state) => state.graph.visible)
-  const stored_active_variables = useStore((state) => state.active_variables)
-  const active_variables = useMemo(() => {
-    let actives = []
-    for (let [key, active] of stored_active_variables.entries()) {
-      if (active) actives.push(key)
-    }
-    return actives
-  }, [stored_active_variables])
+  const active_variables = useActiveVariables()
 
   const lines = useMemo(() => {
     let res = []
@@ -419,7 +413,7 @@ function getTitleMultipleSources(graphs: Graph[]) {
   let titles: string[] = []
   for (let graph of graphs) {
     if (!titles.includes(getGraphTitle(graph))) {
-        titles.push(getGraphTitle(graph))
+      titles.push(getGraphTitle(graph))
     }
   }
   return titles.join(" & ")

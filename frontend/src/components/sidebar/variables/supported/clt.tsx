@@ -1,5 +1,5 @@
 import { useStore } from "@/utils/store/store"
-import { Variable } from "../utils"
+import { Variable } from "../Variable"
 import WindsIcon from "$/assets/icons/winds-slate-500.svg"
 
 type Props = {}
