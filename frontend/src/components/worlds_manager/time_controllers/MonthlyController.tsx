@@ -11,10 +11,9 @@ import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
-import { goto } from "@/utils/store/worlds/time/loop"
-import { useStore } from "@/utils/store/store"
+import { goto } from "@/utils/store/worlds/world.utils"
 
 type MonthlyControllerProps = {
   data: WorldData
@@ -32,7 +31,6 @@ export const MonthlyController = forwardRef<
     undefined,
   )
   const [focus, setFocus] = useState<number | undefined>(undefined)
-  const observed_id = useStore((state) => state.worlds.observed_world)
   useImperativeHandle(ref, () => {
     return {
       onChange(frame) {},
@@ -42,13 +40,7 @@ export const MonthlyController = forwardRef<
     }
   })
   return (
-    <div
-      className={`select-none w-full pt-5 px-5 ${
-        observed_id === world_id
-          ? "brightness-50 pointer-events-none"
-          : "pointer-events-auto"
-      }`}
-    >
+    <div className="w-full pt-5 px-5">
       <div className="w-full my-2">
         <ProgressBar ref={progress_bar_ref} />
       </div>

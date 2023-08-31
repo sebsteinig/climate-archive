@@ -8,7 +8,7 @@ import {
   SelectSingleResult,
   SelectCollectionResult,
 } from "./api.types"
-import { ExperimentInfo, Publication } from "../types"
+import { Publication } from "../types"
 import { Graph } from "../store/graph/graph.type"
 import { EVarID } from "../store/variables/variable.types"
 import useSWR from "swr"
@@ -42,29 +42,6 @@ export async function searchPublication(query: SearchPublication) {
   }
 }
 
-export function useSelectJournal(){
-  let url = new URL("select/journal/", URL_API)
-  const fetcher = (url: string) => axios.get(url).then((res) =>
-    res.data.map(
-    (e: { journal: string }) => e.journal)
-  )
-  const { data, error, isLoading } = useSWR<string[], Error>(url.href, fetcher)
-  return { data: data, error: error, isLoading: isLoading }
-}
-
-export function useSearch(like : string){
-  let href = null
-  if (like !== ""){
-    let url = new URL("search/", URL_API) 
-    url.searchParams.append("like", JSON.stringify(like))
-    href = url.href
-  }    
-  const fetcher = (url: string) => axios.get(url).then((res) => res.data)
-  const { data, error, isLoading } = useSWR<ExperimentInfo[], Error>(href, fetcher)
-  return { data: data, error: error, isLoading: isLoading }
-}
-
-
 export function useSearchPublication(query: SearchPublication) {
   let href = null
   if (query.title || query.journal || query.authors_short) {
@@ -78,7 +55,8 @@ export function useSearchPublication(query: SearchPublication) {
     href = url.href
   }
   const fetcher = (url: string) => axios.get(url).then((res) => res.data)
- return useSWR<Publication[], Error>(href, fetcher)
+  const { data, error, isLoading } = useSWR<Publication[], Error>(href, fetcher)
+  return { data: data, error: error, isLoading: isLoading }
 }
 
 /**
@@ -95,6 +73,30 @@ export function searchLooking(query: { for: string }) {
   }
 }
 
+/**
+ * @param query like ...
+ * @returns experiments with these characteristics
+ */
+export function search(query: SearchExperiment) {
+  try {
+    if (
+      !Object.values(query).every((value, index, number) => {
+        value == null
+      })
+    ) {
+      let url = new URL("search/", URL_API)
+      Object.entries(query).map((bind) => {
+        const [key, value] = bind
+        if (value) {
+          url.searchParams.append(key, JSON.stringify(value))
+        }
+      })
+      return getData(url.href)
+    }
+  } catch (error) {
+    throw new ApiError()
+  }
+}
 
 async function getData<T>(url: string) {
   let data = await axios.get(url)
@@ -152,6 +154,18 @@ export async function getImageArrayBuffer(path: string) {
   }
 }
 
+export async function getJournals() {
+  //console.log("FECTH JOURNAL <getJournals>")
+  try {
+    let url = new URL("select/journal/", URL_API)
+    let data = await axios.get(url.href)
+    let journals = data.data.map((e: { journal: string }) => e.journal)
+    return journals as string[]
+  } catch (error) {
+    throw new ApiError()
+  }
+}
+
 export async function getChartData(graph: Graph, variable: EVarID) {
   //let url = new URL("")
   //let data = await axios.get(url.href)
@@ -178,6 +192,6 @@ function mockData() {
     "November",
     "December",
   ]
-  return[5.0, 4.5, 4.0, 3.3, 2.6, 1.9,0.9, 1.4, 2.2, 2.7, 3, 4.8]
-  //return labels.map((_n: string, i: number) => Math.random() * 25)
+
+  return labels.map((_n: string, i: number) => Math.random() * 25)
 }

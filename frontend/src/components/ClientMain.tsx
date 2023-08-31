@@ -6,11 +6,11 @@ import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useEffect, useState } from "react"
 import SearchBar from "./searchbar/SearchBar"
 import { SearchButton } from "./searchbar/SearchButton"
-import { Collection } from "@/utils/store/collection/collection.store"
+import { Collection } from "@/utils/store/collection.store"
 import { HelpButton } from "./help/HelpButton"
 import Graph from "./Graph"
 import { HomeButton } from "./buttons/HomeButton"
-import { CollectionView } from "./publication/CollectionView"
+import { CollectionView } from "./CollectionView"
 import { useErrorBoundary } from "react-error-boundary"
 
 type Props = {}
@@ -57,7 +57,9 @@ export default function ClientMain({}: Props) {
                   },
                 })
               }}
-            />
+            >
+              {<></>}
+            </SearchBar>
             {/* <div className="h-14 cursor-pointer flex items-center">
               <h1 className="">CLIMATE ARCHIVE</h1>
             </div> */}
@@ -73,9 +75,6 @@ export default function ClientMain({}: Props) {
               </div>
               {collection && (
                 <CollectionView
-                  resetSearchbar={() => {
-                    buildReturn(undefined)
-                  }}
                   onClose={{ fn: () => setCollection(undefined) }}
                   onReturn={onReturn}
                   collection={collection}

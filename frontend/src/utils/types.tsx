@@ -26,11 +26,3 @@ export type Publication = {
 export type Experiments = {
   exps: Experiment[]
 }
-
-
-export type ExperimentInfo = {
-  available_variables:string[],
-  config_name : string,
-  created_at : string,
-  exp_id : string
-}

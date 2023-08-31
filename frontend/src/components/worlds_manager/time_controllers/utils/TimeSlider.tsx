@@ -12,9 +12,11 @@ import {
   TimeFrameState,
   WorldID,
   TimeMode,
+  TimeState,
   WorldData,
-} from "@/utils/store/worlds/time/time.type"
-import { goto } from "@/utils/store/worlds/time/loop"
+} from "@/utils/store/worlds/time.type"
+import { Collection } from "@/utils/store/collection.store"
+import { goto } from "@/utils/store/worlds/world.utils"
 
 type Props = {
   className?: string

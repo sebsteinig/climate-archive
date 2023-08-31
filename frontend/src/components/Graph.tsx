@@ -1,4 +1,6 @@
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
+import BinIcon from "$/assets/icons/bin.svg"
+import PinIcon from "$/assets/icons/place.svg"
 import ChartIcon from "$/assets/icons/chart.svg"
 import DownloadIcon from "$/assets/icons/download.svg"
 import React, { useEffect, useMemo, useRef, useState } from "react"
@@ -19,14 +21,11 @@ import { Line } from "react-chartjs-2"
 import { ChartJSOrUndefined } from "react-chartjs-2/dist/types"
 import { useStore } from "@/utils/store/store"
 import { Graph } from "@/utils/store/graph/graph.type"
-import { getTitleOfExp, isPublication } from "@/utils/types.utils"
+import { isPublication } from "@/utils/types.utils"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { titleOf, unitOf } from "./sidebar/variables/utils"
 import { getChartData } from "@/utils/api/api"
-import {
-  formatCoordinates,
-  getRandomHexColor,
-} from "@/utils/store/graph/graph.utils"
+import { formatCoordinates } from "@/utils/store/graph/graph.utils"
 import { SmSeparator } from "./separators/separators"
 
 //defaults.font.family ='Montserrat'
@@ -60,7 +59,6 @@ type Props = {}
 export default function Graph({}: Props) {
   const show = useStore((state) => state.graph.show)
   const graphs = useStore((state) => state.graph.graphs)
-  const worlds = useStore((state) => state.worlds.slots)
   const visible = useStore((state) => state.graph.visible)
   const stored_active_variables = useStore((state) => state.active_variables)
   const active_variables = useMemo(() => {
@@ -70,29 +68,6 @@ export default function Graph({}: Props) {
     }
     return actives
   }, [stored_active_variables])
-
-  const lines = useMemo(() => {
-    let res = []
-    for (let g of graphs) {
-      for (let w of worlds) {
-        if (!w[1].exp) continue
-        const same = res.filter(
-          (l) =>
-            l.data.exp?.id == w[1].exp?.id && l.lat == g.lat && l.lon == g.lon,
-        )
-        if (same.length != 0) continue
-        res.push({
-          data: w[1],
-          world_id: w[0],
-          color: getRandomHexColor(),
-          id_label: getTitleOfExp(w[1].exp),
-          lat: g.lat,
-          lon: g.lon,
-        })
-      }
-    }
-    return res
-  }, [graphs, worlds])
 
   if (graphs.length == 0 || active_variables.length == 0) return null
 
@@ -119,11 +94,11 @@ export default function Graph({}: Props) {
         />
         <div className="overflow-y-auto flex flex-col gap-2 overflow-x-hidden max-h-[90%]">
           <div className="w-full p-3">
-            <GraphTitles lines={lines} graphs={graphs} />
+            <GraphTitles graphs={graphs} />
           </div>
 
           {active_variables.map((variable, id: number) => (
-            <LineChart key={id} variable={variable} graphs={lines} />
+            <LineChart key={id} variable={variable} graphs={graphs} />
           ))}
         </div>
       </div>
@@ -131,73 +106,44 @@ export default function Graph({}: Props) {
   )
 }
 
-function GraphTitles({ graphs, lines }: { graphs: Graph[]; lines: Graph[] }) {
+function GraphTitles({ graphs }: { graphs: Graph[] }) {
   const remove = useStore((state) => state.graph.remove)
   return (
-    <div className="w-full p-2 m-5">
+    <div className="w-full p-2">
       <p className="text-slate-500 tracking-widest text-lg">Locations</p>
+      <div className="flex flex-col"></div>
       {graphs.map((graph, id) => (
-        <div key={id} className="flex flex-row gap-20 py-2 items-start">
-          <div className="flex flex-row gap-4 items-center">
-            <CrossIcon
-              className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 hover:text-slate-600"
-              onClick={() => {
-                remove(id)
-              }}
-            />
-            <p className="tracking-widest">{graphLabel(graph).coordinates}</p>
+        <div
+          key={id}
+          className="flex flex-row items-center gap-2 py-2 justify-between"
+        >
+          {/* <PinIcon
+            className="w-10 h-10 cursor-pointer text-slate-500 child:fill-slate-500 hover:text-slate-600"
+          /> */}
+          <p className="text-xs tracking-widest" style={{ color: graph.color }}>
+            {graphLabel(graph).coordinates}
+          </p>
+          <div className="flex flex-row items-center gap-5">
+            <p
+              className="text-xs tracking-widest"
+              style={{ color: graph.color }}
+            >
+              {graphLabel(graph).id}
+            </p>
+            <p className="text-xs  italic" style={{ color: graph.color }}>
+              {" "}
+              {getGraphTitle(graph)}
+            </p>
           </div>
-          <ExperimentTitles
-            lines={lines.filter(
-              (line) => line.lat == graph.lat && line.lon == graph.lon,
-            )}
+          <BinIcon
+            className="shrink-0 grow-0 w-8 h-8 cursor-pointer text-slate-500 hover:text-slate-600"
+            onClick={() => remove(id)}
           />
         </div>
       ))}
       <div className="w-full px-5 pt-6">
         <SmSeparator className="w-full bg-slate-500" />
       </div>
-    </div>
-  )
-}
-
-function ExperimentTitles({ lines }: { lines: Graph[] }) {
-  const exp_map = new Map()
-  lines.map((l) => {
-    const line_info = exp_map.get(getGraphTitle(l))
-    if (line_info) {
-      exp_map.set(getGraphTitle(l), [
-        ...line_info,
-        { exp_id: graphLabel(l).id, color: l.color },
-      ])
-    } else {
-      exp_map.set(getGraphTitle(l), [
-        { exp_id: graphLabel(l).id, color: l.color },
-      ])
-    }
-  })
-
-  return (
-    <div className="flex flex-col">
-      {Array.from(exp_map.entries()).map((element, id) => (
-        <div key={id} className="flex flex-row items-center gap-5">
-          <p className="italic"> {element[0]}</p>
-          <p>
-            {element[1].map(
-              (exp: { exp_id: string; color: string }, i: number) => (
-                <span
-                  className="tracking-widest"
-                  key={i}
-                  style={{ color: exp.color }}
-                >
-                  {exp.exp_id}
-                  {i < element[1].length - 1 && ", "}
-                </span>
-              ),
-            )}
-          </p>
-        </div>
-      ))}
     </div>
   )
 }
@@ -418,8 +364,10 @@ function graphLabel(graph: Graph) {
 function getTitleMultipleSources(graphs: Graph[]) {
   let titles: string[] = []
   for (let graph of graphs) {
-    if (!titles.includes(getGraphTitle(graph))) {
+    if (isPublication(graph.data.collection)) {
+      if (!titles.includes(getGraphTitle(graph))) {
         titles.push(getGraphTitle(graph))
+      }
     }
   }
   return titles.join(" & ")

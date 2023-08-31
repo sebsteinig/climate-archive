@@ -4,13 +4,13 @@ import {
   WorldData,
 } from "@/utils/store/worlds/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
+import { CanvasRef } from "../hooks/useCanvas"
+import { PanelRef } from "../../components/worlds_manager/world_panel/Panel"
 import { MutableRefObject, RefObject } from "react"
 import { update } from "@/utils/store/worlds/world.utils"
 import { TextureInfo } from "@/utils/database/database.types"
 import { compute, getPath } from "./tick.utils"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
-import { PanelRef } from "@/components/worlds_manager/world_panel/Panel"
-import { CanvasRef } from "../hooks/useCanvas"
 
 export type TickDataState = {
   min: number[]

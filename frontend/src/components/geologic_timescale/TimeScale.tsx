@@ -4,7 +4,6 @@ import {
   forwardRef,
   memo,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState,
 } from "react"
@@ -59,7 +58,7 @@ export function TimeScale({ onChange }: TimeScaleProps) {
   const [is_focus, setFocus] = useState<boolean>(false)
   return (
     <div
-      className="w-full border-4 border-slate-200 rounded-md bg-slate-900"
+      className="w-full border-4 border-slate-200 rounded-md"
       onMouseLeave={() => {
         if (!is_focus) {
           setSelection(undefined)
@@ -83,15 +82,12 @@ export function TimeScale({ onChange }: TimeScaleProps) {
         appearance={BlockAppereance.full}
         highlight={true}
       />
-      <div className="w-full flex flex-row max-w-full overflow-hidden transition-all duration-300 ease-in-out ">
+      <div className="w-full flex flex-row max-w-full overflow-hidden transition-all duration-100 ease-in-out ">
         {Array.from(tree.root.branches).map(([id, branch]) => {
           const next_selection = nextSelection(id, tree.root.id, selection)
 
           return (
             <Block
-              parent_span={Math.abs(
-                tree.root.data.age_span.to - tree.root.data.age_span.from,
-              )}
               key={id}
               onSelect={onSelect}
               status={statusOf(branch, next_selection)}
@@ -107,7 +103,6 @@ export function TimeScale({ onChange }: TimeScaleProps) {
 }
 
 type BlockProps = {
-  parent_span: number
   branch: GeoBranch
   selection: Selection | undefined
   onSelect: (param: Selection) => void
@@ -120,7 +115,6 @@ const Block = memo(function Block({
   onSelect,
   selection,
   status,
-  parent_span,
   is_focus,
 }: BlockProps) {
   function b_onSelect(param: Selection) {
@@ -133,55 +127,48 @@ const Block = memo(function Block({
       child: param,
     })
   }
-  const grow_span = useMemo(() => {
-    const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from)
-    return Math.floor((span / parent_span) * 100)
-  }, [parent_span])
+
   if (branch.branches.size === 0) {
     return (
       <Cell
-        grow_span={grow_span}
         key={branch.id}
         branch={branch}
         highlight={status.highlight}
         is_focus={is_focus}
         appearance={status.appearance}
         onSelect={onSelect}
+        className="w-full"
       />
     )
   }
 
   return (
     <div
-      style={{ flexGrow: grow_span }}
       className={`
-            ${status.appearance === BlockAppereance.full ? "" : ""}
+            ${status.appearance === BlockAppereance.full ? "w-full" : ""}
             ${status.appearance === BlockAppereance.hidden ? "hidden" : ""}
             ${
               status.appearance === BlockAppereance.reduced
                 ? "w-[2em] h-10"
                 : ""
             }
-            truncate transition-all duration-300 ease-in-out `}
+            grow truncate transition-all duration-100 ease-in-out `}
       key={branch.id}
     >
       <Cell
-        grow_span={grow_span}
         key={branch.id}
         branch={branch}
+        className="w-full"
         onSelect={onSelect}
         is_focus={is_focus}
         appearance={status.appearance}
         highlight={status.highlight}
       />
-      <div className="w-full flex flex-row truncate transition-all duration-300 ease-in-out ">
+      <div className="w-full flex flex-row grow truncate transition-all duration-100 ease-in-out ">
         {Array.from(branch.branches).map(([sub_id, sub_branch]) => {
           const next_selection = nextSelection(sub_id, branch.id, selection)
           return (
             <Block
-              parent_span={Math.abs(
-                branch.data.age_span.to - branch.data.age_span.from,
-              )}
               key={sub_id}
               onSelect={b_onSelect}
               status={statusOf(sub_branch, next_selection)}
@@ -197,7 +184,6 @@ const Block = memo(function Block({
 })
 
 type CellProps = {
-  grow_span?: number
   className?: string
   branch: GeoBranch
   onSelect: (param: Selection) => void
@@ -212,7 +198,6 @@ const Cell = memo(function Cell({
   onSelect,
   highlight,
   is_focus,
-  grow_span,
   appearance,
 }: CellProps) {
   const div_ref = useRef<HTMLDivElement>(null)
@@ -222,9 +207,9 @@ const Cell = memo(function Cell({
       className={`cursor-pointer truncate text-clip tracking-widest 
             small-caps py-1 text-slate-900 text-center ${className ?? ""}
             border border-slate-200 ${!highlight ? "brightness-50" : ""}
-            transition-all duration-300 ease-in-out 
+            transition-all duration-100 ease-in-out 
             `}
-      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1 }}
+      style={{ backgroundColor: branch.data.color, maxWidth: "100%" }}
       onMouseOver={() => {
         if (appearance === BlockAppereance.full && !is_focus) {
           onSelect({

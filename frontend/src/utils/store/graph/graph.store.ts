@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand"
 import { Graph, GraphInfo } from "./graph.type"
-import { getRandomHexColor } from "./graph.utils"
+import { Color } from "three"
 
 export interface GraphSlice {
   graph: {
@@ -31,14 +31,15 @@ export const createGraphStore: StateCreator<
       add(graph_info) {
         set((state) => {
           state.graph.visible = true
-          const color = getRandomHexColor()
+          const rgb = new Color()
+          rgb.setRGB(Math.random(), Math.random() * 0.8, Math.random() * 0.3)
+
           let graph: Graph = {
             lat: graph_info.lat,
             lon: graph_info.lon,
             data: graph_info.data,
-            world_id: graph_info.world_id,
             id_label: graph_info.id_label,
-            color: color,
+            color: `#${rgb.getHexString()}`,
           }
 
           state.graph.graphs.push(graph)

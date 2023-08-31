@@ -5,11 +5,11 @@ import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time/time.type"
+} from "@/utils/store/worlds/time.type"
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
+import { goto } from "@/utils/store/worlds/world.utils"
 import { TimeScale } from "@/components/geologic_timescale/TimeScale"
 import { useGeologicTree } from "@/components/geologic_timescale/geologic_tree"
-import { goto } from "@/utils/store/worlds/time/loop"
 
 type MonthlyControllerProps = {
   data: WorldData

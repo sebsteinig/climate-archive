@@ -1,5 +1,5 @@
 import { ReadonlyURLSearchParams } from "next/navigation"
-import { Slots, TimeFrameRef } from "../store/worlds/time/time.type"
+import { Slots, TimeFrameRef } from "../store/worlds/time.type"
 import { isPublication } from "../types.utils"
 
 export type UP_ContainerDesc = {

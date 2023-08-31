@@ -2,13 +2,11 @@ import { Experiment, Experiments, Publication } from "@/utils/types"
 import { getTitleOfExp, isPublication } from "@/utils/types.utils"
 import { useMemo, useState } from "react"
 import CrossIcon from "$/assets/icons/cross-small-emerald-300.svg"
-import PlusIcon from "$/assets/icons/plus.svg"
-import EarthIcon from "$/assets/icons/earth.svg"
 import LeftPage from "$/assets/icons/left-page.svg"
 import RightPage from "$/assets/icons/right-page.svg"
 import FirstPage from "$/assets/icons/first-page.svg"
 import LastPage from "$/assets/icons/last-page.svg"
-import { Collection } from "@/utils/store/collection/collection.store"
+import { Collection } from "@/utils/store/collection.store"
 import ArrowLeft from "$/assets/icons/arrow-left.svg"
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -16,22 +14,14 @@ import { upPush } from "@/utils/URL_params/url_params.utils"
 import { useStore } from "@/utils/store/store"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useErrorBoundary } from "react-error-boundary"
-import { Loading, useLoading } from "@/utils/hooks/useLoading"
-import { Spinner } from "../loadings/LoadingSpinner"
 
 type Props = {
   collection: Collection
   onClose?: { fn: () => void }
   onReturn?: { fn: () => void }
-  resetSearchbar: () => void
 }
 
-export function CollectionView({
-  collection,
-  onClose,
-  onReturn,
-  resetSearchbar,
-}: Props) {
+export function CollectionView({ collection, onClose, onReturn }: Props) {
   return (
     <div className="h-full">
       <div
@@ -48,16 +38,12 @@ export function CollectionView({
           {onReturn && (
             <ArrowLeft
               className="shrink-0 grow-0 w-4 h-4 cursor-pointer text-emerald-400 child:fill-emerald-400"
-              onClick={() => {
-                onReturn.fn()
-                resetSearchbar()
-              }}
+              onClick={() => onReturn.fn()}
             />
           )}
         </div>
         <div className={`max-h-full overflow-y-auto flex flex-grow h-full`}>
           <CollectionDetails
-            resetSearchbar={resetSearchbar}
             collection={collection}
             load={onReturn !== undefined}
             onClose={onClose}
@@ -72,14 +58,12 @@ type CollectionProps = {
   collection: Publication | Experiments | undefined
   load: boolean
   onClose?: { fn: () => void }
-  resetSearchbar: () => void
 }
 
 export function CollectionDetails({
   collection,
   load,
   onClose,
-  resetSearchbar,
 }: CollectionProps) {
   const clear = useStore((state) => state.worlds.clear)
   const add = useStore((state) => state.worlds.add)
@@ -87,7 +71,6 @@ export function CollectionDetails({
   const { showBoundary } = useErrorBoundary()
   const router = useRouter()
   const addCollection = useStore((state) => state.addCollection)
-  const loading_ref = useLoading()
   if (!collection) return null
 
   if (!isPublication(collection)) {
@@ -117,79 +100,36 @@ export function CollectionDetails({
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-2 h-full">
-        <div className="self-end">
-          {load && (
-            <Loading ref={loading_ref} fallback={<Spinner className="m-2" />}>
-              <div
-                onClick={async () => {
-                  loading_ref.current?.start()
-                  const exp_id = collection.exps[0].id
-                  try {
-                    await database_provider.load({ exp_id })
-                    const idx = await database_provider.addPublicationToDb(
-                      collection,
-                    )
-                    addCollection(idx, collection)
-                    add(collection, undefined, collection.exps[0])
-                  } catch (e) {
-                    showBoundary(e)
-                    return
-                  }
-                  reload(false)
-                  resetSearchbar()
-                  router.push("/publication")
-                  if (onClose) {
-                    onClose.fn()
-                  }
-                  loading_ref.current?.finish()
-                }}
-                className="flex flex-row px-2 mr-5 items-center group cursor-pointer rounded-md bg-gray-800"
-              >
-                <span className="tracking-widest uppercase text-lg cursor-pointer px-2 text-slate-500 group-hover:text-slate-300">
-                  Add world
-                </span>
-                <EarthIcon className="shrink-0 grow-0 w-10 h-10 cursor-pointer text-slate-500 group-hover:text-slate-300 " />
-                <PlusIcon className="shrink-0 grow-0 w-14 h-14 cursor-pointer text-slate-500  group-hover:text-slate-300" />
-              </div>
-            </Loading>
-          )}
-        </div>
-
-        <div className=" h-full overflow-hidden">
+      <div className="grid grid-rows-2 h-full">
+        <div className="row-span-4 h-full overflow-hidden">
           <ExperimentsTab exps={collection.exps} />
         </div>
-        <div className="flex justify-center">
+        <div className="row-start-5 flex justify-center">
           {load && (
-            <Loading ref={loading_ref} fallback={<Spinner className="m-2" />}>
-              <ButtonPrimary
-                onClick={async () => {
-                  clear()
-                  loading_ref.current?.start()
-                  const exp_id = collection.exps[0].id
-                  try {
-                    await database_provider.load({ exp_id })
-                    const idx = await database_provider.addPublicationToDb(
-                      collection,
-                    )
-                    addCollection(idx, collection)
-                    add(collection, undefined, collection.exps[0])
-                  } catch (e) {
-                    showBoundary(e)
-                    return
-                  }
-                  reload(false)
-                  resetSearchbar()
-                  router.push("/publication")
-                  if (onClose) {
-                    onClose.fn()
-                  }
-                  loading_ref.current?.finish()
-                }}
-              >
-                Discover
-              </ButtonPrimary>
-            </Loading>
+            <ButtonPrimary
+              onClick={async () => {
+                clear()
+                const exp_id = collection.exps[0].id
+                try {
+                  await database_provider.load({ exp_id })
+                  const idx = await database_provider.addPublicationToDb(
+                    collection,
+                  )
+                  addCollection(idx, collection)
+                  add(collection, undefined, collection.exps[0])
+                } catch (e) {
+                  showBoundary(e)
+                  return
+                }
+                reload(false)
+                router.push("/publication")
+                if (onClose) {
+                  onClose.fn()
+                }
+              }}
+            >
+              Discover
+            </ButtonPrimary>
           )}
         </div>
       </div>
