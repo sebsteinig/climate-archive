@@ -2,7 +2,7 @@ import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time.type"
+} from "@/utils/store/worlds/time/time.type"
 import { EVarID } from "@/utils/store/variables/variable.types"
 import { World } from "@/components/3D_components/World"
 import {
@@ -30,7 +30,11 @@ export type SceneProps = {
   current_frame: TimeFrameRef
   active_variables: EVarID[]
   canvas: CanvasRef
-  showPopup : (data : WorldData, {lat, lon} : {lat : number, lon : number}, world_id : number) => void  
+  showPopup: (
+    data: WorldData,
+    { lat, lon }: { lat: number; lon: number },
+    world_id: number,
+  ) => void
 }
 export type SceneRef = {
   canOrbit: (can_orbit: boolean) => void
@@ -44,7 +48,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
     current_frame,
     active_variables,
     canvas,
-    showPopup
+    showPopup,
   }: SceneProps,
   ref,
 ) {
@@ -62,7 +66,7 @@ export const Scene = forwardRef<SceneRef, SceneProps>(function Scene(
     }
   })
   function handleClickOnWorld({ lat, lon }: Coordinate) {
-    showPopup(data, {lat, lon}, world_id)
+    showPopup(data, { lat, lon }, world_id)
   }
   if (!panel_ref.current?.container_ref.current) {
     return null

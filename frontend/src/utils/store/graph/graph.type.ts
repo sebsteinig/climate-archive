@@ -1,4 +1,4 @@
-import { WorldData } from "../worlds/time.type"
+import { WorldData } from "../worlds/time/time.type"
 
 export type Coordinate = {
   lat: number
@@ -12,7 +12,7 @@ export type FormattedCoordinates = {
 
 export type GraphInfo = Coordinate & {
   data: WorldData
-  world_id : number
+  world_id: number
   id_label: { id: string; label: string } | undefined
 }
 

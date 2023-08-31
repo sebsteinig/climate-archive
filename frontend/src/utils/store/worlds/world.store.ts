@@ -1,5 +1,13 @@
 import { StateCreator } from "zustand"
-import { WorldID, CollectionID, WorldData, Slots, TimeConf, TimeMode, TimeController } from "./time.type"
+import {
+  WorldID,
+  CollectionID,
+  WorldData,
+  Slots,
+  TimeConf,
+  TimeMode,
+  TimeController,
+} from "./time/time.type"
 
 import { Collection } from "../collection/collection.store"
 import { buildTimeConf, buildWorldConf } from "./world.utils"
@@ -9,6 +17,7 @@ export interface WorldSlice {
   worlds: {
     __auto_increment: number
     slots: Slots
+    observed_world: WorldID | undefined
     reload_flag: boolean
     reload: (flag: boolean) => void
     add: (
@@ -24,8 +33,9 @@ export interface WorldSlice {
     replace: (collection: Collection) => void
     remove: (id: WorldID) => void
     dup: (world_id: WorldID) => void
-    switchTimeMode : (world_id:WorldID, exp: Experiment) => void
+    switchTimeMode: (world_id: WorldID, exp: Experiment) => void
     changeExp: (id: WorldID, exp: Experiment) => void
+    observe: (id: WorldID | undefined) => void
   }
 }
 
@@ -40,6 +50,7 @@ export const createWorldSlice: StateCreator<
       __auto_increment: -1,
       slots: new Map(),
       reload_flag: true,
+      observed_world: undefined,
       reload(flag) {
         set((state) => {
           state.worlds.reload_flag = flag
@@ -102,23 +113,36 @@ export const createWorldSlice: StateCreator<
           state.worlds.slots.delete(id)
         })
       },
-      switchTimeMode(world_id,exp) {
-          set(state => {
-            const data = state.worlds.slots.get(world_id)
-            if (!data) return
-            if(data.time.mode_state.is_writable) {
-              data.time.mode_state.previous = data.time.mode
-              data.time.mode = data.time.mode === TimeMode.ts ? TimeMode.mean : TimeMode.ts
-              data.time.controller = data.time.controller === TimeController.geologic ? TimeController.monthly : TimeController.geologic
-              data.exp = exp
-            }
-          })
+      switchTimeMode(world_id, exp) {
+        set((state) => {
+          const data = state.worlds.slots.get(world_id)
+          if (!data) return
+          if (data.time.mode_state.is_writable) {
+            data.time.mode_state.previous = data.time.mode
+            data.time.mode =
+              data.time.mode === TimeMode.ts ? TimeMode.mean : TimeMode.ts
+            data.time.controller =
+              data.time.controller === TimeController.geologic
+                ? TimeController.monthly
+                : TimeController.geologic
+            data.exp = exp
+          }
+        })
       },
       changeExp(id, exp) {
         set((state) => {
           const data = state.worlds.slots.get(id)
           if (!data) return
           data.exp = exp
+        })
+      },
+      observe(id) {
+        set((state) => {
+          if (!id) {
+            state.worlds.observed_world = undefined
+          } else if (state.worlds.slots.has(id)) {
+            state.worlds.observed_world = id
+          }
         })
       },
     },

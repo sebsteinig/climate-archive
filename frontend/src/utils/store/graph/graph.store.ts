@@ -30,13 +30,13 @@ export const createGraphStore: StateCreator<
       },
       add(graph_info) {
         set((state) => {
-          state.graph.visible = true          
+          state.graph.visible = true
           const color = getRandomHexColor()
           let graph: Graph = {
             lat: graph_info.lat,
             lon: graph_info.lon,
             data: graph_info.data,
-            world_id : graph_info.world_id,
+            world_id: graph_info.world_id,
             id_label: graph_info.id_label,
             color: color,
           }

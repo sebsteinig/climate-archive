@@ -3,7 +3,7 @@ import {
   TimeFrameRef,
   WorldID,
   WorldData,
-} from "@/utils/store/worlds/time.type"
+} from "@/utils/store/worlds/time/time.type"
 import { RefObject, forwardRef, useImperativeHandle, useRef } from "react"
 import { Container, ContainerRef } from "./Container"
 import { Collection } from "@/utils/store/collection/collection.store"
