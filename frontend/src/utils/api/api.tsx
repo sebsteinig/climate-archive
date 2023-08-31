@@ -1,9 +1,7 @@
 import axios from "axios"
 import {
   SearchPublication,
-  DefaultParameter,
   SelectCollectionParameter,
-  SearchExperiment,
   SelectSingleParameter,
   SelectSingleResult,
   SelectCollectionResult,
@@ -20,8 +18,9 @@ const URL_API = "http://51.89.165.226:3000/"
 const URL_IMAGE = "http://51.89.165.226:3005/"
 
 /**
- * @param query {'title', 'journal', 'authors_short'}
- * @returns experiments from publication as json
+ * function that returns a list of publications from search values
+ * @param query : SearchPublication contains search values for title, author...
+ * @returns publication list
  */
 export async function searchPublication(query: SearchPublication) {
   try {
@@ -42,6 +41,11 @@ export async function searchPublication(query: SearchPublication) {
   }
 }
 
+/**
+ * SWR hook : this function retrieves the journals 
+ * and also returns error and loading states
+ * @returns list of journals: string[], error : Error and loading : boolean
+ */
 export function useSelectJournal(){
   let url = new URL("select/journal/", URL_API)
   const fetcher = (url: string) => axios.get(url).then((res) =>
@@ -52,6 +56,12 @@ export function useSelectJournal(){
   return { data: data, error: error, isLoading: isLoading }
 }
 
+/**
+ * SWR hook : this function retrieves the experiments 
+ * and also returns error and loading states
+ * @param query like : string
+ * @returns list of experiment info : ExperimentInfo[], error : Error and loading : boolean
+ */
 export function useSearch(like : string){
   let href = null
   if (like !== ""){
@@ -64,7 +74,12 @@ export function useSearch(like : string){
   return { data: data, error: error, isLoading: isLoading }
 }
 
-
+/**
+ * SWR hook : this function retrieves the experiments 
+ * and also returns error and loading states
+ * @param query : SearchPublication
+ * @returns list of publications : Publication[], error : Error and loading : boolean
+ */
 export function useSearchPublication(query: SearchPublication) {
   let href = null
   if (query.title || query.journal || query.authors_short) {
@@ -82,7 +97,9 @@ export function useSearchPublication(query: SearchPublication) {
 }
 
 /**
- * @param query for
+ * function that retrieves labels
+ * @todo (NEVER USED)
+ * @param query for : string
  * @returns labels
  */
 export function searchLooking(query: { for: string }) {
@@ -95,12 +112,22 @@ export function searchLooking(query: { for: string }) {
   }
 }
 
-
+/**
+ * returns the data from url
+ * @param url : string
+ * @returns data
+ */
 async function getData<T>(url: string) {
   let data = await axios.get(url)
   return data.data as T
 }
 
+/**
+ * retrieves one experiment
+ * @param id : string experiment id
+ * @param query : SelectSingleParameter parameters like extension, config_name...
+ * @returns experiment
+ */
 export async function select(id: string, query: SelectSingleParameter) {
   try {
     let url = new URL(`select/${id}/`, URL_API)
@@ -116,6 +143,13 @@ export async function select(id: string, query: SelectSingleParameter) {
     throw new ApiError()
   }
 }
+
+/**
+ * retrieves a collection of experiments
+ * @param query : SelectCollectionParameter contains ids (the list of experiment ids) 
+ * and other default parameters
+ * @returns experiments
+ */
 export async function selectAll(query: SelectCollectionParameter) {
   try {
     let url = new URL(`select/collection/`, URL_API)
@@ -139,6 +173,11 @@ function trimRoutes(path: string, nb_of_sub_route: number): string {
     .reduce((acc, route) => `${acc}/${route}`, "")
 }
 
+/**
+ * retrieves an image
+ * @param path : string image path
+ * @returns data
+ */
 export async function getImageArrayBuffer(path: string) {
   let url = new URL(trimRoutes(path, 7), URL_IMAGE)
   try {
@@ -152,6 +191,13 @@ export async function getImageArrayBuffer(path: string) {
   }
 }
 
+/**
+ * function that retrieve netCDF data at a location to be displayed
+ * @todo (MOCK DATA AT THE MOMENT)
+ * @param graph : Graph containing experiments and position infos
+ * @param variable : EVarID 
+ * @returns data for a period of time
+ */
 export async function getChartData(graph: Graph, variable: EVarID) {
   //let url = new URL("")
   //let data = await axios.get(url.href)
@@ -162,6 +208,12 @@ export async function getChartData(graph: Graph, variable: EVarID) {
     throw new ApiError()
   }
 }
+
+
+/**
+ * temporary function
+ * @returns mock data
+ */
 
 function mockData() {
   const labels = [
@@ -178,6 +230,6 @@ function mockData() {
     "November",
     "December",
   ]
-  return[5.0, 4.5, 4.0, 3.3, 2.6, 1.9,0.9, 1.4, 2.2, 2.7, 3, 4.8]
-  //return labels.map((_n: string, i: number) => Math.random() * 25)
+  //return[5.0, 4.5, 4.0, 3.3, 2.6, 1.9,0.9, 1.4, 2.2, 2.7, 3, 4.8]
+  return labels.map((_n: string, i: number) => Math.random() * 25)
 }
