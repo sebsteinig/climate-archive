@@ -1,10 +1,14 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Experiments } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useStore } from "@/utils/store/store"
-import { usePathname, useSearchParams } from "next/navigation"
+import {
+  ReadonlyURLSearchParams,
+  usePathname,
+  useSearchParams,
+} from "next/navigation"
 import dynamic from "next/dynamic"
 import { RequestMultipleTexture } from "@/utils/database_provider/database_provider.types"
 import { Loading, useLoading } from "@/utils/hooks/useLoading"
@@ -39,40 +43,7 @@ export default function ExperimentsPage() {
     loading_ref.current?.start()
     clear()
     clearGraph()
-    var request: RequestMultipleTexture = { exp_ids: [] }
-    for (let [key, value] of search_params.entries()) {
-      if (key == "reload") continue
-      switch (key) {
-        case "resolution":
-          request.resolution = {
-            x: parseInt(value.split("*")[0]),
-            y: parseInt(value.split("*")[1]),
-          }
-          break
-        case "exp_ids":
-          const ids = value
-            .split(",")
-            .filter((e) => e)
-            .map((e) => e.trim())
-          //if (ids[ids.length - 1] == "") ids.pop()
-          request.exp_ids = ids
-          break
-        case "lossless":
-          request.lossless = value === "true"
-          break
-        case "config_name":
-          request.config_name = value
-          break
-        case "variables":
-          request.variables = value === "" ? [] : value.split(",")
-          break
-        case "extension":
-          request.extension = value
-          break
-        default:
-          break
-      }
-    }
+    const request = buildRequest(search_params)
     loading_ref.current?.finish()
     loadExperiments(request)
       .then((collection) => {
@@ -93,4 +64,41 @@ export default function ExperimentsPage() {
       </Loading>
     </ErrorBoundary>
   )
+}
+
+function buildRequest(search_params: ReadonlyURLSearchParams) {
+  var request: RequestMultipleTexture = { exp_ids: [] }
+  for (let [key, value] of search_params.entries()) {
+    if (key == "reload") continue
+    switch (key) {
+      case "resolution":
+        request.resolution = {
+          x: parseInt(value.split("*")[0]),
+          y: parseInt(value.split("*")[1]),
+        }
+        break
+      case "exp_ids":
+        const ids = value
+          .split(",")
+          .filter((e) => e)
+          .map((e) => e.trim())
+        request.exp_ids = ids
+        break
+      case "lossless":
+        request.lossless = value === "true"
+        break
+      case "config_name":
+        request.config_name = value
+        break
+      case "variables":
+        request.variables = value === "" ? [] : value.split(",")
+        break
+      case "extension":
+        request.extension = value
+        break
+      default:
+        break
+    }
+  }
+  return request
 }

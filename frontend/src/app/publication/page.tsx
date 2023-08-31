@@ -1,6 +1,6 @@
 "use client"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { searchPublication } from "@/utils/api/api"
 import { Publication } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
