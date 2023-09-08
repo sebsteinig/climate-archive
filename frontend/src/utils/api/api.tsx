@@ -15,7 +15,8 @@ import { ApiError } from "../errors/errors"
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
 const URL_API = "http://51.89.165.226:3000/"
-const URL_IMAGE = "http://51.89.165.226:3005/"
+// const URL_IMAGE = "http://51.89.165.226:3005/"
+const URL_IMAGE = "https://db.climatearchive.org/"
 
 /**
  * function that returns a list of publications from search values
@@ -25,15 +26,21 @@ const URL_IMAGE = "http://51.89.165.226:3005/"
 export async function searchPublication(query: SearchPublication) {
   try {
     let url = new URL("search/publication/", URL_API)
+    console.log(query)
     if (query.title || query.journal || query.authors_short) {
       Object.entries(query).map((bind) => {
         const [key, value] = bind
         if (value) {
           url.searchParams.append(key, JSON.stringify(value))
         }
+
+        console.log(url.href)
+
       })
 
-      return await getData<Publication[]>(url.href)
+      let response = await getData<Publication[]>(url.href)
+      console.log(response)
+      return response
     }
     return []
   } catch (error) {
