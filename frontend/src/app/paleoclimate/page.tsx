@@ -28,10 +28,12 @@ class PublicationNotFound extends Error {
 async function loadValdesEtAl2021() {
   const [publication] = await searchPublication({
     title: "Deep Ocean Temperatures through Time",
-    authors_short: "Valdes et al 2021",
+    authors_short: "Valdes et al",
     year: [2021],
   })
+  console.log("loading Valdes et al 2021")
   if (!publication) throw new PublicationNotFound()
+  console.log("loaded")
   return publication
 }
 
