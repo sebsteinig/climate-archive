@@ -18,6 +18,11 @@ type TimeScaleProps = {
   onChange: (idx: number, exp_id: string) => void
 }
 
+// Define a type for the forwarded ref
+export type InputRef = {
+  updateFromSlider: () => void
+}
+
 // export function TimeScale({ onChange }: TimeScaleProps) {
 export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
 

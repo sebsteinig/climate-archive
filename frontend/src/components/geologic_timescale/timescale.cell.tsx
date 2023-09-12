@@ -37,7 +37,7 @@ export const Cell = memo(function Cell({
               border border-slate-200 ${!highlight ? "brightness-50" : ""}
               transition-all duration-300 ease-in-out 
               `}
-      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1 }}
+      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1, flexBasis: 0 }}
       onMouseOver={() => {
         // highlight only selected route
         // if (appearance === BlockAppereance.full && !is_focus) {
