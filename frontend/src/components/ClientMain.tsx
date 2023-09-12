@@ -69,7 +69,7 @@ export default function ClientMain({}: Props) {
             </div>
           </div>
         </div>
-        {/* <GraphsManager /> */}
+        <GraphsManager />
       </div>
     </>
   )
