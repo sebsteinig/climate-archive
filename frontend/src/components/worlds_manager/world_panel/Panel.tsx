@@ -12,6 +12,8 @@ import { MonthlyController } from "../time_controllers/MonthlyController"
 import { IControllerRef } from "../time_controllers/controller.types"
 import { GeoTimeScaleController } from "../time_controllers/GeoTimeScaleController"
 
+import { TimeSlider } from "../time_controllers/utils/TimeSlider"
+
 export type PanelProps = {
   displayCollection: (collection: Collection) => void
   world_id: WorldID
@@ -62,9 +64,32 @@ export const Panel = forwardRef<PanelRef, PanelProps>(function Panel(
             controller_ref={container_ref.current?.controller}
             current_frame={current_frame}
           />
+        //   <TimeSlider
+        //   ref={controller_ref}
+        //   current_frame={current_frame}
+        //   data={data}
+        //   controller_ref={container_ref.current?.controller}
+        //   world_id={world_id}
+        // />
         )}
         {data.time.controller === TimeController.geologic && (
           <GeoTimeScaleController
+            ref={controller_ref}
+            current_frame={current_frame}
+            data={data}
+            controller_ref={container_ref.current?.controller}
+            world_id={world_id}
+          />
+        //   <TimeSlider
+        //   ref={controller_ref}
+        //   current_frame={current_frame}
+        //   data={data}
+        //   controller_ref={container_ref.current?.controller}
+        //   world_id={world_id}
+        // />
+        )}
+        {data.time.controller === TimeController.slider && (
+          <TimeSlider
             ref={controller_ref}
             current_frame={current_frame}
             data={data}

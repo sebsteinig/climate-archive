@@ -69,7 +69,7 @@ export function World({ tick, onClick }: Props) {
       <AtmosphereLayer ref={atmosphere_layer_ref} />
 
       <OuterSphere onClick={onClick} />
-      <Perf position="bottom-right" />
+      <Perf position="top-right"/>
     </>
   )
 }

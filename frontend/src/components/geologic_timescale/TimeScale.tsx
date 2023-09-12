@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useRef, useImperativeHandle, forwardRef } from "react"
 import { useGeologicTree } from "../../utils/hooks/useGeologicTree"
 import { query } from "./utils/span_tree"
 import {
@@ -18,7 +18,9 @@ type TimeScaleProps = {
   onChange: (idx: number, exp_id: string) => void
 }
 
-export function TimeScale({ onChange }: TimeScaleProps) {
+// export function TimeScale({ onChange }: TimeScaleProps) {
+export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
+
   const [tree, exp_span_tree] = useGeologicTree()
 
   function onSelect(param: Selection) {
@@ -30,7 +32,8 @@ export function TimeScale({ onChange }: TimeScaleProps) {
       action: param.action,
       child: param,
     }
-    if (selection && is_focus && selectionEquality(selection, next_selection)) {
+    if (selection && selectionEquality(selection, next_selection)) {
+    // if (selection && is_focus && selectionEquality(selection, next_selection)) {
       setSelection(undefined)
       setFocus(false)
     } else {
@@ -58,17 +61,24 @@ export function TimeScale({ onChange }: TimeScaleProps) {
   }
   const [selection, setSelection] = useState<Selection | undefined>()
   const [is_focus, setFocus] = useState<boolean>(false)
+  
+  useImperativeHandle(ref, () => ({
+      updateFromSlider() {
+        // console.log('slider moved')
+      }
+    }));
+
   return (
     <div
       className="w-full border-4 border-slate-200 rounded-md bg-slate-900"
       onMouseLeave={() => {
-        if (!is_focus) {
+        // if (!is_focus) {
           setSelection(undefined)
           const span_data = query(exp_span_tree, tree.root.data.age_span.from)
           if (span_data) {
             onChange(span_data.data.idx, span_data.data.exp_id)
           }
-        }
+        // }
       }}
     >
       <Cell
@@ -80,7 +90,8 @@ export function TimeScale({ onChange }: TimeScaleProps) {
         }}
         className="w-full"
         onSelect={r_onSelect}
-        is_focus={is_focus}
+        // is_focus={is_focus}
+        is_focus={true}
         appearance={BlockAppereance.full}
         highlight={true}
       />
@@ -97,7 +108,8 @@ export function TimeScale({ onChange }: TimeScaleProps) {
               onSelect={onSelect}
               status={statusOf(branch, next_selection)}
               selection={next_selection}
-              is_focus={is_focus}
+              // is_focus={is_focus}
+              is_focus={true}
               branch={branch}
             />
           )
@@ -105,4 +117,4 @@ export function TimeScale({ onChange }: TimeScaleProps) {
       </div>
     </div>
   )
-}
+});
