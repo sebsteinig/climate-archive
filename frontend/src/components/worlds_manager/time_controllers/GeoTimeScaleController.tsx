@@ -44,8 +44,8 @@ export const GeoTimeScaleController = forwardRef<
   const timeScaleRef = useRef(); // This ref is to connect to TimeScale
   
   return (
-    <div className="w-full pt-5 px-5">
-      <div className="w-full my-2">
+    <div className="w-full pt-5 px-7">
+      <div className="w-full my-0">
       <TimeSlider 
             world_id={world_id} 
             data={data} 

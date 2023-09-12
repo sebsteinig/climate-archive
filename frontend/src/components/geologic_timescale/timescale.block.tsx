@@ -42,14 +42,9 @@ export const Block = memo(function Block({
   const grow_span = useMemo(() => {
     const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from)
     return Math.floor((span / parent_span) * 100)
-    // return Math.floor((span / 541.0) * 100)
   }, [parent_span])
 
-  if (branch.data.lvl === 3) {
-    console.log(branch.data.name)
-    console.log(grow_span)
 
-  }
   if (branch.branches.size === 0) {
     return (
       <Cell

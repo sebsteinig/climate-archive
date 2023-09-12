@@ -112,7 +112,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
 
 
   return (
-    <div className={className}>
+    <div style={{ padding: '0 5px' }} className={className}>
       <Slider
         value={sliderValue}
         onChange={(event, newValue) => {
@@ -142,6 +142,23 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         max={max}
         step={0.01}
         marks={marks}
+        sx={{
+          "& .MuiSlider-thumb": {
+            width: 30,  // Adjust as needed for thumb size
+            height: 30, // Adjust as needed for thumb size
+          },
+
+          "& .MuiSlider-track": {
+            height: 10, // Adjust as needed for track thickness
+          },
+          "& .MuiSlider-rail": {
+            height: 10, // Adjust as needed for rail thickness
+          },
+
+          "& .MuiSlider-markLabel": {
+            color: "lightgray" // light gray color for the label text
+          }
+        }}
         valueLabelDisplay="auto"
       />
     </div>
