@@ -141,6 +141,7 @@ async function getData<T>(url: string) {
 export async function select(id: string, query: SelectSingleParameter) {
   try {
     let url = new URL(`select/${id}/`, URL_API)
+    console.log(url)
     Object.entries(query).forEach((bind) => {
       const [key, value] = bind
       if (value) {

@@ -75,6 +75,7 @@ export function crop(
   xsize: number,
   ysize: number,
 ) {
+
   canvas.width = xsize
   canvas.height = ysize
 
@@ -82,6 +83,7 @@ export function crop(
   if (res) {
     return res
   }
+
   ctx.drawImage(
     img,
     frame * xsize,
