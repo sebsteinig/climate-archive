@@ -47,11 +47,17 @@ export const World = memo(({ tick }: Props) => {
         // if (wind_layer_ref.current) {
         //   wind_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         // }
-        for (let [variable, data] of res.variables) {
+        for (let variable of res.variables.keys()) {
+          let data = res.variables.get(variable);
+          // Define data_reference only when res.reference is defined
+          let data_reference = res.reference ? res.reference.get(variable) : undefined;    
+
           switch (variable) {
             case EVarID.pr: {
               if (atmosphere_layer_ref.current && res.update_texture) {
-                atmosphere_layer_ref.current.updateTextures(data)
+                console.log("update")
+                // Use data_reference if it's defined, otherwise use data
+                atmosphere_layer_ref.current.updateTextures(data_reference || data, data_reference || data);
               }
               break
             }

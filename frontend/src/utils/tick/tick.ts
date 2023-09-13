@@ -88,9 +88,16 @@ export function tickBuilder(
         frame.swapping = false
         frame.swap_flag = false
       } else {
-        console.log("skipping frame")
+        // console.log("skipping frame")
       }
     }
+
+    // if (update_texture) {
+    //   console.log(res)
+    //   console.log(current_frame.current.reference)
+    // }
+    // console.log(update_texture)
+
     // console.log(frame.weight)
     panel_ref.current?.controller_ref.current?.onWeightUpdate(frame)
     return {

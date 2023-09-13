@@ -75,7 +75,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
   }
 
-  function updateTextures(data:TickData) {
+  function updateTextures(data:TickData, reference:TickData) {
     materialRef.current.uniforms.thisDataFrame.value = loader.load(data.textures[0].current_url)
     materialRef.current.uniforms.nextDataFrame.value = loader.load(data.textures[0].next_url) 
     materialRef.current.uniforms.thisDataMin.value = data.current.min[0] * 86400.
