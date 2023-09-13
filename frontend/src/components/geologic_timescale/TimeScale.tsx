@@ -98,7 +98,8 @@ export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
   
   useImperativeHandle(ref, () => ({
       updateFromSlider() {
-        // console.log('slider moved')
+        setFocus(false)
+        setSelection(undefined)
       }
     }));
 
