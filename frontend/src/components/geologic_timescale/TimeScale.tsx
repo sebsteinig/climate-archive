@@ -55,6 +55,35 @@ export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
       }
     }
   }
+
+  function highlightOnly(param: Selection) {
+    const next_selection = {
+      id: tree.root.id,
+      pid: tree.root.id,
+      data: tree.root.data,
+      fallthrought: param.fallthrought,
+      action: param.action,
+      child: param,
+    }
+    if (selection && selectionEquality(selection, next_selection)) {
+    // if (selection && is_focus && selectionEquality(selection, next_selection)) {
+      setSelection(undefined)
+      setFocus(false)
+    } else {
+      if (next_selection.action === SelectionAction.focus) {
+        setFocus(true)
+      }
+      setSelection(next_selection)
+    //   const span_data = query(
+    //     exp_span_tree,
+    //     lastOf(next_selection).data.age_span.to,
+    //   )
+    //   if (span_data) {
+    //     onChange(span_data.data.idx, span_data.data.exp_id)
+    //   }
+    }
+  }
+
   function r_onSelect(param: Selection) {
     param.action = SelectionAction.highlight
     setSelection(param)
@@ -76,15 +105,15 @@ export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
   return (
     <div
       className="w-full border-4 border-slate-200 rounded-md bg-slate-900"
-      onMouseLeave={() => {
-        // if (!is_focus) {
-          setSelection(undefined)
-          const span_data = query(exp_span_tree, tree.root.data.age_span.from)
-          if (span_data) {
-            onChange(span_data.data.idx, span_data.data.exp_id)
-          }
-        // }
-      }}
+      // onMouseLeave={() => {
+      //   // if (!is_focus) {
+      //     setSelection(undefined)
+      //     const span_data = query(exp_span_tree, tree.root.data.age_span.from)
+      //     if (span_data) {
+      //       onChange(span_data.data.idx, span_data.data.exp_id)
+      //     }
+      //   // }
+      // }}
     >
       <Cell
         branch={{
@@ -95,8 +124,8 @@ export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
         }}
         className="w-full"
         onSelect={r_onSelect}
-        // is_focus={is_focus}
-        is_focus={true}
+        is_focus={is_focus}
+        // is_focus={true}
         appearance={BlockAppereance.full}
         highlight={true}
       />
@@ -111,10 +140,11 @@ export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
               )}
               key={id}
               onSelect={onSelect}
+              // onSelect={highlightOnly}
               status={statusOf(branch, next_selection)}
               selection={next_selection}
-              // is_focus={is_focus}
-              is_focus={true}
+              is_focus={is_focus}
+              // is_focus={true}
               branch={branch}
             />
           )
