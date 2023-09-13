@@ -24,6 +24,7 @@ type Props = {
   data: WorldData;
   current_frame: TimeFrameRef;
   controller_ref: ControllerRef | undefined;
+  labels: boolean;
   onSliderChange?: (value: number) => void;
 };
 
@@ -35,7 +36,7 @@ export type InputRef = {
 
 // Define the TimeSlider component
 export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
-  { world_id, className, current_frame, data, onSliderChange }: Props,
+  { world_id, className, current_frame, data, labels, onSliderChange }: Props,
   ref,
 ) {
   const is_changing = useRef(false);
@@ -110,9 +111,10 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
     },
   ];
 
+  const marksProps = labels ? { marks } : {};
 
   return (
-    <div style={{ padding: '0 5px' }} className={className}>
+    <div style={{ padding: '0 3px' }} className={className}>
       <Slider
         value={sliderValue}
         onChange={(event, newValue) => {
@@ -141,18 +143,28 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
         min={0}
         max={max}
         step={0.01}
-        marks={marks}
+        {...marksProps}
         sx={{
           "& .MuiSlider-thumb": {
-            width: 30,  // Adjust as needed for thumb size
-            height: 30, // Adjust as needed for thumb size
+            width: 25, 
+            height: 25, 
+            backgroundColor: 'rgb(16, 185, 129)',
+            "&:hover": {
+              backgroundColor: 'rgb(16, 185, 129)', 
+              boxShadow: '0px 0px 10px 1px rgb(16, 185, 129)',
+            },
+            "&:active": {
+              boxShadow: '0px 0px 20px 2px rgb(16, 185, 129)',
+            },
           },
 
           "& .MuiSlider-track": {
-            height: 10, // Adjust as needed for track thickness
+            height: 8, // Adjust as needed for track thickness
+            backgroundColor: 'rgb(16, 185, 129)', // Green
           },
           "& .MuiSlider-rail": {
-            height: 10, // Adjust as needed for rail thickness
+            height: 8, // Adjust as needed for rail thickness
+            backgroundColor: 'rgb(5, 150, 105)',
           },
 
           "& .MuiSlider-markLabel": {

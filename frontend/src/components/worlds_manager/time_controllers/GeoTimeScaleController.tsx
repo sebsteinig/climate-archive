@@ -44,18 +44,16 @@ export const GeoTimeScaleController = forwardRef<
   const timeScaleRef = useRef(); // This ref is to connect to TimeScale
   
   return (
-    <div className="w-full pt-5 px-7">
-      <div className="w-full my-0">
+    <div className="w-full pt-2 px-7">
+      <div className="w-full my-2">
       <TimeSlider 
             world_id={world_id} 
             data={data} 
             current_frame={current_frame} 
             controller_ref={controller_ref} 
             ref={time_slider_ref} 
+            labels={false}
             onSliderChange={() => {
-              // Call update function on TimeScale or perform other tasks with the value
-              // If TimeScale has an imperative handle, you can use a ref to call functions on it. 
-              // For this example, let's assume TimeScale exposes a method called "updateFromSlider":
               timeScaleRef.current?.updateFromSlider();
             }}
           />
