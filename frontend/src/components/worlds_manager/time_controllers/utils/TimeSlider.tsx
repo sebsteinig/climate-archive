@@ -115,7 +115,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
 
   return (
     <div style={{ padding: '0 3px' }} className={className}>
-      <Slider
+      <Slider 
         value={sliderValue}
         onChange={(event, newValue) => {
           is_changing.current = true;
@@ -150,22 +150,35 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
             height: 25, 
             backgroundColor: 'rgb(16, 185, 129)',
             boxShadow: '0px 0px 0 0px rgb(16, 185, 129)',
+            transition: '5000ms cubic-bezier(0.25, 0.46, 0.45, 1)',
             "&:hover": {
               backgroundColor: 'rgb(16, 185, 129)', 
               boxShadow: '0px 0px 10px 1px rgb(16, 185, 129)',
+              transition: '5000ms cubic-bezier(0.25, 0.46, 0.45, 1)',
             },
             "&:active": {
               boxShadow: '0px 0px 20px 2px rgb(16, 185, 129)',
+              transition: 'none',
             },
           },
 
           "& .MuiSlider-track": {
             height: 8, // Adjust as needed for track thickness
             backgroundColor: 'rgb(16, 185, 129)', // Green
+            transition: '5000ms cubic-bezier(0.25, 0.46, 0.45, 1)',
+
+            "&:active": {
+              transition: 'none',
+            },
           },
           "& .MuiSlider-rail": {
             height: 8, // Adjust as needed for rail thickness
             backgroundColor: 'rgb(5, 150, 105)',
+            transition: '5000ms cubic-bezier(0.25, 0.46, 0.45, 1)',
+
+            "&:active": {
+              transition: 'none',
+            },
           },
 
           "& .MuiSlider-markLabel": {
