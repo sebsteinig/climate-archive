@@ -43,6 +43,8 @@ export const Block = memo(function Block({
     const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from)
     return Math.floor((span / parent_span) * 100)
   }, [parent_span])
+
+
   if (branch.branches.size === 0) {
     return (
       <Cell
@@ -59,7 +61,7 @@ export const Block = memo(function Block({
 
   return (
     <div
-      style={{ flexGrow: grow_span }}
+      style={{ flexGrow: grow_span, flexBasis: 0 }}
       className={`
               ${status.appearance === BlockAppereance.full ? "" : ""}
               ${status.appearance === BlockAppereance.hidden ? "hidden" : ""}

@@ -9,23 +9,23 @@ function calcDuration(from: number, to: number, speed: number): number {
   return Math.abs(to - from) * t
 }
 const EPSILON = 0.00001
-export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
+
+export function goto(frame: TimeFrame, to: number, duration: number, onComplete?: () => void) {
   let state = {
     previous_idx: Math.floor(frame.weight),
   }
   const rounded_to = Math.round(to)
-  const duration = 5 // 5s
   return gsap.to(frame, {
     ease: "power2.out",
     duration: duration,
     weight: rounded_to,
-    onCompleteParams: [frame],
-    onComplete: (frame: TimeFrame) => {
-      frame.swap_flag = true
-      if (onComplete) {
-        onComplete()
-      }
-    },
+    // onCompleteParams: [frame],
+    // onComplete: (frame: TimeFrame) => {
+    //   frame.swap_flag = true
+    //   if (onComplete) {
+    //     onComplete()
+    //   }
+    // },
     onUpdateParams: [frame, state],
     onUpdate: (frame: TimeFrame, state: { previous_idx: number }) => {
       const idx = Math.floor(frame.weight)
@@ -40,6 +40,46 @@ export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
       pin(frame)
     },
   })
+}
+
+export function jumpTo(frame: TimeFrame, to: number, onComplete?: () => void) {
+  let previous_idx = Math.floor(frame.weight)
+  let new_idx = Math.floor(to)
+
+  const rounded_to = Math.round(to)
+  const duration = 0 // 5s
+  frame.weight = to
+  //     new_idx = Math.floor(frame.weight)
+
+  if (previous_idx !== new_idx && new_idx !== to) {
+        frame.swap_flag = true
+  }
+
+  // return gsap.to(frame, {
+  //   ease: "power2.out",
+  //   duration: duration,
+  //   weight: to,
+  //   onCompleteParams: [frame],
+  //   onComplete: (frame: TimeFrame) => {
+  //     frame.swap_flag = true
+  //     if (onComplete) {
+  //       onComplete()
+  //     }
+  //   },
+  //   onUpdateParams: [frame, state],
+  //   onUpdate: (frame: TimeFrame, state: { previous_idx: number }) => {
+  //     const idx = Math.floor(frame.weight)
+  //     if (state.previous_idx !== idx && idx !== to) {
+  //       state.previous_idx = idx
+
+  //       frame.swap_flag = true
+  //     }
+  //   },
+  //   onInterruptParams: [frame],
+  //   onInterrupt: (frame: TimeFrame) => {
+  //     pin(frame)
+  //   },
+  // })
 }
 
 export function pin(frame: TimeFrame, onComplete?: () => void) {

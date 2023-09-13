@@ -15,7 +15,6 @@ import {
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
 import { goto } from "@/utils/store/worlds/time/loop"
 import { useStore } from "@/utils/store/store"
-import { TimeSlider, InputRef as TimeSliderRef } from "./utils/TimeSlider"
 
 type MonthlyControllerProps = {
   data: WorldData
@@ -27,46 +26,31 @@ type MonthlyControllerProps = {
 export const MonthlyController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
->(function MonthlyController({ current_frame, world_id, data, controller_ref }, ref) {
-  const time_slider_ref = useRef<TimeSliderRef>(null); // updated ref name
-  // const monthlyRef = useRef(); // This ref is to connect to TimeScale
-
+>(function MonthlyController({ current_frame, world_id, controller_ref }, ref) {
+  const progress_bar_ref = useRef<ProgessBarRef>(null)
   const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
     undefined,
   )
   const [focus, setFocus] = useState<number | undefined>(undefined)
   const observed_id = useStore((state) => state.worlds.observed_world)
-  // useImperativeHandle(ref, () => {
-  //   return {
-  //     onChange(frame) {},
-  //     onWeightUpdate(frame) {
-  //       progress_bar_ref.current?.update(frame.weight / (frame.timesteps ?? 12))
-  //     },
-  //   }
-  // })
-
-  const monthlyControllerRef = useRef(); // This ref is to connect to TimeScale
-
+  useImperativeHandle(ref, () => {
+    return {
+      onChange(frame) {},
+      onWeightUpdate(frame) {
+        progress_bar_ref.current?.update(frame.weight / (frame.timesteps ?? 12))
+      },
+    }
+  })
   return (
     <div
-      className={`select-none w-full pt-2 px-7 ${
+      className={`select-none w-full pt-5 px-5 ${
         observed_id === world_id
           ? "brightness-50 pointer-events-none"
           : "pointer-events-auto"
       }`}
     >
       <div className="w-full my-2">
-      <TimeSlider 
-            world_id={world_id} 
-            data={data} 
-            current_frame={current_frame} 
-            controller_ref={controller_ref} 
-            ref={time_slider_ref} 
-            labels={false}
-            onSliderChange={() => {
-              monthlyControllerRef.current?.updateFromSlider();
-            }}
-          />
+        <ProgressBar ref={progress_bar_ref} />
       </div>
       <div
         className="
@@ -83,7 +67,7 @@ export const MonthlyController = forwardRef<
       >
         {MONTHS.map((month, idx) => {
           return (
-            <Month ref={monthlyControllerRef} // This ref is to connect to TimeScale
+            <Month
               key={idx}
               highlight={
                 highlighted_month === undefined || highlighted_month === idx
@@ -106,10 +90,6 @@ export const MonthlyController = forwardRef<
                 }
                 controller_ref?.pause()
                 goto(frame, idx, 5.0)
-                time_slider_ref.current?.onChange(idx)
-              }}
-              resetHighlight={() => {
-                setHighLightMonth(undefined)
               }}
             />
           )
@@ -126,46 +106,32 @@ type MonthProps = {
   focus: number | undefined
   color: string
   onChange: (idx: number, focus: boolean) => void
-  resetHighlight: () => void
 }
 
-export type InputRef = {
-  updateFromSlider: () => void
-}
-
-
-const Month = forwardRef((props: MonthProps, ref: RefObject<InputRef>) => {
-  const { idx, month, color, focus, onChange, resetHighlight, highlight } = props;
-
-  useImperativeHandle(ref, () => ({
-    updateFromSlider() {
-      resetHighlight()
-      // ref.setSelection(undefined)
-    }
-  }));
-
+function Month({ idx, month, color, focus, onChange, highlight }: MonthProps) {
   return (
     <div
-      className={`grow cursor-pointer truncate text-clip tracking-widest 
+      className={`${
+        focus === idx ? "flex-grow-[2]" : "grow"
+      } cursor-pointer truncate text-clip tracking-widest 
         small-caps py-1 text-slate-900 text-center ${color}
         border-r-2 border-slate-200 ${
           highlight ? "brightness-100" : "brightness-50"
         }
         transition-all duration-100 ease-in-out `}
       onClick={() => {
-        onChange(idx, true);
+        onChange(idx, true)
       }}
-      // onMouseOver={() => {
-      //   if (focus === undefined) {
-      //     onChange(idx, false);
-      //   }
-      // }}
+      onMouseOver={() => {
+        if (focus === undefined) {
+          onChange(idx, false)
+        }
+      }}
     >
       {month.slice(0, 3)}
     </div>
-  );
-})
-  
+  )
+}
 
 const MONTHS = [
   "January",

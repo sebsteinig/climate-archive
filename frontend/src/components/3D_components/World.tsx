@@ -25,6 +25,7 @@ export function World({ tick, onClick }: Props) {
     tick(delta)
       .then((res) => {
         //console.log(res.update_texture);
+        console.log(res.weight)
         atmosphere_layer_ref.current?.tick(res.weight, res.uSphereWrapAmount)
 
         //if (res.variables.size === 0) return;
@@ -69,7 +70,7 @@ export function World({ tick, onClick }: Props) {
       <AtmosphereLayer ref={atmosphere_layer_ref} />
 
       <OuterSphere onClick={onClick} />
-      <Perf position="bottom-right" />
+      <Perf position="top-right"/>
     </>
   )
 }

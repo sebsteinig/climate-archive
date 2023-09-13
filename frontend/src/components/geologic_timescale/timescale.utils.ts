@@ -19,6 +19,7 @@ export type Selection = {
   must_falthrought?: boolean
   child?: Selection
   action: SelectionAction
+  highlight_only?: boolean
 }
 export function selectionEquality(sel1: Selection, sel2: Selection): boolean {
   if (sel1.id !== sel2.id) return false

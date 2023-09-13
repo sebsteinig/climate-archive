@@ -37,17 +37,18 @@ export const Cell = memo(function Cell({
               border border-slate-200 ${!highlight ? "brightness-50" : ""}
               transition-all duration-300 ease-in-out 
               `}
-      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1 }}
+      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1, flexBasis: 0 }}
       onMouseOver={() => {
-        if (appearance === BlockAppereance.full && !is_focus) {
-          onSelect({
-            id: branch.id,
-            pid: branch.parent_id,
-            data: branch.data,
-            fallthrought: false,
-            action: SelectionAction.highlight,
-          })
-        }
+        // highlight only selected route
+        // if (appearance === BlockAppereance.full && !is_focus) {
+        //   onSelect({
+        //     id: branch.id,
+        //     pid: branch.parent_id,
+        //     data: branch.data,
+        //     fallthrought: false,
+        //     action: SelectionAction.highlight,
+        //   })
+        // }
       }}
       onClick={() => {
         onSelect({
@@ -55,7 +56,8 @@ export const Cell = memo(function Cell({
           pid: branch.parent_id,
           data: branch.data,
           fallthrought: true,
-          action: SelectionAction.focus,
+          // action: SelectionAction.focus,
+          action: SelectionAction.highlight,
         })
       }}
     >

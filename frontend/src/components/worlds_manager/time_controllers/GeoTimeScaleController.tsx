@@ -11,6 +11,8 @@ import { TimeScale } from "@/components/geologic_timescale/TimeScale"
 import { useGeologicTree } from "@/utils/hooks/useGeologicTree"
 import { goto } from "@/utils/store/worlds/time/loop"
 
+import { TimeSlider, InputRef as TimeSliderRef } from "./utils/TimeSlider"
+
 type MonthlyControllerProps = {
   data: WorldData
   current_frame: TimeFrameRef
@@ -25,34 +27,46 @@ export const GeoTimeScaleController = forwardRef<
   { current_frame, world_id, data, controller_ref },
   ref,
 ) {
-  const progress_bar_ref = useRef<ProgessBarRef>(null)
+  const time_slider_ref = useRef<TimeSliderRef>(null); // updated ref name
   const [tree, exp_span_tree] = useGeologicTree()
-  useImperativeHandle(ref, () => {
-    return {
-      onChange(frame) {
-        const age =
-          exp_span_tree.binder.get(Math.floor(frame.weight))?.high ?? 0
-        progress_bar_ref.current?.update(
-          (tree.root.data.age_span.to - age) / tree.root.data.age_span.to,
-        )
-      },
-      onWeightUpdate(frame) {
-        //const age = exp_span_tree.binder.get(Math.floor(frame.weight))?.high ?? 0
-        //progress_bar_ref.current?.update((tree.root.data.age_span.to - age)/tree.root.data.age_span.to);
-      },
-    }
-  })
+  // useImperativeHandle(ref, () => {
+  //   return {
+  //     onChange(frame) {
+  //       // console.log(exp_span_tree)
+  //     },
+  //     onWeightUpdate(frame) {
+  //       //const age = exp_span_tree.binder.get(Math.floor(frame.weight))?.high ?? 0
+  //       //progress_bar_ref.current?.update((tree.root.data.age_span.to - age)/tree.root.data.age_span.to);
+  //     },
+  //   }
+  // })
+
+  const timeScaleRef = useRef(); // This ref is to connect to TimeScale
+  
   return (
-    <div className="w-full pt-5 px-5">
+    <div className="w-full pt-2 px-7">
       <div className="w-full my-2">
-        <ProgressBar ref={progress_bar_ref} />
+      <TimeSlider 
+            world_id={world_id} 
+            data={data} 
+            current_frame={current_frame} 
+            controller_ref={controller_ref} 
+            ref={time_slider_ref} 
+            labels={false}
+            onSliderChange={() => {
+              timeScaleRef.current?.updateFromSlider();
+            }}
+          />
       </div>
-      <TimeScale
+      <TimeScale ref={timeScaleRef} //
         onChange={(idx, exp_id) => {
           const frame = current_frame.current.get(world_id)
           if (!frame) return
           controller_ref?.pause()
-          goto(frame, idx, () => {})
+          // console.log("frame: "+frame.weight)
+          goto(frame, idx, 5.0, () => {})
+          // console.log("index: "+idx)
+          time_slider_ref.current?.onChange(idx)
         }}
       />
     </div>

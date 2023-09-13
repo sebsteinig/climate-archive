@@ -63,6 +63,7 @@ export function tickBuilder(
     let update_texture = false
 
     if (frame.swap_flag) {
+
       if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
@@ -86,8 +87,11 @@ export function tickBuilder(
         panel_ref.current?.container_ref.current?.controller.onChange(frame)
         frame.swapping = false
         frame.swap_flag = false
+      } else {
+        console.log("skipping frame")
       }
     }
+    // console.log(frame.weight)
     panel_ref.current?.controller_ref.current?.onWeightUpdate(frame)
     return {
       weight: frame.weight,
