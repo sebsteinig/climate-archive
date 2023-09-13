@@ -75,6 +75,7 @@ export type Pr = Variable & {
   min: number
   max: number
   colormap: string
+  colormap_index: number
 }
 export interface PrSlice extends Pr {
   updateColormap: (value: string) => void

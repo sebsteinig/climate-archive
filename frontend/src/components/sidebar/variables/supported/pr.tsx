@@ -20,8 +20,9 @@ export function Pr({
       <Rows>
         <ColorMapRow
           colormap_name={pr.colormap}
-          onChange={(n) => pr.updateColormap(n)}
-        />
+          colormap_index={pr.colormap_index}
+          onChange={(name, index) => pr.updateColormap(name, index)} // pass both name and index
+          />
         <RowWithSlider
           onChange={(n) => {
             pr.updateMin(n)

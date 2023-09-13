@@ -134,10 +134,19 @@ export const createVariableSlice: StateCreator<
         min: 3.5,
         max: 12,
         colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
-          set((state) => {
-            state.variables.pr.colormap = value
-          }),
+        colormap_index: 0,
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              pr: {
+                ...state.variables.pr,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
         updateMin: (value: number) =>
           set((state) => {
             state.variables.pr.min = value

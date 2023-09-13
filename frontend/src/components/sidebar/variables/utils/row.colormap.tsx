@@ -1,19 +1,25 @@
 import { Label, Row } from "@/components/searchbar/filters/filter.utils"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 type ColorMapRowProps = {
   colormap_name: string
-  onChange: (number: string) => void
+  colormap_index: number
+  onChange: (name: string, index: number) => void
 }
 
 export function ColorMapRow({ colormap_name, onChange }: ColorMapRowProps) {
   const [display_color_maps, displayColorMaps] = useState<boolean>(false)
   const colormaps_test = [
+    "ipccPrecip.png",
     "cbrewerSpeed3.png",
     "cmapHaxby.png",
-    "ipccPrecip.png",
     "cmoceanThermal.png",
   ]
+
+  const sortedColormaps = useMemo(() => {
+    return [...colormaps_test];
+  }, []);
+
   return (
     <Row>
       <Label
@@ -25,7 +31,7 @@ export function ColorMapRow({ colormap_name, onChange }: ColorMapRowProps) {
       </Label>
       <div
         className="w-[16rem] ml-1 grid grid-cols-1 gap-1 
-          max-h-20 overflow-y-auto overflow-x-hidden
+          max-h-500 overflow-y-auto overflow-x-hidden
           rounded-md border-emerald-400 border-2"
       >
         {!display_color_maps && (
@@ -37,18 +43,23 @@ export function ColorMapRow({ colormap_name, onChange }: ColorMapRowProps) {
           ></img>
         )}
         {display_color_maps &&
-          colormaps_test
-            .filter((v) => v != colormap_name)
+          sortedColormaps
+            // .filter((v) => v != colormap_name)
             .map((name: string, i: number) => (
               <div
                 onClick={() => {
                   displayColorMaps(false)
-                  onChange(name)
+                  onChange(name, i)
                 }}
-                className="hover:bg-slate-800"
-              >
+                onMouseOver={() => {
+                  onChange(name, i)
+                  console.log(name)
+                }}
+                key={i}
+                className={`hover:bg-slate-800 ${name === colormap_name ? 'bg-slate-700' : ''}`}
+                >
                 <img
-                  key={i + 1}
+                  // key={i + 1}
                   src={`/assets/colormaps/${name}`}
                   className="w-fit h-9 p-2"
                 />
