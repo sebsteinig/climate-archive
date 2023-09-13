@@ -18,11 +18,6 @@ export function Pr({
       controls={true}
     >
       <Rows>
-        <ColorMapRow
-          colormap_name={pr.colormap}
-          colormap_index={pr.colormap_index}
-          onChange={(name, index) => pr.updateColormap(name, index)} // pass both name and index
-          />
         <RowWithSlider
           onChange={(n) => {
             pr.updateMin(n)
@@ -31,7 +26,7 @@ export function Pr({
           max={20}
           step={0.1}
           value={pr.min}
-          label="precip min. [mm/day]"
+          label="min [mm/day]"
         />
         <RowWithSlider
           onChange={(n) => {
@@ -41,8 +36,13 @@ export function Pr({
           max={20}
           step={0.1}
           value={pr.max}
-          label="precip max. [mm/day]"
+          label="max [mm/day]"
         />
+        <ColorMapRow
+          colormap_name={pr.colormap}
+          colormap_index={pr.colormap_index}
+          onChange={(name, index) => pr.updateColormap(name, index)} // pass both name and index
+          />
       </Rows>
     </Variable>
   )

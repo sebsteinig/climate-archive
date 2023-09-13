@@ -48,7 +48,7 @@ export function Label({
     <>
       <h5
         onClick={() => (onClick ? onClick() : {})}
-        className={`shrink-0 grow-0 capitalize truncate whitespace-nowrap basis-1/4 ${
+        className={`shrink-0 grow-0 truncate whitespace-nowrap basis-1/3 ${
           className ?? ""
         }`}
       >

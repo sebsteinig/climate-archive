@@ -11,6 +11,7 @@ uniform float uUserMinValue;
 uniform float uUserMaxValue;
 uniform float numLon;
 uniform float numLat;
+uniform float colorMapIndex;
 
 uniform sampler2D thisDataFrame;
 uniform sampler2D nextDataFrame;
@@ -28,8 +29,8 @@ varying vec2 vUv;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // convert float to color via colormap
-vec4 applyColormap(float t, sampler2D colormap){
-    return(texture2D(colormap,vec2(t,0.5)));
+vec4 applyColormap(float t, sampler2D colormap, float index){
+    return(texture2D(colormap,vec2(t, index / 23.0 + 1.0 / 23.0 )));
 }
 
 // remap color range
@@ -129,7 +130,7 @@ float dataRemapped = remap(
     1.0 );
 
 // apply colormap to data
-vec4 dataColor = applyColormap( dataRemapped, colorMap );
+vec4 dataColor = applyColormap( dataRemapped, colorMap, colorMapIndex );
 
 // send pixel color to screen
 if(dataRemapped > 0.0) {

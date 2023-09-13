@@ -9,15 +9,15 @@ import { memo } from "react"
 import * as THREE from "three"
 import vertexShader from "$/shaders/precipitationVert.glsl"
 import fragmentShader from "$/shaders/precipitationFrag.glsl"
-import { createColormapTexture } from "../../utils/three/colormapTexture.js"
 import { TickData } from "../../utils/tick/tick.js"
 import { PrSlice } from "@/utils/store/variables/variable.types"
 
 type PlaneType = THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>
 
-// create global geometry and material for later re-use
 const loader = new THREE.TextureLoader();
-const cmap = createColormapTexture('YlGnBu-9')
+const cmap = loader.load('../assets/colormaps/all_colormaps.png')
+cmap.minFilter = THREE.NearestFilter;
+cmap.magFilter = THREE.NearestFilter;
 
 const geometry = new THREE.PlaneGeometry(4, 2, 64, 32);
 
@@ -72,12 +72,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   function updateUserUniforms(store:PrSlice) {
     materialRef.current.uniforms.uUserMinValue.value = store.min
     materialRef.current.uniforms.uUserMaxValue.value = store.max
-    if (materialRef.current.uniforms.colorMapIndex.value != store.colormap_index) {
-      console.log('update cmap ')
-      materialRef.current.uniforms.colorMap.value = loader.load('../assets/colormaps/' + store.colormap)
-    }
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
-
   }
 
   function updateTextures(data:TickData) {
