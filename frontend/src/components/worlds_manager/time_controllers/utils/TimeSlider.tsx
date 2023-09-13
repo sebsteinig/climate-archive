@@ -149,6 +149,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
             width: 25, 
             height: 25, 
             backgroundColor: 'rgb(16, 185, 129)',
+            boxShadow: '0px 0px 0 0px rgb(16, 185, 129)',
             "&:hover": {
               backgroundColor: 'rgb(16, 185, 129)', 
               boxShadow: '0px 0px 10px 1px rgb(16, 185, 129)',
