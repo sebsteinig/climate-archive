@@ -89,7 +89,7 @@ export const MonthlyController = forwardRef<
                   })
                 }
                 controller_ref?.pause()
-                goto(frame, idx)
+                goto(frame, idx, 5.0)
               }}
             />
           )

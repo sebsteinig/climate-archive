@@ -138,7 +138,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           if (!frame) return;
           const to = Math.round(destination.current);
           if (!to) return;
-          goto(frame, to);
+          goto(frame, to, 0.2);
         }}
         min={0}
         max={max}

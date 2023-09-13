@@ -10,12 +10,11 @@ function calcDuration(from: number, to: number, speed: number): number {
 }
 const EPSILON = 0.00001
 
-export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
+export function goto(frame: TimeFrame, to: number, duration: number, onComplete?: () => void) {
   let state = {
     previous_idx: Math.floor(frame.weight),
   }
   const rounded_to = Math.round(to)
-  const duration = 5.2 // 1s
   return gsap.to(frame, {
     ease: "power2.out",
     duration: duration,

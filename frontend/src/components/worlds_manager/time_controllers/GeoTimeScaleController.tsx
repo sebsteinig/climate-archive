@@ -64,7 +64,7 @@ export const GeoTimeScaleController = forwardRef<
           if (!frame) return
           controller_ref?.pause()
           // console.log("frame: "+frame.weight)
-          goto(frame, idx, () => {})
+          goto(frame, idx, 5.0, () => {})
           // console.log("index: "+idx)
           time_slider_ref.current?.onChange(idx)
         }}
