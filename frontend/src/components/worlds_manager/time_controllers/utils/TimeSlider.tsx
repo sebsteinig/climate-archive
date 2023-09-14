@@ -113,6 +113,8 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
 
   const marksProps = labels ? { marks } : {};
 
+  const state_worlds = useStore((state) => state.worlds)
+
   return (
     <div style={{ padding: '0 3px' }} className={className}>
       <Slider 
@@ -122,8 +124,11 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           destination.current = newValue as number;
           setSliderValue(newValue as number);
           for (let w of worlds) {
+            console.log(w[0])
+            // console.log(state_worlds.observed_world)
+
             const frame = current_frame.current.get(w[0]);
-            if (!frame) return;
+            if (!frame || state_worlds.observed_world == w[0]) return;
             jumpTo(frame, destination.current, () => {
               is_changing.current = false;
             });

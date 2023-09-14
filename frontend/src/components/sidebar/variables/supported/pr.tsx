@@ -10,7 +10,6 @@ export function Pr({
   setCurrentVariableControls,
 }: VariableProps) {
   const pr = useStore((state) => state.variables.pr)
-  console.log(pr)
   return (
     <Variable
       title={pr.name}

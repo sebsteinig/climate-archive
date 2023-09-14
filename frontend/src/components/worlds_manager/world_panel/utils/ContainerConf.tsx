@@ -252,19 +252,19 @@ type AnchorBtnProps = {
 function AnchorBtn({ world_id, current_frame }: AnchorBtnProps) {
   const observe = useStore((state) => state.worlds.observe)
 
-  const anchoredWorldId = useStore((state) => state.worlds.observed_world)
+  const state_worlds = useStore((state) => state.worlds)
   // Check if the current button is anchored
-  const is_anchored = anchoredWorldId === world_id
+  const is_anchored = state_worlds.observed_world === world_id
 
   return (
     <AnchorIcon
       onClick={() => {
         if (!is_anchored) {
           observe(world_id);
-          current_frame.current.observe(world_id);
+          current_frame.current.observe(world_id, state_worlds.slots);
         } else {
           observe(undefined);
-          current_frame.current.observe(undefined);
+          current_frame.current.observe(undefined, state_worlds.slots);
         }
       }}
       className={`shrink-0 grow-0 cursor-pointer  w-6 h-6 my-2 
