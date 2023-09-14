@@ -135,6 +135,7 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
+        anomaly_range: 5,
         colormap: "rain.png",
         colormap_index: colormaps_list.indexOf("rain.png"),
         updateColormap: (name: string, index: number) => {
@@ -157,6 +158,10 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.pr.max = value
           }),
+        updateAnomalyRange: (value: number) =>
+        set((state) => {
+          state.variables.pr.anomaly_range = value
+        }),
       },
       sic: {
         name: EVarID.sic,

@@ -82,6 +82,8 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     materialRef.current.uniforms.uUserMinValue.value = store.min
     materialRef.current.uniforms.uUserMaxValue.value = store.max
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
+    materialRef.current.uniforms.uUserMinValueAnomaly.value = store.anomaly_range * -1.
+    materialRef.current.uniforms.uUserMaxValueAnomaly.value = store.anomaly_range
   }
 
   function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {

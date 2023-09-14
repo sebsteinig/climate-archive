@@ -76,11 +76,13 @@ export type Pr = Variable & {
   max: number
   colormap: string
   colormap_index: number
+  anomaly_range: number
 }
 export interface PrSlice extends Pr {
-  updateColormap: (value: string) => void
+  updateColormap: (value: string, index: number) => void
   updateMin: (value: number) => void
   updateMax: (value: number) => void
+  updateAnomalyRange: (value: number) => void
 }
 
 export type Sic = Variable & {}

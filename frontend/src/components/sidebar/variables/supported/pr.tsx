@@ -10,6 +10,7 @@ export function Pr({
   setCurrentVariableControls,
 }: VariableProps) {
   const pr = useStore((state) => state.variables.pr)
+  console.log(pr)
   return (
     <Variable
       title={pr.name}
@@ -43,6 +44,16 @@ export function Pr({
           colormap_index={pr.colormap_index}
           onChange={(name, index) => pr.updateColormap(name, index)} // pass both name and index
           />
+        <RowWithSlider
+          onChange={(n) => {
+            pr.updateAnomalyRange(n)
+          }}
+          min={0}
+          max={20}
+          step={0.1}
+          value={pr.anomaly_range}
+          label="anomaly [mm/day]"
+        />
       </Rows>
     </Variable>
   )
