@@ -82,6 +82,11 @@ export function useFrameRef() {
         this._lock.lock = false
         this.reference = undefined
       }
+      // force texture update
+      let frame: TimeFrame = this.map.get(world_id)!
+      if (frame) {
+        frame.swap_flag = true
+      }
     },
     saveReference(reference) {
       this.reference = reference

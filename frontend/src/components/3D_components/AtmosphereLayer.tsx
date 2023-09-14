@@ -105,6 +105,8 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       materialRef.current.uniforms.referenceDataMin.value = reference.current.min[0] * 86400.
       materialRef.current.uniforms.referenceDataMax.value = reference.current.max[0] * 86400.
       materialRef.current.uniforms.referenceDataFlag.value = true
+    } else {
+      materialRef.current.uniforms.referenceDataFlag.value = false
     }
 
   }

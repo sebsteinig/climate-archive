@@ -44,6 +44,7 @@ export const World = memo(({ tick }: Props) => {
     useFrame((state, delta) => {
       tick(delta).then((res) => {
 
+
         if (variables_state.get(EVarID.pr)) {
           atmosphere_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         }
@@ -57,10 +58,11 @@ export const World = memo(({ tick }: Props) => {
             case EVarID.pr: {
               if (atmosphere_layer_ref.current && res.update_texture) {
                 if (world_state.observed_world && res.reference) {
-                  console.log(world_state.observed_world)
+                  console.log("updating reference mode")
                   data_reference = res.reference ? res.reference.get(variable) : undefined;
                   reference_flag = true
                 } else {
+                  console.log("updating standard mode")
                   data_reference = null
                   reference_flag = false
                 }
