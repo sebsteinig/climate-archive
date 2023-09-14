@@ -84,6 +84,7 @@ export function useFrameRef() {
         this.reference = undefined
       }
 
+
       function executeLoop(ref) {
         for (let w of worlds) {
           const frame = ref.map.get(w[0]);

@@ -20,7 +20,7 @@ const cmap = loader.load('../assets/colormaps/all_colormaps.png')
 cmap.minFilter = THREE.NearestFilter;
 cmap.magFilter = THREE.NearestFilter;
 
-const geometry = new THREE.PlaneGeometry(4, 2, 50, 25);
+const geometry = new THREE.PlaneGeometry(4, 2, 64, 32);
 
 type Props = {
 

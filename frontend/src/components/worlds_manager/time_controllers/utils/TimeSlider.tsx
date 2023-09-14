@@ -43,8 +43,6 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
   const departure = useRef<number>(null!);
   const destination = useRef<number>(null!);
 
-  const worlds = useStore((state) => state.worlds.slots);
-
   // Expose some methods to parent components via ref
   useImperativeHandle(ref, () => {
     return {
@@ -78,6 +76,7 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
 
   // Reflect external changes in the slider's value
   useEffect(() => {
+    console.log('external change')
     const frame = current_frame.current.get(world_id);
     if (frame) {
       setSliderValue(frame.weight as number);
@@ -123,16 +122,29 @@ export const TimeSlider = forwardRef<InputRef, Props>(function TimeSlider(
           is_changing.current = true;
           destination.current = newValue as number;
           setSliderValue(newValue as number);
-          for (let w of worlds) {
-            console.log(w[0])
-            // console.log(state_worlds.observed_world)
 
-            const frame = current_frame.current.get(w[0]);
-            if (!frame || state_worlds.observed_world == w[0]) return;
-            jumpTo(frame, destination.current, () => {
-              is_changing.current = false;
-            });
+          // check whether current time controller is monthly climatology
+          // if so, update all monthly time controllers
+          let activeController = state_worlds.slots.get(world_id).time.controller
+
+          if ( activeController == 0 ) { 
+            for (let w of state_worlds.slots) {
+              let frame = current_frame.current.get(w[0]);
+              let passiveController = w[1].time.controller
+              if (!frame ) return;
+              if ( passiveController == activeController )
+              jumpTo(frame, destination.current, () => {
+                is_changing.current = false;
+              });
+            }
+          // if not, update only the current time controller
+          } else {
+              let frame = current_frame.current.get(world_id);
+              jumpTo(frame, destination.current, () => {
+                is_changing.current = false;
+              });
           }
+
           if (onSliderChange) {
             onSliderChange(destination.current);
           }
