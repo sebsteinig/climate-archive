@@ -105,7 +105,7 @@ export function tickBuilder(
       uSphereWrapAmount: frame.uSphereWrapAmount,
       update_texture: update_texture,
       variables: res,
-      reference: current_frame.current.reference,
+      reference: world_id === current_frame.current._observed_id ? null : current_frame.current.reference,
     }
   }
 }

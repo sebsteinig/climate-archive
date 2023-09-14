@@ -23,6 +23,8 @@ export const World = memo(({ tick }: Props) => {
   
     const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
 
+    const variables_state = useStore((state) => state.active_variables)
+
     useEffect(() => {
       const userVariables = state => state.variables;
   
@@ -37,11 +39,12 @@ export const World = memo(({ tick }: Props) => {
       return unsubscribe;
     }, []);  // The empty dependency array means this useEffect runs once when the component mounts
   
-    
+    const world_state = useStore((state) => state.worlds)
+
     useFrame((state, delta) => {
       tick(delta).then((res) => {
-  
-        if (atmosphere_layer_ref.current) {
+
+        if (variables_state.get(EVarID.pr)) {
           atmosphere_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         }
         // if (wind_layer_ref.current) {
@@ -49,15 +52,19 @@ export const World = memo(({ tick }: Props) => {
         // }
         for (let variable of res.variables.keys()) {
           let data = res.variables.get(variable);
-          // Define data_reference only when res.reference is defined
-          let data_reference = res.reference ? res.reference.get(variable) : undefined;    
-
+          let data_reference, reference_flag
           switch (variable) {
             case EVarID.pr: {
               if (atmosphere_layer_ref.current && res.update_texture) {
-                console.log("update")
-                // Use data_reference if it's defined, otherwise use data
-                atmosphere_layer_ref.current.updateTextures(data_reference || data, data_reference || data);
+                if (world_state.observed_world && res.reference) {
+                  console.log(world_state.observed_world)
+                  data_reference = res.reference ? res.reference.get(variable) : undefined;
+                  reference_flag = true
+                } else {
+                  data_reference = null
+                  reference_flag = false
+                }
+                atmosphere_layer_ref.current.updateTextures(data, data_reference, reference_flag);
               }
               break
             }

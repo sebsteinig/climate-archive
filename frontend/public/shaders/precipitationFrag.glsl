@@ -7,17 +7,22 @@ uniform float thisDataMin;
 uniform float thisDataMax;
 uniform float nextDataMin;
 uniform float nextDataMax;
+uniform float referenceDataMin;
+uniform float referenceDataMax;
 uniform float uUserMinValue;
 uniform float uUserMaxValue;
+uniform float uUserMinValueAnomaly;
+uniform float uUserMaxValueAnomaly;
 uniform float numLon;
 uniform float numLat;
 uniform float colorMapIndex;
 
 uniform sampler2D thisDataFrame;
 uniform sampler2D nextDataFrame;
+uniform sampler2D referenceDataFrame;
 uniform sampler2D colorMap;
 
-uniform bool uCMIP6Mode;
+uniform bool referenceDataFlag;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // varying from vertex shader
@@ -93,6 +98,9 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords, float numLon, float numLa
 
 void main()	{
 
+float cmap_index = colorMapIndex;
+float opacity_cutoff = 0.0;
+
 // convert relative bitmap value to absolute value for both frames
 float thisFrameData = remap( 
     textureBicubic(
@@ -129,11 +137,42 @@ float dataRemapped = remap(
     0.0, 
     1.0 );
 
+// only process reference data if reference mode is active
+if (referenceDataFlag) {
+    float referenceData = remap( 
+    textureBicubic(
+        referenceDataFrame, 
+        vUv, 
+        numLon, 
+        numLat
+        ).r, 
+    0.0, 
+    1.0, 
+    referenceDataMin, 
+    referenceDataMax);
+
+    intData -= referenceData;
+
+    dataRemapped = remap( 
+    intData, 
+    uUserMinValueAnomaly, 
+    uUserMaxValueAnomaly, 
+    0.0, 
+    1.0 );
+
+    cmap_index = 17.0;
+}
+
 // apply colormap to data
-vec4 dataColor = applyColormap( dataRemapped, colorMap, colorMapIndex );
+vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
 
 // send pixel color to screen
-if(dataRemapped > 0.0) {
+if (referenceDataFlag == false) {
+    if (dataRemapped > 0.0 ) {
+        gl_FragColor = dataColor;
+        gl_FragColor.a *= uLayerOpacity;
+    }
+} else {
     gl_FragColor = dataColor;
     gl_FragColor.a *= uLayerOpacity;
 }

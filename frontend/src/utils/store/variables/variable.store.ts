@@ -14,6 +14,8 @@ import {
   WindsSlice,
   EVarID,
 } from "./variable.types"
+import colormaps_list from "$/assets/colormaps/colormaps_list.json"
+
 
 export type VariableSlice = {
   active_variables: Map<EVarID, boolean>
@@ -133,8 +135,8 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
-        colormap: "ipccPrecip.png",
-        colormap_index: 0,
+        colormap: "rain.png",
+        colormap_index: colormaps_list.indexOf("rain.png"),
         updateColormap: (name: string, index: number) => {
           set((state) => ({
             variables: {
