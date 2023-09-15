@@ -25,87 +25,91 @@ type MonthlyControllerProps = {
   controller_ref: ControllerRef | undefined
 }
 
-export const MonthlyController = forwardRef<
-  IControllerRef,
-  MonthlyControllerProps
->(function MonthlyController({ current_frame, world_id, data, controller_ref }, ref) {
+// ... (your imports)
 
-  const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
-    undefined,
-  )
-  const [focus, setFocus] = useState<number | undefined>(undefined)
-  const worlds = useStore((state) => state.worlds)
+export const MonthlyController = forwardRef<IControllerRef, MonthlyControllerProps>(
+  function MonthlyController({ current_frame, world_id, data, controller_ref }, ref) {
 
-  const monthlyControllerRef = useRef(); // This ref is to connect to TimeScale
+    const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
+      undefined,
+    )
+    const [focus, setFocus] = useState<number | undefined>(undefined)
+    const worlds = useStore((state) => state.worlds)
 
-  return (
-    <div
-      className={`select-none w-full pt-2 px-7 ${
-        worlds.observed_world === world_id || worlds.slots.get(world_id)?.time.animation == true
-          ? "brightness-50 pointer-events-none"
-          : "pointer-events-auto"
-      }`}
-    >
-      <div className="w-full my-2">
-      <TimeSlider 
-            world_id={world_id} 
-            data={data} 
-            current_frame={current_frame} 
-            controller_ref={controller_ref} 
-            labels={false}
-          />
-      </div>
+    const monthlyControllerRef = useRef(); // This ref is to connect to TimeScale
+
+    return (
       <div
-        className="
-                    w-full rounded-lg 
-                    flex flex-row
-                    overflow-hidden
-                    border-2 border-slate-200
-                "
-        onMouseLeave={() => {
-          if (focus === undefined) {
-            setHighLightMonth(undefined)
-          }
-        }}
+        className={`select-none w-full pt-2 px-7 ${
+          worlds.observed_world === world_id || worlds.slots.get(world_id)?.time.animation == true
+            ? "brightness-50 pointer-events-none"
+            : "pointer-events-auto"
+        }`}
       >
-        {MONTHS.map((month, idx) => {
-          return (
-            <Month ref={monthlyControllerRef} // This ref is to connect to TimeScale
-              key={idx}
-              highlight={
-                highlighted_month === undefined || highlighted_month === idx
-              }
-              focus={focus}
-              idx={idx}
-              month={month}
-              color={MONTHS_COLOR[idx]}
-              current_frame={current_frame}
-              world_id={world_id} 
-              onChange={(idx, focus) => {
-                const frame = current_frame.current.get(world_id)
-                if (!frame) return
-                setHighLightMonth(idx)
-                if (focus) {
-                  setFocus((prev) => {
-                    if (prev === idx) {
-                      return undefined
-                    }
-                    return idx
-                  })
-                }
-                // controller_ref?.pause()
-                goto(frame, idx, 5.0, true)
-              }}
-              resetHighlight={() => {
+        <div className="w-full my-2">
+          <TimeSlider
+            world_id={world_id}
+            data={data}
+            current_frame={current_frame}
+            controller_ref={controller_ref}
+            labels={worlds.slots.size <= 4 ? false : true}
+          />
+        </div>
+        {worlds.slots.size <= 4 ? (
+          <div
+            className="
+              w-full rounded-lg 
+              flex flex-row
+              overflow-hidden
+              border-2 border-slate-200
+            "
+            onMouseLeave={() => {
+              if (focus === undefined) {
                 setHighLightMonth(undefined)
-              }}
-            />
-          )
-        })}
+              }
+            }}
+          >
+            {MONTHS.map((month, idx) => (
+              <Month ref={monthlyControllerRef} // This ref is to connect to TimeScale
+                key={idx}
+                highlight={
+                  highlighted_month === undefined || highlighted_month === idx
+                }
+                focus={focus}
+                idx={idx}
+                month={month}
+                color={MONTHS_COLOR[idx]}
+                current_frame={current_frame}
+                world_id={world_id}
+                onChange={(idx, focus) => {
+                  const frame = current_frame.current.get(world_id)
+                  if (!frame) return
+                  setHighLightMonth(idx)
+                  if (focus) {
+                    setFocus((prev) => {
+                      if (prev === idx) {
+                        return undefined
+                      }
+                      return idx
+                    })
+                  }
+                  // controller_ref?.pause()
+                  goto(frame, idx, 5.0, true)
+                }}
+                resetHighlight={() => {
+                  setHighLightMonth(undefined)
+                }}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
-    </div>
-  )
-})
+    )
+  }
+)
+
+// ... (rest of your code)
+
 
 type MonthProps = {
   idx: number
