@@ -13,6 +13,7 @@ import {
   sync,
   updateFrame,
 } from "../store/worlds/time/time.utils"
+import { useStore } from "@/utils/store/store";
 
 export function useFrameRef() {
   const current_frame = useRef<TimeFrameHolder>({
@@ -74,7 +75,7 @@ export function useFrameRef() {
         resolve()
       }
     },
-    observe(world_id) {
+    observe(world_id, worlds) {
       if (world_id) {
         this._observed_id = world_id
         this._lock.lock = true
@@ -82,6 +83,19 @@ export function useFrameRef() {
         this._lock.lock = false
         this.reference = undefined
       }
+
+
+      function executeLoop(ref) {
+        for (let w of worlds) {
+          const frame = ref.map.get(w[0]);
+          if (!frame) return;
+          console.log("force update" + w[0])
+          frame.swap_flag = true;
+        }
+      }
+      setTimeout(executeLoop(this), 100); // 200ms or 0.2 seconds
+
+
     },
     saveReference(reference) {
       this.reference = reference

@@ -22,12 +22,14 @@ import {
   TimeMode,
   WorldData,
 } from "@/utils/store/worlds/time/time.type"
+import { TimeController as TimeControllerType } from "@/utils/store/worlds/time/time.type"
 import { useStore } from "@/utils/store/store"
 import { getTitleOfExp } from "@/utils/types.utils"
 import { Experiment } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { circular, once, walk } from "@/utils/store/worlds/time/loop"
 import { useActiveVariables } from "@/utils/hooks/useActiveVariables"
+import { useFrameRef } from "@/utils/hooks/useFrameRef"
 
 type Props = {
   className?: string
@@ -48,22 +50,32 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const exp_title_ref = useRef<HTMLDivElement>(null)
     const tween_ref = useRef<gsap.core.Tween | undefined>(null!)
     const switchTimeMode = useStore((state) => state.worlds.switchTimeMode)
+    const toggleAnimation = useStore(state => state.worlds.toggleAnimation);
     const observed_id = useStore((state) => state.worlds.observed_world)
     const active_variables = useActiveVariables()
+    const state_worlds = useStore((state) => state.worlds)
+
+    let worldsRef = useRef(state_worlds);
+    useEffect(() => {
+      worldsRef.current = state_worlds;
+    }, [state_worlds]);
+
+    const currentFrame = useFrameRef()
 
     useEffect(() => {
-      pause(tween_ref, setPlaying)
+      pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
     }, [active_variables])
     useEffect(() => {
-      pause(tween_ref, setPlaying)
+      pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
     }, [observed_id])
     useImperativeHandle(ref, () => {
       return {
         play() {
-          play(data, world_id, current_frame, tween_ref, setPlaying)
+          play(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
         },
         pause() {
-          pause(tween_ref, setPlaying)
+          // pause(tween_ref, setPlaying)
+          pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
         },
         stop() {
           stop(data, world_id, current_frame, tween_ref, setPlaying)
@@ -121,7 +133,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
           ></div>
         </div>
         <div className="grow flex flex-wrap gap-5 justify-center">
-          {is_playing ? (
+          {state_worlds.slots.get(world_id)?.time.animation ? (
             // PAUSE BUTTON
             <Pause
               className={`${
@@ -130,25 +142,32 @@ export const TimeController = forwardRef<ControllerRef, Props>(
                   : "pointer-events-auto"
               } shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
-                pause(tween_ref, setPlaying)
+                const frame = current_frame.current.get(world_id);
+                if (!frame) return;
+                frame.controllerFlag = false
+                pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame, toggleAnimation)
+                // pause(tween_ref, setPlaying)
               }}
             />
           ) : (
             // PLAY BUTTON
             <Play
               className={`${
-                observed_id === world_id
+                state_worlds.slots.get(world_id)?.time.animation
                   ? "pointer-events-none"
                   : "pointer-events-auto"
               } shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 if (active_variables.length > 0) {
-                  play(data, world_id, current_frame, tween_ref, setPlaying)
+                  const frame = current_frame.current.get(world_id);
+                  if (!frame) return;
+                  frame.controllerFlag = false
+                  play(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame, toggleAnimation)
                 }
               }}
             />
           )}
-          <Stop
+          {/* <Stop
             className={`${
               observed_id === world_id
                 ? "pointer-events-none"
@@ -157,7 +176,7 @@ export const TimeController = forwardRef<ControllerRef, Props>(
             onClick={() => {
               stop(data, world_id, current_frame, tween_ref, setPlaying)
             }}
-          />
+          /> */}
           {data.time.mode_state.is_writable ? (
             <Clock
               className={`${
@@ -191,11 +210,36 @@ export const TimeController = forwardRef<ControllerRef, Props>(
 )
 
 function pause(
+  data: WorldData,
+  world_id: WorldID,
+  worldsRef: any,
+  current_frame: TimeFrameRef,
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
   setPlaying: Dispatch<SetStateAction<boolean>>,
+  currentFrame: any,
+  toggleAnimation: any
 ) {
-  tween_ref.current?.kill()
-  setPlaying(false)
+     // check whether current time controller is monthly climatology
+    // if so, start animation for all monthly time controllers (sync)
+    let synced_ids = [];
+    
+    let activeController = worldsRef.current.slots.get(world_id).time.controller
+
+    for (let w of worldsRef.current.slots) {
+      const frame = current_frame.current.get(w[0]);  
+      if (!frame ) return;
+      let passiveController = w[1].time.controller
+      if ( w[0] == world_id || ( activeController == TimeControllerType.monthly ) && ( passiveController == TimeControllerType.monthly )) {
+        synced_ids.push(w[0])
+      }
+    }
+    
+    toggleAnimation(synced_ids)
+
+    tween_ref.current?.kill()
+    setPlaying(false)
+
+
 }
 function stop(
   data: WorldData,
@@ -214,26 +258,50 @@ function stop(
 function play(
   data: WorldData,
   world_id: WorldID,
+  worldsRef: any,
   current_frame: TimeFrameRef,
   tween_ref: MutableRefObject<gsap.core.Tween | undefined>,
   setPlaying: Dispatch<SetStateAction<boolean>>,
+  currentFrame: any,
+  toggleAnimation: any
 ) {
-  const frame = current_frame.current.get(world_id)
-  if (!frame) return
-  switch (data.time.kind) {
-    case TimeKind.circular:
-      tween_ref.current = circular(frame, tween_ref, data)
-      break
-    case TimeKind.once:
-      tween_ref.current = once(frame, tween_ref, data, () => {
-        setPlaying(false)
-      })
-      break
-    case TimeKind.walk:
-      tween_ref.current = walk(frame, tween_ref, data)
-      break
-  }
-  setPlaying(true)
+    // check whether current time controller is monthly climatology
+    // if so, start animation for all monthly time controllers (sync)
+    let synced_ids = [];
+    let activeController = worldsRef.current.slots.get(world_id).time.controller
+
+    for (let w of worldsRef.current.slots) {
+      const frame = current_frame.current.get(w[0]);  
+      if (!frame ) return;
+      let passiveController = w[1].time.controller
+      if ( w[0] == world_id || ( activeController == TimeControllerType.monthly ) && ( passiveController == TimeControllerType.monthly )) {
+        synced_ids.push(w[0])
+      }
+    }
+    
+    toggleAnimation(synced_ids)
+
+    // artificial delay to wait (i.e. hope) that component has rerendered
+    setTimeout(() => {
+      for (let idx of synced_ids) {
+        const frame = current_frame.current.get(idx);  
+        switch (data.time.kind) {
+          case TimeKind.circular:
+            tween_ref.current = circular(frame, tween_ref, data)
+            break
+          case TimeKind.once:
+            tween_ref.current = once(frame, tween_ref, data, () => {
+              setPlaying(false)
+            })
+            break
+          case TimeKind.walk:
+            tween_ref.current = walk(frame, tween_ref, data)
+            break
+        }
+        setPlaying(true)
+      }
+    }, 500);
+
 }
 
 const MONTHS = [

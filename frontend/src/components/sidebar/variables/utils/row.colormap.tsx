@@ -1,19 +1,21 @@
 import { Label, Row } from "@/components/searchbar/filters/filter.utils"
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import colormaps_list from "$/assets/colormaps/colormaps_list.json"
 
 type ColorMapRowProps = {
   colormap_name: string
-  onChange: (number: string) => void
+  colormap_index: number
+  onChange: (name: string, index: number) => void
 }
 
 export function ColorMapRow({ colormap_name, onChange }: ColorMapRowProps) {
   const [display_color_maps, displayColorMaps] = useState<boolean>(false)
-  const colormaps_test = [
-    "cbrewerSpeed3.png",
-    "cmapHaxby.png",
-    "ipccPrecip.png",
-    "cmoceanThermal.png",
-  ]
+
+
+  const sortedColormaps = useMemo(() => {
+    return [...colormaps_list];
+  }, []);
+
   return (
     <Row>
       <Label
@@ -21,39 +23,47 @@ export function ColorMapRow({ colormap_name, onChange }: ColorMapRowProps) {
           displayColorMaps((prev) => !prev)
         }}
       >
-        Select color map
+        colormap
       </Label>
       <div
-        className="w-[16rem] ml-1 grid grid-cols-1 gap-1 
-          max-h-20 overflow-y-auto overflow-x-hidden
-          rounded-md border-emerald-400 border-2"
+        className={`w-[16rem] ml-1 grid ${display_color_maps ? 'grid-cols-2' : 'grid-cols-1'} gap-1 
+        max-h-30 overflow-y-auto overflow-x-hidden
+        rounded-md border-emerald-400 border-2 pixelated`}
       >
         {!display_color_maps && (
           <img
             onClick={() => displayColorMaps(true)}
             src={`/assets/colormaps/${colormap_name}`}
             key={0}
-            className="w-fit h-9 p-2"
+            className="w-fit h-9 p-2 grid-cols-1"
           ></img>
         )}
         {display_color_maps &&
-          colormaps_test
-            .filter((v) => v != colormap_name)
-            .map((name: string, i: number) => (
-              <div
-                onClick={() => {
-                  displayColorMaps(false)
-                  onChange(name)
-                }}
-                className="hover:bg-slate-800"
-              >
-                <img
-                  key={i + 1}
-                  src={`/assets/colormaps/${name}`}
-                  className="w-fit h-9 p-2"
-                />
-              </div>
-            ))}
+          sortedColormaps
+            .map((name: string, i: number) => {
+              const filenameWithoutExtension = name.replace(".png", "");
+              return (
+                <div
+                  onClick={() => {
+                    displayColorMaps(false);
+                    onChange(name, i);
+                  }}
+                  onMouseOver={() => {
+                    onChange(name, i);
+                    console.log(name);
+                  }}
+                  key={i}
+                  className={`hover:bg-slate-800 ${name === colormap_name ? 'bg-slate-700' : ''}`}
+                >
+                  <img
+                    src={`/assets/colormaps/${name}`}
+                    className="w-fit h-9 p-2 pixelated"
+                    title={filenameWithoutExtension} // tooltip showing the filename without the .png
+                  />
+                </div>
+              );
+            })}
+
       </div>
     </Row>
   )
