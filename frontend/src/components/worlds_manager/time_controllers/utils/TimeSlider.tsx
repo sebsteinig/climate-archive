@@ -94,7 +94,7 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
         // `mousedown` event is fired, i.e. slider is clicked
         onChange={(event, newValue) => {
           // stop animation
-          controller_ref?.pause()
+          // controller_ref?.pause()
           let newWeight = newValue as number
           // check whether current time controller is monthly climatology
           // if so, update all monthly time controllers (sync)

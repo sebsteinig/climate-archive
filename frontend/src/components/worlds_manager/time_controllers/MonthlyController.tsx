@@ -93,7 +93,7 @@ export const MonthlyController = forwardRef<
                     return idx
                   })
                 }
-                controller_ref?.pause()
+                // controller_ref?.pause()
                 goto(frame, idx, 5.0, true)
               }}
               resetHighlight={() => {

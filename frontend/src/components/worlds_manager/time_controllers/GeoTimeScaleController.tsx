@@ -46,7 +46,7 @@ export const GeoTimeScaleController = forwardRef<
         onChange={(idx, exp_id) => {
           const frame = current_frame.current.get(world_id)
           if (!frame) return
-          controller_ref?.pause()
+          // controller_ref?.pause()
           // console.log("frame: "+frame.weight)
           goto(frame, idx, 5.0, true, () => {})
           // console.log("index: "+idx)
