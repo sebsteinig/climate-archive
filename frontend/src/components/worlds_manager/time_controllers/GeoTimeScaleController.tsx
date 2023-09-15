@@ -27,19 +27,6 @@ export const GeoTimeScaleController = forwardRef<
   { current_frame, world_id, data, controller_ref },
   ref,
 ) {
-  const time_slider_ref = useRef<TimeSliderRef>(null); // updated ref name
-  const [tree, exp_span_tree] = useGeologicTree()
-  // useImperativeHandle(ref, () => {
-  //   return {
-  //     onChange(frame) {
-  //       // console.log(exp_span_tree)
-  //     },
-  //     onWeightUpdate(frame) {
-  //       //const age = exp_span_tree.binder.get(Math.floor(frame.weight))?.high ?? 0
-  //       //progress_bar_ref.current?.update((tree.root.data.age_span.to - age)/tree.root.data.age_span.to);
-  //     },
-  //   }
-  // })
 
   const timeScaleRef = useRef(); // This ref is to connect to TimeScale
   
@@ -51,11 +38,7 @@ export const GeoTimeScaleController = forwardRef<
             data={data} 
             current_frame={current_frame} 
             controller_ref={controller_ref} 
-            ref={time_slider_ref} 
             labels={false}
-            onSliderChange={() => {
-              timeScaleRef.current?.updateFromSlider();
-            }}
           />
       </div>
       <TimeScale ref={timeScaleRef} //
@@ -64,10 +47,11 @@ export const GeoTimeScaleController = forwardRef<
           if (!frame) return
           controller_ref?.pause()
           // console.log("frame: "+frame.weight)
-          goto(frame, idx, 5.0, () => {})
+          goto(frame, idx, 5.0, true, () => {})
           // console.log("index: "+idx)
-          time_slider_ref.current?.onChange(idx)
         }}
+        world_id={world_id} 
+        current_frame={current_frame} 
       />
     </div>
   )

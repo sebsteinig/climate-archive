@@ -143,6 +143,10 @@ export const TimeController = forwardRef<ControllerRef, Props>(
               } shrink-0 grow-0 cursor-pointer w-8 h-8 inline-block text-slate-300 child:fill-slate-300`}
               onClick={() => {
                 if (active_variables.length > 0) {
+                  // reset highlighted interval in monthly or timescale controllers
+                  const frame = current_frame.current.get(world_id);
+                  if (!frame) return;
+                  frame.controllerFlag = false
                   play(data, world_id, current_frame, tween_ref, setPlaying)
                 }
               }}

@@ -1,5 +1,5 @@
 "use client"
-import { useState, useRef, useImperativeHandle, forwardRef } from "react"
+import { useState, useRef, useImperativeHandle, forwardRef, useEffect } from "react"
 import { useGeologicTree } from "../../utils/hooks/useGeologicTree"
 import { query } from "./utils/span_tree"
 import {
@@ -16,14 +16,12 @@ import { Cell } from "./timescale.cell"
 
 type TimeScaleProps = {
   onChange: (idx: number, exp_id: string) => void
-}
-
-export type InputRef = {
-  updateFromSlider: () => void
+  current_frame: TimeFrameRef
+  world_id: WorldID
 }
 
 // export function TimeScale({ onChange }: TimeScaleProps) {
-export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
+export const TimeScale = forwardRef<any, TimeScaleProps>(({ onChange, current_frame, world_id }, ref) => {
 
   const [tree, exp_span_tree] = useGeologicTree()
 
@@ -94,13 +92,25 @@ export const TimeScale = forwardRef(({ onChange }: TimeScaleProps, ref) => {
   }
   const [selection, setSelection] = useState<Selection | undefined>()
   const [is_focus, setFocus] = useState<boolean>(false)
-  
-  useImperativeHandle(ref, () => ({
-      updateFromSlider() {
-        setFocus(false)
-        setSelection(undefined)
-      }
-    }));
+
+  // reset highlights if frame gets changed outside of the controller
+  // e.g. by time slider or play/pause button
+  useEffect(() => {
+    // 
+    const checkForChanges = () => {
+        let frame = current_frame.current.get(world_id);
+        if (!frame ) return;
+        if (frame.swapping == true && !frame.controllerFlag) {
+          setSelection(undefined)
+        }
+        // console.log(newValue)
+    };
+    // Set up the interval
+    const intervalId = setInterval(checkForChanges, 10);
+    // Clear the interval when the component is unmounted.
+    return () => clearInterval(intervalId);
+  }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
+
 
   return (
     <div

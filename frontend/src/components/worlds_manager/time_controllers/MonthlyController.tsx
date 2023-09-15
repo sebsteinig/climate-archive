@@ -4,6 +4,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
+  useEffect,
 } from "react"
 import { ControllerRef, TimeController } from "./utils/TimeController"
 import { IControllerRef } from "./controller.types"
@@ -28,22 +29,12 @@ export const MonthlyController = forwardRef<
   IControllerRef,
   MonthlyControllerProps
 >(function MonthlyController({ current_frame, world_id, data, controller_ref }, ref) {
-  const time_slider_ref = useRef<TimeSliderRef>(null); // updated ref name
-  // const monthlyRef = useRef(); // This ref is to connect to TimeScale
 
   const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
     undefined,
   )
   const [focus, setFocus] = useState<number | undefined>(undefined)
   const observed_id = useStore((state) => state.worlds.observed_world)
-  // useImperativeHandle(ref, () => {
-  //   return {
-  //     onChange(frame) {},
-  //     onWeightUpdate(frame) {
-  //       progress_bar_ref.current?.update(frame.weight / (frame.timesteps ?? 12))
-  //     },
-  //   }
-  // })
 
   const monthlyControllerRef = useRef(); // This ref is to connect to TimeScale
 
@@ -61,7 +52,6 @@ export const MonthlyController = forwardRef<
             data={data} 
             current_frame={current_frame} 
             controller_ref={controller_ref} 
-            ref={time_slider_ref} 
             labels={false}
             onSliderChange={() => {
               monthlyControllerRef.current?.updateFromSlider();
@@ -92,6 +82,8 @@ export const MonthlyController = forwardRef<
               idx={idx}
               month={month}
               color={MONTHS_COLOR[idx]}
+              current_frame={current_frame}
+              world_id={world_id} 
               onChange={(idx, focus) => {
                 const frame = current_frame.current.get(world_id)
                 if (!frame) return
@@ -105,8 +97,7 @@ export const MonthlyController = forwardRef<
                   })
                 }
                 controller_ref?.pause()
-                goto(frame, idx, 5.0)
-                time_slider_ref.current?.onChange(idx)
+                goto(frame, idx, 5.0, true)
               }}
               resetHighlight={() => {
                 setHighLightMonth(undefined)
@@ -125,6 +116,8 @@ type MonthProps = {
   highlight: boolean
   focus: number | undefined
   color: string
+  current_frame: TimeFrameRef
+  world_id: WorldID
   onChange: (idx: number, focus: boolean) => void
   resetHighlight: () => void
 }
@@ -135,7 +128,7 @@ export type InputRef = {
 
 
 const Month = forwardRef((props: MonthProps, ref: RefObject<InputRef>) => {
-  const { idx, month, color, focus, onChange, resetHighlight, highlight } = props;
+  const { idx, month, color, current_frame, world_id, focus, onChange, resetHighlight, highlight } = props;
 
   useImperativeHandle(ref, () => ({
     updateFromSlider() {
@@ -143,6 +136,25 @@ const Month = forwardRef((props: MonthProps, ref: RefObject<InputRef>) => {
       // ref.setSelection(undefined)
     }
   }));
+
+  // reset highlights if frame gets changed outside of the controller
+  // e.g. by time slider or play/pause button
+  useEffect(() => {
+    // 
+    const checkForChanges = () => {
+        let frame = current_frame.current.get(world_id);
+        if (!frame ) return;
+        if (frame.swapping == true && !frame.controllerFlag) {
+          resetHighlight();
+        }
+        // console.log(newValue)
+    };
+    // Set up the interval
+    const intervalId = setInterval(checkForChanges, 10);
+    // Clear the interval when the component is unmounted.
+    return () => clearInterval(intervalId);
+  }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
+
 
   return (
     <div
