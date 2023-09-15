@@ -18,6 +18,7 @@ export interface WorldSlice {
     __auto_increment: number
     slots: Slots
     observed_world: WorldID | undefined
+    animated_world: WorldID | undefined
     reload_flag: boolean
     reload: (flag: boolean) => void
     add: (
@@ -51,6 +52,7 @@ export const createWorldSlice: StateCreator<
       slots: new Map(),
       reload_flag: true,
       observed_world: undefined,
+      animated_world: undefined,
       reload(flag) {
         set((state) => {
           state.worlds.reload_flag = flag
@@ -145,12 +147,22 @@ export const createWorldSlice: StateCreator<
           }
         })
       },
-      toggleAnimation(id_list) {
+      toggleAnimation(main_id, sync_flags) {
         set((state) => {
-          for (let id of id_list) {
-            const data = state.worlds.slots.get(id)
+          // set global animation flag to key of selected world
+          if (sync_flags.some(value => value === true)) {
+            state.worlds.animated_world = main_id
+          } else {
+            state.worlds.animated_world = undefined
+          }  
+          // update animation flag of all worlds
+          let idx = 0
+          for (let w of state.worlds.slots) {
+            const data = state.worlds.slots.get(w[0])
             if (!data) return
-            data.time.animation = !data.time.animation
+            data.time.animation = sync_flags[idx]
+            console.log(data.time.animation)
+            idx += 1
           }
         })
       },

@@ -102,7 +102,6 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
           if ( activeController == 0 ) { 
             for (let w of state_worlds.slots) {
               let frame = current_frame.current.get(w[0]);
-              console.log(frame)
               let passiveController = w[1].time.controller
               if (!frame ) return;
               if ( passiveController == activeController )
