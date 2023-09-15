@@ -29,14 +29,8 @@ type Props = {
   onSliderChange?: (value: number) => void;
 };
 
-// Define a type for the forwarded ref
-export type InputRef = {
-  onChange: (frame: number) => void;
-  onWeightUpdate: (frame: number) => void;
-};
-
 // Define the TimeSlider component
-export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame, data, labels, onSliderChange }) => {
+export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame, controller_ref, data, labels, onSliderChange }) => {
 
   const state_worlds = useStore((state) => state.worlds)
   const [sliderValue, setSliderValue] = useState(0);
@@ -99,13 +93,16 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
         value={sliderValue}
         // `mousedown` event is fired, i.e. slider is clicked
         onChange={(event, newValue) => {
+          // stop animation
+          controller_ref?.pause()
           let newWeight = newValue as number
-          // // check whether current time controller is monthly climatology
-          // // if so, update all monthly time controllers (sync)
+          // check whether current time controller is monthly climatology
+          // if so, update all monthly time controllers (sync)
           let activeController = state_worlds.slots.get(world_id).time.controller
           if ( activeController == 0 ) { 
             for (let w of state_worlds.slots) {
               let frame = current_frame.current.get(w[0]);
+              console.log(frame)
               let passiveController = w[1].time.controller
               if (!frame ) return;
               if ( passiveController == activeController )

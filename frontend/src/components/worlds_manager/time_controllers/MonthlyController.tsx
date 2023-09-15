@@ -34,14 +34,14 @@ export const MonthlyController = forwardRef<
     undefined,
   )
   const [focus, setFocus] = useState<number | undefined>(undefined)
-  const observed_id = useStore((state) => state.worlds.observed_world)
+  const worlds = useStore((state) => state.worlds)
 
   const monthlyControllerRef = useRef(); // This ref is to connect to TimeScale
 
   return (
     <div
       className={`select-none w-full pt-2 px-7 ${
-        observed_id === world_id
+        worlds.observed_world === world_id || worlds.slots.get(world_id)?.time.animation == true
           ? "brightness-50 pointer-events-none"
           : "pointer-events-auto"
       }`}
@@ -53,9 +53,6 @@ export const MonthlyController = forwardRef<
             current_frame={current_frame} 
             controller_ref={controller_ref} 
             labels={false}
-            onSliderChange={() => {
-              monthlyControllerRef.current?.updateFromSlider();
-            }}
           />
       </div>
       <div

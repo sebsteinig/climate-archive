@@ -43,5 +43,6 @@ export function buildTimeConf(config?: Partial<TimeConf>): TimeConf {
     mode_state: config?.mode_state ?? {
       is_writable: false,
     },
+    animation: false,
   }
 }

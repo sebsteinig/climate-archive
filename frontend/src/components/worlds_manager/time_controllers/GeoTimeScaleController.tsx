@@ -10,6 +10,7 @@ import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
 import { TimeScale } from "@/components/geologic_timescale/TimeScale"
 import { useGeologicTree } from "@/utils/hooks/useGeologicTree"
 import { goto } from "@/utils/store/worlds/time/loop"
+import { useStore } from "@/utils/store/store"
 
 import { TimeSlider, InputRef as TimeSliderRef } from "./utils/TimeSlider"
 
@@ -29,7 +30,7 @@ export const GeoTimeScaleController = forwardRef<
 ) {
 
   const timeScaleRef = useRef(); // This ref is to connect to TimeScale
-  
+
   return (
     <div className="w-full pt-2 px-7">
       <div className="w-full my-2">

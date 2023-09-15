@@ -145,6 +145,15 @@ export const createWorldSlice: StateCreator<
           }
         })
       },
+      toggleAnimation(id_list) {
+        set((state) => {
+          for (let id of id_list) {
+            const data = state.worlds.slots.get(id)
+            if (!data) return
+            data.time.animation = !data.time.animation
+          }
+        })
+      },
     },
   }
 }

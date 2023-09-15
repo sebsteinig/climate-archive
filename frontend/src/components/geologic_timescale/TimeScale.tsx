@@ -13,6 +13,7 @@ import {
 } from "./timescale.utils"
 import { Block } from "./timescale.block"
 import { Cell } from "./timescale.cell"
+import { useStore } from "@/utils/store/store"
 
 type TimeScaleProps = {
   onChange: (idx: number, exp_id: string) => void
@@ -22,6 +23,8 @@ type TimeScaleProps = {
 
 // export function TimeScale({ onChange }: TimeScaleProps) {
 export const TimeScale = forwardRef<any, TimeScaleProps>(({ onChange, current_frame, world_id }, ref) => {
+
+  const worlds = useStore((state) => state.worlds)
 
   const [tree, exp_span_tree] = useGeologicTree()
 
@@ -114,7 +117,11 @@ export const TimeScale = forwardRef<any, TimeScaleProps>(({ onChange, current_fr
 
   return (
     <div
-      className="w-full border-4 border-slate-200 rounded-md bg-slate-900"
+    className={`w-full border-4 border-slate-200 rounded-md bg-slate-900 ${
+      worlds.slots.get(world_id)?.time.animation
+        ? "brightness-50 pointer-events-none"
+        : "pointer-events-auto"
+    }`}
       // onMouseLeave={() => {
       //   // if (!is_focus) {
       //     setSelection(undefined)
