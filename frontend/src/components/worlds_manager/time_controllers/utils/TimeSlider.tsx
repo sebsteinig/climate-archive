@@ -61,7 +61,25 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
     { value: 10, label: 'N'},
     { value: 11, label: 'D'},
   ];
-  const marksProps = labels ? { marks } : {};
+
+  const marks_no_labels = [
+    { value: 0},
+    { value: 1},
+    { value: 2},
+    { value: 3},
+    { value: 4},
+    { value: 5},
+    { value: 6},
+    { value: 7},
+    { value: 8},
+    { value: 9},
+    { value: 10},
+    { value: 11},
+  ];
+
+  console.log(labels)
+
+  const marksProps = labels && state_worlds.slots.size <= 18 ? { marks } : {marks_no_labels};
 
   // The slider value shoullf alway be in sync with the frame weight
   // of the current_frame. This frame weight might be updated by different
@@ -92,6 +110,78 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
     // Clear the interval when the component is unmounted.
     return () => clearInterval(intervalId);
   }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
+
+  const getSliderStyles = () => {
+    const baseStyles = {
+      transition: 'none',
+      "& .MuiSlider-thumb": {
+        width: 25, 
+        height: 25, 
+        backgroundColor: 'rgb(16, 185, 129)',
+        boxShadow: '0px 0px 0 0px rgb(16, 185, 129)',
+        "&:hover": {
+          backgroundColor: 'rgb(16, 185, 129)', 
+          boxShadow: '0px 0px 10px 1px rgb(16, 185, 129)',
+        },
+        "&:active": {
+          boxShadow: '0px 0px 20px 2px rgb(16, 185, 129)',
+        },
+      },
+      "& .MuiSlider-track": {
+        height: 8, // Adjust as needed for track thickness
+        backgroundColor: 'rgb(16, 185, 129)', // Green
+      },
+      "& .MuiSlider-rail": {
+        height: 8, // Adjust as needed for rail thickness
+        backgroundColor: 'rgb(5, 150, 105)',
+      },
+      "& .MuiSlider-markLabel": {
+        color: "lightgray", // light gray color for the label text
+        fontSize: 10.5
+      }
+    }
+  
+    if (state_worlds.slots.size <= 4) {
+      return baseStyles;
+    }
+  
+    return {
+      ...baseStyles,
+      padding: '0 0 10px 0',
+      // margins: 0,
+      margin: '2px 0 8px 0',
+      transition: 'none',            
+
+      "& .MuiSlider-thumb": {
+        width: 15, 
+        height: 15, 
+        backgroundColor: 'rgb(16, 185, 129)',
+        boxShadow: '0px 0px 0 0px rgb(16, 185, 129)',
+        "&:hover": {
+          backgroundColor: 'rgb(16, 185, 129)', 
+          boxShadow: '0px 0px 10px 1px rgb(16, 185, 129)',
+        },
+        "&:active": {
+          boxShadow: '0px 0px 20px 2px rgb(16, 185, 129)',
+        },
+      },
+      "& .MuiSlider-track": {
+        height: 5, // Adjust as needed for track thickness
+        backgroundColor: 'rgb(16, 185, 129)', // Green
+      },
+      "& .MuiSlider-rail": {
+        height: 5, // Adjust as needed for rail thickness
+        backgroundColor: 'rgb(5, 150, 105)',
+      },
+      "& .MuiSlider-markLabel": {
+        color: "lightgray", // light gray color for the label text
+        fontSize: 8.0,
+        padding: 0,
+        top: '15px' // Adjust this value as needed
+
+      }
+    };
+  };
 
   return (
     <div style={{ padding: '0 3px' }} className={className}>
@@ -150,37 +240,7 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
         max={max}
         step={0.01}
         {...marksProps}
-        sx={{
-          "& .MuiSlider-thumb": {
-            width: 25, 
-            height: 25, 
-            backgroundColor: 'rgb(16, 185, 129)',
-            boxShadow: '0px 0px 0 0px rgb(16, 185, 129)',
-            transition: 'none',
-            "&:hover": {
-              backgroundColor: 'rgb(16, 185, 129)', 
-              boxShadow: '0px 0px 10px 1px rgb(16, 185, 129)',
-              transition: 'none',            
-            },
-            "&:active": {
-              boxShadow: '0px 0px 20px 2px rgb(16, 185, 129)',
-              transition: 'none',            
-            },
-          },
-          "& .MuiSlider-track": {
-            height: 8, // Adjust as needed for track thickness
-            backgroundColor: 'rgb(16, 185, 129)', // Green
-            transition: 'none',
-          },
-          "& .MuiSlider-rail": {
-            height: 8, // Adjust as needed for rail thickness
-            backgroundColor: 'rgb(5, 150, 105)',
-            transition: 'none',
-          },
-          "& .MuiSlider-markLabel": {
-            color: "lightgray" // light gray color for the label text
-          }
-        }}
+        sx={ getSliderStyles() }
         valueLabelDisplay="auto"
       />
     </div>

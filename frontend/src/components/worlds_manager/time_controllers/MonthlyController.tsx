@@ -40,13 +40,15 @@ export const MonthlyController = forwardRef<IControllerRef, MonthlyControllerPro
 
     return (
       <div
-        className={`select-none w-full pt-2 px-7 ${
+        className={`select-none w-full ${
+          worlds.slots.size <= 4 ? 'pt-2 px-7' : 'pt-0 px-4'
+        } ${
           worlds.observed_world === world_id || worlds.slots.get(world_id)?.time.animation == true
             ? "brightness-50 pointer-events-none"
             : "pointer-events-auto"
         }`}
       >
-        <div className="w-full my-2">
+      <div className={`w-full ${worlds.slots.size <= 4 ? 'my-2' : 'my-0'}`}>
           <TimeSlider
             world_id={world_id}
             data={data}
@@ -55,6 +57,7 @@ export const MonthlyController = forwardRef<IControllerRef, MonthlyControllerPro
             labels={worlds.slots.size <= 4 ? false : true}
           />
         </div>
+        {/* no month buttons in case of a lot of worlds to save space*/}
         {worlds.slots.size <= 4 ? (
           <div
             className="
