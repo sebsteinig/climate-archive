@@ -87,6 +87,18 @@ export function gridOf(n: number) {
       width = 3
       height = 3
       break
+    case 10:
+    case 11:
+    case 12:
+      width = 4
+      height = 3
+      break
+    case 13:
+    case 14:
+    case 15:
+      width = 5
+      height = 3
+      break
     default:
       let grid = _gridOf(n)
       width = grid.width
