@@ -143,21 +143,21 @@ const Month = forwardRef((props: MonthProps, ref: RefObject<InputRef>) => {
 
   // reset highlights if frame gets changed outside of the controller
   // e.g. by time slider or play/pause button
-  useEffect(() => {
-    // 
-    const checkForChanges = () => {
-        let frame = current_frame.current.get(world_id);
-        if (!frame ) return;
-        if (frame.swapping == true && !frame.controllerFlag) {
-          resetHighlight();
-        }
-        // console.log(newValue)
-    };
-    // Set up the interval
-    const intervalId = setInterval(checkForChanges, 10);
-    // Clear the interval when the component is unmounted.
-    return () => clearInterval(intervalId);
-  }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
+  // useEffect(() => {
+  //   // 
+  //   const checkForChanges = () => {
+  //       let frame = current_frame.current.get(world_id);
+  //       if (!frame ) return;
+  //       if (frame.swapping == true && !frame.controllerFlag) {
+  //         resetHighlight();
+  //       }
+  //       // console.log(newValue)
+  //   };
+  //   // Set up the interval
+  //   const intervalId = setInterval(checkForChanges, 1);
+  //   // Clear the interval when the component is unmounted.
+  //   return () => clearInterval(intervalId);
+  // }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
 
 
   return (

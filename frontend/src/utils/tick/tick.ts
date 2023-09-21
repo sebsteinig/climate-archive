@@ -80,15 +80,12 @@ export function tickBuilder(
       }
     } 
 
-
-
-
-
     if (frame.swap_flag) {
 
       if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
+        
         frame = await current_frame.current.update(
           world_id,
           world_data,

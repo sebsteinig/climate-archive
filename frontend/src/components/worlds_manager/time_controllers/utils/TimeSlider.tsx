@@ -29,6 +29,36 @@ type Props = {
   onSliderChange?: (value: number) => void;
 };
 
+const marks = [
+  { value: 0, label: 'J'},
+  { value: 1, label: 'F'},
+  { value: 2, label: 'M'},
+  { value: 3, label: 'A'},
+  { value: 4, label: 'M'},
+  { value: 5, label: 'J'},
+  { value: 6, label: 'J'},
+  { value: 7, label: 'A'},
+  { value: 8, label: 'S'},
+  { value: 9, label: 'O'},
+  { value: 10, label: 'N'},
+  { value: 11, label: 'D'},
+];
+
+const marks_no_labels = [
+  { value: 0},
+  { value: 1},
+  { value: 2},
+  { value: 3},
+  { value: 4},
+  { value: 5},
+  { value: 6},
+  { value: 7},
+  { value: 8},
+  { value: 9},
+  { value: 10},
+  { value: 11},
+];
+
 // Define the TimeSlider component
 export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame, controller_ref, data, labels, onSliderChange }) => {
 
@@ -38,7 +68,6 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
   // get number of timesteps
   const max = useMemo(() => {
     if (data.time.mode === TimeMode.mean) {
-      console.log(data.collection);
       return data.collection.exps.length;
     } else {
       const frame = current_frame.current.get(world_id);
@@ -46,38 +75,6 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
       return timestep ?? 0;
     }
   }, [current_frame.current.get(world_id)]);
-
-  const marks = [
-    { value: 0, label: 'J'},
-    { value: 1, label: 'F'},
-    { value: 2, label: 'M'},
-    { value: 3, label: 'A'},
-    { value: 4, label: 'M'},
-    { value: 5, label: 'J'},
-    { value: 6, label: 'J'},
-    { value: 7, label: 'A'},
-    { value: 8, label: 'S'},
-    { value: 9, label: 'O'},
-    { value: 10, label: 'N'},
-    { value: 11, label: 'D'},
-  ];
-
-  const marks_no_labels = [
-    { value: 0},
-    { value: 1},
-    { value: 2},
-    { value: 3},
-    { value: 4},
-    { value: 5},
-    { value: 6},
-    { value: 7},
-    { value: 8},
-    { value: 9},
-    { value: 10},
-    { value: 11},
-  ];
-
-  console.log(labels)
 
   const marksProps = labels && state_worlds.slots.size <= 18 ? { marks } : {marks_no_labels};
 
@@ -106,7 +103,7 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
         }
     };
     // Set up the interval
-    const intervalId = setInterval(updateSlider, 10);
+    const intervalId = setInterval(updateSlider, 50);
     // Clear the interval when the component is unmounted.
     return () => clearInterval(intervalId);
   }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
@@ -183,6 +180,9 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
     };
   };
 
+  const sliderStyles = useMemo(() => getSliderStyles(), [state_worlds.slots.size]);
+
+
   return (
     <div style={{ padding: '0 3px' }} className={className}>
       <Slider 
@@ -238,9 +238,9 @@ export const TimeSlider: React.FC<Props> = ({ world_id, className, current_frame
         }}
         min={0}
         max={max}
-        step={0.01}
+        step={0.010}
         {...marksProps}
-        sx={ getSliderStyles() }
+        sx={ sliderStyles }
         valueLabelDisplay="auto"
       />
     </div>
