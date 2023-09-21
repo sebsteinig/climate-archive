@@ -63,19 +63,19 @@ export const TimeController = forwardRef<ControllerRef, Props>(
     const currentFrame = useFrameRef()
 
     useEffect(() => {
-      pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
+      pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame, toggleAnimation)
     }, [active_variables])
     useEffect(() => {
-      pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
+      pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame, toggleAnimation)
     }, [observed_id])
     useImperativeHandle(ref, () => {
       return {
         play() {
-          play(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
+          play(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame, toggleAnimation)
         },
         pause() {
           // pause(tween_ref, setPlaying)
-          pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame)
+          pause(data, world_id, worldsRef, current_frame, tween_ref, setPlaying, currentFrame, toggleAnimation)
         },
         stop() {
           stop(data, world_id, current_frame, tween_ref, setPlaying)
@@ -219,26 +219,13 @@ function pause(
   currentFrame: any,
   toggleAnimation: any
 ) {
-     // check whether current time controller is monthly climatology
-    // if so, start animation for all monthly time controllers (sync)
-    let synced_ids = [];
-    
-    let activeController = worldsRef.current.slots.get(world_id).time.controller
 
+    let sync_flags = [];
     for (let w of worldsRef.current.slots) {
-      const frame = current_frame.current.get(w[0]);  
-      if (!frame ) return;
-      let passiveController = w[1].time.controller
-      if ( w[0] == world_id || ( activeController == TimeControllerType.monthly ) && ( passiveController == TimeControllerType.monthly )) {
-        synced_ids.push(w[0])
+        sync_flags.push(false)
       }
-    }
-    
-    toggleAnimation(synced_ids)
 
-    tween_ref.current?.kill()
-    setPlaying(false)
-
+      toggleAnimation(undefined, sync_flags)
 
 }
 function stop(
@@ -267,7 +254,7 @@ function play(
 ) {
     // check whether current time controller is monthly climatology
     // if so, start animation for all monthly time controllers (sync)
-    let synced_ids = [];
+    let sync_flags = [];
     let activeController = worldsRef.current.slots.get(world_id).time.controller
 
     for (let w of worldsRef.current.slots) {
@@ -275,32 +262,13 @@ function play(
       if (!frame ) return;
       let passiveController = w[1].time.controller
       if ( w[0] == world_id || ( activeController == TimeControllerType.monthly ) && ( passiveController == TimeControllerType.monthly )) {
-        synced_ids.push(w[0])
+        sync_flags.push(true)
+      } else {
+        sync_flags.push(false)
       }
     }
     
-    toggleAnimation(synced_ids)
-
-    // artificial delay to wait (i.e. hope) that component has rerendered
-    setTimeout(() => {
-      for (let idx of synced_ids) {
-        const frame = current_frame.current.get(idx);  
-        switch (data.time.kind) {
-          case TimeKind.circular:
-            tween_ref.current = circular(frame, tween_ref, data)
-            break
-          case TimeKind.once:
-            tween_ref.current = once(frame, tween_ref, data, () => {
-              setPlaying(false)
-            })
-            break
-          case TimeKind.walk:
-            tween_ref.current = walk(frame, tween_ref, data)
-            break
-        }
-        setPlaying(true)
-      }
-    }, 500);
+    toggleAnimation(world_id, sync_flags)
 
 }
 

@@ -10,6 +10,8 @@ import { compute, getPath } from "./tick.utils"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { PanelRef } from "@/components/worlds_manager/world_panel/Panel"
 import { CanvasRef } from "../hooks/useCanvas"
+import { useStore } from "@/utils/store/store"
+import { jumpTo } from "@/utils/store/worlds/time/loop"
 
 export type TickDataState = {
   min: number[]
@@ -50,6 +52,9 @@ export function tickBuilder(
   active_variables: EVarID[],
   canvas: CanvasRef,
 ): TickFn {
+
+  const worlds = useStore((state) => state.worlds)
+
   return async function tick(delta: number) {
     const res: Map<EVarID, TickData> = new Map()
     let frame = current_frame.current.get(world_id)
@@ -62,11 +67,25 @@ export function tickBuilder(
       }
     let update_texture = false
 
+    // console.log(world_id, frame.weight)
+    // handle play/pause loop animation
+    if (worlds.animated_world !== undefined) {
+      // only update the world selected by the user (i.e. key world)
+      // and sync other worlds with the key world
+      if (world_id == worlds.animated_world) {
+        jumpTo(frame, frame.weight + delta, false)
+      } else {
+        let targetWeight = current_frame.current.get(worlds.animated_world)?.weight
+        jumpTo(frame, targetWeight, false)
+      }
+    } 
+
     if (frame.swap_flag) {
 
       if (!frame.swapping) {
         frame.swapping = true
         update_texture = true
+        
         frame = await current_frame.current.update(
           world_id,
           world_data,

@@ -44,17 +44,17 @@ export function goto(frame: TimeFrame, to: number, duration: number, controllerF
   })
 }
 
-export function jumpTo(frame: TimeFrame, to: number, controllerFlag: boolean, onComplete?: () => void) {
+export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: boolean, onComplete?: () => void) {
   let previous_idx = Math.floor(frame.weight)
-  let new_idx = Math.floor(to)
+  let new_idx = Math.floor(targetWeight)
   frame.controllerFlag = controllerFlag
+  if (targetWeight < frame.timesteps - EPSILON) {
+    frame.weight = targetWeight
+  } else {
+    frame.weight = 0.
+  }
 
-  const rounded_to = Math.round(to)
-  const duration = 0 // 5s
-  frame.weight = to
-  //     new_idx = Math.floor(frame.weight)
-
-  if (previous_idx !== new_idx && new_idx !== to) {
+  if (previous_idx !== new_idx && new_idx !== targetWeight) {
         frame.swap_flag = true
   }
 

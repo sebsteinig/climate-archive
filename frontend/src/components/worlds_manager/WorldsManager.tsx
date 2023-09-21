@@ -65,7 +65,7 @@ export function WorldManager(props: Props) {
       <div className={`flex flex-grow h-full`}>
         <div
           ref={container_ref}
-          className={`w-full h-full grid gap-4 `}
+          className={`w-full h-full grid ${worlds_slots.size <= 4 ? 'gap-4' : 'gap-1'}`}
           style={{
             gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${grid.rows}, minmax(0, 1fr))`,
