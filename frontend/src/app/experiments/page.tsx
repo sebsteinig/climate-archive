@@ -27,6 +27,7 @@ async function loadExperiments(request: RequestMultipleTexture) {
       return { id: exp, metadata: [] }
     }),
   } as Experiments
+  // console.log(collection)
   return collection
 }
 

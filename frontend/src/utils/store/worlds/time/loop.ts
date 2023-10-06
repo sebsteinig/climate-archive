@@ -48,11 +48,15 @@ export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: b
   let previous_idx = Math.floor(frame.weight)
   let new_idx = Math.floor(targetWeight)
   frame.controllerFlag = controllerFlag
-  if (targetWeight < frame.timesteps - EPSILON) {
-    frame.weight = targetWeight
-  } else {
-    frame.weight = 0.
-  }
+
+  // works for monthly data, not for paleo
+  // if (targetWeight < frame.timesteps - EPSILON) {
+  //   frame.weight = targetWeight
+  // } else {
+  //   frame.weight = 0.
+  // }
+
+  frame.weight = targetWeight
 
   if (previous_idx !== new_idx && new_idx !== targetWeight) {
         frame.swap_flag = true

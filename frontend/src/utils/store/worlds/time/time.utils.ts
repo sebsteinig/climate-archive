@@ -45,6 +45,7 @@ export async function sync(
       data.collection.exps[next_time].id,
       variable,
     )
+
     return {
       mean: {
         current: {
@@ -102,6 +103,7 @@ export async function updateFrame(
       frame.variables.delete(variable)
     }
   }
+
   const current_time = Math.floor(frame.weight)
   let next_time = current_time + 1
   for (let variable of active_variables) {
@@ -113,19 +115,25 @@ export async function updateFrame(
       continue
     }
     if (data.time.mode === TimeMode.mean) {
+
       if (!state.mean) continue
       const size = data.collection.exps.length
       if (next_time >= size) {
         next_time = current_time
       }
-      const current_info = await database_provider.getInfo(
-        data.collection.exps[current_time].id,
-        variable,
-      )
-      const next_info = await database_provider.getInfo(
-        data.collection.exps[next_time].id,
-        variable,
-      )
+
+      // const current_info = await database_provider.getInfo(
+      //   data.collection.exps[current_time].id,
+      //   variable,
+      // )
+
+      // const next_info = await database_provider.getInfo(
+      //   data.collection.exps[next_time].id,
+      //   variable,
+      // )
+
+      const current_info = data.collection.allInfo[current_time]
+      const next_info = data.collection.allInfo[next_time]
 
       state.mean.current = {
         exp: data.collection.exps[current_time],

@@ -59,6 +59,7 @@ export default function PaleoClimatePage() {
         )
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
+        console.log(publication)
         return publication
       })
       .then((publication) => {

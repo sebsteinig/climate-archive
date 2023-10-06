@@ -11,6 +11,7 @@ import { Graph } from "../store/graph/graph.type"
 import { EVarID } from "../store/variables/variable.types"
 import useSWR from "swr"
 import { ApiError } from "../errors/errors"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
@@ -39,6 +40,26 @@ export async function searchPublication(query: SearchPublication) {
       })
 
       let response = await getData<Publication[]>(url.href)
+      console.log(response)
+
+      const  exps  = response[0].exps;
+
+      // Fetching additional info for each item in `exps` array
+      let allInfo = [];
+
+      await Promise.all(
+        exps.map( async (exp) => {
+          const info = await database_provider.getInfo(exp.id, 6)
+          allInfo.push(info);
+        }
+      ));
+
+        // Adding the additional info to the response object
+        response[0] = {
+          ...response[0],
+          allInfo
+      };
+      // // const info = await database_provider.getInfo('texqe', 6)
       console.log(response)
       return response
     }
@@ -128,7 +149,9 @@ export function searchLooking(query: { for: string }) {
  * @returns data
  */
 async function getData<T>(url: string) {
+  console.log(url)
   let data = await axios.get(url)
+  console.log(data)
   return data.data as T
 }
 

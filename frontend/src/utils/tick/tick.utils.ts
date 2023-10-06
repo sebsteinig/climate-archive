@@ -188,7 +188,7 @@ export async function compute(
   world_data: WorldData,
 ): Promise<TickData | undefined> {
   const paths = getPath(world_data.time.mode, data, 0)
-  console.log(paths)
+  // console.log(paths)
   if (paths.length === 0) return
   if (
     !canvas.current ||

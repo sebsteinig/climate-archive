@@ -176,6 +176,7 @@ class DatabaseProvider {
 
   async getInfo(exp_id: string, variable: EVarID) {
     let texture_info = this.info_cache.get({ exp_id, variable })
+    
     if (!texture_info) {
       texture_info = await this.database.textures_info.get([
         exp_id,
