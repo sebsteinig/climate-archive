@@ -88,8 +88,11 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
 
   function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
     // always update the own data
-    const thisFrame = loader.load(data.textures[0].current_url)
-    const nextFrame = loader.load(data.textures[0].next_url)
+
+    // create the texture from the image blob
+    const thisFrame = loader.load(URL.createObjectURL(data.textures[0].current_url.image))
+    const nextFrame = loader.load(URL.createObjectURL(data.textures[0].next_url.image))
+
     thisFrame.wrapS = thisFrame.wrapT = THREE.RepeatWrapping
     nextFrame.wrapS = nextFrame.wrapT = THREE.RepeatWrapping
     materialRef.current.uniforms.thisDataFrame.value = thisFrame

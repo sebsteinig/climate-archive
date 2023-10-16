@@ -1,5 +1,5 @@
 "use client"
-import { getImageArrayBuffer, select, selectAll } from "../api/api"
+import { getImageArrayBuffer, getImageAsBlob, select, selectAll } from "../api/api"
 import { Texture, TextureInfo } from "../database/database.types"
 import { Database } from "@/utils/database/database"
 import {
@@ -24,6 +24,7 @@ class DatabaseProvider {
   info_cache!: LRUCache<{ exp_id: string; variable: EVarID }, TextureInfo>
 
   constructor() {
+
     this.database = new Database()
     this.cache = new LRUCache({
       max: 100,
@@ -146,11 +147,24 @@ class DatabaseProvider {
     return texture
   }
 
+  async getImageBase64(path: string) {
+    const texture = await this.getTexture(path)
+    const base64 = btoa(
+      new Uint8Array(texture.image).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        "",
+      ),
+    )
+    console.log('base64')
+    return base64
+  }
+
   async loadFromServer(path: string) {
     let texture = await this.database.textures.get({ path })
     if (texture) return texture
     try {
-      const image_blob = await getImageArrayBuffer(path)
+      // const image_blob = await getImageArrayBuffer(path)
+      const image_blob = await getImageAsBlob(path)
       texture = {
         path,
         image: image_blob,
@@ -163,29 +177,23 @@ class DatabaseProvider {
     return texture!
   }
 
-  async getImageBase64(path: string) {
-    const texture = await this.getTexture(path)
-    const base64 = btoa(
-      new Uint8Array(texture.image).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        "",
-      ),
-    )
-    return base64
-  }
-
   async getInfo(exp_id: string, variable: EVarID) {
     let texture_info = this.info_cache.get({ exp_id, variable })
-    
     if (!texture_info) {
-      texture_info = await this.database.textures_info.get([
-        exp_id,
-        EVarID[variable],
-      ])
+      console.log([exp_id, EVarID[variable]])
+      try {
+        texture_info = await this.database.textures_info.get([exp_id, EVarID[variable]]);
+      } catch (err) {
+        console.error("Error fetching from database:", err);
+      }
+      console.log(texture_info)
     }
+
     if (!texture_info) {
       throw new TextureMustBeLoaded({ variable, exp_id })
     }
+
+
     return texture_info
   }
 
@@ -195,6 +203,7 @@ class DatabaseProvider {
     if (!texture) {
       texture = await this.database.textures.get({ path: path })
       if (!texture) {
+        console.log('load from server')
         texture = await this.loadFromServer(path)
       }
       this.cache.set(path, texture)

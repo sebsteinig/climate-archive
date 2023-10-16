@@ -151,7 +151,6 @@ export function searchLooking(query: { for: string }) {
 async function getData<T>(url: string) {
   console.log(url)
   let data = await axios.get(url)
-  console.log(data)
   return data.data as T
 }
 
@@ -225,6 +224,17 @@ export async function getImageArrayBuffer(path: string) {
   }
 }
 
+export async function getImageAsBlob(path: string) {
+  let url = new URL(trimRoutes(path, 7), URL_IMAGE);
+  try {
+    let res = await axios.get(url.href, {
+      responseType: "blob",
+    });
+    return res.data;
+  } catch (error) {
+    throw new ApiError();
+  }
+}
 /**
  * function that retrieve netCDF data at a location to be displayed
  * @todo (MOCK DATA AT THE MOMENT)

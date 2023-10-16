@@ -163,23 +163,38 @@ async function getTextureFromPath(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ) {
+          
   const texture = await database_provider.getTexture(path)
-  const blob = new Blob([texture.image], {
-    type: `image/${info.extension.toLowerCase()}`,
-  })
-  const bitmap = await createImageBitmap(blob)
-  const url = crop(
-    canvas,
-    ctx,
-    bitmap,
-    path,
-    time,
-    vertical,
-    info.xsize,
-    info.ysize,
-  )
-  return url
+  console.log(texture)
+
+  // const blob = new Blob([texture.image], {
+  //   type: `image/${info.extension.toLowerCase()}`,
+  // })
+  // const bmpLabel = `create bitmap for world ${Date.now()}`;
+  // console.time(bmpLabel);
+  // const bitmap = await createImageBitmap(blob, 0, 0, 10, 10)
+  // console.timeEnd(bmpLabel);
+
+  // const cropLabel = `ccrop for world ${Date.now()}`;
+  // console.time(cropLabel);
+
+  // const url = crop(
+  //   canvas,
+  //   ctx,
+  //   bitmap,
+  //   path,
+  //   time,
+  //   vertical,
+  //   info.xsize,
+  //   info.ysize,
+  // )
+  // console.timeEnd(cropLabel);
+  // console.log(url)
+  // return url
+  return texture
 }
+
+
 
 export async function compute(
   variable: EVarID,
@@ -188,7 +203,7 @@ export async function compute(
   world_data: WorldData,
 ): Promise<TickData | undefined> {
   const paths = getPath(world_data.time.mode, data, 0)
-  // console.log(paths)
+  console.log(paths)
   if (paths.length === 0) return
   if (
     !canvas.current ||
@@ -213,6 +228,8 @@ export async function compute(
     current_info = data.ts!.info
     next_info = data.ts!.info
   }
+
+          
 
   const textures = await Promise.all(
     paths.map(async ({ current_path, next_path }) => {
@@ -239,8 +256,10 @@ export async function compute(
       }
     }),
   )
+
   if (world_data.time.mode === TimeMode.mean) {
     return {
+      // textures,
       textures,
       current: processInfo(variable, 0, 0, data.mean!.current.info, true),
       next: processInfo(variable, 0, 0, data.mean!.current.info, true),
