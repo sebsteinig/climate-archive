@@ -92,6 +92,10 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     // create the texture from the image blob
     const thisFrame = loader.load(URL.createObjectURL(data.textures[0].current_url.image))
     const nextFrame = loader.load(URL.createObjectURL(data.textures[0].next_url.image))
+    // const thisFrame = loader.load(data.textures[0].current_url)
+    // const nextFrame = loader.load(data.textures[0].next_url)
+
+    console.log(thisFrame)
 
     thisFrame.wrapS = thisFrame.wrapT = THREE.RepeatWrapping
     nextFrame.wrapS = nextFrame.wrapT = THREE.RepeatWrapping

@@ -69,6 +69,8 @@ class DatabaseProvider {
       /** TODO : resolutions */
     }
 
+    console.log('private')
+
     if (!only_mean) {
       await this._loadPaths(info.paths_ts.paths, info)
     }

@@ -98,20 +98,19 @@ export function tickBuilder(
         //await update(frame, active_variables, world_data)
 
 
+        const computeLabel = `compute texture for world ${world_id} ${Date.now()}`;
+        console.time(computeLabel);
 
         for (let [variable, state] of frame.variables) {
         
-          const computeLabel = `compute texture for world ${world_id} and variable ${variable} ${Date.now()}`;
-          console.time(computeLabel);
           const data = await compute(variable, state, canvas, world_data)
-          console.log(data)
-          console.timeEnd(computeLabel);
 
           if (data) {
             res.set(variable, data)
           }
         }
 
+        console.timeEnd(computeLabel);
 
         if (world_id === current_frame.current._observed_id) {
           current_frame.current.saveReference(res)

@@ -116,7 +116,7 @@ function processInfo(
       }[][]
     }[]
   }
-  const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
+  const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix_ts)
 
   const min = bound_matrices.map((matrix) => {
     if (mean) {
@@ -178,10 +178,14 @@ async function getTextureFromPath(
   // const cropLabel = `ccrop for world ${Date.now()}`;
   // console.time(cropLabel);
 
+  // Convert the Blob into an ObjectURL
+  // const imageURL = URL.createObjectURL(texture.image);
+
+
   // const url = crop(
   //   canvas,
   //   ctx,
-  //   bitmap,
+  //   img,
   //   path,
   //   time,
   //   vertical,
@@ -189,10 +193,60 @@ async function getTextureFromPath(
   //   info.ysize,
   // )
   // console.timeEnd(cropLabel);
-  // console.log(url)
-  // return url
   return texture
 }
+
+async function getTextureFromPathCrop(
+  path: string,
+  time: number,
+  vertical: number,
+  info: TextureInfo,
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+) {
+          
+
+  const textureLabel = `getTexture ${Date.now()}`;
+  console.time(textureLabel);
+  const texture = await database_provider.getTexture(path)
+  console.log(texture)
+  console.timeEnd(textureLabel);
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    const cropLabel = `cropTexture ${Date.now()}`;
+    console.time(cropLabel);
+
+    img.onload = function() {
+      try {
+        const url = crop(
+          canvas,
+          ctx,
+          img,
+          path,
+          time,
+          vertical,
+          info.xsize,
+          info.ysize,
+        );
+      
+        console.log(url)
+        console.timeEnd(cropLabel);
+        resolve(url); // resolve the Promise with the url
+      } catch(error) {
+        reject(error); // in case of any errors during the crop, reject the Promise
+      }
+    };
+
+    img.onerror = function() {
+      reject(new Error("Error loading the image."));
+    };
+
+    img.src = URL.createObjectURL(texture.image);
+  });
+}
+
 
 
 
@@ -234,6 +288,7 @@ export async function compute(
   const textures = await Promise.all(
     paths.map(async ({ current_path, next_path }) => {
       const current_url = await getTextureFromPath(
+      // const current_url = await getTextureFromPathCrop(
         current_path,
         current_frame,
         0,
@@ -242,6 +297,7 @@ export async function compute(
         canvas.current!.current.ctx!,
       )
       const next_url = await getTextureFromPath(
+      // const next_url = await getTextureFromPathCrop(
         next_path,
         next_frame,
         0,
@@ -249,6 +305,8 @@ export async function compute(
         canvas.current!.next.canvas,
         canvas.current!.next.ctx!,
       )
+
+      console.log(current_url, next_url)
 
       return {
         current_url,
@@ -259,7 +317,6 @@ export async function compute(
 
   if (world_data.time.mode === TimeMode.mean) {
     return {
-      // textures,
       textures,
       current: processInfo(variable, 0, 0, data.mean!.current.info, true),
       next: processInfo(variable, 0, 0, data.mean!.current.info, true),
