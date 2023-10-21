@@ -79,11 +79,16 @@ export function crop(
   canvas.width = xsize
   canvas.height = ysize
 
+  const cacheLabel = `getCache ${Date.now()}`;
+  console.time(cacheLabel);
   let res = cache.get(JSON.stringify({ path, frame, vertical }))
+  console.timeEnd(cacheLabel);
   if (res) {
+    console.log(res)
     return res
   }
 
+  console.log('cropping')
   ctx.drawImage(
     img,
     frame * xsize,
@@ -116,6 +121,7 @@ function processInfo(
       }[][]
     }[]
   }
+  // const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
   const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix_ts)
 
   const min = bound_matrices.map((matrix) => {
@@ -165,7 +171,6 @@ async function getTextureFromPath(
 ) {
           
   const texture = await database_provider.getTexture(path)
-  console.log(texture)
 
   // const blob = new Blob([texture.image], {
   //   type: `image/${info.extension.toLowerCase()}`,
@@ -215,8 +220,6 @@ async function getTextureFromPathCrop(
   return new Promise((resolve, reject) => {
     const img = new Image();
 
-    const cropLabel = `cropTexture ${Date.now()}`;
-    console.time(cropLabel);
 
     img.onload = function() {
       try {
@@ -232,7 +235,6 @@ async function getTextureFromPathCrop(
         );
       
         console.log(url)
-        console.timeEnd(cropLabel);
         resolve(url); // resolve the Promise with the url
       } catch(error) {
         reject(error); // in case of any errors during the crop, reject the Promise
@@ -242,8 +244,9 @@ async function getTextureFromPathCrop(
     img.onerror = function() {
       reject(new Error("Error loading the image."));
     };
-
-    img.src = URL.createObjectURL(texture.image);
+    
+    img.src = URL.createObjectURL(texture.image)
+    
   });
 }
 
@@ -257,7 +260,6 @@ export async function compute(
   world_data: WorldData,
 ): Promise<TickData | undefined> {
   const paths = getPath(world_data.time.mode, data, 0)
-  console.log(paths)
   if (paths.length === 0) return
   if (
     !canvas.current ||
@@ -283,8 +285,6 @@ export async function compute(
     next_info = data.ts!.info
   }
 
-          
-
   const textures = await Promise.all(
     paths.map(async ({ current_path, next_path }) => {
       const current_url = await getTextureFromPath(
@@ -296,6 +296,7 @@ export async function compute(
         canvas.current!.current.canvas,
         canvas.current!.current.ctx!,
       )
+
       const next_url = await getTextureFromPath(
       // const next_url = await getTextureFromPathCrop(
         next_path,
@@ -305,8 +306,6 @@ export async function compute(
         canvas.current!.next.canvas,
         canvas.current!.next.ctx!,
       )
-
-      console.log(current_url, next_url)
 
       return {
         current_url,

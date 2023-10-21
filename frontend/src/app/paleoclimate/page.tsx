@@ -57,6 +57,21 @@ export default function PaleoClimatePage() {
           },
           true,
         )
+        // console.log(publication)
+        // await database_provider.load(
+        //   {
+        //     exp_id: ["texqe"],
+        //     extension: "webp",
+        //   },
+        //   true,
+        // )
+        // await database_provider.load(
+        //   {
+        //     exp_id: ["texqd"],
+        //     extension: "webp",
+        //   },
+        //   true,
+        // )
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
         console.log(publication)

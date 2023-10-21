@@ -173,7 +173,8 @@ export function searchLooking(query: { for: string }) {
  */
 async function getData<T>(url: string) {
   console.log(url)
-  let data = await axios.get(url)
+  // let data = await axios.get(url)
+  let data = await axios.get(url + '&refresh=True')
   return data.data as T
 }
 
@@ -186,7 +187,6 @@ async function getData<T>(url: string) {
 export async function select(id: string, query: SelectSingleParameter) {
   try {
     let url = new URL(`select/${id}/`, URL_API)
-    console.log(url)
     Object.entries(query).forEach((bind) => {
       const [key, value] = bind
       if (value) {
@@ -215,6 +215,8 @@ export async function selectAll(query: SelectCollectionParameter) {
         url.searchParams.append(key, JSON.stringify(value))
       }
     })
+    console.log(url.href)
+
     let data = await axios.get(url.href)
     return data.data as SelectCollectionResult
   } catch (error) {

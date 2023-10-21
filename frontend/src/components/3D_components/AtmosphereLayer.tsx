@@ -95,8 +95,6 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     // const thisFrame = loader.load(data.textures[0].current_url)
     // const nextFrame = loader.load(data.textures[0].next_url)
 
-    console.log(thisFrame)
-
     thisFrame.wrapS = thisFrame.wrapT = THREE.RepeatWrapping
     nextFrame.wrapS = nextFrame.wrapT = THREE.RepeatWrapping
     materialRef.current.uniforms.thisDataFrame.value = thisFrame

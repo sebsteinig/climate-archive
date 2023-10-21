@@ -26,11 +26,12 @@ class DatabaseProvider {
   constructor() {
 
     this.database = new Database()
+
     this.cache = new LRUCache({
-      max: 100,
+      max: 1000,
     })
     this.info_cache = new LRUCache({
-      max: 100,
+      max: 1000,
     })
   }
 
@@ -68,8 +69,6 @@ class DatabaseProvider {
       variable: res.variable_name,
       /** TODO : resolutions */
     }
-
-    console.log('private')
 
     if (!only_mean) {
       await this._loadPaths(info.paths_ts.paths, info)
@@ -113,6 +112,7 @@ class DatabaseProvider {
     })
     await Promise.all(
       response.map(async (res) => {
+        console.log("load")
         await this._loadFromSingleResult(res, only_mean)
       }),
     )
@@ -122,6 +122,7 @@ class DatabaseProvider {
     requested_textures: RequestMultipleTexture,
     only_mean?: boolean,
   ) {
+    console.log(requested_textures)
     const response = await selectAll({
       vars: requested_textures.variables,
       ids: requested_textures.exp_ids,
@@ -132,8 +133,10 @@ class DatabaseProvider {
       ry: requested_textures.resolution?.y,
       /** TODO : nan_value_encoding, chunks, threshold */
     })
+    console.log(response)
     await Promise.all(
       Object.entries(response).flatMap(async (tmp) => {
+        console.log(tmp)
         const [_, single_result_arr] = tmp
         await Promise.all(
           single_result_arr.map(async (res) => {
@@ -162,8 +165,10 @@ class DatabaseProvider {
   }
 
   async loadFromServer(path: string) {
-    let texture = await this.database.textures.get({ path })
-    if (texture) return texture
+    // console.log(path)
+    // let texture = await this.database.textures.get({ path })
+    // if (texture) return texture
+    let texture
     try {
       // const image_blob = await getImageArrayBuffer(path)
       const image_blob = await getImageAsBlob(path)
@@ -182,19 +187,24 @@ class DatabaseProvider {
   async getInfo(exp_id: string, variable: EVarID) {
     let texture_info = this.info_cache.get({ exp_id, variable })
     if (!texture_info) {
-      console.log([exp_id, EVarID[variable]])
       try {
         texture_info = await this.database.textures_info.get([exp_id, EVarID[variable]]);
       } catch (err) {
         console.error("Error fetching from database:", err);
       }
-      console.log(texture_info)
     }
 
     if (!texture_info) {
+      // await database_provider.load(
+      //   {
+      //     exp_id: [exp_id],
+      //     extension: "webp",
+      //   },
+      //   true,
+      // )
+      // texture_info = await this.database.textures_info.get([exp_id, EVarID[variable]]);
       throw new TextureMustBeLoaded({ variable, exp_id })
     }
-
 
     return texture_info
   }
@@ -202,13 +212,18 @@ class DatabaseProvider {
   async getTexture(path: string) {
     if (!path) throw new PathError("undefinied path")
     let texture = this.cache.get(path)
+    // let texture = this.cache.get("dont use cache")
     if (!texture) {
       texture = await this.database.textures.get({ path: path })
       if (!texture) {
         console.log('load from server')
         texture = await this.loadFromServer(path)
+      } else {
+        console.log('using texture from local database')
       }
       this.cache.set(path, texture)
+    } else {
+      console.log('using cached texture')
     }
     return texture!
   }

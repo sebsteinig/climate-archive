@@ -37,6 +37,9 @@ export async function sync(
       next_time = current_time
     }
 
+    console.log(data.collection.exps[current_time].id)
+    console.log(variable)
+    
     const current_info = await database_provider.getInfo(
       data.collection.exps[current_time].id,
       variable,
