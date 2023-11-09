@@ -1,7 +1,7 @@
 "use client"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
 import { ErrorView } from "@/components/error/ErrorView"
-import { searchPublication } from "@/utils/api/api"
+import { searchPublication, searchPublicationAll } from "@/utils/api/api"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 import { useStore } from "@/utils/store/store"
 import {
@@ -27,6 +27,7 @@ class PublicationNotFound extends Error {
 }
 async function loadValdesEtAl2021() {
   const [publication] = await searchPublication({
+  // const [publication] = await searchPublicationAll({
     title: "Deep Ocean Temperatures through Time",
     authors_short: "Valdes et al",
     year: [2021],
@@ -50,6 +51,8 @@ export default function PaleoClimatePage() {
     clearGraph()
     loadValdesEtAl2021()
       .then(async (publication) => {
+        console.log('start')
+
         await database_provider.loadAll(
           {
             exp_ids: publication.exps.map((exp) => exp.id),
@@ -57,24 +60,18 @@ export default function PaleoClimatePage() {
           },
           true,
         )
-        // console.log(publication)
-        // await database_provider.load(
-        //   {
-        //     exp_id: ["texqe"],
-        //     extension: "webp",
-        //   },
-        //   true,
-        // )
-        // await database_provider.load(
-        //   {
-        //     exp_id: ["texqd"],
-        //     extension: "webp",
-        //   },
-        //   true,
-        // )
+
+        console.log('end')
+
+        
+
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
-        console.log(publication)
+
+        // get all texture_info for all experiments and add this to the publication 
+        // object for quick access during frame updates
+        publication = await database_provider.addAllInfo(publication)
+
         return publication
       })
       .then((publication) => {

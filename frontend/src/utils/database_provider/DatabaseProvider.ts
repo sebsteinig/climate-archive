@@ -120,7 +120,7 @@ class DatabaseProvider {
 
   async loadAll(
     requested_textures: RequestMultipleTexture,
-    only_mean?: boolean,
+    only_mean?: boolean
   ) {
     console.log(requested_textures)
     const response = await selectAll({
@@ -133,10 +133,8 @@ class DatabaseProvider {
       ry: requested_textures.resolution?.y,
       /** TODO : nan_value_encoding, chunks, threshold */
     })
-    console.log(response)
     await Promise.all(
       Object.entries(response).flatMap(async (tmp) => {
-        console.log(tmp)
         const [_, single_result_arr] = tmp
         await Promise.all(
           single_result_arr.map(async (res) => {
@@ -146,6 +144,66 @@ class DatabaseProvider {
       }),
     )
   }
+
+  // async addAllInfo(publication: Publication) {
+  //   console.log(ALL_VARIABLES)
+    
+  //   let allInfo = [];
+  
+  //   for (const variable of ALL_VARIABLES) {
+  //     let variableInfo = [];
+  //     await Promise.all(
+  //       publication.exps.map(async (exp) => {
+  //         const info = await database_provider.getInfo(exp.id, variable);
+  //         variableInfo.push(info);
+  //       })
+  //     );
+  //     allInfo.push(variableInfo);
+  //   }
+  
+  //   // Adding the additional info to the response object
+  //   publication = {
+  //     ...publication,
+  //     allInfo
+  //   };
+
+  //   console.log(allInfo)
+  
+  //   return publication;
+  // };
+
+  async addAllInfo(publication: Publication) {
+    
+    // This array will hold promises for all variable info retrievals
+    let infoPromises = [];
+  
+    for (const variable of ALL_VARIABLES) {
+      for (const exp of publication.exps) {
+        infoPromises.push(database_provider.getInfo(exp.id, variable).then(info => ({ variable, info })));
+      }
+    }
+  
+    // Wait for all promises to resolve
+    const results = await Promise.all(infoPromises);
+  
+    // Organize the results into allInfo
+    let allInfo = ALL_VARIABLES.map(() => []);
+    for (const { variable, info } of results) {
+      const variableIndex = ALL_VARIABLES.indexOf(variable);
+      allInfo[variableIndex].push(info);
+    }
+  
+    // Adding the additional info to the response object
+    publication = {
+      ...publication,
+      allInfo
+    };
+  
+    console.log(allInfo)
+  
+    return publication;
+  };
+  
 
   async loadFromDb(path: string) {
     const texture = await this.database.textures.get({ path: path })
@@ -188,7 +246,9 @@ class DatabaseProvider {
     let texture_info = this.info_cache.get({ exp_id, variable })
     if (!texture_info) {
       try {
+        console.log(EVarID[variable])
         texture_info = await this.database.textures_info.get([exp_id, EVarID[variable]]);
+
       } catch (err) {
         console.error("Error fetching from database:", err);
       }

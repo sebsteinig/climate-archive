@@ -44,15 +44,22 @@ export async function searchPublicationAll(query: SearchPublication) {
 
       const  exps  = response[0].exps;
 
+
       // Fetching additional info for each item in `exps` array
       let allInfo = [];
 
       await Promise.all(
         exps.map( async (exp) => {
+
+          console.log(exp)
           const info = await database_provider.getInfo(exp.id, 6)
+          console.log(info)
           allInfo.push(info);
+
         }
       ));
+
+      console.log(allInfo)
 
         // Adding the additional info to the response object
         response[0] = {

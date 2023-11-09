@@ -125,19 +125,21 @@ export async function updateFrame(
         next_time = current_time
       }
 
-      const current_info = await database_provider.getInfo(
-        data.collection.exps[current_time].id,
-        variable,
-      )
+      // const current_info = await database_provider.getInfo(
+      //   data.collection.exps[current_time].id,
+      //   variable,
+      // )
 
-      const next_info = await database_provider.getInfo(
-        data.collection.exps[next_time].id,
-        variable,
-      )
+      // const next_info = await database_provider.getInfo(
+      //   data.collection.exps[next_time].id,
+      //   variable,
+      // )
 
       // use pre-loaded Info for less computation between farmes
-      // const current_info = data.collection.allInfo[current_time]
-      // const next_info = data.collection.allInfo[next_time]
+      const current_info = data.collection.allInfo[variable][current_time]
+      const next_info = data.collection.allInfo[variable][next_time]
+
+      console.log(current_info)
 
       state.mean.current = {
         exp: data.collection.exps[current_time],
