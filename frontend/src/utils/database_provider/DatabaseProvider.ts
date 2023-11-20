@@ -44,6 +44,7 @@ class DatabaseProvider {
               let texture = await this.loadFromDb(path)
 
               if (!texture) {
+                console.log('load from server')
                 // texture is undefined => not in the db, must be fetched and inserted in db
                 texture = await this.loadFromServer(path)
               }
@@ -145,68 +146,55 @@ class DatabaseProvider {
     )
   }
 
-  // async addAllInfo(publication: Publication) {
-  //   console.log(ALL_VARIABLES)
-    
-  //   let allInfo = [];
+  async addAllInfo(publication, subsetExps) {
+    // Initialize allInfo based on existing data or as empty arrays
+    let allInfo = publication.allInfo || ALL_VARIABLES.map(() => new Array(109).fill(null));
   
-  //   for (const variable of ALL_VARIABLES) {
-  //     let variableInfo = [];
-  //     await Promise.all(
-  //       publication.exps.map(async (exp) => {
-  //         const info = await database_provider.getInfo(exp.id, variable);
-  //         variableInfo.push(info);
-  //       })
-  //     );
-  //     allInfo.push(variableInfo);
-  //   }
-  
-  //   // Adding the additional info to the response object
-  //   publication = {
-  //     ...publication,
-  //     allInfo
-  //   };
-
-  //   console.log(allInfo)
-  
-  //   return publication;
-  // };
-
-  async addAllInfo(publication: Publication) {
-    
-    // This array will hold promises for all variable info retrievals
+    // Array to hold promises
     let infoPromises = [];
   
+    // Iterate over all variables and subset of experiments
     for (const variable of ALL_VARIABLES) {
-      for (const exp of publication.exps) {
-        infoPromises.push(database_provider.getInfo(exp.id, variable).then(info => ({ variable, info })));
+      for (const exp of subsetExps) {
+        const expIndex = publication.exps.findIndex(e => e.id === exp.id);        
+        if (expIndex !== -1) {
+          infoPromises.push(
+            database_provider.getInfo(exp.id, variable)
+              .then(info => ({ variable, info, expIndex }))
+              .catch(() => ({ variable, info: null, expIndex })) // Handle errors
+          );
+        }
       }
     }
   
     // Wait for all promises to resolve
     const results = await Promise.all(infoPromises);
   
-    // Organize the results into allInfo
-    let allInfo = ALL_VARIABLES.map(() => []);
-    for (const { variable, info } of results) {
+    // Update allInfo with new data
+    for (const { variable, info, expIndex } of results) {
       const variableIndex = ALL_VARIABLES.indexOf(variable);
-      allInfo[variableIndex].push(info);
+      {console.log(allInfo)}
+      allInfo[variableIndex][expIndex] = info;
     }
   
-    // Adding the additional info to the response object
+    // // Update publication with new allInfo
+    
     publication = {
       ...publication,
       allInfo
     };
   
-    console.log(allInfo)
+    console.log(allInfo);
   
     return publication;
   };
   
+  
 
   async loadFromDb(path: string) {
+    console.log("start get")
     const texture = await this.database.textures.get({ path: path })
+    // console.log(texture)
     return texture
   }
 
@@ -246,7 +234,7 @@ class DatabaseProvider {
     let texture_info = this.info_cache.get({ exp_id, variable })
     if (!texture_info) {
       try {
-        console.log(EVarID[variable])
+        // console.log(EVarID[variable])
         texture_info = await this.database.textures_info.get([exp_id, EVarID[variable]]);
 
       } catch (err) {
