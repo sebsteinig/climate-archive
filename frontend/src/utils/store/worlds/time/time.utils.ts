@@ -37,6 +37,9 @@ export async function sync(
       next_time = current_time
     }
 
+    console.log(data.collection.exps[current_time].id)
+    console.log(variable)
+    
     const current_info = await database_provider.getInfo(
       data.collection.exps[current_time].id,
       variable,
@@ -45,6 +48,9 @@ export async function sync(
       data.collection.exps[next_time].id,
       variable,
     )
+
+    console.log(current_info)
+
     return {
       mean: {
         current: {
@@ -102,8 +108,10 @@ export async function updateFrame(
       frame.variables.delete(variable)
     }
   }
+
   const current_time = Math.floor(frame.weight)
   let next_time = current_time + 1
+
   for (let variable of active_variables) {
     const state = frame.variables.get(variable)
     if (!state) {
@@ -113,19 +121,31 @@ export async function updateFrame(
       continue
     }
     if (data.time.mode === TimeMode.mean) {
+
       if (!state.mean) continue
+
+      // console.log(state.mean.current.idx)
+      // console.log(state.mean.next.idx)
+      // console.log(current_time)
+
       const size = data.collection.exps.length
       if (next_time >= size) {
         next_time = current_time
       }
+
       const current_info = await database_provider.getInfo(
         data.collection.exps[current_time].id,
         variable,
       )
+
       const next_info = await database_provider.getInfo(
         data.collection.exps[next_time].id,
         variable,
       )
+
+      // use pre-loaded Info for less computation between farmes
+      // const current_info = data.collection.allInfo[variable][current_time]
+      // const next_info = data.collection.allInfo[variable][next_time]
 
       state.mean.current = {
         exp: data.collection.exps[current_time],
@@ -138,6 +158,19 @@ export async function updateFrame(
         idx: next_time,
         info: next_info,
       }
+
+      // state.mean.current = {
+      //   exp: state.mean.next.exp,
+      //   idx: state.mean.next.idx,
+      //   info: state.mean.next.info,
+      // }
+
+      // state.mean.next = {
+      //   exp: data.collection.exps[next_time],
+      //   idx: next_time,
+      //   info: next_info,
+      // }
+
     } else {
       if (!state.ts) continue
       if (state.ts.is_freezed) continue

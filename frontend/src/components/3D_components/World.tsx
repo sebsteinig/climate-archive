@@ -58,11 +58,11 @@ export const World = memo(({ tick }: Props) => {
             case EVarID.pr: {
               if (atmosphere_layer_ref.current && res.update_texture) {
                 if (world_state.observed_world && res.reference) {
-                  console.log("updating reference mode")
+                  // console.log("updating reference mode")
                   data_reference = res.reference ? res.reference.get(variable) : undefined;
                   reference_flag = true
                 } else {
-                  console.log("updating standard mode")
+                  // console.log("updating standard mode")
                   data_reference = null
                   reference_flag = false
                 }

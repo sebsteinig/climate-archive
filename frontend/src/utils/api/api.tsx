@@ -11,6 +11,7 @@ import { Graph } from "../store/graph/graph.type"
 import { EVarID } from "../store/variables/variable.types"
 import useSWR from "swr"
 import { ApiError } from "../errors/errors"
+import { database_provider } from "@/utils/database_provider/DatabaseProvider"
 
 // const URL_API = "http://localhost:3000/"
 // const URL_IMAGE = "http://localhost:3005/"
@@ -23,7 +24,7 @@ const URL_IMAGE = "https://db.climatearchive.org/"
  * @param query : SearchPublication contains search values for title, author...
  * @returns publication list
  */
-export async function searchPublication(query: SearchPublication) {
+export async function searchPublicationAll(query: SearchPublication) {
   try {
     let url = new URL("search/publication/", URL_API)
     console.log(query)
@@ -40,7 +41,57 @@ export async function searchPublication(query: SearchPublication) {
 
       let response = await getData<Publication[]>(url.href)
       console.log(response)
+
+      const  exps  = response[0].exps;
+
+
+      // Fetching additional info for each item in `exps` array
+      let allInfo = [];
+
+      await Promise.all(
+        exps.map( async (exp) => {
+
+          console.log(exp)
+          const info = await database_provider.getInfo(exp.id, 6)
+          console.log(info)
+          allInfo.push(info);
+
+        }
+      ));
+
+      console.log(allInfo)
+
+        // Adding the additional info to the response object
+        response[0] = {
+          ...response[0],
+          allInfo
+      };
+      // // const info = await database_provider.getInfo('texqe', 6)
+      console.log(response)
       return response
+    }
+    return []
+  } catch (error) {
+    throw new ApiError()
+  }
+}
+
+/**
+ * @param query {'title', 'journal', 'authors_short'}
+ * @returns experiments from publication as json
+ */
+export async function searchPublication(query: SearchPublication) {
+  try {
+    let url = new URL("search/publication/", URL_API)
+    if (query.title || query.journal || query.authors_short) {
+      Object.entries(query).map((bind) => {
+        const [key, value] = bind
+        if (value) {
+          url.searchParams.append(key, JSON.stringify(value))
+        }
+      })
+
+      return await getData<Publication[]>(url.href)
     }
     return []
   } catch (error) {
@@ -128,7 +179,9 @@ export function searchLooking(query: { for: string }) {
  * @returns data
  */
 async function getData<T>(url: string) {
-  let data = await axios.get(url)
+  console.log(url)
+  // let data = await axios.get(url)
+  let data = await axios.get(url + '&refresh=True')
   return data.data as T
 }
 
@@ -141,7 +194,6 @@ async function getData<T>(url: string) {
 export async function select(id: string, query: SelectSingleParameter) {
   try {
     let url = new URL(`select/${id}/`, URL_API)
-    console.log(url)
     Object.entries(query).forEach((bind) => {
       const [key, value] = bind
       if (value) {
@@ -170,6 +222,8 @@ export async function selectAll(query: SelectCollectionParameter) {
         url.searchParams.append(key, JSON.stringify(value))
       }
     })
+    console.log(url.href)
+
     let data = await axios.get(url.href)
     return data.data as SelectCollectionResult
   } catch (error) {
@@ -202,6 +256,17 @@ export async function getImageArrayBuffer(path: string) {
   }
 }
 
+export async function getImageAsBlob(path: string) {
+  let url = new URL(trimRoutes(path, 7), URL_IMAGE);
+  try {
+    let res = await axios.get(url.href, {
+      responseType: "blob",
+    });
+    return res.data;
+  } catch (error) {
+    throw new ApiError();
+  }
+}
 /**
  * function that retrieve netCDF data at a location to be displayed
  * @todo (MOCK DATA AT THE MOMENT)
