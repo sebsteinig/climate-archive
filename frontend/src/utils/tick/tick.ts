@@ -97,7 +97,6 @@ export function tickBuilder(
         console.timeEnd(updateLabel);
         // await update(frame, active_variables, world_data)
 
-
         const computeLabel = `compute texture for world ${world_id} ${Date.now()}`;
         console.time(computeLabel);
 

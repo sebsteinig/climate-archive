@@ -284,7 +284,7 @@ export async function compute(
     current_info = data.ts!.info
     next_info = data.ts!.info
   }
-
+  
   const textures = await Promise.all(
     paths.map(async ({ current_path, next_path }) => {
       const current_url = await getTextureFromPath(
