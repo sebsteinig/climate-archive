@@ -6,6 +6,7 @@ import { useRef, useEffect, memo } from "react"
 import * as THREE from "three"
 import Lights from "./Lights"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
+import { SurfaceLayer, SurfaceLayerRef } from "./SurfaceLayer"
 import { ALL_VARIABLES, EVarID } from "@/utils/store/variables/variable.types"
 import { TickFn } from "../../utils/tick/tick"
 import { Coordinate } from "@/utils/store/graph/graph.type"
@@ -22,15 +23,19 @@ export const World = memo(({ tick }: Props) => {
     console.log('creating World component')
   
     const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
+    const surface_layer_ref = useRef<SurfaceLayerRef>(null)
 
     const variables_state = useStore((state) => state.active_variables)
 
+    // update shader uniforms when user uses GUI
     useEffect(() => {
       const userVariables = state => state.variables;
   
       const unsubscribe = useStore.subscribe(
         (state) => {
           atmosphere_layer_ref.current.updateUserUniforms(state.variables.pr);
+          surface_layer_ref.current.updateUserUniforms(state.variables.height);
+
         },
         userVariables
       );
@@ -44,17 +49,24 @@ export const World = memo(({ tick }: Props) => {
     useFrame((state, delta) => {
       tick(delta).then((res) => {
 
-
+        // update frame weight and projection every frame
         if (variables_state.get(EVarID.pr)) {
           atmosphere_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
+        }
+        if (variables_state.get(EVarID.height)) {
+          surface_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         }
         // if (wind_layer_ref.current) {
         //   wind_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         // }
+
+        // update textures only when necessary
         for (let variable of res.variables.keys()) {
+          console.log(variable)
           let data = res.variables.get(variable);
           let data_reference, reference_flag
           switch (variable) {
+
             case EVarID.pr: {
               if (atmosphere_layer_ref.current && res.update_texture) {
                 if (world_state.observed_world && res.reference) {
@@ -70,6 +82,16 @@ export const World = memo(({ tick }: Props) => {
               }
               break
             }
+
+            case EVarID.height: {
+                console.log('update height')
+                console.log(data)
+                data_reference = null
+                reference_flag = false
+                surface_layer_ref.current.updateTextures(data, data_reference, reference_flag);
+              break
+            }
+
             // case EVarID.winds: {
             //   if (wind_layer_ref.current && res.update_texture) {
             //     wind_layer_ref.current.updateTextures(data)
@@ -90,6 +112,7 @@ export const World = memo(({ tick }: Props) => {
         {/* <Surface ref={sphereRef} config={config} /> */}
         {/* <ATM_2D ref={atm2DRef} /> */}
         <AtmosphereLayer ref={atmosphere_layer_ref} />
+        <SurfaceLayer ref={surface_layer_ref} />
         {/* <WindLayer ref={wind_layer_ref} /> */}
   
         <Perf position="top-right" />

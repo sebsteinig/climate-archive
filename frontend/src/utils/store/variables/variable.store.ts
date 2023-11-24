@@ -40,11 +40,11 @@ function initMap() {
   let m = new Map()
   m.set(EVarID.currents, false)
   m.set(EVarID.clt, false)
-  m.set(EVarID.height, false)
+  m.set(EVarID.height, true)
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)
-  m.set(EVarID.pr, true)
+  m.set(EVarID.pr, false)
   m.set(EVarID.sic, false)
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
@@ -112,10 +112,29 @@ export const createVariableSlice: StateCreator<
       height: {
         name: EVarID.height,
         diplacement: 0.2,
-        colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
+        min: -6000,
+        max: 6000,
+        colormap: "topo.png",
+        colormap_index: colormaps_list.indexOf("topo.png"),
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              height: {
+                ...state.variables.height,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
+        updateMin: (value: number) =>
           set((state) => {
-            state.variables.height.colormap = value
+            state.variables.height.min = value
+          }),
+        updateMax: (value: number) =>
+          set((state) => {
+            state.variables.height.max = value
           }),
         updateDiplacement: (value: number) =>
           set((state) => {
