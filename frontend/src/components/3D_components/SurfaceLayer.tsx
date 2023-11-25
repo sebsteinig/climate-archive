@@ -39,8 +39,6 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
 
   // use global state/user input to initialise the layer
   const height_state = useStore((state) => state.variables.height)
-  console.log(height_state.colormap_index)
-  console.log(height_state.colormap)
 
   const materialRef = useRef(new THREE.ShaderMaterial( {
     vertexShader: vertexShader,
@@ -53,10 +51,10 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
       uSphereWrapAmount: {value: 0.0},
       uLayerHeight: {value: 0.0},
       uLayerOpacity: {value: 0.0},
-      thisDataFrame: {value: null},
-      nextDataFrame: {value: null}, 
-      thisDataMin: {value: null},
-      thisDataMax: {value: null},
+      dataTexture: {value: null},
+      textureTimesteps: {value: null},
+      thisDataMin: {value: new Float32Array(1)},
+      thisDataMax: {value: new Float32Array(1)},
       nextDataMin: {value: null},
       nextDataMax: {value: null},
       referenceDataFrame: {value: null},
@@ -85,24 +83,17 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
   }
 
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
-    // always update the own data
 
     // create the texture from the image blob
-    // const thisFrame = loader.load(URL.createObjectURL(data.textures[0].current_url.image))
-    // const nextFrame = loader.load(URL.createObjectURL(data.textures[0].next_url.image))
-    const thisFrame = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
-    const nextFrame = await loader.loadAsync(URL.createObjectURL(data.textures[0].next_url.image))
-    // const thisFrame = loader.load(data.textures[0].current_url)
-    // const nextFrame = loader.load(data.textures[0].next_url)
-
-    thisFrame.wrapS = thisFrame.wrapT = THREE.RepeatWrapping
-    nextFrame.wrapS = nextFrame.wrapT = THREE.RepeatWrapping
-    materialRef.current.uniforms.thisDataFrame.value = thisFrame
-    materialRef.current.uniforms.nextDataFrame.value = nextFrame 
-    materialRef.current.uniforms.thisDataMin.value = data.current.min[0]
-    materialRef.current.uniforms.thisDataMax.value = data.current.max[0]
-    materialRef.current.uniforms.nextDataMin.value = data.next.min[0]
-    materialRef.current.uniforms.nextDataMax.value = data.next.max[0]
+    const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
+    console.log(dataTexture)
+    dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
+    materialRef.current.uniforms.dataTexture.value = dataTexture
+    const dataMin = new Float32Array(data.info.min[0]);
+    const dataMax = new Float32Array(data.info.max[0]);
+    materialRef.current.uniforms.thisDataMin.value = dataMin
+    materialRef.current.uniforms.thisDataMax.value = dataMax
+    materialRef.current.uniforms.textureTimesteps.value = 12.0
 
   }
   

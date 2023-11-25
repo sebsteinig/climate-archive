@@ -4,8 +4,8 @@
 uniform float uLayerOpacity;
 uniform float uFrame;
 uniform float uFrameWeight;
-uniform float thisDataMin[12]; // Replace MAX_SIZE with your array's maximum size
-uniform float thisDataMax[12]; // Replace MAX_SIZE with your array's maximum size
+uniform float thisDataMin[12]; 
+uniform float thisDataMax[12];
 uniform float textureTimesteps;
 uniform float referenceDataMin[12];
 uniform float referenceDataMax[12];

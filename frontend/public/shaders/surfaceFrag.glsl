@@ -3,26 +3,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 uniform float uLayerOpacity;
 uniform float uFrameWeight;
-uniform float thisDataMin;
-uniform float thisDataMax;
-uniform float nextDataMin;
-uniform float nextDataMax;
-uniform float referenceDataMin;
-uniform float referenceDataMax;
+uniform float thisDataMin[12]; 
+uniform float thisDataMax[12];
 uniform float uUserMinValue;
 uniform float uUserMaxValue;
-uniform float uUserMinValueAnomaly;
-uniform float uUserMaxValueAnomaly;
 uniform float numLon;
 uniform float numLat;
 uniform float colorMapIndex;
 
-uniform sampler2D thisDataFrame;
-uniform sampler2D nextDataFrame;
-uniform sampler2D referenceDataFrame;
+uniform sampler2D dataTexture;
 uniform sampler2D colorMap;
-
-uniform bool referenceDataFlag;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // varying from vertex shader
@@ -104,27 +94,27 @@ float opacity_cutoff = 0.0;
 // convert relative bitmap value to absolute value for both frames
 float thisFrameData = remap( 
     textureBicubic(
-        thisDataFrame, 
+        dataTexture, 
         vUv, 
         numLon, 
         numLat
         ).r, 
     0.0, 
     1.0, 
-    thisDataMin, 
-    thisDataMax);
+    thisDataMin[0], 
+    thisDataMax[0]);
 
 float nextFrameData = remap( 
     textureBicubic(
-        nextDataFrame, 
+        dataTexture, 
         vUv, 
         numLon, 
         numLat
         ).r, 
     0.0, 
     1.0, 
-    nextDataMin, 
-    nextDataMax);
+    thisDataMin[0], 
+    thisDataMax[0]);
 
 // interpolate between absolute values of both frames
 float intData = mix(thisFrameData, nextFrameData, uFrameWeight);

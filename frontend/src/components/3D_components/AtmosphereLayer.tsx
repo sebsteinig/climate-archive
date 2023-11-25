@@ -89,11 +89,9 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
 
     // always update the own data
-      const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
-      dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
-      materialRef.current.uniforms.dataTexture.value = dataTexture
-    // }
-
+    const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
+    dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
+    materialRef.current.uniforms.dataTexture.value = dataTexture
     const dataMin = new Float32Array(data.info.min[0].map(value => value * 86400));
     const dataMax = new Float32Array(data.info.max[0].map(value => value * 86400));
     materialRef.current.uniforms.thisDataMin.value = dataMin

@@ -40,11 +40,11 @@ function initMap() {
   let m = new Map()
   m.set(EVarID.currents, false)
   m.set(EVarID.clt, false)
-  m.set(EVarID.height, false)
+  m.set(EVarID.height, true)
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)
-  m.set(EVarID.pr, true)
+  m.set(EVarID.pr, false)
   m.set(EVarID.sic, false)
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
@@ -152,8 +152,7 @@ export const createVariableSlice: StateCreator<
       },
       pr: {
         name: EVarID.pr,
-        // min: 3.5,
-        min: 0.0,
+        min: 3.5,
         max: 12,
         anomaly_range: 5,
         colormap: "rain.png",

@@ -24,7 +24,6 @@ export const World = memo(({ tick }: Props) => {
   
     const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
     const surface_layer_ref = useRef<SurfaceLayerRef>(null)
-
     const variables_state = useStore((state) => state.active_variables)
 
     // update shader uniforms when user uses GUI
@@ -34,7 +33,7 @@ export const World = memo(({ tick }: Props) => {
       const unsubscribe = useStore.subscribe(
         (state) => {
           atmosphere_layer_ref.current.updateUserUniforms(state.variables.pr);
-          // surface_layer_ref.current.updateUserUniforms(state.variables.height);
+          surface_layer_ref.current.updateUserUniforms(state.variables.height);
 
         },
         userVariables
@@ -112,7 +111,7 @@ export const World = memo(({ tick }: Props) => {
         {/* <Surface ref={sphereRef} config={config} /> */}
         {/* <ATM_2D ref={atm2DRef} /> */}
         <AtmosphereLayer ref={atmosphere_layer_ref} />
-        {/* <SurfaceLayer ref={surface_layer_ref} /> */}
+        <SurfaceLayer ref={surface_layer_ref} />
         {/* <WindLayer ref={wind_layer_ref} /> */}
   
         <Perf position="top-right" />
