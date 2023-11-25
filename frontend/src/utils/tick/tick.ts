@@ -80,7 +80,7 @@ export function tickBuilder(
       }
     } 
 
-    if (frame.swap_flag) {
+    if ( (frame.swap_flag)  ) {
 
       if (!frame.swapping) {
         frame.swapping = true
@@ -97,6 +97,7 @@ export function tickBuilder(
         console.timeEnd(updateLabel);
         // await update(frame, active_variables, world_data)
 
+        if (frame.weight == 0.0) {
         const computeLabel = `compute texture for world ${world_id} ${Date.now()}`;
         console.time(computeLabel);
 
@@ -111,7 +112,7 @@ export function tickBuilder(
         }
 
          console.timeEnd(computeLabel);
-
+        }
 
 
         if (world_id === current_frame.current._observed_id) {

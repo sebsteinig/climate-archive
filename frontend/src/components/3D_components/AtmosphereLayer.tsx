@@ -47,17 +47,18 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
+      uFrame: {value: null},
       uFrameWeight: {value: null},
       uSphereWrapAmount: {value: 0.0},
       uLayerHeight: {value: 0.15},
       uLayerOpacity: {value: 0.0},
-      thisDataFrame: {value: null},
-      nextDataFrame: {value: null}, 
+      dataTexture: {value: null},
+      textureTimesteps: {value: null},
       thisDataMin: {value: null},
       thisDataMax: {value: null},
       nextDataMin: {value: null},
       nextDataMax: {value: null},
-      referenceDataFrame: {value: null},
+      referenceDataTexture: {value: null},
       referenceDataMin: {value: null},
       referenceDataMax: {value: null},
       referenceDataFlag: {value: false},
@@ -73,6 +74,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   } ));
   
   function tick(weight:number, uSphereWrapAmount:number) {
+    materialRef.current.uniforms.uFrame.value = Math.floor(weight)
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
     materialRef.current.uniforms.uSphereWrapAmount.value = uSphereWrapAmount
     materialRef.current.uniforms.uLayerOpacity.value = 1.0
@@ -90,32 +92,28 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     // always update the own data
 
     // create the texture from the image blob
-    const computeLabel = `load THREE texture ${Date.now()}`;
-    console.time(computeLabel);
+    // const computeLabel = `load THREE texture ${Date.now()}`;
+    // console.time(computeLabel);
 
-    const thisFrame = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
-    const nextFrame = await loader.loadAsync(URL.createObjectURL(data.textures[0].next_url.image))
-    // const thisFrame = loader.load(URL.createObjectURL(data.textures[0].current_url.image))
-    // const nextFrame = loader.load(URL.createObjectURL(data.textures[0].next_url.image))
-    // const thisFrame = loader.load(data.textures[0].current_url)
-    // const nextFrame = loader.load(data.textures[0].next_url)
-    console.timeEnd(computeLabel);
+    if (materialRef.current.uniforms.uFrameWeight.value == 0.0) {
+      console.log("load THREE texture")
+      const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
+      console.log(data)
+      dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
+      materialRef.current.uniforms.dataTexture.value = dataTexture
+    }
 
-    thisFrame.wrapS = thisFrame.wrapT = THREE.RepeatWrapping
-    nextFrame.wrapS = nextFrame.wrapT = THREE.RepeatWrapping
-    materialRef.current.uniforms.thisDataFrame.value = thisFrame
-    materialRef.current.uniforms.nextDataFrame.value = nextFrame 
     materialRef.current.uniforms.thisDataMin.value = data.current.min[0] * 86400.
     materialRef.current.uniforms.thisDataMax.value = data.current.max[0] * 86400.
     materialRef.current.uniforms.nextDataMin.value = data.next.min[0] * 86400.
     materialRef.current.uniforms.nextDataMax.value = data.next.max[0] * 86400.
-    // materialRef.current.uniforms.uFrameWeight.value = 0.0
+    materialRef.current.uniforms.textureTimesteps.value = 12.0
     
     // also update the reference data when reference mode is activated
     if ( reference_flag ) {
-      const referenceFrame = await loader.loadAsync(reference.textures[0].current_url)
-      referenceFrame.wrapS = referenceFrame.wrapT = THREE.RepeatWrapping
-      materialRef.current.uniforms.referenceDataFrame.value = referenceFrame
+      const referenceDataTexture = await loader.loadAsync(reference.textures[0].current_url.image)
+      referenceDataTexture.wrapS = referenceDataTexture.wrapT = THREE.RepeatWrapping
+      materialRef.current.uniforms.referenceDataTexture.value = referenceDataTexture
       materialRef.current.uniforms.referenceDataMin.value = reference.current.min[0] * 86400.
       materialRef.current.uniforms.referenceDataMax.value = reference.current.max[0] * 86400.
       materialRef.current.uniforms.referenceDataFlag.value = true

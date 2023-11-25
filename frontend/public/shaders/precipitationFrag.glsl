@@ -2,11 +2,13 @@
 // define uniforms
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 uniform float uLayerOpacity;
+uniform float uFrame;
 uniform float uFrameWeight;
 uniform float thisDataMin;
 uniform float thisDataMax;
 uniform float nextDataMin;
 uniform float nextDataMax;
+uniform float textureTimesteps;
 uniform float referenceDataMin;
 uniform float referenceDataMax;
 uniform float uUserMinValue;
@@ -17,9 +19,8 @@ uniform float numLon;
 uniform float numLat;
 uniform float colorMapIndex;
 
-uniform sampler2D thisDataFrame;
-uniform sampler2D nextDataFrame;
-uniform sampler2D referenceDataFrame;
+uniform sampler2D dataTexture;
+uniform sampler2D referenceDataTexture;
 uniform sampler2D colorMap;
 
 uniform bool referenceDataFlag;
@@ -100,15 +101,21 @@ void main()	{
 
 float cmap_index = colorMapIndex;
 float opacity_cutoff = 0.0;
+// Calculate the start and end of the UV segment for the current timesteps
+float segmentWidth = 1.0 / textureTimesteps;
+
+// Adjust the UV coordinates
+vec2 this_uv = vec2((uFrame / textureTimesteps) + (vUv.x * segmentWidth), vUv.y);
+vec2 next_uv = vec2((( uFrame + 1.0) / textureTimesteps) + (vUv.x * segmentWidth), vUv.y);
 
 // convert relative bitmap value to absolute value for both frames
 float thisFrameData = remap( 
     textureBicubic(
-        thisDataFrame, 
-        vUv, 
-        numLon, 
+        dataTexture, 
+        this_uv, 
+        numLon * textureTimesteps, 
         numLat
-        ).r, 
+        ).r,
     0.0, 
     1.0, 
     thisDataMin, 
@@ -116,9 +123,9 @@ float thisFrameData = remap(
 
 float nextFrameData = remap( 
     textureBicubic(
-        nextDataFrame, 
-        vUv, 
-        numLon, 
+        dataTexture, 
+        next_uv, 
+        numLon * textureTimesteps, 
         numLat
         ).r, 
     0.0, 
@@ -141,7 +148,7 @@ float dataRemapped = remap(
 if (referenceDataFlag) {
     float referenceData = remap( 
     textureBicubic(
-        referenceDataFrame, 
+        referenceDataTexture, 
         vUv, 
         numLon, 
         numLat
@@ -163,8 +170,11 @@ if (referenceDataFlag) {
     cmap_index = 17.0;
 }
 
+vec4 dataTest = texture2D(dataTexture, this_uv);
+
 // apply colormap to data
 vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
+// vec4 dataColor = applyColormap( dataTest.r, colorMap, cmap_index );
 
 // send pixel color to screen
 if (referenceDataFlag == false) {

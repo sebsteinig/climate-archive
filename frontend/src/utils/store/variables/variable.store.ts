@@ -152,7 +152,8 @@ export const createVariableSlice: StateCreator<
       },
       pr: {
         name: EVarID.pr,
-        min: 3.5,
+        // min: 3.5,
+        min: 0.0,
         max: 12,
         anomaly_range: 5,
         colormap: "rain.png",

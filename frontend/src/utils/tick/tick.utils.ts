@@ -251,8 +251,6 @@ async function getTextureFromPathCrop(
 }
 
 
-
-
 export async function compute(
   variable: EVarID,
   data: TimeFrameState,
@@ -263,8 +261,7 @@ export async function compute(
   if (paths.length === 0) return
   if (
     !canvas.current ||
-    !canvas.current.current.ctx ||
-    !canvas.current.next.ctx
+    !canvas.current.current.ctx
   ) {
     return
   }
@@ -322,6 +319,7 @@ export async function compute(
     }
   } else {
     const [_, fpc] = chunksDetails(data.ts!.info)
+    console.log(data.ts!.info)
     const current_t = data.ts!.current.frame + data.ts!.current.time_chunk * fpc
     const next_t = data.ts!.next.frame + data.ts!.next.time_chunk * fpc
 
