@@ -120,32 +120,27 @@ function processInfo(
         min: string
       }[][]
     }[]
-  }
-  // const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
-  const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix_ts)
+  };
 
-  const min = bound_matrices.map((matrix) => {
+  const calculateMinMax = (matrix, index, isMax) => {
     if (mean) {
-      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.min), 0)
-      const average = sum / matrix[z].length
-      return average
+      const sum = matrix.reduce((acc, val) => acc + parseFloat(isMax ? val[index].max : val[index].min), 0);
+      return sum / matrix.length;
     } else {
-      const _z = matrix.length > z ? z : 0
-      const _t = matrix[_z].length > t ? t : 0
-      return parseFloat(matrix[_z][_t].min)
+      return parseFloat(isMax ? matrix[z][index].max : matrix[z][index].min);
     }
-  })
-  const max = bound_matrices.map((matrix) => {
-    if (mean) {
-      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.max), 0)
-      const average = sum / matrix[z].length
-      return average
-    } else {
-      const _z = matrix.length > z ? z : 0
-      const _t = matrix[_z].length > t ? t : 0
-      return parseFloat(matrix[_z][_t].max)
-    }
-  })
+  };
+
+  const min = metadata.metadata.map(m => {
+    const matrix = m.bounds_matrix_ts;
+    return Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix, index, false));
+  });
+
+  const max = metadata.metadata.map(m => {
+    const matrix = m.bounds_matrix_ts;
+    return Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix, index, true));
+  });
+
   return {
     min,
     max,
@@ -159,7 +154,8 @@ function processInfo(
     yinc: info.yinc,
     nan_value_encoding: info.nan_value_encoding,
   }
-}
+};
+
 
 async function getTextureFromPath(
   path: string,
@@ -267,25 +263,18 @@ export async function compute(
   }
 
   let current_frame: number
-  let next_frame: number
   let current_info: TextureInfo
-  let next_info: TextureInfo
   if (world_data.time.mode === TimeMode.mean) {
     current_frame = 0
     current_info = data.mean!.current.info
-    next_frame = 0
-    next_info = data.mean!.next.info
   } else {
     current_frame = data.ts!.current.frame
-    next_frame = data.ts!.next.frame
     current_info = data.ts!.info
-    next_info = data.ts!.info
   }
   
   const textures = await Promise.all(
-    paths.map(async ({ current_path, next_path }) => {
+    paths.map(async ({ current_path }) => {
       const current_url = await getTextureFromPath(
-      // const current_url = await getTextureFromPathCrop(
         current_path,
         current_frame,
         0,
@@ -294,19 +283,8 @@ export async function compute(
         canvas.current!.current.ctx!,
       )
 
-      const next_url = await getTextureFromPath(
-      // const next_url = await getTextureFromPathCrop(
-        next_path,
-        next_frame,
-        0,
-        next_info,
-        canvas.current!.next.canvas,
-        canvas.current!.next.ctx!,
-      )
-
       return {
         current_url,
-        next_url,
       }
     }),
   )
@@ -314,19 +292,16 @@ export async function compute(
   if (world_data.time.mode === TimeMode.mean) {
     return {
       textures,
-      current: processInfo(variable, 0, 0, data.mean!.current.info, true),
-      next: processInfo(variable, 0, 0, data.mean!.current.info, true),
+      info: processInfo(variable, 0, 0, data.mean!.current.info, true),
     }
   } else {
     const [_, fpc] = chunksDetails(data.ts!.info)
-    console.log(data.ts!.info)
     const current_t = data.ts!.current.frame + data.ts!.current.time_chunk * fpc
-    const next_t = data.ts!.next.frame + data.ts!.next.time_chunk * fpc
 
+    // should return a single texture and info with field min/max for each timestep
     return {
       textures,
-      current: processInfo(variable, current_t, 0, data.ts!.info),
-      next: processInfo(variable, next_t, 0, data.ts!.info),
+      info: processInfo(variable, current_t, 0, data.ts!.info),
     }
   }
 }

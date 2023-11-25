@@ -62,7 +62,7 @@ export const World = memo(({ tick }: Props) => {
 
         // update textures only when necessary
         for (let variable of res.variables.keys()) {
-          console.log(variable)
+        
           let data = res.variables.get(variable);
           let data_reference, reference_flag
           switch (variable) {

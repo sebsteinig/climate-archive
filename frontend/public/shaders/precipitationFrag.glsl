@@ -4,13 +4,11 @@
 uniform float uLayerOpacity;
 uniform float uFrame;
 uniform float uFrameWeight;
-uniform float thisDataMin;
-uniform float thisDataMax;
-uniform float nextDataMin;
-uniform float nextDataMax;
+uniform float thisDataMin[12]; // Replace MAX_SIZE with your array's maximum size
+uniform float thisDataMax[12]; // Replace MAX_SIZE with your array's maximum size
 uniform float textureTimesteps;
-uniform float referenceDataMin;
-uniform float referenceDataMax;
+uniform float referenceDataMin[12];
+uniform float referenceDataMax[12];
 uniform float uUserMinValue;
 uniform float uUserMaxValue;
 uniform float uUserMinValueAnomaly;
@@ -118,8 +116,8 @@ float thisFrameData = remap(
         ).r,
     0.0, 
     1.0, 
-    thisDataMin, 
-    thisDataMax);
+    thisDataMin[int(uFrame)], 
+    thisDataMax[int(uFrame)]);
 
 float nextFrameData = remap( 
     textureBicubic(
@@ -130,8 +128,8 @@ float nextFrameData = remap(
         ).r, 
     0.0, 
     1.0, 
-    nextDataMin, 
-    nextDataMax);
+    thisDataMin[int(uFrame + 1.0)], 
+    thisDataMax[int(uFrame + 1.0)]);
 
 // interpolate between absolute values of both frames
 float intData = mix(thisFrameData, nextFrameData, uFrameWeight);
@@ -146,19 +144,35 @@ float dataRemapped = remap(
 
 // only process reference data if reference mode is active
 if (referenceDataFlag) {
-    float referenceData = remap( 
-    textureBicubic(
-        referenceDataTexture, 
-        vUv, 
-        numLon, 
-        numLat
-        ).r, 
-    0.0, 
-    1.0, 
-    referenceDataMin, 
-    referenceDataMax);
 
-    intData -= referenceData;
+    float thisReferenceData = remap( 
+        textureBicubic(
+            referenceDataTexture, 
+            this_uv, 
+            numLon * textureTimesteps, 
+            numLat
+            ).r, 
+        0.0, 
+        1.0, 
+        referenceDataMin[int(uFrame)], 
+        referenceDataMax[int(uFrame)]);
+
+    float nexReferenceData = remap( 
+        textureBicubic(
+            referenceDataTexture, 
+            next_uv, 
+            numLon * textureTimesteps, 
+            numLat
+            ).r, 
+        0.0, 
+        1.0, 
+        referenceDataMin[int(uFrame + 1.0)], 
+        referenceDataMax[int(uFrame + 1.0)]);
+
+    // interpolate between absolute values of both frames
+    float intReferenceData = mix(thisReferenceData, nexReferenceData, uFrameWeight);
+    
+    intData -= intReferenceData;
 
     dataRemapped = remap( 
     intData, 
@@ -170,11 +184,9 @@ if (referenceDataFlag) {
     cmap_index = 17.0;
 }
 
-vec4 dataTest = texture2D(dataTexture, this_uv);
 
 // apply colormap to data
 vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
-// vec4 dataColor = applyColormap( dataTest.r, colorMap, cmap_index );
 
 // send pixel color to screen
 if (referenceDataFlag == false) {
