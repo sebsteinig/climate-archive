@@ -67,7 +67,6 @@ export function tickBuilder(
       }
     let update_texture = false
 
-    console.log(frame.weight)
     // console.log(world_id, frame.weight)
     // handle play/pause loop animation
     if (worlds.animated_world !== undefined) {
