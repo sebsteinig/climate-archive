@@ -80,7 +80,7 @@ export function tickBuilder(
       }
     } 
 
-    if (frame.swap_flag) {
+    if ( (frame.swap_flag)  ) {
 
       if (!frame.swapping) {
         frame.swapping = true
@@ -111,7 +111,6 @@ export function tickBuilder(
         }
 
          console.timeEnd(computeLabel);
-
 
 
         if (world_id === current_frame.current._observed_id) {

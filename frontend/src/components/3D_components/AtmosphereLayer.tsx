@@ -47,19 +47,18 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
+      uFrame: {value: null},
       uFrameWeight: {value: null},
       uSphereWrapAmount: {value: 0.0},
       uLayerHeight: {value: 0.15},
       uLayerOpacity: {value: 0.0},
-      thisDataFrame: {value: null},
-      nextDataFrame: {value: null}, 
-      thisDataMin: {value: null},
-      thisDataMax: {value: null},
-      nextDataMin: {value: null},
-      nextDataMax: {value: null},
-      referenceDataFrame: {value: null},
-      referenceDataMin: {value: null},
-      referenceDataMax: {value: null},
+      dataTexture: {value: null},
+      textureTimesteps: {value: null},
+      thisDataMin: {value: new Float32Array(1)},
+      thisDataMax: {value: new Float32Array(1)},
+      referenceDataTexture: {value: null},
+      referenceDataMin: {value: new Float32Array(1)},
+      referenceDataMax: {value: new Float32Array(1)},
       referenceDataFlag: {value: false},
       uUserMinValue: {value: pr_state.min},
       uUserMaxValue: {value: pr_state.max},
@@ -73,6 +72,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   } ));
   
   function tick(weight:number, uSphereWrapAmount:number) {
+    materialRef.current.uniforms.uFrame.value = Math.floor(weight)
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
     materialRef.current.uniforms.uSphereWrapAmount.value = uSphereWrapAmount
     materialRef.current.uniforms.uLayerOpacity.value = 1.0
@@ -87,37 +87,29 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   }
 
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
+
     // always update the own data
+      const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
+      dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
+      materialRef.current.uniforms.dataTexture.value = dataTexture
+    // }
 
-    // create the texture from the image blob
-    const computeLabel = `load THREE texture ${Date.now()}`;
-    console.time(computeLabel);
-
-    const thisFrame = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
-    const nextFrame = await loader.loadAsync(URL.createObjectURL(data.textures[0].next_url.image))
-    // const thisFrame = loader.load(URL.createObjectURL(data.textures[0].current_url.image))
-    // const nextFrame = loader.load(URL.createObjectURL(data.textures[0].next_url.image))
-    // const thisFrame = loader.load(data.textures[0].current_url)
-    // const nextFrame = loader.load(data.textures[0].next_url)
-    console.timeEnd(computeLabel);
-
-    thisFrame.wrapS = thisFrame.wrapT = THREE.RepeatWrapping
-    nextFrame.wrapS = nextFrame.wrapT = THREE.RepeatWrapping
-    materialRef.current.uniforms.thisDataFrame.value = thisFrame
-    materialRef.current.uniforms.nextDataFrame.value = nextFrame 
-    materialRef.current.uniforms.thisDataMin.value = data.current.min[0] * 86400.
-    materialRef.current.uniforms.thisDataMax.value = data.current.max[0] * 86400.
-    materialRef.current.uniforms.nextDataMin.value = data.next.min[0] * 86400.
-    materialRef.current.uniforms.nextDataMax.value = data.next.max[0] * 86400.
-    // materialRef.current.uniforms.uFrameWeight.value = 0.0
+    const dataMin = new Float32Array(data.info.min[0].map(value => value * 86400));
+    const dataMax = new Float32Array(data.info.max[0].map(value => value * 86400));
+    materialRef.current.uniforms.thisDataMin.value = dataMin
+    materialRef.current.uniforms.thisDataMax.value = dataMax
+    materialRef.current.uniforms.textureTimesteps.value = 12.0
     
     // also update the reference data when reference mode is activated
     if ( reference_flag ) {
-      const referenceFrame = await loader.loadAsync(reference.textures[0].current_url)
-      referenceFrame.wrapS = referenceFrame.wrapT = THREE.RepeatWrapping
-      materialRef.current.uniforms.referenceDataFrame.value = referenceFrame
-      materialRef.current.uniforms.referenceDataMin.value = reference.current.min[0] * 86400.
-      materialRef.current.uniforms.referenceDataMax.value = reference.current.max[0] * 86400.
+      console.log(reference)
+      const referenceDataTexture = await loader.loadAsync(URL.createObjectURL(reference.textures[0].current_url.image))
+      referenceDataTexture.wrapS = referenceDataTexture.wrapT = THREE.RepeatWrapping
+      materialRef.current.uniforms.referenceDataTexture.value = referenceDataTexture
+      const referenceDataMin = new Float32Array(reference.info.min[0].map(value => value * 86400));
+      const referenceDataMax = new Float32Array(reference.info.max[0].map(value => value * 86400));
+      materialRef.current.uniforms.referenceDataMin.value = referenceDataMin
+      materialRef.current.uniforms.referenceDataMax.value = referenceDataMax
       materialRef.current.uniforms.referenceDataFlag.value = true
     } else {
       materialRef.current.uniforms.referenceDataFlag.value = false

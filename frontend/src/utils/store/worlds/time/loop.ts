@@ -58,8 +58,13 @@ export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: b
 
   frame.weight = targetWeight
 
+  // hard-coded for annual cycle demo, need to be generalised
   if (previous_idx !== new_idx && new_idx !== targetWeight) {
-        frame.swap_flag = true
+        if (frame.weight <= 12.0 + EPSILON) {
+          frame.swap_flag = false
+        } else {
+          frame.swap_flag = true
+        }
   }
 
   // return gsap.to(frame, {

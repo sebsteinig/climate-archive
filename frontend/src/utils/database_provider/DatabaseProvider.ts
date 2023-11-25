@@ -111,6 +111,7 @@ class DatabaseProvider {
       vars: requested_texture.variables,
       /** TODO : resolutions */
     })
+    console.log(response)
     await Promise.all(
       response.map(async (res) => {
         console.log("load")

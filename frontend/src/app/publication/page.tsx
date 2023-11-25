@@ -55,6 +55,7 @@ export default function PublicationPage() {
         })
 
         if (!publication) return
+        console.log('load', exp_id)
         await database_provider.load({ exp_id })
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)
