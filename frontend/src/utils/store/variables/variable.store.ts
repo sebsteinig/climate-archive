@@ -112,10 +112,29 @@ export const createVariableSlice: StateCreator<
       height: {
         name: EVarID.height,
         diplacement: 0.2,
-        colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
+        min: -6000,
+        max: 6000,
+        colormap: "topo.png",
+        colormap_index: colormaps_list.indexOf("topo.png"),
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              height: {
+                ...state.variables.height,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
+        updateMin: (value: number) =>
           set((state) => {
-            state.variables.height.colormap = value
+            state.variables.height.min = value
+          }),
+        updateMax: (value: number) =>
+          set((state) => {
+            state.variables.height.max = value
           }),
         updateDiplacement: (value: number) =>
           set((state) => {

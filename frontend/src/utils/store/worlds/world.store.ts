@@ -161,7 +161,6 @@ export const createWorldSlice: StateCreator<
             const data = state.worlds.slots.get(w[0])
             if (!data) return
             data.time.animation = sync_flags[idx]
-            console.log(data.time.animation)
             idx += 1
           }
         })
