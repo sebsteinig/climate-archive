@@ -21,8 +21,8 @@ const loader = new THREE.TextureLoader();
 
 const shaderUniforms =
 {
-    uWindsMaxParticleCount : {value: 4096},
-    uWindsParticleCount : {value: 4096},
+    uWindsMaxParticleCount : {value: 40},
+    uWindsParticleCount : {value: 40},
     uWindsVerticalSpread : {value: null},
     uWindsParticleLifeTime : {value: null},
     uWindsSpeedMin : {value: 5.0},
@@ -33,6 +33,7 @@ const shaderUniforms =
 const initialPositions = createInitialWindPositions(shaderUniforms)
 const [geometry, quaternionTexture ] = createWindsGeometry(initialPositions, shaderUniforms);
 
+console.log(geometry)
 type Props = {
 
 }
@@ -54,15 +55,13 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
   const materialRef = useRef( createWindsMaterial(quaternionTexture, shaderUniforms, state.gl, initialPositions) )
   
   function tick(weight:number, uSphereWrapAmount:number) {
-    console.log(gpuComputeWinds)
-    materialRef.current.material.uniforms.uFrameWeight.value = weight % 1
-    materialRef.current.material.uniforms.wrapAmountUniform.value = uSphereWrapAmount
-    gpuComputeWinds.variables[0].material.uniforms.uDelta.value = 0.016;
-    gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
+    // materialRef.current.material.uniforms.uFrameWeight.value = weight % 1
+    // materialRef.current.material.uniforms.wrapAmountUniform.value = uSphereWrapAmount
+    // gpuComputeWinds.variables[0].material.uniforms.uDelta.value = 0.016;
+    // gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
 
-    gpuComputeWinds.compute();
-
-    materialRef.material.uniforms[ "texturePosition" ].value = gpuComputeWinds.getCurrentRenderTarget( positionVariable ).texture;
+    gpuComputeWinds.tickEachFrame(0.1,0.1,0.1);
+    // materialRef.current.material.uniforms[ "texturePosition" ].value = gpuComputeWinds.getCurrentRenderTarget( positionVariable ).texture;
     console.log("tick")
   }
 
@@ -73,8 +72,10 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
   }
 
   function updateTextures(data:TickData) {
-    // materialRef.current.uniforms.thisDataFrame.value = loader.load(data.textures[0].current_url)
-    // materialRef.current.uniforms.nextDataFrame.value = loader.load(data.textures[0].next_url) 
+    const test = loader.load(data.textures[0].current_url)
+    console.log(test)
+    materialRef.current.uniforms.thisDataFrame.value = loader.load(data.textures[0].current_url)
+    materialRef.current.uniforms.nextDataFrame.value = loader.load(data.textures[0].next_url) 
     // materialRef.current.uniforms.thisDataMin.value = data.current.min[0] * 86400.
     // materialRef.current.uniforms.thisDataMax.value = data.current.max[0]  * 86400.
     // materialRef.current.uniforms.nextDataMin.value = data.next.min[0]  * 86400.
@@ -93,11 +94,16 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     }
   })
 
+  // Create a basic material for testing
+  const basicMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
+  const basicGeometry = new THREE.BoxGeometry(1, 1, 1);
+  
   return (
     <mesh 
       ref={wind_layer_ref} 
       geometry={ geometry }
-      material={ materialRef.current }>
+      // material={ materialRef.current }>
+      material={ basicMaterial }>
     </mesh>
   )
 }))

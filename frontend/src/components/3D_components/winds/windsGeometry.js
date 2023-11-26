@@ -20,8 +20,8 @@ function createWindsGeometry(initialPositions, shaderUniforms) {
 
     }
 
-    const baseGeometry = getArrowGeometry()
-//    const baseGeometry = new PlaneGeometry()
+    // const baseGeometry = getArrowGeometry()
+   const baseGeometry = new PlaneGeometry()
 
     var jj = 0;
     var kk = 0;

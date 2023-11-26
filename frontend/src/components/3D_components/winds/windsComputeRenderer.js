@@ -52,6 +52,8 @@ function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniform
       gpuComputeWinds.variables[0].material.uniforms.uDelta.value = deltaTime
       gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
 
+      console.log(gpuComputeWinds)
+
       gpuComputeWinds.compute();
 
       winds.material.uniforms[ "texturePosition" ].value = gpuComputeWinds.getCurrentRenderTarget( positionVariable ).texture;
