@@ -7,6 +7,8 @@ import * as THREE from "three"
 import Lights from "./Lights"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
 import { SurfaceLayer, SurfaceLayerRef } from "./SurfaceLayer"
+import { WindLayer, WindLayerRef } from "./winds/WindsLayer"
+
 import { ALL_VARIABLES, EVarID } from "@/utils/store/variables/variable.types"
 import { TickFn } from "../../utils/tick/tick"
 import { Coordinate } from "@/utils/store/graph/graph.type"
@@ -24,6 +26,8 @@ export const World = memo(({ tick }: Props) => {
   
     const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
     const surface_layer_ref = useRef<SurfaceLayerRef>(null)
+    const winds_layer_ref = useRef<WindLayerRef>(null)
+
     const variables_state = useStore((state) => state.active_variables)
 
     // update shader uniforms when user uses GUI
@@ -60,16 +64,16 @@ export const World = memo(({ tick }: Props) => {
         if (variables_state.get(EVarID.height)) {
           surface_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         }
-        // if (wind_layer_ref.current) {
-        //   wind_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
-        // }
+        if (variables_state.get(EVarID.winds)) {
+          winds_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
+        }
 
         // update textures only when necessary
         for (let variable of res.variables.keys()) {
         
           let data = res.variables.get(variable);
           let data_reference, reference_flag
-          
+
           switch (variable) {
 
             case EVarID.pr: {
@@ -118,8 +122,8 @@ export const World = memo(({ tick }: Props) => {
         {variables_state.get(EVarID.pr) && <AtmosphereLayer ref={atmosphere_layer_ref} />}
         {/* <SurfaceLayer ref={surface_layer_ref} /> */}
         {/* <AtmosphereLayer ref={atmosphere_layer_ref} /> */}
-        {/* <WindLayer ref={wind_layer_ref} /> */}
-  
+        {variables_state.get(EVarID.winds) && <WindLayer ref={winds_layer_ref} />}
+
         <Perf position="top-right" />
       </>
     )

@@ -40,7 +40,7 @@ function initMap() {
   let m = new Map()
   m.set(EVarID.currents, false)
   m.set(EVarID.clt, false)
-  m.set(EVarID.height, true)
+  m.set(EVarID.height, false)
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)
@@ -49,7 +49,7 @@ function initMap() {
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
   m.set(EVarID.tos, false)
-  m.set(EVarID.winds, false)
+  m.set(EVarID.winds, true)
   return m
 }
 
