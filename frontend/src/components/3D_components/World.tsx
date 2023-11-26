@@ -69,6 +69,7 @@ export const World = memo(({ tick }: Props) => {
         
           let data = res.variables.get(variable);
           let data_reference, reference_flag
+          
           switch (variable) {
 
             case EVarID.pr: {

@@ -36,9 +36,6 @@ export async function sync(
     if (next_time >= size) {
       next_time = current_time
     }
-
-    console.log(data.collection.exps[current_time].id)
-    console.log(variable)
     
     const current_info = await database_provider.getInfo(
       data.collection.exps[current_time].id,
@@ -48,8 +45,6 @@ export async function sync(
       data.collection.exps[next_time].id,
       variable,
     )
-
-    console.log(current_info)
 
     return {
       mean: {
