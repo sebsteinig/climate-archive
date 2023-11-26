@@ -4,6 +4,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
+  useEffect,
 } from "react"
 import { ControllerRef, TimeController } from "./utils/TimeController"
 import { IControllerRef } from "./controller.types"
@@ -15,6 +16,7 @@ import {
 import { ProgessBarRef, ProgressBar } from "./utils/ProgressBar"
 import { goto } from "@/utils/store/worlds/time/loop"
 import { useStore } from "@/utils/store/store"
+import { TimeSlider, InputRef as TimeSliderRef } from "./utils/TimeSlider"
 
 type MonthlyControllerProps = {
   data: WorldData
@@ -23,81 +25,94 @@ type MonthlyControllerProps = {
   controller_ref: ControllerRef | undefined
 }
 
-export const MonthlyController = forwardRef<
-  IControllerRef,
-  MonthlyControllerProps
->(function MonthlyController({ current_frame, world_id, controller_ref }, ref) {
-  const progress_bar_ref = useRef<ProgessBarRef>(null)
-  const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
-    undefined,
-  )
-  const [focus, setFocus] = useState<number | undefined>(undefined)
-  const observed_id = useStore((state) => state.worlds.observed_world)
-  useImperativeHandle(ref, () => {
-    return {
-      onChange(frame) {},
-      onWeightUpdate(frame) {
-        progress_bar_ref.current?.update(frame.weight / (frame.timesteps ?? 12))
-      },
-    }
-  })
-  return (
-    <div
-      className={`select-none w-full pt-5 px-5 ${
-        observed_id === world_id
-          ? "brightness-50 pointer-events-none"
-          : "pointer-events-auto"
-      }`}
-    >
-      <div className="w-full my-2">
-        <ProgressBar ref={progress_bar_ref} />
-      </div>
+// ... (your imports)
+
+export const MonthlyController = forwardRef<IControllerRef, MonthlyControllerProps>(
+  function MonthlyController({ current_frame, world_id, data, controller_ref }, ref) {
+
+    const [highlighted_month, setHighLightMonth] = useState<number | undefined>(
+      undefined,
+    )
+    const [focus, setFocus] = useState<number | undefined>(undefined)
+    const worlds = useStore((state) => state.worlds)
+
+    const monthlyControllerRef = useRef(); // This ref is to connect to TimeScale
+
+    return (
       <div
-        className="
-                    w-full rounded-lg 
-                    flex flex-row
-                    overflow-hidden
-                    border-2 border-slate-200
-                "
-        onMouseLeave={() => {
-          if (focus === undefined) {
-            setHighLightMonth(undefined)
-          }
-        }}
+        className={`select-none w-full ${
+          worlds.slots.size <= 4 ? 'pt-2 px-7' : 'pt-0 px-4'
+        } ${
+          worlds.observed_world === world_id || worlds.slots.get(world_id)?.time.animation == true
+            ? "brightness-50 pointer-events-none"
+            : "pointer-events-auto"
+        }`}
       >
-        {MONTHS.map((month, idx) => {
-          return (
-            <Month
-              key={idx}
-              highlight={
-                highlighted_month === undefined || highlighted_month === idx
+      <div className={`w-full ${worlds.slots.size <= 4 ? 'my-2' : 'my-0'}`}>
+          <TimeSlider
+            world_id={world_id}
+            data={data}
+            current_frame={current_frame}
+            controller_ref={controller_ref}
+            labels={worlds.slots.size <= 4 ? false : true}
+          />
+        </div>
+        {/* no month buttons in case of a lot of worlds to save space*/}
+        {worlds.slots.size <= 4 ? (
+          <div
+            className="
+              w-full rounded-lg 
+              flex flex-row
+              overflow-hidden
+              border-2 border-slate-200
+            "
+            onMouseLeave={() => {
+              if (focus === undefined) {
+                setHighLightMonth(undefined)
               }
-              focus={focus}
-              idx={idx}
-              month={month}
-              color={MONTHS_COLOR[idx]}
-              onChange={(idx, focus) => {
-                const frame = current_frame.current.get(world_id)
-                if (!frame) return
-                setHighLightMonth(idx)
-                if (focus) {
-                  setFocus((prev) => {
-                    if (prev === idx) {
-                      return undefined
-                    }
-                    return idx
-                  })
+            }}
+          >
+            {MONTHS.map((month, idx) => (
+              <Month ref={monthlyControllerRef} // This ref is to connect to TimeScale
+                key={idx}
+                highlight={
+                  highlighted_month === undefined || highlighted_month === idx
                 }
-                controller_ref?.pause()
-                goto(frame, idx)
-              }}
-            />
-          )
-        })}
+                focus={focus}
+                idx={idx}
+                month={month}
+                color={MONTHS_COLOR[idx]}
+                current_frame={current_frame}
+                world_id={world_id}
+                onChange={(idx, focus) => {
+                  const frame = current_frame.current.get(world_id)
+                  if (!frame) return
+                  setHighLightMonth(idx)
+                  if (focus) {
+                    setFocus((prev) => {
+                      if (prev === idx) {
+                        return undefined
+                      }
+                      return idx
+                    })
+                  }
+                  // controller_ref?.pause()
+                  goto(frame, idx, 5.0, true)
+                }}
+                resetHighlight={() => {
+                  setHighLightMonth(undefined)
+                }}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
-    </div>
-  )
-})
+    )
+  }
+)
+
+// ... (rest of your code)
+
 
 type MonthProps = {
   idx: number
@@ -105,33 +120,68 @@ type MonthProps = {
   highlight: boolean
   focus: number | undefined
   color: string
+  current_frame: TimeFrameRef
+  world_id: WorldID
   onChange: (idx: number, focus: boolean) => void
+  resetHighlight: () => void
 }
 
-function Month({ idx, month, color, focus, onChange, highlight }: MonthProps) {
+export type InputRef = {
+  updateFromSlider: () => void
+}
+
+
+const Month = forwardRef((props: MonthProps, ref: RefObject<InputRef>) => {
+  const { idx, month, color, current_frame, world_id, focus, onChange, resetHighlight, highlight } = props;
+
+  useImperativeHandle(ref, () => ({
+    updateFromSlider() {
+      resetHighlight()
+      // ref.setSelection(undefined)
+    }
+  }));
+
+  // reset highlights if frame gets changed outside of the controller
+  // e.g. by time slider or play/pause button
+  // useEffect(() => {
+  //   // 
+  //   const checkForChanges = () => {
+  //       let frame = current_frame.current.get(world_id);
+  //       if (!frame ) return;
+  //       if (frame.swapping == true && !frame.controllerFlag) {
+  //         resetHighlight();
+  //       }
+  //       // console.log(newValue)
+  //   };
+  //   // Set up the interval
+  //   const intervalId = setInterval(checkForChanges, 1);
+  //   // Clear the interval when the component is unmounted.
+  //   return () => clearInterval(intervalId);
+  // }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
+
+
   return (
     <div
-      className={`${
-        focus === idx ? "flex-grow-[2]" : "grow"
-      } cursor-pointer truncate text-clip tracking-widest 
+      className={`grow cursor-pointer truncate text-clip tracking-widest 
         small-caps py-1 text-slate-900 text-center ${color}
         border-r-2 border-slate-200 ${
           highlight ? "brightness-100" : "brightness-50"
         }
         transition-all duration-100 ease-in-out `}
       onClick={() => {
-        onChange(idx, true)
+        onChange(idx, true);
       }}
-      onMouseOver={() => {
-        if (focus === undefined) {
-          onChange(idx, false)
-        }
-      }}
+      // onMouseOver={() => {
+      //   if (focus === undefined) {
+      //     onChange(idx, false);
+      //   }
+      // }}
     >
       {month.slice(0, 3)}
     </div>
-  )
-}
+  );
+})
+  
 
 const MONTHS = [
   "January",

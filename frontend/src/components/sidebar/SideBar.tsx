@@ -7,10 +7,9 @@ import { EVarID } from "@/utils/store/variables/variable.types"
 //import { PreCollectionView } from "./PreCollectionView"
 
 type Props = {
-  journals: JSX.Element
 }
 
-export default function SideBar({ journals }: Props) {
+export default function SideBar({ }: Props) {
   const [current_variable_controls, setCurrentVariableControls] =
     useState<EVarID>()
   return (

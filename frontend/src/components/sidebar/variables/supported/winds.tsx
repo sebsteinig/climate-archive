@@ -1,15 +1,9 @@
-import {
-  ColorMapRow,
-  RowWithCheckBox,
-  RowWithSlider,
-  Rows,
-  Variable,
-  VariableProps,
-} from "../utils"
+import { Variable, VariableProps } from "../Variable"
 import { useStore } from "@/utils/store/store"
-import InputNumber from "@/components/inputs/InputNumber"
-import Slider from "@/components/inputs/Slider"
-import Checkbox from "@/components/inputs/Checkbox"
+import { Rows } from "../utils/Rows"
+import { ColorMapRow } from "../utils/row.colormap"
+import { RowWithSlider } from "../utils/row.slider"
+import { RowWithCheckBox } from "../utils/row.checkbox"
 
 export function Winds({
   current_variable_controls,

@@ -14,6 +14,8 @@ import {
   WindsSlice,
   EVarID,
 } from "./variable.types"
+import colormaps_list from "$/assets/colormaps/colormaps_list.json"
+
 
 export type VariableSlice = {
   active_variables: Map<EVarID, boolean>
@@ -38,7 +40,7 @@ function initMap() {
   let m = new Map()
   m.set(EVarID.currents, false)
   m.set(EVarID.clt, false)
-  m.set(EVarID.height, false)
+  m.set(EVarID.height, true)
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)
@@ -109,15 +111,34 @@ export const createVariableSlice: StateCreator<
       },
       height: {
         name: EVarID.height,
-        diplacement: 0.2,
-        colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
+        displacement: 0.2,
+        min: -5000,
+        max: 5000,
+        colormap: "topo.png",
+        colormap_index: colormaps_list.indexOf("topo.png"),
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              height: {
+                ...state.variables.height,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
+        updateMin: (value: number) =>
           set((state) => {
-            state.variables.height.colormap = value
+            state.variables.height.min = value
           }),
-        updateDiplacement: (value: number) =>
+        updateMax: (value: number) =>
           set((state) => {
-            state.variables.height.diplacement = value
+            state.variables.height.max = value
+          }),
+        updateDisplacement: (value: number) =>
+          set((state) => {
+            state.variables.height.displacement = value
           }),
       },
       liconc: {
@@ -133,11 +154,21 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
-        colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
-          set((state) => {
-            state.variables.pr.colormap = value
-          }),
+        anomaly_range: 5,
+        colormap: "rain.png",
+        colormap_index: colormaps_list.indexOf("rain.png"),
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              pr: {
+                ...state.variables.pr,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
         updateMin: (value: number) =>
           set((state) => {
             state.variables.pr.min = value
@@ -146,6 +177,10 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.pr.max = value
           }),
+        updateAnomalyRange: (value: number) =>
+        set((state) => {
+          state.variables.pr.anomaly_range = value
+        }),
       },
       sic: {
         name: EVarID.sic,

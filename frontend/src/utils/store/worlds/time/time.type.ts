@@ -13,6 +13,7 @@ export enum TimeKind {
 export enum TimeController {
   monthly,
   geologic,
+  slider
 }
 
 export enum TimeSpeed {

@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react"
 type Props = {
   placeholder: string
   value: string
-  onChange: (value:string) => void
+  onChange: (value: string) => void
   onKeyDown?: (e: string) => void
   name?: string
   id?: string

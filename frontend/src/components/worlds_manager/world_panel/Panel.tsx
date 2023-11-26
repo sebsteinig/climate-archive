@@ -12,6 +12,8 @@ import { MonthlyController } from "../time_controllers/MonthlyController"
 import { IControllerRef } from "../time_controllers/controller.types"
 import { GeoTimeScaleController } from "../time_controllers/GeoTimeScaleController"
 
+import { TimeSlider } from "../time_controllers/utils/TimeSlider"
+
 export type PanelProps = {
   displayCollection: (collection: Collection) => void
   world_id: WorldID

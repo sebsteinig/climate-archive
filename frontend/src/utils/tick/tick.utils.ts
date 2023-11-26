@@ -75,13 +75,20 @@ export function crop(
   xsize: number,
   ysize: number,
 ) {
+
   canvas.width = xsize
   canvas.height = ysize
 
+  const cacheLabel = `getCache ${Date.now()}`;
+  console.time(cacheLabel);
   let res = cache.get(JSON.stringify({ path, frame, vertical }))
+  console.timeEnd(cacheLabel);
   if (res) {
+    console.log(res)
     return res
   }
+
+  console.log('cropping')
   ctx.drawImage(
     img,
     frame * xsize,
@@ -113,31 +120,27 @@ function processInfo(
         min: string
       }[][]
     }[]
-  }
-  const bound_matrices = metadata.metadata.map((m) => m.bounds_matrix)
+  };
 
-  const min = bound_matrices.map((matrix) => {
+  const calculateMinMax = (matrix, index, isMax) => {
     if (mean) {
-      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.min), 0)
-      const average = sum / matrix[z].length
-      return average
+      const sum = matrix.reduce((acc, val) => acc + parseFloat(isMax ? val[index].max : val[index].min), 0);
+      return sum / matrix.length;
     } else {
-      const _z = matrix.length > z ? z : 0
-      const _t = matrix[_z].length > t ? t : 0
-      return parseFloat(matrix[_z][_t].min)
+      return parseFloat(isMax ? matrix[z][index].max : matrix[z][index].min);
     }
-  })
-  const max = bound_matrices.map((matrix) => {
-    if (mean) {
-      const sum = matrix[z].reduce((acc, val) => acc + parseFloat(val.max), 0)
-      const average = sum / matrix[z].length
-      return average
-    } else {
-      const _z = matrix.length > z ? z : 0
-      const _t = matrix[_z].length > t ? t : 0
-      return parseFloat(matrix[_z][_t].max)
-    }
-  })
+  };
+
+  const min = metadata.metadata.map(m => {
+    const matrix = m.bounds_matrix_ts;
+    return Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix, index, false));
+  });
+
+  const max = metadata.metadata.map(m => {
+    const matrix = m.bounds_matrix_ts;
+    return Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix, index, true));
+  });
+
   return {
     min,
     max,
@@ -151,7 +154,8 @@ function processInfo(
     yinc: info.yinc,
     nan_value_encoding: info.nan_value_encoding,
   }
-}
+};
+
 
 async function getTextureFromPath(
   path: string,
@@ -161,23 +165,87 @@ async function getTextureFromPath(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ) {
+          
   const texture = await database_provider.getTexture(path)
-  const blob = new Blob([texture.image], {
-    type: `image/${info.extension.toLowerCase()}`,
-  })
-  const bitmap = await createImageBitmap(blob)
-  const url = crop(
-    canvas,
-    ctx,
-    bitmap,
-    path,
-    time,
-    vertical,
-    info.xsize,
-    info.ysize,
-  )
-  return url
+
+  // const blob = new Blob([texture.image], {
+  //   type: `image/${info.extension.toLowerCase()}`,
+  // })
+  // const bmpLabel = `create bitmap for world ${Date.now()}`;
+  // console.time(bmpLabel);
+  // const bitmap = await createImageBitmap(blob, 0, 0, 10, 10)
+  // console.timeEnd(bmpLabel);
+
+  // const cropLabel = `ccrop for world ${Date.now()}`;
+  // console.time(cropLabel);
+
+  // Convert the Blob into an ObjectURL
+  // const imageURL = URL.createObjectURL(texture.image);
+
+
+  // const url = crop(
+  //   canvas,
+  //   ctx,
+  //   img,
+  //   path,
+  //   time,
+  //   vertical,
+  //   info.xsize,
+  //   info.ysize,
+  // )
+  // console.timeEnd(cropLabel);
+  return texture
 }
+
+async function getTextureFromPathCrop(
+  path: string,
+  time: number,
+  vertical: number,
+  info: TextureInfo,
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+) {
+          
+
+  const textureLabel = `getTexture ${Date.now()}`;
+  console.time(textureLabel);
+  const texture = await database_provider.getTexture(path)
+  console.log(texture)
+  console.timeEnd(textureLabel);
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+
+    img.onload = function() {
+      try {
+        const url = crop(
+          canvas,
+          ctx,
+          img,
+          path,
+          time,
+          vertical,
+          info.xsize,
+          info.ysize,
+        );
+      
+        console.log(url)
+        resolve(url); // resolve the Promise with the url
+      } catch(error) {
+        reject(error); // in case of any errors during the crop, reject the Promise
+      }
+    };
+
+    img.onerror = function() {
+      reject(new Error("Error loading the image."));
+    };
+    
+    img.src = URL.createObjectURL(texture.image)
+    
+  });
+}
+
 
 export async function compute(
   variable: EVarID,
@@ -189,30 +257,23 @@ export async function compute(
   if (paths.length === 0) return
   if (
     !canvas.current ||
-    !canvas.current.current.ctx ||
-    !canvas.current.next.ctx
+    !canvas.current.current.ctx
   ) {
     return
   }
 
   let current_frame: number
-  let next_frame: number
   let current_info: TextureInfo
-  let next_info: TextureInfo
   if (world_data.time.mode === TimeMode.mean) {
     current_frame = 0
     current_info = data.mean!.current.info
-    next_frame = 0
-    next_info = data.mean!.next.info
   } else {
     current_frame = data.ts!.current.frame
-    next_frame = data.ts!.next.frame
     current_info = data.ts!.info
-    next_info = data.ts!.info
   }
-
+  
   const textures = await Promise.all(
-    paths.map(async ({ current_path, next_path }) => {
+    paths.map(async ({ current_path }) => {
       const current_url = await getTextureFromPath(
         current_path,
         current_frame,
@@ -221,36 +282,26 @@ export async function compute(
         canvas.current!.current.canvas,
         canvas.current!.current.ctx!,
       )
-      const next_url = await getTextureFromPath(
-        next_path,
-        next_frame,
-        0,
-        next_info,
-        canvas.current!.next.canvas,
-        canvas.current!.next.ctx!,
-      )
 
       return {
         current_url,
-        next_url,
       }
     }),
   )
+
   if (world_data.time.mode === TimeMode.mean) {
     return {
       textures,
-      current: processInfo(variable, 0, 0, data.mean!.current.info, true),
-      next: processInfo(variable, 0, 0, data.mean!.current.info, true),
+      info: processInfo(variable, 0, 0, data.mean!.current.info, true),
     }
   } else {
     const [_, fpc] = chunksDetails(data.ts!.info)
     const current_t = data.ts!.current.frame + data.ts!.current.time_chunk * fpc
-    const next_t = data.ts!.next.frame + data.ts!.next.time_chunk * fpc
 
+    // should return a single texture and info with field min/max for each timestep
     return {
       textures,
-      current: processInfo(variable, current_t, 0, data.ts!.info),
-      next: processInfo(variable, next_t, 0, data.ts!.info),
+      info: processInfo(variable, current_t, 0, data.ts!.info),
     }
   }
 }

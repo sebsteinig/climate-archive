@@ -9,23 +9,25 @@ function calcDuration(from: number, to: number, speed: number): number {
   return Math.abs(to - from) * t
 }
 const EPSILON = 0.00001
-export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
+
+export function goto(frame: TimeFrame, to: number, duration: number, controllerFlag: boolean, onComplete?: () => void) {
   let state = {
     previous_idx: Math.floor(frame.weight),
   }
   const rounded_to = Math.round(to)
-  const duration = 5 // 5s
+  frame.controllerFlag = controllerFlag
+
   return gsap.to(frame, {
     ease: "power2.out",
     duration: duration,
     weight: rounded_to,
-    onCompleteParams: [frame],
-    onComplete: (frame: TimeFrame) => {
-      frame.swap_flag = true
-      if (onComplete) {
-        onComplete()
-      }
-    },
+    // onCompleteParams: [frame],
+    // onComplete: (frame: TimeFrame) => {
+    //   frame.swap_flag = true
+    //   if (onComplete) {
+    //     onComplete()
+    //   }
+    // },
     onUpdateParams: [frame, state],
     onUpdate: (frame: TimeFrame, state: { previous_idx: number }) => {
       const idx = Math.floor(frame.weight)
@@ -40,6 +42,56 @@ export function goto(frame: TimeFrame, to: number, onComplete?: () => void) {
       pin(frame)
     },
   })
+}
+
+export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: boolean, onComplete?: () => void) {
+  let previous_idx = Math.floor(frame.weight)
+  let new_idx = Math.floor(targetWeight)
+  frame.controllerFlag = controllerFlag
+
+  // works for monthly data, not for paleo
+  // if (targetWeight < frame.timesteps - EPSILON) {
+  //   frame.weight = targetWeight
+  // } else {
+  //   frame.weight = 0.
+  // }
+
+  frame.weight = targetWeight
+
+  // hard-coded for annual cycle demo, need to be generalised
+  if (previous_idx !== new_idx && new_idx !== targetWeight) {
+        if (frame.weight <= 12.0 + EPSILON) {
+          frame.swap_flag = false
+        } else {
+          frame.swap_flag = true
+        }
+  }
+
+  // return gsap.to(frame, {
+  //   ease: "power2.out",
+  //   duration: duration,
+  //   weight: to,
+  //   onCompleteParams: [frame],
+  //   onComplete: (frame: TimeFrame) => {
+  //     frame.swap_flag = true
+  //     if (onComplete) {
+  //       onComplete()
+  //     }
+  //   },
+  //   onUpdateParams: [frame, state],
+  //   onUpdate: (frame: TimeFrame, state: { previous_idx: number }) => {
+  //     const idx = Math.floor(frame.weight)
+  //     if (state.previous_idx !== idx && idx !== to) {
+  //       state.previous_idx = idx
+
+  //       frame.swap_flag = true
+  //     }
+  //   },
+  //   onInterruptParams: [frame],
+  //   onInterrupt: (frame: TimeFrame) => {
+  //     pin(frame)
+  //   },
+  // })
 }
 
 export function pin(frame: TimeFrame, onComplete?: () => void) {

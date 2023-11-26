@@ -2,21 +2,26 @@
 // define uniforms
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 uniform float uLayerOpacity;
+uniform float uFrame;
 uniform float uFrameWeight;
-uniform float thisDataMin;
-uniform float thisDataMax;
-uniform float nextDataMin;
-uniform float nextDataMax;
+uniform float thisDataMin[12]; 
+uniform float thisDataMax[12];
+uniform float textureTimesteps;
+uniform float referenceDataMin[12];
+uniform float referenceDataMax[12];
 uniform float uUserMinValue;
 uniform float uUserMaxValue;
+uniform float uUserMinValueAnomaly;
+uniform float uUserMaxValueAnomaly;
 uniform float numLon;
 uniform float numLat;
+uniform float colorMapIndex;
 
-uniform sampler2D thisDataFrame;
-uniform sampler2D nextDataFrame;
+uniform sampler2D dataTexture;
+uniform sampler2D referenceDataTexture;
 uniform sampler2D colorMap;
 
-uniform bool uCMIP6Mode;
+uniform bool referenceDataFlag;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // varying from vertex shader
@@ -28,8 +33,8 @@ varying vec2 vUv;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // convert float to color via colormap
-vec4 applyColormap(float t, sampler2D colormap){
-    return(texture2D(colormap,vec2(t,0.5)));
+vec4 applyColormap(float t, sampler2D colormap, float index){
+    return(texture2D(colormap,vec2(t, index / 23.0 + 1.0 / 23.0 )));
 }
 
 // remap color range
@@ -92,30 +97,39 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords, float numLon, float numLa
 
 void main()	{
 
+float cmap_index = colorMapIndex;
+float opacity_cutoff = 0.0;
+// Calculate the start and end of the UV segment for the current timesteps
+float segmentWidth = 1.0 / textureTimesteps;
+
+// Adjust the UV coordinates
+vec2 this_uv = vec2((uFrame / textureTimesteps) + (vUv.x * segmentWidth), vUv.y);
+vec2 next_uv = vec2((( uFrame + 1.0) / textureTimesteps) + (vUv.x * segmentWidth), vUv.y);
+
 // convert relative bitmap value to absolute value for both frames
 float thisFrameData = remap( 
     textureBicubic(
-        thisDataFrame, 
-        vUv, 
-        numLon, 
+        dataTexture, 
+        this_uv, 
+        numLon * textureTimesteps, 
         numLat
-        ).r, 
+        ).r,
     0.0, 
     1.0, 
-    thisDataMin, 
-    thisDataMax);
+    thisDataMin[int(uFrame)], 
+    thisDataMax[int(uFrame)]);
 
 float nextFrameData = remap( 
     textureBicubic(
-        nextDataFrame, 
-        vUv, 
-        numLon, 
+        dataTexture, 
+        next_uv, 
+        numLon * textureTimesteps, 
         numLat
         ).r, 
     0.0, 
     1.0, 
-    nextDataMin, 
-    nextDataMax);
+    thisDataMin[int(uFrame + 1.0)], 
+    thisDataMax[int(uFrame + 1.0)]);
 
 // interpolate between absolute values of both frames
 float intData = mix(thisFrameData, nextFrameData, uFrameWeight);
@@ -128,11 +142,59 @@ float dataRemapped = remap(
     0.0, 
     1.0 );
 
+// only process reference data if reference mode is active
+if (referenceDataFlag) {
+
+    float thisReferenceData = remap( 
+        textureBicubic(
+            referenceDataTexture, 
+            this_uv, 
+            numLon * textureTimesteps, 
+            numLat
+            ).r, 
+        0.0, 
+        1.0, 
+        referenceDataMin[int(uFrame)], 
+        referenceDataMax[int(uFrame)]);
+
+    float nexReferenceData = remap( 
+        textureBicubic(
+            referenceDataTexture, 
+            next_uv, 
+            numLon * textureTimesteps, 
+            numLat
+            ).r, 
+        0.0, 
+        1.0, 
+        referenceDataMin[int(uFrame + 1.0)], 
+        referenceDataMax[int(uFrame + 1.0)]);
+
+    // interpolate between absolute values of both frames
+    float intReferenceData = mix(thisReferenceData, nexReferenceData, uFrameWeight);
+    
+    intData -= intReferenceData;
+
+    dataRemapped = remap( 
+    intData, 
+    uUserMinValueAnomaly, 
+    uUserMaxValueAnomaly, 
+    0.0, 
+    1.0 );
+
+    cmap_index = 17.0;
+}
+
+
 // apply colormap to data
-vec4 dataColor = applyColormap( dataRemapped, colorMap );
+vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
 
 // send pixel color to screen
-if(dataRemapped > 0.0) {
+if (referenceDataFlag == false) {
+    if (dataRemapped >= 0.0 ) {
+        gl_FragColor = dataColor;
+        gl_FragColor.a *= uLayerOpacity;
+    }
+} else {
     gl_FragColor = dataColor;
     gl_FragColor.a *= uLayerOpacity;
 }

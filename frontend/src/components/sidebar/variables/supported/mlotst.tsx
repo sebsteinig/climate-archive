@@ -1,4 +1,4 @@
-import { Variable } from "../utils"
+import { Variable } from "../Variable"
 import { useStore } from "@/utils/store/store"
 
 type Props = {}

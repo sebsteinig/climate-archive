@@ -1,6 +1,6 @@
 "use client"
 import LoadingSpinner from "@/components/loadings/LoadingSpinner"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { searchPublication } from "@/utils/api/api"
 import { Publication } from "@/utils/types"
 import { database_provider } from "@/utils/database_provider/DatabaseProvider"
@@ -14,7 +14,7 @@ import {
   resolveURLparams,
 } from "@/utils/URL_params/url_params.utils"
 import { ErrorBoundary } from "react-error-boundary"
-import { ErrorView } from "@/components/ErrorView"
+import { ErrorView } from "@/components/error/ErrorView"
 
 const ClientMain = dynamic(() => import("@/components/ClientMain"), {
   ssr: false,
@@ -55,6 +55,7 @@ export default function PublicationPage() {
         })
 
         if (!publication) return
+        console.log('load', exp_id)
         await database_provider.load({ exp_id })
         const idx = await database_provider.addPublicationToDb(publication)
         addCollection(idx, publication)

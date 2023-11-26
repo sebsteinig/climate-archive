@@ -54,12 +54,12 @@ export type Clt = Variable & {}
 export interface CltSlice extends Clt {}
 
 export type Height = Variable & {
-  diplacement: number
+  displacement: number
   colormap: string
 }
 export interface HeightSlice extends Height {
   updateColormap: (value: string) => void
-  updateDiplacement: (value: number) => void
+  updateDisplacement: (value: number) => void
 }
 
 export type Liconc = Variable & {}
@@ -75,11 +75,14 @@ export type Pr = Variable & {
   min: number
   max: number
   colormap: string
+  colormap_index: number
+  anomaly_range: number
 }
 export interface PrSlice extends Pr {
-  updateColormap: (value: string) => void
+  updateColormap: (value: string, index: number) => void
   updateMin: (value: number) => void
   updateMax: (value: number) => void
+  updateAnomalyRange: (value: number) => void
 }
 
 export type Sic = Variable & {}

@@ -2,7 +2,7 @@
 
 import ButtonPrimary from "@/components/buttons/ButtonPrimary"
 import ButtonSecondary from "@/components/buttons/ButtonSecondary"
-import { SearchButtonStatic } from "@/components/searchbar/SearchButtonStatic"
+// import { SearchButtonStatic } from "@/components/searchbar/SearchButtonStatic"
 import Link from "next/link"
 import { useEffect } from "react"
 
@@ -21,7 +21,7 @@ export default function Error({
     <main className="w-full h-full flex flex-col gap-5">
       <div>
         <nav className="flex flex-row justify-between">
-          <SearchButtonStatic />
+          {/* <SearchButtonStatic /> */}
           <div className="h-14 cursor-pointer flex items-center">
             <h1 className="">CLIMATE ARCHIVE</h1>
           </div>

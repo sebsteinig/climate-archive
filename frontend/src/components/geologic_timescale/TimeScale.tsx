@@ -1,23 +1,31 @@
 "use client"
-import {
-  RefObject,
-  forwardRef,
-  memo,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
-import { useGeologicTree } from "./geologic_tree"
-import { GeoBranch, GeoData, GeoID } from "./utils/geologic_tree.utils"
-import { GeoTreeRepr } from "./utils/geo_tree"
+import { useState, useRef, useImperativeHandle, forwardRef, useEffect } from "react"
+import { useGeologicTree } from "../../utils/hooks/useGeologicTree"
 import { query } from "./utils/span_tree"
+import {
+  BlockAppereance,
+  Selection,
+  SelectionAction,
+  lastOf,
+  nextSelection,
+  selectionEquality,
+  statusOf,
+} from "./timescale.utils"
+import { Block } from "./timescale.block"
+import { Cell } from "./timescale.cell"
+import { useStore } from "@/utils/store/store"
 
 type TimeScaleProps = {
   onChange: (idx: number, exp_id: string) => void
+  current_frame: TimeFrameRef
+  world_id: WorldID
 }
 
-export function TimeScale({ onChange }: TimeScaleProps) {
+// export function TimeScale({ onChange }: TimeScaleProps) {
+export const TimeScale = forwardRef<any, TimeScaleProps>(({ onChange, current_frame, world_id }, ref) => {
+
+  const worlds = useStore((state) => state.worlds)
+
   const [tree, exp_span_tree] = useGeologicTree()
 
   function onSelect(param: Selection) {
@@ -29,7 +37,8 @@ export function TimeScale({ onChange }: TimeScaleProps) {
       action: param.action,
       child: param,
     }
-    if (selection && is_focus && selectionEquality(selection, next_selection)) {
+    if (selection && selectionEquality(selection, next_selection)) {
+    // if (selection && is_focus && selectionEquality(selection, next_selection)) {
       setSelection(undefined)
       setFocus(false)
     } else {
@@ -46,6 +55,35 @@ export function TimeScale({ onChange }: TimeScaleProps) {
       }
     }
   }
+
+  function highlightOnly(param: Selection) {
+    const next_selection = {
+      id: tree.root.id,
+      pid: tree.root.id,
+      data: tree.root.data,
+      fallthrought: param.fallthrought,
+      action: param.action,
+      child: param,
+    }
+    if (selection && selectionEquality(selection, next_selection)) {
+    // if (selection && is_focus && selectionEquality(selection, next_selection)) {
+      setSelection(undefined)
+      setFocus(false)
+    } else {
+      if (next_selection.action === SelectionAction.focus) {
+        setFocus(true)
+      }
+      setSelection(next_selection)
+    //   const span_data = query(
+    //     exp_span_tree,
+    //     lastOf(next_selection).data.age_span.to,
+    //   )
+    //   if (span_data) {
+    //     onChange(span_data.data.idx, span_data.data.exp_id)
+    //   }
+    }
+  }
+
   function r_onSelect(param: Selection) {
     param.action = SelectionAction.highlight
     setSelection(param)
@@ -57,18 +95,42 @@ export function TimeScale({ onChange }: TimeScaleProps) {
   }
   const [selection, setSelection] = useState<Selection | undefined>()
   const [is_focus, setFocus] = useState<boolean>(false)
+
+  // reset highlights if frame gets changed outside of the controller
+  // e.g. by time slider or play/pause button
+  useEffect(() => {
+    // 
+    const checkForChanges = () => {
+        let frame = current_frame.current.get(world_id);
+        if (!frame ) return;
+        if (frame.swapping == true && !frame.controllerFlag) {
+          setSelection(undefined)
+        }
+        // console.log(newValue)
+    };
+    // Set up the interval
+    const intervalId = setInterval(checkForChanges, 10);
+    // Clear the interval when the component is unmounted.
+    return () => clearInterval(intervalId);
+  }, []);  // The empty dependency array means this useEffect runs once when the component mounts.
+
+
   return (
     <div
-      className="w-full border-4 border-slate-200 rounded-md bg-slate-900"
-      onMouseLeave={() => {
-        if (!is_focus) {
-          setSelection(undefined)
-          const span_data = query(exp_span_tree, tree.root.data.age_span.from)
-          if (span_data) {
-            onChange(span_data.data.idx, span_data.data.exp_id)
-          }
-        }
-      }}
+    className={`w-full border-4 border-slate-200 rounded-md bg-slate-900 ${
+      worlds.slots.get(world_id)?.time.animation
+        ? "brightness-50 pointer-events-none"
+        : "pointer-events-auto"
+    }`}
+      // onMouseLeave={() => {
+      //   // if (!is_focus) {
+      //     setSelection(undefined)
+      //     const span_data = query(exp_span_tree, tree.root.data.age_span.from)
+      //     if (span_data) {
+      //       onChange(span_data.data.idx, span_data.data.exp_id)
+      //     }
+      //   // }
+      // }}
     >
       <Cell
         branch={{
@@ -80,6 +142,7 @@ export function TimeScale({ onChange }: TimeScaleProps) {
         className="w-full"
         onSelect={r_onSelect}
         is_focus={is_focus}
+        // is_focus={true}
         appearance={BlockAppereance.full}
         highlight={true}
       />
@@ -94,9 +157,11 @@ export function TimeScale({ onChange }: TimeScaleProps) {
               )}
               key={id}
               onSelect={onSelect}
+              // onSelect={highlightOnly}
               status={statusOf(branch, next_selection)}
               selection={next_selection}
               is_focus={is_focus}
+              // is_focus={true}
               branch={branch}
             />
           )
@@ -104,269 +169,4 @@ export function TimeScale({ onChange }: TimeScaleProps) {
       </div>
     </div>
   )
-}
-
-type BlockProps = {
-  parent_span: number
-  branch: GeoBranch
-  selection: Selection | undefined
-  onSelect: (param: Selection) => void
-  status: BlockStatus
-  is_focus: boolean
-}
-
-const Block = memo(function Block({
-  branch,
-  onSelect,
-  selection,
-  status,
-  parent_span,
-  is_focus,
-}: BlockProps) {
-  function b_onSelect(param: Selection) {
-    onSelect({
-      id: branch.id,
-      pid: branch.parent_id,
-      data: branch.data,
-      fallthrought: param.fallthrought,
-      action: param.action,
-      child: param,
-    })
-  }
-  const grow_span = useMemo(() => {
-    const span = Math.abs(branch.data.age_span.to - branch.data.age_span.from)
-    return Math.floor((span / parent_span) * 100)
-  }, [parent_span])
-  if (branch.branches.size === 0) {
-    return (
-      <Cell
-        grow_span={grow_span}
-        key={branch.id}
-        branch={branch}
-        highlight={status.highlight}
-        is_focus={is_focus}
-        appearance={status.appearance}
-        onSelect={onSelect}
-      />
-    )
-  }
-
-  return (
-    <div
-      style={{ flexGrow: grow_span }}
-      className={`
-            ${status.appearance === BlockAppereance.full ? "" : ""}
-            ${status.appearance === BlockAppereance.hidden ? "hidden" : ""}
-            ${
-              status.appearance === BlockAppereance.reduced
-                ? "w-[2em] h-10"
-                : ""
-            }
-            truncate transition-all duration-300 ease-in-out `}
-      key={branch.id}
-    >
-      <Cell
-        grow_span={grow_span}
-        key={branch.id}
-        branch={branch}
-        onSelect={onSelect}
-        is_focus={is_focus}
-        appearance={status.appearance}
-        highlight={status.highlight}
-      />
-      <div className="w-full flex flex-row truncate transition-all duration-300 ease-in-out ">
-        {Array.from(branch.branches).map(([sub_id, sub_branch]) => {
-          const next_selection = nextSelection(sub_id, branch.id, selection)
-          return (
-            <Block
-              parent_span={Math.abs(
-                branch.data.age_span.to - branch.data.age_span.from,
-              )}
-              key={sub_id}
-              onSelect={b_onSelect}
-              status={statusOf(sub_branch, next_selection)}
-              selection={next_selection}
-              is_focus={is_focus}
-              branch={sub_branch}
-            />
-          )
-        })}
-      </div>
-    </div>
-  )
-})
-
-type CellProps = {
-  grow_span?: number
-  className?: string
-  branch: GeoBranch
-  onSelect: (param: Selection) => void
-  appearance: BlockAppereance
-  is_focus: boolean
-  highlight: boolean
-}
-
-const Cell = memo(function Cell({
-  className,
-  branch,
-  onSelect,
-  highlight,
-  is_focus,
-  grow_span,
-  appearance,
-}: CellProps) {
-  const div_ref = useRef<HTMLDivElement>(null)
-  return (
-    <div
-      ref={div_ref}
-      className={`cursor-pointer truncate text-clip tracking-widest 
-            small-caps py-1 text-slate-900 text-center ${className ?? ""}
-            border border-slate-200 ${!highlight ? "brightness-50" : ""}
-            transition-all duration-300 ease-in-out 
-            `}
-      style={{ backgroundColor: branch.data.color, flexGrow: grow_span ?? 1 }}
-      onMouseOver={() => {
-        if (appearance === BlockAppereance.full && !is_focus) {
-          onSelect({
-            id: branch.id,
-            pid: branch.parent_id,
-            data: branch.data,
-            fallthrought: false,
-            action: SelectionAction.highlight,
-          })
-        }
-      }}
-      onClick={() => {
-        onSelect({
-          id: branch.id,
-          pid: branch.parent_id,
-          data: branch.data,
-          fallthrought: true,
-          action: SelectionAction.focus,
-        })
-      }}
-    >
-      {appearance === BlockAppereance.full
-        ? branch.data.name
-        : branch.data.name.charAt(0)}
-    </div>
-  )
-})
-
-enum BlockAppereance {
-  reduced,
-  full,
-  hidden,
-}
-
-type BlockStatus = {
-  highlight: boolean
-  appearance: BlockAppereance
-}
-type Selection = {
-  data: GeoData
-  id: GeoID
-  pid: GeoID
-  fallthrought?: boolean
-  unselected?: boolean
-  must_falthrought?: boolean
-  child?: Selection
-  action: SelectionAction
-}
-function selectionEquality(sel1: Selection, sel2: Selection): boolean {
-  if (sel1.id !== sel2.id) return false
-  if (sel1.child) {
-    if (sel2.child) {
-      return selectionEquality(sel1.child, sel2.child)
-    }
-    return false
-  } else {
-    if (sel2.child) return false
-    return true
-  }
-}
-
-function lastOf(selection: Selection): Selection {
-  if (!selection.child) return selection
-  return lastOf(selection.child)
-}
-
-enum SelectionAction {
-  focus,
-  highlight,
-}
-
-function nextSelection(
-  id: GeoID,
-  pid: GeoID,
-  selection: Selection | undefined,
-): Selection | undefined {
-  if (!selection) return undefined
-  if (pid === selection.id) {
-    if (selection.child) {
-      if (id === selection.child.id) return selection.child
-    } else {
-      if (selection.fallthrought) {
-        return {
-          ...selection,
-          id,
-          pid,
-          must_falthrought: true,
-        }
-      }
-    }
-  }
-  if (selection.child) {
-    return {
-      ...selection.child,
-      unselected: true,
-    }
-  }
-  return {
-    ...selection,
-    unselected: true,
-  }
-}
-
-function statusOf(
-  branch: GeoBranch,
-  selection: Selection | undefined,
-): BlockStatus {
-  if (selection === undefined) {
-    return {
-      highlight: true,
-      appearance: BlockAppereance.full,
-    }
-  }
-  if (
-    selection.action === SelectionAction.focus &&
-    (branch.right_id === selection.id || branch.left_id === selection.id)
-  ) {
-    return {
-      highlight: false,
-      appearance: BlockAppereance.reduced,
-    }
-  }
-  if (selection.unselected) {
-    return {
-      highlight: false,
-      appearance:
-        selection.action === SelectionAction.focus
-          ? BlockAppereance.hidden
-          : BlockAppereance.full,
-    }
-  }
-  if (selection.must_falthrought || branch.id === selection.id) {
-    return {
-      highlight: true,
-      appearance: BlockAppereance.full,
-    }
-  }
-  return {
-    highlight: false,
-    appearance:
-      selection.action === SelectionAction.focus
-        ? BlockAppereance.hidden
-        : BlockAppereance.full,
-  }
-}
+});
