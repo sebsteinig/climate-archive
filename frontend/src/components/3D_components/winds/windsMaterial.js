@@ -1,6 +1,8 @@
-import { ShaderMaterial, Color, DataTexture, RGBAFormat, LinearFilter, TextureLoader, DoubleSide, BackSide, NoBlending} from 'three';
+import { ShaderMaterial, MeshBasicMaterial, Color, DataTexture, RGBAFormat, LinearFilter, TextureLoader, DoubleSide, BackSide, NoBlending} from 'three';
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js'
-import vertexShader from "$/shaders/windsVert.glsl"
+// import vertexShader from "$/shaders/windsVert.glsl"
+import vertexShader from "$/shaders/windsVert.orig.glsl"
+// import vertexShader from "$/shaders/windsTest.vert.glsl"
 import fragmentShader from "$/shaders/windsFrag.glsl"
 
 function createWindsMaterial(quaternionTexture, shaderUniforms, renderer, initialPositions) {
@@ -60,7 +62,6 @@ function createWindsMaterial(quaternionTexture, shaderUniforms, renderer, initia
 
             const dataTexture = new DataTexture( initialPositions, 64, 64 );
             dataTexture.needsUpdate = true;
-            console.log(dataTexture)
 
             const material = new ShaderMaterial({
                 vertexShader: vertexShader,
@@ -73,28 +74,34 @@ function createWindsMaterial(quaternionTexture, shaderUniforms, renderer, initia
                     texturePosition: { value: dataTexture },
                     cmapTexture: { value: cmap },
                     quaternionTexture: { value: quaternionTexture },
-                    thisWindsFrame : {value: null },
-                    nextWindsFrame : {value: null },
+                    dataTexture : {value: null },
+                    textureTimesteps: {value: null},
                     wrapAmountUniform: { value: 0.0 },
-                    uFrameWeight: { value: 0.0 },
+                    uFrame: {value: null},
+                    uFrameWeight: { value: null },
                     uWindsParticleOpacity: { value: 1.0 },
-                    uWindsArrowSize: { value: 0.0 },
+                    uWindsArrowSize: shaderUniforms.uWindsArrowSize,
                     uWindsMaxArrowSize: { value: 1.0 },
                     uWindsParticleLifeTime: shaderUniforms.uWindsParticleLifeTime,
-                    uWindsScaleMagnitude: { value: false },
+                    uWindsScaleMagnitude: shaderUniforms.uWindsScaleMagnitude,
                     uWindsColorMagnitude: { value: false },
                     uWindsSpeedMin: shaderUniforms.uWindsSpeedMin,
                     uWindsSpeedMax: shaderUniforms.uWindsSpeedMax,
                     uHeightWinds: { value: 0.18 },
-                    uWindsZonalDataMin: { value: -100.0 },
+                    thisDataMinU: {value: new Float32Array(1)},
+                    thisDataMaxU: {value: new Float32Array(1)},
+                    thisDataMinV: {value: new Float32Array(1)},
+                    thisDataMaxV: {value: new Float32Array(1)},
                     uWindsZonalDataMax: { value: 100.0 },
                     uWindsMeridionalDataMin: { value: -100.0 },
                     uWindsMeridionalDataMax: { value: 100.0 },
-
+                    referenceDataFlag: {value: false},
                 }
             })
 
-        return {material}
+        const materialBasic = new MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
+
+        return material
 
 
 }

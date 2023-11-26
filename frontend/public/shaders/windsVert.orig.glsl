@@ -3,8 +3,7 @@
 uniform sampler2D texturePosition;
 uniform sampler2D cmapTexture;
 uniform sampler2D quaternionTexture;
-uniform sampler2D thisWindsFrame;
-uniform sampler2D nextWindsFrame;
+uniform sampler2D dataTexture;
 
 uniform float wrapAmountUniform;
 uniform float uWindsArrowSize;
@@ -95,7 +94,7 @@ void main()
 //    vec2 gridUV = vec2( posTemp.x / 4. + 0.5 - ( 1. / 96. / 2.0 ), posTemp.y / 2. + 0.5 + ( 1. / 73. / 2.0 ) );
 //    vec2 gridUV = vec2( posTemp.x / 4. + 0.5 - ( 1. / 128. / 2.0 ), posTemp.y / 2. + 0.5 + ( 1. / 64. / 2.0 ) );
     // get velocities at particle position
-    vec4 velocityInt = mix(texture2D(thisWindsFrame,gridUV),texture2D(nextWindsFrame,gridUV),uFrameWeight);
+    vec4 velocityInt = mix(texture2D(dataTexture,gridUV),texture2D(dataTexture,gridUV),uFrameWeight);
  
     // get sphere position rotation quaternion at particle position
     vec4 quaternions = texture2D(quaternionTexture,gridUV);
@@ -136,7 +135,7 @@ void main()
     // apply quaternion rotation depending on uSphereWrapAmount
     vec3 vPositionScaled = position + ( 2.0 * cross( quaternions.xyz, cross( quaternions.xyz, position ) + quaternions.w * position ) * wrapAmountUniform);
 
-    // scale arrow size
+    // // scale arrow size
     if (uWindsScaleMagnitude) {
 
          vPositionScaled *= 1.0 * uWindsArrowSize * relativeMagnitude;
@@ -160,8 +159,6 @@ void main()
         velAngleSphere += M_PI;
     }
 
-   // velAngle = 0.;
-
     vec3 vPositionScaledRotated = vec3(
         vPositionScaled.x * -1. * sin(velAnglePlane) + vPositionScaled.y * cos(velAnglePlane),
         vPositionScaled.x * cos(velAnglePlane) + vPositionScaled.y * sin(velAnglePlane),
@@ -179,7 +176,8 @@ void main()
 
 
     // calculate positions on plane
-    vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
+    // vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
+    vec3 planePos = vPositionScaled + posTemp.xyz;
     planePos.z += uHeightWinds;
 
 //    vec3 planePos = vPositionScaledRotated + spherePositions;

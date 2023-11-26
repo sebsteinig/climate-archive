@@ -104,7 +104,6 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     const dataMax = new Float32Array(data.info.max[0].map(value => value * 86400));
     materialRef.current.uniforms.thisDataMin.value = dataMin
     materialRef.current.uniforms.thisDataMax.value = dataMax
-    console.log(data.textures[0].current_url.path)
     if (data.textures[0].current_url.path.includes('.avg.')) {
       materialRef.current.uniforms.textureTimesteps.value = 1.0
     } else {
@@ -144,7 +143,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       ref={atmosphere_layer_ref} 
       geometry={ geometry }
       material={ materialRef.current }
-      renderOrder = { 5 }
+      renderOrder = { 3 }
       >
     </mesh>
   )

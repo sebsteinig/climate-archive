@@ -40,7 +40,7 @@ function initMap() {
   let m = new Map()
   m.set(EVarID.currents, false)
   m.set(EVarID.clt, false)
-  m.set(EVarID.height, false)
+  m.set(EVarID.height, true)
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)

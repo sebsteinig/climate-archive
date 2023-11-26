@@ -1,10 +1,16 @@
-uniform sampler2D windsThisDataFrame;
-uniform sampler2D windsNextDataFrame;
+uniform sampler2D dataTexture;
 
+uniform float uFrame;
 uniform float uFrameWeight;
-uniform float uSpeed;
+uniform float uWindsSpeed;
 uniform float uDelta;
 uniform float uRandSeed;
+uniform float dataMinU[12];
+uniform float dataMaxU[12];
+uniform float dataMinV[12];
+uniform float dataMaxV[12];
+uniform float textureTimesteps;
+
 uniform float uDropRate;
 uniform float uDropRateBump;
 uniform float uWindsParticleLifeTime;
@@ -63,22 +69,36 @@ void main() {
     // convert xy-plane position to UV texture coordinate [0,1]
     vec2 vc2D  = vec2 (pos.x / 4.0 + 0.5 - ( 1. / 96. / 2.0 ),  pos.y / 2.0 + 0.5 + ( 1. / 73. / 2.0 ) );
 
+    // calculate the width of the UV segment each timesteps
+    float segmentWidth = 1.0 / textureTimesteps;
+    
+    // Adjust the UV coordinates
+    vec2 this_uv = vec2((uFrame / textureTimesteps) + (vc2D.x * segmentWidth), vc2D.y);
+    vec2 next_uv = vec2((( uFrame + 1.0) / textureTimesteps) + (vc2D.x * segmentWidth), vc2D.y);
+
     vec4 intVelocities;
-    float remappedU;
-    float remappedV; 
-    float remappedW; 
 
     // 2D surface velocity fields
-    // look up model velocities at those UVs for both frame and apply linear interpolation between both based on uFrameWeight (calculated from selected time)
-    intVelocities = mix(texture2D(windsThisDataFrame,vc2D),texture2D(windsNextDataFrame,vc2D),uFrameWeight);
+    // look up model velocities at those UVs for both frames
+    vec4 thisFrameVel = texture2D( dataTexture, this_uv);
+    vec4 nextFrameVel = texture2D( dataTexture, next_uv); 
 
     // remap velocities from RGB image value [0,1] to cm/s [-50,50 cm/s] 
-    intVelocities.r = remap( intVelocities.r, 0.0, 1.0, -50.0, 50.0 );
-    intVelocities.g = remap( intVelocities.g, 0.0, 1.0, -10.0, 10.0 );
-    intVelocities.b = 0.0;
+    thisFrameVel.x = remap( thisFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame)], dataMaxU[int(uFrame)] );
+    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinU[int(uFrame)], dataMaxU[int(uFrame)] );
+    thisFrameVel.z = 0.0;
+
+    nextFrameVel.x = remap( nextFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame+1.0)], dataMaxU[int(uFrame+1.0)] );
+    nextFrameVel.y = remap( nextFrameVel.y, 0.0, 1.0, dataMinV[int(uFrame+1.0)], dataMaxV[int(uFrame+1.0)] );
+    nextFrameVel.z = 0.0;
+
+    // interpolate velocities between frames
+    intVelocities = mix(thisFrameVel, nextFrameVel, uFrameWeight);
 
     // scale particle velocities
-    vec3 vel = intVelocities.rgb * uSpeed;
+    // vec3 vel = intVelocities.rgb * uWindsSpeed;
+    vec3 vel = intVelocities.xyz * uWindsSpeed;
+    // vec3 vel = vec3(0.) * uWindsSpeed;
 
     // velocity disortion at higher latitudes; needs to be checked; from https://github.com/mapbox/webgl-wind/blob/master/src/shaders/update.frag.glsl
 //    if (vc2D.y > 0.01 && vc2D.y < 0.99) {
@@ -86,7 +106,9 @@ void main() {
 //    }
 
     // Advance dynamics one time step
-    pos += vel * uDelta / 3.0 ;
+    pos += vel * uDelta / 10.0 ;
+    // pos += vec3(0.1, 0.1, 0.0) * uDelta / 3.0 ;
+    // pos += 0.0 ;
 
     if (pos.x > 2.0) {
         pos.x -= 4.0;
@@ -135,6 +157,8 @@ void main() {
 
 
     gl_FragColor = vec4( pos, age );
+    // gl_FragColor = vec4( vec3(0.0,1.0,0.0), 1.0 );
+    // gl_FragColor = vec4( pos, 1.0 );
 
 // no movement
 //     gl_FragColor = tmpPos;

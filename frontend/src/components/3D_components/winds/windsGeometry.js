@@ -20,8 +20,8 @@ function createWindsGeometry(initialPositions, shaderUniforms) {
 
     }
 
-    // const baseGeometry = getArrowGeometry()
-   const baseGeometry = new PlaneGeometry()
+    const baseGeometry = getArrowGeometry()
+  //  const baseGeometry = new PlaneGeometry()
 
     var jj = 0;
     var kk = 0;
@@ -123,18 +123,17 @@ function createWindsGeometry(initialPositions, shaderUniforms) {
     // instanced geometries
     const geometry = new InstancedBufferGeometry();
     geometry.copy(baseGeometry);
+    geometry.scale(0.01,0.01,0.01)
 
-
-    geometry.instanceCount = shaderUniforms.uWindsParticleCount.value; 
-    geometry.maxInstancedCount = shaderUniforms.uWindsMaxParticleCount.value; 
-
+    // geometry.instanceCount = shaderUniforms.uWindsParticleCount.value; 
+    // geometry.maxInstancedCount = shaderUniforms.uWindsMaxParticleCount.value; 
 
     geometry.setAttribute('aGPUuvs', new InstancedBufferAttribute(gpuComputeUVs, 2 ));
- //   geometry.setAttribute('quaternions', new InstancedBufferAttribute(quaternions, 4 ));
+  //  geometry.setAttribute('quaternions', new InstancedBufferAttribute(quaternions, 4 ));
 
     const geometry_test = new PlaneGeometry(4, 2, 64, 32);
 
-    return [ geometry_test, quaternionTexture ]
+    return [ geometry, quaternionTexture ]
 
 }
 

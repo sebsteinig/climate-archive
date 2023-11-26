@@ -65,7 +65,7 @@ export const World = memo(({ tick }: Props) => {
           surface_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         }
         if (variables_state.get(EVarID.winds)) {
-          winds_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
+          winds_layer_ref.current.tick(res.weight,res.uSphereWrapAmount, delta)
         }
 
         // update textures only when necessary
@@ -98,6 +98,22 @@ export const World = memo(({ tick }: Props) => {
                 data_reference = null
                 reference_flag = false
                 surface_layer_ref.current.updateTextures(data, data_reference, reference_flag);
+              break
+            }
+
+            case EVarID.winds: {
+              if (winds_layer_ref.current && res.update_texture) {
+                if (world_state.observed_world && res.reference) {
+                  // console.log("updating reference mode")
+                  data_reference = res.reference ? res.reference.get(variable) : undefined;
+                  reference_flag = true
+                } else {
+                  // console.log("updating standard mode")
+                  data_reference = null
+                  reference_flag = false
+                }
+                winds_layer_ref.current.updateTextures(data, data_reference, reference_flag);
+              }
               break
             }
 

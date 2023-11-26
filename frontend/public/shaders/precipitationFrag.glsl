@@ -99,7 +99,7 @@ void main()	{
 
 float cmap_index = colorMapIndex;
 float opacity_cutoff = 0.0;
-// Calculate the start and end of the UV segment for the current timesteps
+    // calculate the width of the UV segment each timesteps
 float segmentWidth = 1.0 / textureTimesteps;
 
 // Adjust the UV coordinates

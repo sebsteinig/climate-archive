@@ -21,12 +21,15 @@ const loader = new THREE.TextureLoader();
 
 const shaderUniforms =
 {
-    uWindsMaxParticleCount : {value: 40},
-    uWindsParticleCount : {value: 40},
+    uWindsMaxParticleCount : {value: 4000},
+    uWindsParticleCount : {value: 4000},
     uWindsVerticalSpread : {value: null},
-    uWindsParticleLifeTime : {value: null},
+    uWindsParticleLifeTime : {value: 400.0},
+    uWindsSpeed : {value: 0.2},
     uWindsSpeedMin : {value: 5.0},
     uWindsSpeedMax : {value: 30.0},
+    uWindsScaleMagnitude : {value: false},
+    uWindsArrowSize : {value: 1.0},
 
 }
 
@@ -40,7 +43,7 @@ type Props = {
 
 export type WindLayerRef = {
   type : RefObject<VectorLayerType>,
-  updateTextures : (data:TickData) => void
+  updateTextures : (data:TickData, reference:TickData, reference_flag:boolean) => void
   tick: (weight:number, uSphereWrapAmount:number) => void
 }
 
@@ -51,36 +54,67 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
 
   const state = useThree()
 
-  const gpuComputeWinds = initComputeRendererWinds(initialPositions, state.gl, shaderUniforms)
+  const { gpuComputeWinds, positionVariable } = initComputeRendererWinds(initialPositions, state.gl, shaderUniforms)
   const materialRef = useRef( createWindsMaterial(quaternionTexture, shaderUniforms, state.gl, initialPositions) )
-  
-  function tick(weight:number, uSphereWrapAmount:number) {
-    // materialRef.current.material.uniforms.uFrameWeight.value = weight % 1
-    // materialRef.current.material.uniforms.wrapAmountUniform.value = uSphereWrapAmount
-    // gpuComputeWinds.variables[0].material.uniforms.uDelta.value = 0.016;
-    // gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
 
-    gpuComputeWinds.tickEachFrame(0.1,0.1,0.1);
-    // materialRef.current.material.uniforms[ "texturePosition" ].value = gpuComputeWinds.getCurrentRenderTarget( positionVariable ).texture;
-    console.log("tick")
+  // gpuComputeWindRef = useRef(gpuComputeWinds)
+  function tick(weight:number, uSphereWrapAmount:number, delta:number) {
+
+    // update and run GPUComputationRenderer
+    gpuComputeWinds.variables[0].material.uniforms.uFrame.value = Math.floor(weight)
+    gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value = weight % 1
+    gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
+    gpuComputeWinds.variables[0].material.uniforms.uDelta.value = delta;
+    gpuComputeWinds.compute();
+
+    // update the wind material for visualisation
+    materialRef.current.uniforms.uFrame.value = Math.floor(weight)
+    materialRef.current.uniforms.uFrameWeight.value = weight % 1
+    materialRef.current.uniforms.wrapAmountUniform.value = uSphereWrapAmount
+    materialRef.current.uniforms["texturePosition"].value = gpuComputeWinds.getCurrentRenderTarget( positionVariable ).texture;
+
   }
 
   function updateUserUniforms(store:PrSlice) {
     // materialRef.current.uniforms.uUserMinValue.value = store.min
     // materialRef.current.uniforms.uUserMaxValue.value = store.max
-    console.log("update uniforms")
+    // console.log("update uniforms")
   }
 
-  function updateTextures(data:TickData) {
-    const test = loader.load(data.textures[0].current_url)
-    console.log(test)
-    materialRef.current.uniforms.thisDataFrame.value = loader.load(data.textures[0].current_url)
-    materialRef.current.uniforms.nextDataFrame.value = loader.load(data.textures[0].next_url) 
-    // materialRef.current.uniforms.thisDataMin.value = data.current.min[0] * 86400.
-    // materialRef.current.uniforms.thisDataMax.value = data.current.max[0]  * 86400.
-    // materialRef.current.uniforms.nextDataMin.value = data.next.min[0]  * 86400.
-    // materialRef.current.uniforms.nextDataMax.value = data.next.max[0]  * 86400.
-    console.log("update textures")
+  async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
+
+    // always update the own data
+    // load texture and info
+    const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
+    console.log(dataTexture)
+    dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
+    const dataMinU = new Float32Array(data.info.min[0]);
+    const dataMaxU = new Float32Array(data.info.max[0]);
+    const dataMinV = new Float32Array(data.info.min[1]);
+    const dataMaxV = new Float32Array(data.info.max[1]);
+
+    // update wind input data for the compute renderer
+    console.log(dataTexture)
+    gpuComputeWinds.variables[0].material.uniforms.dataTexture.value = dataTexture
+    gpuComputeWinds.variables[0].material.uniforms.thisDataMinU.value = dataMinU
+    gpuComputeWinds.variables[0].material.uniforms.thisDataMaxU.value = dataMaxU
+    gpuComputeWinds.variables[0].material.uniforms.thisDataMinV.value = dataMinV
+    gpuComputeWinds.variables[0].material.uniforms.thisDataMaxV.value = dataMaxV
+
+    // update the wind data for scaling the arrows in the arrow material
+    materialRef.current.uniforms.dataTexture.value = dataTexture
+    materialRef.current.uniforms.thisDataMinU.value = dataMinU
+    materialRef.current.uniforms.thisDataMaxU.value = dataMaxU
+    materialRef.current.uniforms.thisDataMinV.value = dataMinV
+    materialRef.current.uniforms.thisDataMaxV.value = dataMaxV
+    if (data.textures[0].current_url.path.includes('.avg.')) {
+      materialRef.current.uniforms.textureTimesteps.value = 1.0
+      gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 1.0
+    } else {
+      materialRef.current.uniforms.textureTimesteps.value = 12.0
+      gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 12.0
+    };
+    
   }
   
 
@@ -93,18 +127,24 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
       updateUserUniforms
     }
   })
-
-  // Create a basic material for testing
-  const basicMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
-  const basicGeometry = new THREE.BoxGeometry(1, 1, 1);
   
+  // return (
+  //   <mesh 
+  //     ref={wind_layer_ref} 
+  //     geometry={ geometry }
+  //     material={ materialRef.current }>
+  //     {/* material={ basicMaterial }> */}
+  //   </mesh>
+  // )
+
   return (
-    <mesh 
+    <instancedMesh 
       ref={wind_layer_ref} 
-      geometry={ geometry }
-      // material={ materialRef.current }>
-      material={ basicMaterial }>
-    </mesh>
+      args={[geometry, materialRef.current, shaderUniforms.uWindsMaxParticleCount.value]}
+      renderOrder = { 2 }
+      >
+      {/* material={ basicMaterial }> */}
+    </instancedMesh>
   )
 }))
 
