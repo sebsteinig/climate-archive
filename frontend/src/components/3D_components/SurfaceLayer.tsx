@@ -5,7 +5,7 @@ import {
   useRef,
   RefObject,
 } from "react"
-import { memo } from "react"
+import { memo, useEffect } from "react"
 import * as THREE from "three"
 import vertexShader from "$/shaders/surfaceVert.glsl"
 import fragmentShader from "$/shaders/surfaceFrag.glsl"
@@ -20,7 +20,7 @@ const cmap = loader.load('../assets/colormaps/all_colormaps.png')
 cmap.minFilter = THREE.NearestFilter;
 cmap.magFilter = THREE.NearestFilter;
 
-const geometry = new THREE.PlaneGeometry(4, 2, 64, 32);
+const geometry = new THREE.PlaneGeometry(4, 2, 64*2, 32*2);
 
 type Props = {
 
@@ -48,7 +48,8 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
     side: THREE.DoubleSide,
     uniforms: {
       uFrameWeight: {value: null},
-      uSphereWrapAmount: {value: 0.0},
+      uSphereWrapAmount: {value: 1.0},
+      uHeightDisplacement: {value: height_state.displacement},
       uLayerHeight: {value: 0.0},
       uLayerOpacity: {value: 0.0},
       dataTexture: {value: null},
@@ -65,8 +66,6 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
       uUserMaxValue: {value: height_state.max},
       colorMap: {value: cmap},
       colorMapIndex: {value: height_state.colormap_index},
-      numLon: {value: 96},
-      numLat: {value: 73},
     },
   } ));
   
@@ -80,6 +79,7 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
     materialRef.current.uniforms.uUserMinValue.value = store.min
     materialRef.current.uniforms.uUserMaxValue.value = store.max
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
+    materialRef.current.uniforms.uHeightDisplacement.value = store.displacement
   }
 
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {

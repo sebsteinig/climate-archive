@@ -45,13 +45,13 @@ export function Height({
           />
         <RowWithSlider
           onChange={(n) => {
-            height.updateDiplacement(n)
+            height.updateDisplacement(n)
           }}
           min={0}
           max={0.8}
           step={0.001}
-          value={height.diplacement}
-          label="height diplacement"
+          value={height.displacement}
+          label="height displacement"
         />
       </Rows>
     </Variable>

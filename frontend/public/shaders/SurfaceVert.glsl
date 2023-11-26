@@ -5,6 +5,9 @@
 
 uniform float uSphereWrapAmount;
 uniform float uLayerHeight;
+uniform float uHeightDisplacement; // Scale of the height displacement
+
+uniform sampler2D dataTexture; // Heightmap texture
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // varying for fragment shader
@@ -31,15 +34,16 @@ vec3 anglesToSphereCoord(vec2 a, float r) {
 
 void main()	{
 
-    // standard plane position
-    vec3 modPosition = position;
+    // Sample the heightmap texture
+    float height = texture2D(dataTexture, uv).r;
 
-    // move layer vertically
-    modPosition.z += uLayerHeight;
+    // standard plane position
+    // vec3 modPosition = position;
+    vec3 modPosition = position + normal * height * uHeightDisplacement;
 
     // calculate sphere position with radius increased by calculated z displacement
     vec2 angles = M_PI * vec2(2. * uv.x, uv.y - 1.);
-    vec3 sphPos = anglesToSphereCoord(angles, 1.0 + uLayerHeight );
+    vec3 sphPos = anglesToSphereCoord(angles, 1.0 + height * uHeightDisplacement );
 
     // mix plane and sphere position based on chosen projection weight
     vec3 wrapPos = mix(modPosition, sphPos, uSphereWrapAmount);

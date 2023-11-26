@@ -54,12 +54,12 @@ export type Clt = Variable & {}
 export interface CltSlice extends Clt {}
 
 export type Height = Variable & {
-  diplacement: number
+  displacement: number
   colormap: string
 }
 export interface HeightSlice extends Height {
   updateColormap: (value: string) => void
-  updateDiplacement: (value: number) => void
+  updateDisplacement: (value: number) => void
 }
 
 export type Liconc = Variable & {}

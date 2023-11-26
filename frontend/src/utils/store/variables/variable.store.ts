@@ -111,9 +111,9 @@ export const createVariableSlice: StateCreator<
       },
       height: {
         name: EVarID.height,
-        diplacement: 0.2,
-        min: -6000,
-        max: 6000,
+        displacement: 0.2,
+        min: -5000,
+        max: 5000,
         colormap: "topo.png",
         colormap_index: colormaps_list.indexOf("topo.png"),
         updateColormap: (name: string, index: number) => {
@@ -136,9 +136,9 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.height.max = value
           }),
-        updateDiplacement: (value: number) =>
+        updateDisplacement: (value: number) =>
           set((state) => {
-            state.variables.height.diplacement = value
+            state.variables.height.displacement = value
           }),
       },
       liconc: {

@@ -29,12 +29,17 @@ export const World = memo(({ tick }: Props) => {
     // update shader uniforms when user uses GUI
     useEffect(() => {
       const userVariables = state => state.variables;
+
+      console.log(userVariables)
   
       const unsubscribe = useStore.subscribe(
         (state) => {
-          atmosphere_layer_ref.current.updateUserUniforms(state.variables.pr);
-          surface_layer_ref.current.updateUserUniforms(state.variables.height);
-
+            if (atmosphere_layer_ref.current) {
+              atmosphere_layer_ref.current.updateUserUniforms(state.variables.pr, state.variables.height);
+            }
+            if (surface_layer_ref.current) {
+              surface_layer_ref.current.updateUserUniforms(state.variables.height);
+            }
         },
         userVariables
       );
@@ -108,10 +113,10 @@ export const World = memo(({ tick }: Props) => {
         {useTitle && <Title config={config}/>}
         <Controls /> */}
         <Lights />
-        {/* <Surface ref={sphereRef} config={config} /> */}
-        {/* <ATM_2D ref={atm2DRef} /> */}
-        <AtmosphereLayer ref={atmosphere_layer_ref} />
-        <SurfaceLayer ref={surface_layer_ref} />
+        {variables_state.get(EVarID.height) && <SurfaceLayer ref={surface_layer_ref} />}
+        {variables_state.get(EVarID.pr) && <AtmosphereLayer ref={atmosphere_layer_ref} />}
+        {/* <SurfaceLayer ref={surface_layer_ref} /> */}
+        {/* <AtmosphereLayer ref={atmosphere_layer_ref} /> */}
         {/* <WindLayer ref={wind_layer_ref} /> */}
   
         <Perf position="top-right" />

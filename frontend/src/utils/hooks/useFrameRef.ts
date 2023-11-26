@@ -116,7 +116,7 @@ export function useFrameRef() {
         exp: exp,
         swap_flag: true,
         swapping: false,
-        uSphereWrapAmount: data?.uSphereWrapAmount ?? 1,
+        uSphereWrapAmount: data?.uSphereWrapAmount ?? 1.0,
         weight: data?.weight ?? 0,
         variables: data?.variables ?? new Map(),
         mode: data?.mode,

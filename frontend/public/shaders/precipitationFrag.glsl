@@ -190,7 +190,7 @@ vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
 
 // send pixel color to screen
 if (referenceDataFlag == false) {
-    if (dataRemapped > 0.0 ) {
+    if (dataRemapped >= 0.0 ) {
         gl_FragColor = dataColor;
         gl_FragColor.a *= uLayerOpacity;
     }

@@ -39,7 +39,9 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
 
   // use global state/user input to initialise the layer
   const pr_state = useStore((state) => state.variables.pr)
+  const height_state = useStore((state) => state.variables.height)
 
+  
   const materialRef = useRef(new THREE.ShaderMaterial( {
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
@@ -50,7 +52,8 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       uFrame: {value: null},
       uFrameWeight: {value: null},
       uSphereWrapAmount: {value: 0.0},
-      uLayerHeight: {value: 0.15},
+      uLayerHeight: {value: height_state.displacement + 0.05},
+      // uLayerHeight: {value: 0.25},
       uLayerOpacity: {value: 0.0},
       dataTexture: {value: null},
       textureTimesteps: {value: null},
@@ -69,7 +72,10 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       numLon: {value: 96},
       numLat: {value: 73},
     },
-  } ));
+  } )
+  );
+
+
   
   function tick(weight:number, uSphereWrapAmount:number) {
     materialRef.current.uniforms.uFrame.value = Math.floor(weight)
@@ -78,12 +84,13 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     materialRef.current.uniforms.uLayerOpacity.value = 1.0
   }
 
-  function updateUserUniforms(store:PrSlice) {
+  function updateUserUniforms(store:PrSlice, store_height:HeightSlice) {
     materialRef.current.uniforms.uUserMinValue.value = store.min
     materialRef.current.uniforms.uUserMaxValue.value = store.max
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
     materialRef.current.uniforms.uUserMinValueAnomaly.value = store.anomaly_range * -1.
     materialRef.current.uniforms.uUserMaxValueAnomaly.value = store.anomaly_range
+    materialRef.current.uniforms.uLayerHeight.value = store_height.displacement + 0.05
   }
 
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
