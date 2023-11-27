@@ -85,7 +85,7 @@ function createWindsMaterial(quaternionTexture, shaderUniforms, renderer, initia
                     uWindsMaxArrowSize: { value: 1.0 },
                     uWindsParticleLifeTime: shaderUniforms.uWindsParticleLifeTime,
                     uWindsScaleMagnitude: shaderUniforms.uWindsScaleMagnitude,
-                    uWindsColorMagnitude: { value: false },
+                    uWindsColorMagnitude: shaderUniforms.uWindsColorMagnitude,
                     uWindsSpeedMin: shaderUniforms.uWindsSpeedMin,
                     uWindsSpeedMax: shaderUniforms.uWindsSpeedMax,
                     uHeightWinds: { value: 0.18 },

@@ -177,9 +177,9 @@ void main()
         relativeOpacity = 1.;
     }
 
-    if (relativeMagnitude > ( uWindsMaxArrowSize - wrapAmountUniform * 0.5 )) {
-        relativeMagnitude = uWindsMaxArrowSize - wrapAmountUniform * 0.5;
-    }
+    // if (relativeMagnitude > ( uWindsMaxArrowSize - wrapAmountUniform * 0.5 )) {
+    //     relativeMagnitude = uWindsMaxArrowSize - wrapAmountUniform * 0.5;
+    // }
 
     // apply quaternion rotation depending on uSphereWrapAmount
     vec3 vPositionScaled = position + ( 2.0 * cross( quaternions.xyz, cross( quaternions.xyz, position ) + quaternions.w * position ) * wrapAmountUniform);

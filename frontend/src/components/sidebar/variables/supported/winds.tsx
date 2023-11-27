@@ -37,8 +37,8 @@ export function Winds({
             winds.updateAnimationSpeed(n)
           }}
           min={0}
-          max={5.0}
-          step={0.01}
+          max={1.0}
+          step={0.001}
           value={winds.animation_speed}
           label="animation speed"
         />
@@ -47,12 +47,12 @@ export function Winds({
             winds.updateMinSpeed(n)
           }}
           min={1}
-          max={10}
+          max={50}
           step={0.01}
           value={winds.min_speed}
           label="min speed [m/s]"
         />
-        {/* <RowWithSlider
+        <RowWithSlider
           onChange={(n) => {
             winds.updateReferenceSpeed(n)
           }}
@@ -62,7 +62,7 @@ export function Winds({
           value={winds.reference_speed}
           label="reference speed [m/s]"
         />
-        <RowWithSlider
+        {/* <RowWithSlider
           onChange={(n) => {
             winds.updateArrows(n)
           }}
@@ -82,7 +82,7 @@ export function Winds({
           value={winds.arrows_size}
           label="size of arrows"
         />
-        {/* <RowWithCheckBox
+        <RowWithCheckBox
           toggle={() => {
             winds.toggleScaleByMagnitude()
           }}
@@ -95,7 +95,7 @@ export function Winds({
           }}
           checked={winds.color_by_magnitude}
           label="color by magnitude"
-        /> */}
+        />
       </Rows>
     </Variable>
   )

@@ -28,10 +28,11 @@ const shaderUniforms =
     uWindsVerticalSpread : {value: null},
     uWindsParticleLifeTime : {value: 400.0},
     uWindsSpeed : {value: 0.2},
-    uWindsSpeedMin : {value: 0.0},
-    uWindsSpeedMax : {value: 30.0},
-    uWindsScaleMagnitude : {value: false},
-    uWindsArrowSize : {value: 0.7},
+    uWindsSpeedMin : {value: 2.0},
+    uWindsSpeedMax : {value: 25.0},
+    uWindsScaleMagnitude : {value: true},
+    uWindsColorMagnitude : {value: false},
+    uWindsArrowSize : {value: 2.5},
 
 }
 
@@ -93,6 +94,9 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     materialRef.current.uniforms.level.value = store.level
     materialRef.current.uniforms.uWindsArrowSize.value = store.arrows_size
     materialRef.current.uniforms.uWindsSpeedMin.value = store.min_speed
+    materialRef.current.uniforms.uWindsSpeedMax.value = store.reference_speed
+    materialRef.current.uniforms.uWindsScaleMagnitude.value = store.scale_by_magnitude
+    materialRef.current.uniforms.uWindsColorMagnitude.value = store.color_by_magnitude
     gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uWindsSpeed.value = store.animation_speed
 
     // shaderUniforms.uWindsParticleCount.value = store.arrows

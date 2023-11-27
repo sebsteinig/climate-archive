@@ -1,5 +1,5 @@
-// uniform float uFrame;
-// uniform float uFrameWeight;
+uniform float uFrame;
+uniform float uFrameWeight;
 uniform float uWindsSpeed;
 uniform float uDelta;
 uniform float uRandSeed;
@@ -7,8 +7,8 @@ uniform float dataMinU[84];
 uniform float dataMaxU[84];
 uniform float dataMinV[84];
 uniform float dataMaxV[84];
-// uniform float level;
-// uniform float textureTimesteps;
+uniform float level;
+uniform float textureTimesteps;
 
 uniform float uDropRate;
 uniform float uDropRateBump;
@@ -67,10 +67,6 @@ int getIndex(int i, int j) {
 
 void main() {
 
-    float level = 0.0;
-    float textureTimesteps = 12.0;
-    float uFrame = 0.0;
-    float uFrameWeight = 0.0;
     // divide screen space coordinates by viewport size to get UV texture coordinates in the range 0 to 1
     vec2 uv = gl_FragCoord.xy / resolution.xy;
 
@@ -155,25 +151,37 @@ void main() {
 
     float age;
 
-    // reset particle to random position if lifetime expires or it leaves northern or southern boundary
-    if ( posTemp.a > uWindsParticleLifeTime || pos.y >= .9 || pos.y <= -.9 ) {
+    if (uWindsSpeed > 0.0 ) {
 
-        // get new random position
-        // random reset of particle positions from from https://github.com/mapbox/webgl-wind/blob/master/src/shaders/update.frag.glsl
-  
-        // a random seed to use for the particle drop
-        vec2 seed = (pos.xy + posTemp.xy) * uRandSeed;
-        
-        pos = getRandomPosition(seed, 1.2, posTemp.z);
+        // reset particle to random position if lifetime expires or it leaves northern or southern boundary
+        if ( posTemp.a > uWindsParticleLifeTime || pos.y >= .9 || pos.y <= -.9 ) {
 
-        age = 0.;
+            // get new random position
+            // random reset of particle positions from from https://github.com/mapbox/webgl-wind/blob/master/src/shaders/update.frag.glsl
+    
+            // a random seed to use for the particle drop
+            vec2 seed = (pos.xy + posTemp.xy) * uRandSeed;
+            
+            seed = (pos.xy + posTemp.xy) * uRandSeed * 2.0;
+            
+            pos = getRandomPosition(seed, 1.2, posTemp.z);
 
-    // otherwise increment time counter for particle
+            age = 0.;
+
+        // otherwise increment time counter for particle
+        } else {
+
+            age = posTemp.a + 1.;
+
+        }
+
     } else {
 
-        age = posTemp.a + 1.;
-
+        age = 200.;
+        
     }
+
+
 
 
    //     pos = mix(pos, random_pos, drop);
