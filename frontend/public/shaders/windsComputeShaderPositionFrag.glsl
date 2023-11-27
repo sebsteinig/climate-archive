@@ -1,5 +1,5 @@
-uniform float uFrame;
-uniform float uFrameWeight;
+// uniform float uFrame;
+// uniform float uFrameWeight;
 uniform float uWindsSpeed;
 uniform float uDelta;
 uniform float uRandSeed;
@@ -7,8 +7,8 @@ uniform float dataMinU[84];
 uniform float dataMaxU[84];
 uniform float dataMinV[84];
 uniform float dataMaxV[84];
-uniform float level;
-uniform float textureTimesteps;
+// uniform float level;
+// uniform float textureTimesteps;
 
 uniform float uDropRate;
 uniform float uDropRateBump;
@@ -67,15 +67,20 @@ int getIndex(int i, int j) {
 
 void main() {
 
+    float level = 0.0;
+    float textureTimesteps = 12.0;
+    float uFrame = 0.0;
+    float uFrameWeight = 0.0;
     // divide screen space coordinates by viewport size to get UV texture coordinates in the range 0 to 1
     vec2 uv = gl_FragCoord.xy / resolution.xy;
 
     // look up particle position (texel) from texture
-    vec4 tmpPos = texture2D( texturePosition, uv );
-    vec3 pos = tmpPos.xyz;
+    vec4 posTemp = texture2D( texturePosition, uv );
 
-    // convert xy-plane position to UV texture coordinate [0,1]
-    vec2 vc2D  = vec2 (pos.x / 4.0 + 0.5,  pos.y / 2.0 + 0.5 );
+    // calculate UV coordinates (0 to 1) from particle position
+    vec2 gridUV = vec2( posTemp.x / 4. + 0.5, posTemp.y / 2. + 0.5 );
+
+    // gridUV = vec2(0.5, 0.5);
 
     // calculate the width of the UV segment each timesteps
     float segmentWidthX = 1.0 / textureTimesteps;
@@ -84,14 +89,14 @@ void main() {
 
     // Adjust the UV coordinates
     // X vertical levels
-    vec2 this_uv = vc2D;
-    vec2 next_uv = vc2D;
+    vec2 this_uv = gridUV;
+    vec2 next_uv = gridUV;
     // 1 or 12 timesteps in the horizontal
     this_uv.x = uFrame / textureTimesteps + (this_uv.x * segmentWidthX);
     next_uv.x = ( uFrame + 1.0) / textureTimesteps + (next_uv.x * segmentWidthX);
     // 7 vertical levels
-    this_uv.y = level / verticalLevels + (this_uv.y * segmentWidthY);
-    next_uv.y = level / verticalLevels + (next_uv.y * segmentWidthY);
+    this_uv.y = ( 1.0 - ( level + 1.0 ) * segmentWidthY ) + (this_uv.y * segmentWidthY);
+    next_uv.y = ( 1.0 - ( level + 1.0 ) * segmentWidthY ) + (next_uv.y * segmentWidthY);
 
     vec4 intVelocities;
 
@@ -123,22 +128,20 @@ void main() {
     intVelocities = mix(thisFrameVel, nextFrameVel, uFrameWeight);
 
     // scale particle velocities
-    // vec3 vel = intVelocities.rgb * uWindsSpeed;
-    vec3 vel = intVelocities.xyz * uWindsSpeed;
-    // vec3 vel = vec3(0.) * uWindsSpeed;
+    vec3 vel = intVelocities.xyz * uWindsSpeed ;
 
     // velocity disortion at higher latitudes; needs to be checked; from https://github.com/mapbox/webgl-wind/blob/master/src/shaders/update.frag.glsl
 //    if (vc2D.y > 0.01 && vc2D.y < 0.99) {
 //      vel.x /= cos(radians(vc2D.y * 180.0 - 90.0));
 //    }
 
+    vec3 pos = posTemp.xyz;
+
     // Advance dynamics one time step
-    pos += vel * uDelta / 3.0 ;
-    // pos += vec3(0.1, 0.1, 0.0) * uDelta / 3.0 ;
-    // pos += 0.0 ;
-    // pos += vec3(this_uv,0.) * uDelta / 10.0 ;
-    // pos += vec3(thisFrameVel.xy,0.) * uDelta / 3.0 ;
-    // pos += vec3(uFrame, uFrame, 0.0) * uDelta / 3.0 ;
+    pos += vel * 0.01 / 3.0 ;
+    // pos += 0.1 * uDelta / 3.0 ;
+    // pos.xy += uv*0.001;
+
 
     if (pos.x > 2.0) {
         pos.x -= 4.0;
@@ -153,22 +156,22 @@ void main() {
     float age;
 
     // reset particle to random position if lifetime expires or it leaves northern or southern boundary
-    if ( tmpPos.a > uWindsParticleLifeTime || pos.y >= .9 || pos.y <= -.9 ) {
+    if ( posTemp.a > uWindsParticleLifeTime || pos.y >= .9 || pos.y <= -.9 ) {
 
         // get new random position
         // random reset of particle positions from from https://github.com/mapbox/webgl-wind/blob/master/src/shaders/update.frag.glsl
   
         // a random seed to use for the particle drop
-        vec2 seed = (pos.xy + tmpPos.xy) * uRandSeed;
+        vec2 seed = (pos.xy + posTemp.xy) * uRandSeed;
         
-        pos = getRandomPosition(seed, 1.2, tmpPos.z);
+        pos = getRandomPosition(seed, 1.2, posTemp.z);
 
         age = 0.;
 
     // otherwise increment time counter for particle
     } else {
 
-        age = tmpPos.a + 1.;
+        age = posTemp.a + 1.;
 
     }
 

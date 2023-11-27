@@ -93,9 +93,6 @@ function createWindsMaterial(quaternionTexture, shaderUniforms, renderer, initia
                     dataMaxU: {value: new Float32Array(1)},
                     dataMinV: {value: new Float32Array(1)},
                     dataMaxV: {value: new Float32Array(1)},
-                    uWindsZonalDataMax: { value: 100.0 },
-                    uWindsMeridionalDataMin: { value: -100.0 },
-                    uWindsMeridionalDataMax: { value: 100.0 },
                     referenceDataFlag: {value: false},
                 }
             })

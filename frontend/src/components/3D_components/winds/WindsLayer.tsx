@@ -23,15 +23,15 @@ const loader = new THREE.TextureLoader();
 
 const shaderUniforms =
 {
-    uWindsMaxParticleCount : {value: 4000},
-    uWindsParticleCount : {value: 4000},
+    uWindsMaxParticleCount : {value: 40000},
+    uWindsParticleCount : {value: 40000},
     uWindsVerticalSpread : {value: null},
     uWindsParticleLifeTime : {value: 400.0},
     uWindsSpeed : {value: 0.2},
     uWindsSpeedMin : {value: 0.0},
     uWindsSpeedMax : {value: 30.0},
     uWindsScaleMagnitude : {value: false},
-    uWindsArrowSize : {value: 1.0},
+    uWindsArrowSize : {value: 0.7},
 
 }
 
@@ -107,14 +107,11 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
     console.log(data.info)
     dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
-    console.log(data.info.min[1])
+    console.log(data.info.min[0])
     const dataMinU = new Float32Array(data.info.min[0].flat());
     const dataMaxU = new Float32Array(data.info.max[0].flat());
     const dataMinV = new Float32Array(data.info.min[1].flat());
     const dataMaxV = new Float32Array(data.info.max[1].flat());
-
-    const flattenedArray = data.info.min[0].flat();
-    console.log(flattenedArray)
 
     // update wind input data for the compute renderer
     console.log("UPDATE COMPUTE TEXTURE")
@@ -138,6 +135,8 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
       materialRef.current.uniforms.textureTimesteps.value = 12.0
       gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 12.0
     };
+        gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataTexture.value = dataTexture
+
     
   }
   

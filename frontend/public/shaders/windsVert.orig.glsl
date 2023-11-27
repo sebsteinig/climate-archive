@@ -118,8 +118,8 @@ void main()
     this_uv.x = uFrame / textureTimesteps + (this_uv.x * segmentWidthX);
     next_uv.x = ( uFrame + 1.0) / textureTimesteps + (next_uv.x * segmentWidthX);
     // 7 vertical levels
-    this_uv.y = level / verticalLevels + (this_uv.y * segmentWidthY);
-    next_uv.y = level / verticalLevels + (next_uv.y * segmentWidthY);
+    this_uv.y = ( 1.0 - ( level + 1.0 ) * segmentWidthY ) + (this_uv.y * segmentWidthY);
+    next_uv.y = ( 1.0 - ( level + 1.0 ) * segmentWidthY ) + (next_uv.y * segmentWidthY);
 
     vec4 intVelocities;
 

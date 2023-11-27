@@ -2,7 +2,7 @@ import { Variable, VariableProps } from "../Variable"
 import { useStore } from "@/utils/store/store"
 import { Rows } from "../utils/Rows"
 import { ColorMapRow } from "../utils/row.colormap"
-import { RowWithSlider } from "../utils/row.slider"
+import { RowWithSlider, RowWithSlider_reversed } from "../utils/row.slider"
 import { RowWithCheckBox } from "../utils/row.checkbox"
 
 export function Winds({
@@ -18,12 +18,16 @@ export function Winds({
       controls={true}
     >
       <Rows>
+      {/* <RowWithSlider_reversed */}
       <RowWithSlider
           onChange={(n) => {
             winds.updateLevel(n)
           }}
+          // min={10}
+          // max={1000}
+          // step={1}
           min={0}
-          max={5}
+          max={6}
           step={1}
           value={winds.level}
           label="level"

@@ -1,6 +1,6 @@
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js'
 import windsComputeShaderPosition from '$/shaders/windsComputeShaderPositionFrag.glsl' 
-import { RepeatWrapping, ShaderMaterial, MeshBasicMaterial, Color, DataTexture, RGBAFormat, LinearFilter, TextureLoader, DoubleSide, BackSide, NoBlending} from 'three';
+import { Vector2, InstancedBufferAttribute, RepeatWrapping, ShaderMaterial, MeshBasicMaterial, Color, DataTexture, RGBAFormat, LinearFilter, TextureLoader, DoubleSide, BackSide, NoBlending} from 'three';
 
 
 function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniforms ) {
@@ -8,6 +8,7 @@ function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniform
     let gpuComputeWinds = new GPUComputationRenderer( Math.sqrt(shaderUniforms.uWindsMaxParticleCount.value ), Math.sqrt(shaderUniforms.uWindsMaxParticleCount.value ), renderer );
 
     let dtPosition = gpuComputeWinds.createTexture();
+    console.log(dtPosition)
   
     fillTexture( dtPosition, windsInitialPositions );
 
@@ -18,8 +19,6 @@ function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniform
     gpuComputeWinds.setVariableDependencies( positionVariable, [ positionVariable ] );
 
     let positionUniforms = positionVariable.material.uniforms;
-
-    let windsThisDataFrame, windsNextDataFrame
 
     positionUniforms[ "dataTexture" ] = { value: null };
     positionUniforms[ "level" ] = { value: 0.0 };
