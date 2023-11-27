@@ -73,7 +73,7 @@ export function tickBuilder(
       // only update the world selected by the user (i.e. key world)
       // and sync other worlds with the key world
       if (world_id == worlds.animated_world) {
-        jumpTo(frame, frame.weight + delta, false)
+        jumpTo(frame, frame.weight + delta, false, world_data.time.controller)
       } else {
         let targetWeight = current_frame.current.get(worlds.animated_world)?.weight
         jumpTo(frame, targetWeight, false)
