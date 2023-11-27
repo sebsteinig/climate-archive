@@ -142,8 +142,7 @@ export const World = memo(({ tick }: Props) => {
         {/* <SurfaceLayer ref={surface_layer_ref} /> */}
         {/* <AtmosphereLayer ref={atmosphere_layer_ref} /> */}
         {variables_state.get(EVarID.winds) && <WindLayer ref={winds_layer_ref} />}
-
-        <Perf position="top-right" />
+        {/* <Perf position="top-right" deepAnalyze="true"/> */}
       </>
     )
   });

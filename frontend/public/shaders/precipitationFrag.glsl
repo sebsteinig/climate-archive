@@ -172,7 +172,7 @@ if (referenceDataFlag) {
     // interpolate between absolute values of both frames
     float intReferenceData = mix(thisReferenceData, nexReferenceData, uFrameWeight);
     
-    intData -= intReferenceData;
+    intData = intReferenceData - intData;
 
     dataRemapped = remap( 
     intData, 

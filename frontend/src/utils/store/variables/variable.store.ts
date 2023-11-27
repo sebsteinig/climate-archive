@@ -156,7 +156,7 @@ export const createVariableSlice: StateCreator<
         max: 12,
         anomaly_min: 2,
         anomaly_max: 10,
-        opacity: 0.7,
+        opacity: 0.75,
         colormap: "rain.png",
         colormap_index: colormaps_list.indexOf("rain.png"),
         updateColormap: (name: string, index: number) => {
