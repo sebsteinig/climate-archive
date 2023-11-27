@@ -226,17 +226,22 @@ export const createVariableSlice: StateCreator<
       },
       winds: {
         name: EVarID.winds,
-        animation_speed: 0.025,
-        min_speed: 20,
+        level: 0,
+        animation_speed: 0.2,
+        min_speed: 0.0,
         reference_speed: 35,
-        arrows: 10000,
-        arrows_size: 2,
+        arrows: 4000,
+        arrows_size: 1.0,
         scale_by_magnitude: true,
         color_by_magnitude: true,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
           set((state) => {
             state.variables.winds.colormap = value
+          }),
+        updateLevel: (value: number) =>
+          set((state) => {
+            state.variables.winds.level = value
           }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {

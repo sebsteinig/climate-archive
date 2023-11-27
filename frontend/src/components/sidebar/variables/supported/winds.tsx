@@ -18,17 +18,23 @@ export function Winds({
       controls={true}
     >
       <Rows>
-        <ColorMapRow
-          colormap_name={winds.colormap}
-          onChange={(n) => winds.updateColormap(n)}
+      <RowWithSlider
+          onChange={(n) => {
+            winds.updateLevel(n)
+          }}
+          min={0}
+          max={6}
+          step={1}
+          value={winds.level}
+          label="level"
         />
         <RowWithSlider
           onChange={(n) => {
             winds.updateAnimationSpeed(n)
           }}
           min={0}
-          max={0.08}
-          step={0.0001}
+          max={5.0}
+          step={0.01}
           value={winds.animation_speed}
           label="animation speed"
         />
@@ -37,12 +43,12 @@ export function Winds({
             winds.updateMinSpeed(n)
           }}
           min={1}
-          max={100}
-          step={1}
+          max={10}
+          step={0.01}
           value={winds.min_speed}
           label="min speed [m/s]"
         />
-        <RowWithSlider
+        {/* <RowWithSlider
           onChange={(n) => {
             winds.updateReferenceSpeed(n)
           }}
@@ -61,7 +67,7 @@ export function Winds({
           step={100}
           value={winds.arrows}
           label="number of arrows"
-        />
+        /> */}
         <RowWithSlider
           onChange={(n) => {
             winds.updateArrowsSize(n)
@@ -72,7 +78,7 @@ export function Winds({
           value={winds.arrows_size}
           label="size of arrows"
         />
-        <RowWithCheckBox
+        {/* <RowWithCheckBox
           toggle={() => {
             winds.toggleScaleByMagnitude()
           }}
@@ -85,7 +91,7 @@ export function Winds({
           }}
           checked={winds.color_by_magnitude}
           label="color by magnitude"
-        />
+        /> */}
       </Rows>
     </Variable>
   )

@@ -1,5 +1,6 @@
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js'
 import windsComputeShaderPosition from '$/shaders/windsComputeShaderPositionFrag.glsl' 
+import { RepeatWrapping, ShaderMaterial, MeshBasicMaterial, Color, DataTexture, RGBAFormat, LinearFilter, TextureLoader, DoubleSide, BackSide, NoBlending} from 'three';
 
 
 function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniforms ) {
@@ -19,12 +20,13 @@ function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniform
     let positionUniforms = positionVariable.material.uniforms;
 
     let windsThisDataFrame, windsNextDataFrame
-  
+
     positionUniforms[ "dataTexture" ] = { value: null };
-    positionUniforms[ "thisDataMinU" ] = {value: new Float32Array(1)};
-    positionUniforms[ "thisDataMaxU" ] = {value: new Float32Array(1)};
-    positionUniforms[ "thisDataMinV" ] = {value: new Float32Array(1)};
-    positionUniforms[ "thisDataMaxV" ] = {value: new Float32Array(1)};
+    positionUniforms[ "level" ] = { value: 0.0 };
+    positionUniforms[ "dataMinU" ] = {value: new Float32Array(1)};
+    positionUniforms[ "dataMaxU" ] = {value: new Float32Array(1)};
+    positionUniforms[ "dataMinV" ] = {value: new Float32Array(1)};
+    positionUniforms[ "dataMaxV" ] = {value: new Float32Array(1)};
     positionUniforms[ "thisHeightFrame" ] = { value: thisHeightFrame };
     positionUniforms[ "uFrame" ] = { value: null };
     positionUniforms[ "uFrameWeight" ] = { value: null };

@@ -4,16 +4,18 @@ import {
   useImperativeHandle,
   useRef,
   RefObject,
+  useEffect
 } from "react"
 import { memo } from "react"
 import * as THREE from "three"
 import { useThree } from '@react-three/fiber'
 import { TickData } from "../../time_provider/tick.js"
-import { PrSlice } from "@/utils/store/variables/variable.types"
+import { PrSlice, WindsSlice } from "@/utils/store/variables/variable.types"
 import { createInitialWindPositions } from './windsInitialPositions.js'
 import { createWindsGeometry } from './windsGeometry.js'
 import { createWindsMaterial } from './windsMaterial.js'
 import { initComputeRendererWinds } from './windsComputeRenderer.js'
+import { useStore } from "@/utils/store/store"
 
 type VectorLayerType = THREE.Mesh<THREE.InstancedBufferGeometry, THREE.ShaderMaterial>
 
@@ -26,7 +28,7 @@ const shaderUniforms =
     uWindsVerticalSpread : {value: null},
     uWindsParticleLifeTime : {value: 400.0},
     uWindsSpeed : {value: 0.2},
-    uWindsSpeedMin : {value: 5.0},
+    uWindsSpeedMin : {value: 0.0},
     uWindsSpeedMax : {value: 30.0},
     uWindsScaleMagnitude : {value: false},
     uWindsArrowSize : {value: 1.0},
@@ -54,31 +56,52 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
 
   const state = useThree()
 
-  const { gpuComputeWinds, positionVariable } = initComputeRendererWinds(initialPositions, state.gl, shaderUniforms)
+  // const { gpuComputeWinds, positionVariable } = initComputeRendererWinds(initialPositions, state.gl, shaderUniforms)
   const materialRef = useRef( createWindsMaterial(quaternionTexture, shaderUniforms, state.gl, initialPositions) )
 
-  // gpuComputeWindRef = useRef(gpuComputeWinds)
+  const gpuComputeWindsRef = useRef({ renderer: null, positionVariable: null });
+  useEffect(() => {
+    const { gpuComputeWinds, positionVariable } = initComputeRendererWinds(initialPositions, state.gl, shaderUniforms);
+    gpuComputeWindsRef.current = { gpuComputeWinds, positionVariable };
+    console.log(gpuComputeWindsRef.current)
+  }, []);
+
   function tick(weight:number, uSphereWrapAmount:number, delta:number) {
 
     // update and run GPUComputationRenderer
-    gpuComputeWinds.variables[0].material.uniforms.uFrame.value = Math.floor(weight)
-    gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value = weight % 1
-    gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
-    gpuComputeWinds.variables[0].material.uniforms.uDelta.value = delta;
-    gpuComputeWinds.compute();
+    if (gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataTexture.value) {
+      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrame.value = Math.floor(weight)
+      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value = weight % 1
+      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
+      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uDelta.value = delta;
 
-    // update the wind material for visualisation
-    materialRef.current.uniforms.uFrame.value = Math.floor(weight)
-    materialRef.current.uniforms.uFrameWeight.value = weight % 1
-    materialRef.current.uniforms.wrapAmountUniform.value = uSphereWrapAmount
-    materialRef.current.uniforms["texturePosition"].value = gpuComputeWinds.getCurrentRenderTarget( positionVariable ).texture;
+      // console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrame.value)
+      // console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value)
+      // console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value)
+      console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.level.value)
+
+      gpuComputeWindsRef.current.gpuComputeWinds.compute();
+
+      // update the wind material for visualisation
+      materialRef.current.uniforms.uFrame.value = Math.floor(weight)
+      materialRef.current.uniforms.uFrameWeight.value = weight % 1
+      materialRef.current.uniforms.wrapAmountUniform.value = uSphereWrapAmount
+      materialRef.current.uniforms["texturePosition"].value = gpuComputeWindsRef.current.gpuComputeWinds.getCurrentRenderTarget( gpuComputeWindsRef.current.positionVariable ).texture;
+
+    }
 
   }
 
-  function updateUserUniforms(store:PrSlice) {
-    // materialRef.current.uniforms.uUserMinValue.value = store.min
-    // materialRef.current.uniforms.uUserMaxValue.value = store.max
-    // console.log("update uniforms")
+  function updateUserUniforms(store:WindsSlice) {
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.level.value = store.level;
+    materialRef.current.uniforms.level.value = store.level
+    materialRef.current.uniforms.uWindsArrowSize.value = store.arrows_size
+    materialRef.current.uniforms.uWindsSpeedMin.value = store.min_speed
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uWindsSpeed.value = store.animation_speed
+
+    // shaderUniforms.uWindsParticleCount.value = store.arrows
+    // shaderUniforms.uWindsMaxParticleCount.value = store.arrows
+
   }
 
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
@@ -94,25 +117,30 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     const dataMaxV = new Float32Array(data.info.max[1]);
 
     // update wind input data for the compute renderer
+    console.log("UPDATE COMPUTE TEXTURE")
     console.log(dataTexture)
-    gpuComputeWinds.variables[0].material.uniforms.dataTexture.value = dataTexture
-    gpuComputeWinds.variables[0].material.uniforms.thisDataMinU.value = dataMinU
-    gpuComputeWinds.variables[0].material.uniforms.thisDataMaxU.value = dataMaxU
-    gpuComputeWinds.variables[0].material.uniforms.thisDataMinV.value = dataMinV
-    gpuComputeWinds.variables[0].material.uniforms.thisDataMaxV.value = dataMaxV
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataTexture.value = dataTexture
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataMinU.value = dataMinU
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataMaxU.value = dataMaxU
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataMinV.value = dataMinV
+    gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataMaxV.value = dataMaxV
 
     // update the wind data for scaling the arrows in the arrow material
     materialRef.current.uniforms.dataTexture.value = dataTexture
-    materialRef.current.uniforms.thisDataMinU.value = dataMinU
-    materialRef.current.uniforms.thisDataMaxU.value = dataMaxU
-    materialRef.current.uniforms.thisDataMinV.value = dataMinV
-    materialRef.current.uniforms.thisDataMaxV.value = dataMaxV
+    console.log("minU",dataMinU)
+    console.log("maxU",dataMaxU)
+    console.log("minV",dataMinV)
+    console.log("maxV",dataMaxV)
+    materialRef.current.uniforms.dataMinU.value = dataMinU
+    materialRef.current.uniforms.dataMaxU.value = dataMaxU
+    materialRef.current.uniforms.dataMinV.value = dataMinV
+    materialRef.current.uniforms.dataMaxV.value = dataMaxV
     if (data.textures[0].current_url.path.includes('.avg.')) {
       materialRef.current.uniforms.textureTimesteps.value = 1.0
-      gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 1.0
+      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 1.0
     } else {
       materialRef.current.uniforms.textureTimesteps.value = 12.0
-      gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 12.0
+      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value = 12.0
     };
     
   }

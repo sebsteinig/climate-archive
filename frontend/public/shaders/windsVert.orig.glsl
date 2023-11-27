@@ -8,13 +8,16 @@ uniform sampler2D dataTexture;
 uniform float wrapAmountUniform;
 uniform float uWindsArrowSize;
 
+uniform float uFrame;
 uniform float uFrameWeight;
 uniform float uWindsSpeedMin;
 uniform float uWindsSpeedMax;
-uniform float uWindsZonalDataMin;
-uniform float uWindsZonalDataMax;
-uniform float uWindsMeridionalDataMin;
-uniform float uWindsMeridionalDataMax;
+uniform float dataMinU[12];
+uniform float dataMaxU[12];
+uniform float dataMinV[12];
+uniform float dataMaxV[12];
+uniform float level;
+uniform float textureTimesteps;
 
 uniform float uWindsMaxArrowSize;
 
@@ -91,11 +94,43 @@ void main()
 
     // calculate UV coordinates (0 to 1) from particle position
     vec2 gridUV = vec2( posTemp.x / 4. + 0.5, posTemp.y / 2. + 0.5 );
-//    vec2 gridUV = vec2( posTemp.x / 4. + 0.5 - ( 1. / 96. / 2.0 ), posTemp.y / 2. + 0.5 + ( 1. / 73. / 2.0 ) );
-//    vec2 gridUV = vec2( posTemp.x / 4. + 0.5 - ( 1. / 128. / 2.0 ), posTemp.y / 2. + 0.5 + ( 1. / 64. / 2.0 ) );
-    // get velocities at particle position
-    vec4 velocityInt = mix(texture2D(dataTexture,gridUV),texture2D(dataTexture,gridUV),uFrameWeight);
- 
+
+    // calculate the width of the UV segment each timesteps
+    float segmentWidthX = 1.0 / textureTimesteps;
+    float verticalLevels = 7.0;
+    float segmentWidthY = 1.0 / verticalLevels;
+
+    // Adjust the UV coordinates
+    // X vertical levels
+    vec2 this_uv = gridUV;
+    vec2 next_uv = gridUV;
+    // 1 or 12 timesteps in the horizontal
+    this_uv.x = uFrame / textureTimesteps + (this_uv.x * segmentWidthX);
+    next_uv.x = ( uFrame + 1.0) / textureTimesteps + (next_uv.x * segmentWidthX);
+    // 7 vertical levels
+    this_uv.y = level / verticalLevels + (this_uv.y * segmentWidthY);
+    next_uv.y = level / verticalLevels + (next_uv.y * segmentWidthY);
+
+    vec4 intVelocities;
+
+    // 2D surface velocity fields
+    // look up model velocities at those UVs for both frames
+    // vec4 thisFrameVel = texture2D( dataTexture, this_uv);
+    vec4 thisFrameVel = texture2D( dataTexture, this_uv);
+    vec4 nextFrameVel = texture2D( dataTexture, next_uv); 
+
+    // remap velocities from RGB image value [0,1] to cm/s [-50,50 cm/s] 
+    thisFrameVel.x = remap( thisFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame)], dataMaxU[int(uFrame)] );
+    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinV[int(uFrame)], dataMaxV[int(uFrame)] );
+    thisFrameVel.z = 0.0;
+
+    nextFrameVel.x = remap( nextFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame+1.0)], dataMaxU[int(uFrame+1.0)] );
+    nextFrameVel.y = remap( nextFrameVel.y, 0.0, 1.0, dataMinV[int(uFrame+1.0)], dataMaxV[int(uFrame+1.0)] );
+    nextFrameVel.z = 0.0;
+
+    // interpolate velocities between frames
+    intVelocities = mix(thisFrameVel, nextFrameVel, uFrameWeight);
+
     // get sphere position rotation quaternion at particle position
     vec4 quaternions = texture2D(quaternionTexture,gridUV);
 
@@ -107,12 +142,7 @@ void main()
 
     quaternions = remapVec4( quaternions, 0.0, 1.0, -1.0, 1.0 );
 
-    // remap velocities from RGB image value [0,1] to cm/s
-    velocityInt.x = remap( velocityInt.x, 0.0, 1.0, uWindsZonalDataMin, uWindsZonalDataMax );
-    velocityInt.y = remap( velocityInt.y, 0.0, 1.0, uWindsMeridionalDataMin, uWindsMeridionalDataMax );
-    velocityInt.z = 0.0;
-
-    float magnitude = length(velocityInt);
+    float magnitude = length(intVelocities);
  //   float relativeMagnitude = mix(0.0, 1.0, magnitude );
     float relativeMagnitude;
     float relativeOpacity;
@@ -147,15 +177,15 @@ void main()
 //   
 
     // get velocity direction
-    float velAnglePlane = atan( velocityInt.y / velocityInt.x );
+    float velAnglePlane = atan( intVelocities.y / intVelocities.x );
 
-    if (velocityInt.x <= 0.) {
+    if (intVelocities.x <= 0.) {
         velAnglePlane += M_PI;
     }
 
-    float velAngleSphere = atan( -1. * velocityInt.y / velocityInt.x );
+    float velAngleSphere = atan( -1. * intVelocities.y / intVelocities.x );
 
-    if (velocityInt.x <= 0.) {
+    if (intVelocities.x <= 0.) {
         velAngleSphere += M_PI;
     }
 
@@ -166,7 +196,7 @@ void main()
     );
 
     vec2 angles = M_PI * vec2(-1.0 * map(posTemp.x,-2.0,2.0,0.0,2.0) , map(posTemp.y,1.0,-1.0,0.0,1.0));
-    vec3 sphCoordinates = anglesToSphereCoord(angles, 1.0 + posTemp.z + uHeightWinds);
+    vec3 sphCoordinates = anglesToSphereCoord(angles, 1.0 + posTemp.z + uHeightWinds + level * 0.05);
 
   //  vec3 vPositionScaledRotatedSphere = rotateAxis( vPositionScaled, normalize(-1. * posTemp.xyz), velAngle);
   //  vec3 vPositionScaledRotatedSphere = vPositionScaled;
@@ -176,9 +206,9 @@ void main()
 
 
     // calculate positions on plane
-    // vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
-    vec3 planePos = vPositionScaled + posTemp.xyz;
-    planePos.z += uHeightWinds;
+    vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
+    // vec3 planePos = vPositionScaled + posTemp.xyz;
+    planePos.z += uHeightWinds + level * 0.05;
 
 //    vec3 planePos = vPositionScaledRotated + spherePositions;
 

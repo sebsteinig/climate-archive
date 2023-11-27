@@ -1,5 +1,3 @@
-uniform sampler2D dataTexture;
-
 uniform float uFrame;
 uniform float uFrameWeight;
 uniform float uWindsSpeed;
@@ -9,13 +7,15 @@ uniform float dataMinU[12];
 uniform float dataMaxU[12];
 uniform float dataMinV[12];
 uniform float dataMaxV[12];
+uniform float level;
 uniform float textureTimesteps;
 
 uniform float uDropRate;
 uniform float uDropRateBump;
 uniform float uWindsParticleLifeTime;
-uniform float uSphereWrapAmount;
-uniform float uHeightWinds;
+
+uniform sampler2D dataTexture;
+uniform sampler2D cmapTexture;
 
 // remap function from RGB color to data value
 float remap(float value, float inMin, float inMax, float outMin, float outMax) {
@@ -70,22 +70,32 @@ void main() {
     vec2 vc2D  = vec2 (pos.x / 4.0 + 0.5 - ( 1. / 96. / 2.0 ),  pos.y / 2.0 + 0.5 + ( 1. / 73. / 2.0 ) );
 
     // calculate the width of the UV segment each timesteps
-    float segmentWidth = 1.0 / textureTimesteps;
-    
+    float segmentWidthX = 1.0 / textureTimesteps;
+    float verticalLevels = 7.0;
+    float segmentWidthY = 1.0 / verticalLevels;
+
     // Adjust the UV coordinates
-    vec2 this_uv = vec2((uFrame / textureTimesteps) + (vc2D.x * segmentWidth), vc2D.y);
-    vec2 next_uv = vec2((( uFrame + 1.0) / textureTimesteps) + (vc2D.x * segmentWidth), vc2D.y);
+    // X vertical levels
+    vec2 this_uv = vc2D;
+    vec2 next_uv = vc2D;
+    // 1 or 12 timesteps in the horizontal
+    this_uv.x = uFrame / textureTimesteps + (this_uv.x * segmentWidthX);
+    next_uv.x = ( uFrame + 1.0) / textureTimesteps + (next_uv.x * segmentWidthX);
+    // 7 vertical levels
+    this_uv.y = level / verticalLevels + (this_uv.y * segmentWidthY);
+    next_uv.y = level / verticalLevels + (next_uv.y * segmentWidthY);
 
     vec4 intVelocities;
 
     // 2D surface velocity fields
     // look up model velocities at those UVs for both frames
+    // vec4 thisFrameVel = texture2D( dataTexture, this_uv);
     vec4 thisFrameVel = texture2D( dataTexture, this_uv);
     vec4 nextFrameVel = texture2D( dataTexture, next_uv); 
 
     // remap velocities from RGB image value [0,1] to cm/s [-50,50 cm/s] 
     thisFrameVel.x = remap( thisFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame)], dataMaxU[int(uFrame)] );
-    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinU[int(uFrame)], dataMaxU[int(uFrame)] );
+    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinV[int(uFrame)], dataMaxV[int(uFrame)] );
     thisFrameVel.z = 0.0;
 
     nextFrameVel.x = remap( nextFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame+1.0)], dataMaxU[int(uFrame+1.0)] );
@@ -106,9 +116,12 @@ void main() {
 //    }
 
     // Advance dynamics one time step
-    pos += vel * uDelta / 10.0 ;
+    pos += vel * uDelta / 3.0 ;
     // pos += vec3(0.1, 0.1, 0.0) * uDelta / 3.0 ;
     // pos += 0.0 ;
+    // pos += vec3(this_uv,0.) * uDelta / 10.0 ;
+    // pos += vec3(thisFrameVel.xy,0.) * uDelta / 3.0 ;
+    // pos += vec3(uFrame, uFrame, 0.0) * uDelta / 3.0 ;
 
     if (pos.x > 2.0) {
         pos.x -= 4.0;

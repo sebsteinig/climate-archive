@@ -40,7 +40,6 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
   // use global state/user input to initialise the layer
   const pr_state = useStore((state) => state.variables.pr)
   const height_state = useStore((state) => state.variables.height)
-  const world_state = useStore((state) => state.worlds)
 
   
   const materialRef = useRef(new THREE.ShaderMaterial( {

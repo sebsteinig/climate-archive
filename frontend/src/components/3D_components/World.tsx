@@ -44,6 +44,9 @@ export const World = memo(({ tick }: Props) => {
             if (surface_layer_ref.current) {
               surface_layer_ref.current.updateUserUniforms(state.variables.height);
             }
+            if (winds_layer_ref.current) {
+              winds_layer_ref.current.updateUserUniforms(state.variables.winds);
+            }
         },
         userVariables
       );
