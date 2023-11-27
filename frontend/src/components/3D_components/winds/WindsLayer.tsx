@@ -69,26 +69,22 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
   function tick(weight:number, uSphereWrapAmount:number, delta:number) {
 
     // update and run GPUComputationRenderer
-    if (gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataTexture.value) {
-      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrame.value = Math.floor(weight)
-      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value = weight % 1
-      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
-      gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uDelta.value = delta;
+    if (gpuComputeWindsRef.current.gpuComputeWinds != null) {
+      if (gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.dataTexture.value) {
+        gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrame.value = Math.floor(weight)
+        gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value = weight % 1
+        gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
+        gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uDelta.value = delta;
+        
+        gpuComputeWindsRef.current.gpuComputeWinds.compute();
 
-      // console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrame.value)
-      // console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value)
-      // console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.textureTimesteps.value)
-      console.log( gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.level.value)
-
-      gpuComputeWindsRef.current.gpuComputeWinds.compute();
-
-      // update the wind material for visualisation
-      materialRef.current.uniforms.uFrame.value = Math.floor(weight)
-      materialRef.current.uniforms.uFrameWeight.value = weight % 1
-      materialRef.current.uniforms.wrapAmountUniform.value = uSphereWrapAmount
-      materialRef.current.uniforms["texturePosition"].value = gpuComputeWindsRef.current.gpuComputeWinds.getCurrentRenderTarget( gpuComputeWindsRef.current.positionVariable ).texture;
-
-    }
+        // update the wind material for visualisation
+        materialRef.current.uniforms.uFrame.value = Math.floor(weight)
+        materialRef.current.uniforms.uFrameWeight.value = weight % 1
+        materialRef.current.uniforms.wrapAmountUniform.value = uSphereWrapAmount
+        materialRef.current.uniforms["texturePosition"].value = gpuComputeWindsRef.current.gpuComputeWinds.getCurrentRenderTarget( gpuComputeWindsRef.current.positionVariable ).texture;
+      }
+  }
 
   }
 
@@ -109,12 +105,16 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     // always update the own data
     // load texture and info
     const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
-    console.log(dataTexture)
+    console.log(data.info)
     dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
-    const dataMinU = new Float32Array(data.info.min[0]);
-    const dataMaxU = new Float32Array(data.info.max[0]);
-    const dataMinV = new Float32Array(data.info.min[1]);
-    const dataMaxV = new Float32Array(data.info.max[1]);
+    console.log(data.info.min[0])
+    const dataMinU = new Float32Array(data.info.min[0].flat());
+    const dataMaxU = new Float32Array(data.info.max[0].flat());
+    const dataMinV = new Float32Array(data.info.min[1].flat());
+    const dataMaxV = new Float32Array(data.info.max[1].flat());
+
+    const flattenedArray = data.info.min[0].flat();
+    console.log(flattenedArray)
 
     // update wind input data for the compute renderer
     console.log("UPDATE COMPUTE TEXTURE")
@@ -127,10 +127,6 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
 
     // update the wind data for scaling the arrows in the arrow material
     materialRef.current.uniforms.dataTexture.value = dataTexture
-    console.log("minU",dataMinU)
-    console.log("maxU",dataMaxU)
-    console.log("minV",dataMinV)
-    console.log("maxV",dataMaxV)
     materialRef.current.uniforms.dataMinU.value = dataMinU
     materialRef.current.uniforms.dataMaxU.value = dataMaxU
     materialRef.current.uniforms.dataMinV.value = dataMinV

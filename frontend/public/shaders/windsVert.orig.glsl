@@ -12,10 +12,10 @@ uniform float uFrame;
 uniform float uFrameWeight;
 uniform float uWindsSpeedMin;
 uniform float uWindsSpeedMax;
-uniform float dataMinU[12];
-uniform float dataMaxU[12];
-uniform float dataMinV[12];
-uniform float dataMaxV[12];
+uniform float dataMinU[84];
+uniform float dataMaxU[84];
+uniform float dataMinV[84];
+uniform float dataMaxV[84];
 uniform float level;
 uniform float textureTimesteps;
 
@@ -83,6 +83,16 @@ vec4 applyColormap(float t, sampler2D colormap){
 
 }
 
+
+// Function to calculate the index from 2D coordinates (i, j)
+// Assuming the number of columns is 12
+const int NUM_COLS = 12;
+
+int getIndex(int i, int j) {
+    return i * NUM_COLS + j;
+}
+
+
 void main()
 {
     /**
@@ -119,13 +129,22 @@ void main()
     vec4 thisFrameVel = texture2D( dataTexture, this_uv);
     vec4 nextFrameVel = texture2D( dataTexture, next_uv); 
 
+    // flattended array[84]; // 7 * 12 = 84
+    // To access the element at [i][j], calculate the index like this:
+    // int i = 1; // Example row
+    // int j = 2; // Example column
+    // float value = yourArrayUniform[i * 12 + j];
+    // ... your shader code ...
+    int this2DIndex = getIndex(int(level), int(uFrame));
+    int next2DIndex = getIndex(int(level), int(uFrame +1.0));
+
     // remap velocities from RGB image value [0,1] to cm/s [-50,50 cm/s] 
-    thisFrameVel.x = remap( thisFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame)], dataMaxU[int(uFrame)] );
-    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinV[int(uFrame)], dataMaxV[int(uFrame)] );
+    thisFrameVel.x = remap( thisFrameVel.x, 0.0, 1.0, dataMinU[this2DIndex], dataMaxU[this2DIndex] );
+    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinV[this2DIndex], dataMaxV[this2DIndex] );
     thisFrameVel.z = 0.0;
 
-    nextFrameVel.x = remap( nextFrameVel.x, 0.0, 1.0, dataMinU[int(uFrame+1.0)], dataMaxU[int(uFrame+1.0)] );
-    nextFrameVel.y = remap( nextFrameVel.y, 0.0, 1.0, dataMinV[int(uFrame+1.0)], dataMaxV[int(uFrame+1.0)] );
+    nextFrameVel.x = remap( nextFrameVel.x, 0.0, 1.0, dataMinU[next2DIndex], dataMaxU[next2DIndex] );
+    nextFrameVel.y = remap( nextFrameVel.y, 0.0, 1.0, dataMinV[next2DIndex], dataMaxV[next2DIndex] );
     nextFrameVel.z = 0.0;
 
     // interpolate velocities between frames
@@ -186,7 +205,7 @@ void main()
     float velAngleSphere = atan( -1. * intVelocities.y / intVelocities.x );
 
     if (intVelocities.x <= 0.) {
-        velAngleSphere += M_PI;
+        velAngleSphere -= M_PI;
     }
 
     vec3 vPositionScaledRotated = vec3(
@@ -207,7 +226,6 @@ void main()
 
     // calculate positions on plane
     vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
-    // vec3 planePos = vPositionScaled + posTemp.xyz;
     planePos.z += uHeightWinds + level * 0.05;
 
 //    vec3 planePos = vPositionScaledRotated + spherePositions;

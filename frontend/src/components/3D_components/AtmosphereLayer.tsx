@@ -99,8 +99,9 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
     dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
     materialRef.current.uniforms.dataTexture.value = dataTexture
-    const dataMin = new Float32Array(data.info.min[0].map(value => value * 86400));
-    const dataMax = new Float32Array(data.info.max[0].map(value => value * 86400));
+    const dataMin = new Float32Array(data.info.min[0][0].map(value => value * 86400));
+    const dataMax = new Float32Array(data.info.max[0][0].map(value => value * 86400));
+
     materialRef.current.uniforms.thisDataMin.value = dataMin
     materialRef.current.uniforms.thisDataMax.value = dataMax
     if (data.textures[0].current_url.path.includes('.avg.')) {

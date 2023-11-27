@@ -124,23 +124,42 @@ function processInfo(
 
   const calculateMinMax = (matrix, index, isMax) => {
     if (mean) {
-      const sum = matrix.reduce((acc, val) => acc + parseFloat(isMax ? val[index].max : val[index].min), 0);
+      const sum = matrix.reduce((acc, val) => acc + parseFloat(isMax ? val.max : val.min), 0);
       return sum / matrix.length;
     } else {
-      return parseFloat(isMax ? matrix[z][index].max : matrix[z][index].min);
+      return parseFloat(isMax ? matrix[index].max : matrix[index].min);
     }
   };
 
   const min = metadata.metadata.map(m => {
     const matrix = m.bounds_matrix_ts;
-    return Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix, index, false));
+  
+    if (matrix.length === 1) {
+      // Use original logic for matrices with only one row
+      return [Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix[0], index, false))];
+    } else {
+      // Use new logic for matrices with multiple rows
+      return matrix.map(row =>
+        Array(row.length).fill(0).map((_, index) => calculateMinMax(row, index, false))
+      );
+    }
   });
-
+  
   const max = metadata.metadata.map(m => {
     const matrix = m.bounds_matrix_ts;
-    return Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix, index, true));
+  
+    if (matrix.length === 1) {
+      // Use original logic for matrices with only one row
+      return [Array(matrix[0].length).fill(0).map((_, index) => calculateMinMax(matrix[0], index, true))];
+    } else {
+      // Use new logic for matrices with multiple rows
+      return matrix.map(row =>
+        Array(row.length).fill(0).map((_, index) => calculateMinMax(row, index, true))
+      );
+    }
   });
-
+  
+  
   return {
     min,
     max,
@@ -288,6 +307,8 @@ export async function compute(
       }
     }),
   )
+
+  console.log(data)
 
   if (world_data.time.mode === TimeMode.mean) {
     return {

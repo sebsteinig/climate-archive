@@ -23,7 +23,7 @@ export function Winds({
             winds.updateLevel(n)
           }}
           min={0}
-          max={6}
+          max={5}
           step={1}
           value={winds.level}
           label="level"

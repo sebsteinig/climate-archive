@@ -49,7 +49,7 @@ function initMap() {
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
   m.set(EVarID.tos, false)
-  m.set(EVarID.winds, true)
+  m.set(EVarID.winds, false)
   return m
 }
 
