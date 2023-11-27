@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // define uniforms
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uniform float uLayerOpacity;
+uniform float uOpacity;
 uniform float uFrame;
 uniform float uFrameWeight;
 uniform float thisDataMin[12]; 
@@ -176,7 +176,7 @@ if (referenceDataFlag) {
 
     dataRemapped = remap( 
     intData, 
-    uUserMinValueAnomaly, 
+    uUserMaxValueAnomaly * -1.0, 
     uUserMaxValueAnomaly, 
     0.0, 
     1.0 );
@@ -192,11 +192,13 @@ vec4 dataColor = applyColormap( dataRemapped, colorMap, cmap_index );
 if (referenceDataFlag == false) {
     if (dataRemapped >= 0.0 ) {
         gl_FragColor = dataColor;
-        gl_FragColor.a *= uLayerOpacity;
     }
 } else {
-    gl_FragColor = dataColor;
-    gl_FragColor.a *= uLayerOpacity;
+    if (abs(intData) >= uUserMinValueAnomaly) {
+        gl_FragColor = dataColor;
+    }
 }
+
+gl_FragColor.a *= uOpacity;
 
 }

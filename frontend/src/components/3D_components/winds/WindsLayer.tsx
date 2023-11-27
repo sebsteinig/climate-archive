@@ -75,7 +75,7 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
         gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uFrameWeight.value = weight % 1
         gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uRandSeed.value = Math.random()
         gpuComputeWindsRef.current.gpuComputeWinds.variables[0].material.uniforms.uDelta.value = delta;
-        
+
         gpuComputeWindsRef.current.gpuComputeWinds.compute();
 
         // update the wind material for visualisation
@@ -107,7 +107,7 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     const dataTexture = await loader.loadAsync(URL.createObjectURL(data.textures[0].current_url.image))
     console.log(data.info)
     dataTexture.wrapS = dataTexture.wrapT = THREE.RepeatWrapping
-    console.log(data.info.min[0])
+    console.log(data.info.min[1])
     const dataMinU = new Float32Array(data.info.min[0].flat());
     const dataMaxU = new Float32Array(data.info.max[0].flat());
     const dataMinV = new Float32Array(data.info.min[1].flat());

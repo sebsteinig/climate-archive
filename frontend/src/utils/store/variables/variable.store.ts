@@ -49,7 +49,7 @@ function initMap() {
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
   m.set(EVarID.tos, false)
-  m.set(EVarID.winds, false)
+  m.set(EVarID.winds, true)
   return m
 }
 
@@ -154,7 +154,9 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
-        anomaly_range: 5,
+        anomaly_min: 2,
+        anomaly_max: 10,
+        opacity: 0.7,
         colormap: "rain.png",
         colormap_index: colormaps_list.indexOf("rain.png"),
         updateColormap: (name: string, index: number) => {
@@ -177,9 +179,17 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.pr.max = value
           }),
-        updateAnomalyRange: (value: number) =>
+        updateAnomalyMin: (value: number) =>
         set((state) => {
-          state.variables.pr.anomaly_range = value
+          state.variables.pr.anomaly_min = value
+        }),
+        updateAnomalyMax: (value: number) =>
+        set((state) => {
+          state.variables.pr.anomaly_max = value
+        }),
+        updateOpacity: (value: number) =>
+        set((state) => {
+          state.variables.pr.opacity = value
         }),
       },
       sic: {

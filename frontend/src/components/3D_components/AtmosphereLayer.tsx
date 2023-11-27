@@ -54,7 +54,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       uSphereWrapAmount: {value: 0.0},
       uLayerHeight: {value: height_state.displacement + 0.05},
       // uLayerHeight: {value: 0.25},
-      uLayerOpacity: {value: 0.0},
+      uOpacity: {value: pr_state.opacity},
       dataTexture: {value: null},
       textureTimesteps: {value: null},
       thisDataMin: {value: new Float32Array(1)},
@@ -65,8 +65,8 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       referenceDataFlag: {value: false},
       uUserMinValue: {value: pr_state.min},
       uUserMaxValue: {value: pr_state.max},
-      uUserMinValueAnomaly: {value: -5.0},
-      uUserMaxValueAnomaly: {value: 5.0},
+      uUserMinValueAnomaly: {value: pr_state.anomaly_min},
+      uUserMaxValueAnomaly: {value: pr_state.anomaly_max},
       colorMap: {value: cmap},
       colorMapIndex: {value: pr_state.colormap_index},
       numLon: {value: 96},
@@ -81,16 +81,16 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     materialRef.current.uniforms.uFrame.value = Math.floor(weight)
     materialRef.current.uniforms.uFrameWeight.value = weight % 1
     materialRef.current.uniforms.uSphereWrapAmount.value = uSphereWrapAmount
-    materialRef.current.uniforms.uLayerOpacity.value = 1.0
   }
 
   function updateUserUniforms(store:PrSlice, store_height:HeightSlice) {
     materialRef.current.uniforms.uUserMinValue.value = store.min
     materialRef.current.uniforms.uUserMaxValue.value = store.max
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
-    materialRef.current.uniforms.uUserMinValueAnomaly.value = store.anomaly_range * -1.
-    materialRef.current.uniforms.uUserMaxValueAnomaly.value = store.anomaly_range
+    materialRef.current.uniforms.uUserMinValueAnomaly.value = store.anomaly_min
+    materialRef.current.uniforms.uUserMaxValueAnomaly.value = store.anomaly_max
     materialRef.current.uniforms.uLayerHeight.value = store_height.displacement + 0.05
+    materialRef.current.uniforms.uOpacity.value = store.opacity
   }
 
   async function updateTextures(data:TickData, reference:TickData, reference_flag:boolean) {
@@ -116,8 +116,8 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       const referenceDataTexture = await loader.loadAsync(URL.createObjectURL(reference.textures[0].current_url.image))
       referenceDataTexture.wrapS = referenceDataTexture.wrapT = THREE.RepeatWrapping
       materialRef.current.uniforms.referenceDataTexture.value = referenceDataTexture
-      const referenceDataMin = new Float32Array(reference.info.min[0].map(value => value * 86400));
-      const referenceDataMax = new Float32Array(reference.info.max[0].map(value => value * 86400));
+      const referenceDataMin = new Float32Array(reference.info.min[0][0].map(value => value * 86400));
+      const referenceDataMax = new Float32Array(reference.info.max[0][0].map(value => value * 86400));
       materialRef.current.uniforms.referenceDataMin.value = referenceDataMin
       materialRef.current.uniforms.referenceDataMax.value = referenceDataMax
       materialRef.current.uniforms.referenceDataFlag.value = true
