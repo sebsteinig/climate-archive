@@ -6,6 +6,8 @@ uniform float uFrame;
 uniform float uFrameWeight;
 uniform float thisDataMin[12]; 
 uniform float thisDataMax[12];
+uniform float heightMin[1]; 
+uniform float heightMax[1]; 
 uniform float textureTimesteps;
 uniform float referenceDataMin[12];
 uniform float referenceDataMax[12];
@@ -195,10 +197,19 @@ if (referenceDataFlag == false) {
 
 gl_FragColor.a *= uOpacity;
 
-vec4 lsm =texture2D(heightTexture,vUv );
+// vec4 height_raw =texture2D(heightTexture,vUv );
+float height = remap( 
+    texture2D(
+        heightTexture, 
+        vUv
+        ).r, 
+    0.0, 
+    1.0, 
+    heightMin[0], 
+    heightMax[0]);
 
-// if (lsm.r >= 0.5) {
-//     gl_FragColor.a = 0.0;
-// }
+if (height > 0.0) {
+    gl_FragColor.a = 0.0;
+}
 
 }

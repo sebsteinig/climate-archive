@@ -50,14 +50,16 @@ const OceanLayer = memo(forwardRef<OceanLayerRef, Props>(({ }, ref) => {
       uFrame: {value: null},
       uFrameWeight: {value: null},
       uSphereWrapAmount: {value: 0.0},
-      uLayerHeight: { value: 0.095 },
-      // uLayerHeight: {value: 0.25},
+      uLayerHeight: { value: 0.1 },
+      // uLayerHeight: { value: 0.12 },
       uOpacity: {value: tos_state.opacity},
       dataTexture: {value: null},
       heightTexture: {value: null},
       textureTimesteps: {value: null},
       thisDataMin: {value: new Float32Array(1)},
       thisDataMax: {value: new Float32Array(1)},
+      heightMin: {value: new Float32Array(1)},
+      heightMax: {value: new Float32Array(1)},
       referenceDataTexture: {value: null},
       referenceDataMin: {value: new Float32Array(1)},
       referenceDataMax: {value: new Float32Array(1)},
@@ -126,7 +128,12 @@ const OceanLayer = memo(forwardRef<OceanLayerRef, Props>(({ }, ref) => {
     if ( surface_layer_ref != null ) {
       // get surface height texture for masking
       const heightTexture = surface_layer_ref.current?.type.current.material.uniforms.dataTexture.value
+      const heightMin = surface_layer_ref.current?.type.current.material.uniforms.thisDataMin.value
+      const heightMax = surface_layer_ref.current?.type.current.material.uniforms.thisDataMax.value
       materialRef.current.uniforms.heightTexture.value = heightTexture
+      materialRef.current.uniforms.heightMin.value = heightMin
+      materialRef.current.uniforms.heightMax.value = heightMax
+
     }
   }
   
