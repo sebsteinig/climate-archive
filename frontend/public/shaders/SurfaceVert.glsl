@@ -6,6 +6,8 @@
 uniform float uSphereWrapAmount;
 uniform float uLayerHeight;
 uniform float uHeightDisplacement; // Scale of the height displacement
+uniform float thisDataMin[12]; 
+uniform float thisDataMax[12];
 
 uniform sampler2D dataTexture; // Heightmap texture
 
@@ -28,14 +30,46 @@ vec3 anglesToSphereCoord(vec2 a, float r) {
 
 }
 
+// remap color range
+float remap(float value, float inMin, float inMax, float outMin, float outMax) {
+    return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
+// Adjusted remap function to handle user-defined min and max values
+float userRemap(float value) {
+    float uUserMinValue = -6000.0;
+    float uUserMaxValue =  6000.0;
+
+    if (value < 0.0) {
+        return 0.5 * (value - uUserMinValue) / -uUserMinValue;
+    } else {
+        return 0.5 + 0.5 * value / uUserMaxValue;
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // main program
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void main()	{
 
+    float thisFrameData = remap( 
+        texture2D(
+            dataTexture, 
+            uv
+            ).r, 
+        0.0, 
+        1.0, 
+        thisDataMin[0], 
+        thisDataMax[0]);
+
+    float dataRemapped = userRemap(thisFrameData);
+
+        
+
     // Sample the heightmap texture
-    float height = texture2D(dataTexture, uv).r;
+    // float height = texture2D(dataTexture, uv).r - 0.5;
+    float height = dataRemapped - 0.5;
 
     // standard plane position
     // vec3 modPosition = position;

@@ -50,7 +50,7 @@ const OceanLayer = memo(forwardRef<OceanLayerRef, Props>(({ }, ref) => {
       uFrame: {value: null},
       uFrameWeight: {value: null},
       uSphereWrapAmount: {value: 0.0},
-      uLayerHeight: { value: 0.1 },
+      uLayerHeight: { value: 0.0 },
       // uLayerHeight: { value: 0.12 },
       uOpacity: {value: tos_state.opacity},
       dataTexture: {value: null},
@@ -133,6 +133,7 @@ const OceanLayer = memo(forwardRef<OceanLayerRef, Props>(({ }, ref) => {
       materialRef.current.uniforms.heightTexture.value = heightTexture
       materialRef.current.uniforms.heightMin.value = heightMin
       materialRef.current.uniforms.heightMax.value = heightMax
+      console.log(materialRef.current.uniforms.heightMax.value)
 
     }
   }

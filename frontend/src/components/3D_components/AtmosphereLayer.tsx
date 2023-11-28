@@ -52,7 +52,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
       uFrame: {value: null},
       uFrameWeight: {value: null},
       uSphereWrapAmount: {value: 0.0},
-      uLayerHeight: {value: height_state.displacement + 0.05},
+      uLayerHeight: {value: height_state.displacement * 0.5},
       // uLayerHeight: {value: 0.25},
       uOpacity: {value: pr_state.opacity},
       dataTexture: {value: null},
@@ -89,7 +89,7 @@ const AtmosphereLayer = memo(forwardRef<AtmosphereLayerRef, Props>(({ }, ref) =>
     materialRef.current.uniforms.colorMapIndex.value = store.colormap_index
     materialRef.current.uniforms.uUserMinValueAnomaly.value = store.anomaly_min
     materialRef.current.uniforms.uUserMaxValueAnomaly.value = store.anomaly_max
-    materialRef.current.uniforms.uLayerHeight.value = store_height.displacement + 0.05
+    materialRef.current.uniforms.uLayerHeight.value = height_state.displacement * 0.5
     materialRef.current.uniforms.uOpacity.value = store.opacity
   }
 

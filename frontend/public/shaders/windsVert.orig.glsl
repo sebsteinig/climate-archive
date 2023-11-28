@@ -215,7 +215,7 @@ void main()
     );
 
     vec2 angles = M_PI * vec2(-1.0 * map(posTemp.x,-2.0,2.0,0.0,2.0) , map(posTemp.y,1.0,-1.0,0.0,1.0));
-    vec3 sphCoordinates = anglesToSphereCoord(angles, 1.0 + posTemp.z + uHeightWinds + level * 0.05);
+    vec3 sphCoordinates = anglesToSphereCoord(angles, 1.0 + posTemp.z + uHeightWinds + level * 0.03);
 
   //  vec3 vPositionScaledRotatedSphere = rotateAxis( vPositionScaled, normalize(-1. * posTemp.xyz), velAngle);
   //  vec3 vPositionScaledRotatedSphere = vPositionScaled;
@@ -226,7 +226,7 @@ void main()
 
     // calculate positions on plane
     vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
-    planePos.z += uHeightWinds + level * 0.05;
+    planePos.z += uHeightWinds + level * 0.03;
 
 //    vec3 planePos = vPositionScaledRotated + spherePositions;
 
