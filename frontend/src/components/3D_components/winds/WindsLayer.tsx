@@ -168,7 +168,7 @@ const WindLayer = memo(forwardRef<WindLayerRef, Props>(({ }, ref) => {
     <instancedMesh 
       ref={wind_layer_ref} 
       args={[geometry, materialRef.current, shaderUniforms.uWindsMaxParticleCount.value]}
-      renderOrder = { 2 }
+      renderOrder = { 3 }
       >
       {/* material={ basicMaterial }> */}
     </instancedMesh>

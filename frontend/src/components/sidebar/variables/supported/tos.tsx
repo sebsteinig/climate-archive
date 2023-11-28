@@ -18,56 +18,60 @@ export function Tos({
       controls={true}
     >
       <Rows>
-        <ColorMapRow
-          colormap_name={tos.colormap}
-          onChange={(n) => tos.updateColormap(n)}
-        />
         <RowWithSlider
           onChange={(n) => {
             tos.updateMin(n)
           }}
           min={-2}
-          max={40}
+          max={50}
           step={0.1}
           value={tos.min}
-          label="SST min. [°C]"
+          label="min [°C]"
         />
         <RowWithSlider
           onChange={(n) => {
             tos.updateMax(n)
           }}
           min={-2}
-          max={40}
+          max={50}
           step={0.1}
           value={tos.max}
-          label="SST max. [°C]"
+          label="max [°C]"
         />
+        <ColorMapRow
+          colormap_name={tos.colormap}
+          colormap_index={tos.colormap_index}
+          onChange={(name, index) => tos.updateColormap(name, index)} // pass both name and index
+          />
         <RowWithSlider
           onChange={(n) => {
-            tos.updateAnomalyRange(n)
+            tos.updateAnomalyMin(n)
           }}
           min={0}
           max={20}
           step={0.1}
-          value={tos.anomaly_range}
-          label="anomaly range [°C]"
+          value={tos.anomaly_min}
+          label="anomaly min [°C]"
         />
         <RowWithSlider
           onChange={(n) => {
-            tos.updateAnomaliesLowerBound(n)
+            pr.updateAnomalyMax(n)
           }}
           min={0}
           max={20}
           step={0.1}
-          value={tos.anomalies_lower_bound}
-          label="mask anomalies below [°C]"
+          value={tos.anomaly_max}
+          label="anomaly max [°C]"
         />
-        <RowWithCheckBox
-          toggle={() => {
-            tos.toggleSeaIce()
+        <RowWithSlider
+          onChange={(n) => {
+            tos.updateOpacity(n)
           }}
-          checked={tos.sea_ice}
-          label="show sea ice"
+          min={0}
+          max={1.0}
+          step={0.01}
+          value={tos.opacity}
+          label="opacity"
         />
       </Rows>
     </Variable>

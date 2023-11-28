@@ -48,8 +48,8 @@ function initMap() {
   m.set(EVarID.sic, false)
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
-  m.set(EVarID.tos, false)
-  m.set(EVarID.winds, true)
+  m.set(EVarID.tos, true)
+  m.set(EVarID.winds, false)
   return m
 }
 
@@ -204,15 +204,25 @@ export const createVariableSlice: StateCreator<
       tos: {
         min: -2,
         max: 36,
-        anomaly_range: 15,
-        anomalies_lower_bound: 2.5,
+        anomaly_min: 2,
+        anomaly_max: 15,
         sea_ice: true,
         name: EVarID.tos,
-        colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
-          set((state) => {
-            state.variables.tos.colormap = value
-          }),
+        colormap: "thermal.png",
+        colormap_index: colormaps_list.indexOf("thermal.png"),
+        opacity: 1.0,
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              tos: {
+                ...state.variables.tos,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
         updateMin: (value: number) =>
           set((state) => {
             state.variables.tos.min = value
@@ -221,18 +231,18 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.tos.max = value
           }),
-        updateAnomalyRange: (value: number) =>
-          set((state) => {
-            state.variables.tos.anomaly_range = value
-          }),
-        updateAnomaliesLowerBound: (value: number) =>
-          set((state) => {
-            state.variables.tos.anomalies_lower_bound = value
-          }),
-        toggleSeaIce: () =>
-          set((state) => {
-            state.variables.tos.sea_ice = !state.variables.tos.sea_ice
-          }),
+        updateAnomalyMin: (value: number) =>
+        set((state) => {
+          state.variables.tos.anomaly_min = value
+        }),
+        updateAnomalyMax: (value: number) =>
+        set((state) => {
+          state.variables.tos.anomaly_max = value
+        }),
+        updateOpacity: (value: number) =>
+        set((state) => {
+          state.variables.tos.opacity = value
+        }),
       },
       winds: {
         name: EVarID.winds,

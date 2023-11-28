@@ -101,6 +101,8 @@ export function tickBuilder(
         console.time(computeLabel);
 
         for (let [variable, state] of frame.variables) {
+
+          console.log(variable)
       
 
           const data = await compute(variable, state, canvas, world_data)
@@ -109,9 +111,6 @@ export function tickBuilder(
             res.set(variable, data)
           }
         }
-
-         console.timeEnd(computeLabel);
-
 
         if (world_id === current_frame.current._observed_id) {
           current_frame.current.saveReference(res)
