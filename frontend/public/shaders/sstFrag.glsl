@@ -19,9 +19,13 @@ uniform float numLon;
 uniform float numLat;
 uniform float colorMapIndex;
 
+uniform float referenceHeightMin[1];
+uniform float referenceHeightMax[1];
+
 uniform sampler2D dataTexture;
 uniform sampler2D heightTexture;
 uniform sampler2D referenceDataTexture;
+uniform sampler2D referenceHeightTexture;
 uniform sampler2D colorMap;
 
 uniform bool referenceDataFlag;
@@ -142,6 +146,7 @@ float dataRemapped = remap(
     0.0, 
     1.0 );
 
+float heightReference;
 // only process reference data if reference mode is active
 if (referenceDataFlag) {
 
@@ -178,6 +183,17 @@ if (referenceDataFlag) {
     1.0 );
 
     cmap_index = 17.0;
+
+    heightReference = remap( 
+    texture2D(
+        referenceHeightTexture, 
+        vUv
+        ).r, 
+    0.0, 
+    1.0, 
+    referenceHeightMin[0], 
+    referenceHeightMax[0]);
+
 }
 
 
@@ -190,8 +206,10 @@ if (referenceDataFlag == false) {
         gl_FragColor = dataColor;
     }
 } else {
-    if (abs(intData) >= uUserMinValueAnomaly) {
+    if (abs(intData) >= uUserMinValueAnomaly && heightReference < 0.0) {
         gl_FragColor = dataColor;
+    } else if ( heightReference > 0.0) {
+       gl_FragColor = vec4(0.3, 0.3, 0.3,1.0);
     }
 }
 
@@ -211,5 +229,13 @@ float height = remap(
 if (height > 0.0) {
     gl_FragColor.a = 0.0;
 }
+
+// if (referenceDataFlag) {
+
+//     if (heightReference > 0.0) {
+//         gl_FragColor.xyz = vec3(0.3);
+//     }
+
+//     }
 
 }

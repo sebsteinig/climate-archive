@@ -64,6 +64,9 @@ const OceanLayer = memo(forwardRef<OceanLayerRef, Props>(({ }, ref) => {
       referenceDataMin: {value: new Float32Array(1)},
       referenceDataMax: {value: new Float32Array(1)},
       referenceDataFlag: {value: false},
+      referenceHeightTexture: {value: null},
+      referenceHeightMin: {value: new Float32Array(1)},
+      referenceHeightMax: {value: new Float32Array(1)},
       uUserMinValue: {value: tos_state.min},
       uUserMaxValue: {value: tos_state.max},
       uUserMinValueAnomaly: {value: tos_state.anomaly_min},
@@ -133,7 +136,17 @@ const OceanLayer = memo(forwardRef<OceanLayerRef, Props>(({ }, ref) => {
       materialRef.current.uniforms.heightTexture.value = heightTexture
       materialRef.current.uniforms.heightMin.value = heightMin
       materialRef.current.uniforms.heightMax.value = heightMax
-      console.log(materialRef.current.uniforms.heightMax.value)
+      
+      if ( reference_flag ) {
+        console.log(surface_layer_ref.current?.type.current.material.uniforms)
+        const referenceHeightTexture = surface_layer_ref.current?.type.current.material.uniforms.referenceHeightTexture.value
+        const referenceHeightMin = surface_layer_ref.current?.type.current.material.uniforms.referenceDataMin.value
+        const referenceHeightMax = surface_layer_ref.current?.type.current.material.uniforms.referenceDataMax.value
+        console.log(referenceHeightMin)
+        materialRef.current.uniforms.referenceHeightTexture.value = referenceHeightTexture
+        materialRef.current.uniforms.referenceHeightMin.value = referenceHeightMin
+        materialRef.current.uniforms.referenceHeightMax.value = referenceHeightMax
+      }
 
     }
   }
