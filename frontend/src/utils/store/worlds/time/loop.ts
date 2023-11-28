@@ -49,8 +49,6 @@ export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: b
   let new_idx = Math.floor(targetWeight)
   frame.controllerFlag = controllerFlag
 
-  console.log(mode)
-
   if ( mode == 0 && targetWeight > frame.timesteps - EPSILON ) {
     frame.weight = 0.
   } else {

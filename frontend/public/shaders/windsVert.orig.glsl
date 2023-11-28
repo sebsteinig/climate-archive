@@ -83,6 +83,26 @@ vec4 applyColormap(float t, sampler2D colormap){
 
 }
 
+// find bracketing indices based on user chosen pressure level
+float myArray[7] = float[7](1000.0, 850.0, 700.0, 500.0, 200.0, 100.0, 10.0);
+
+vec3 pressure2index(float value) {
+    // Check if the value is out of the array bounds
+    if (value >= myArray[0]) return vec3(0.0, 1.0, 1.0);
+    if (value <= myArray[6]) return vec3(5.0, 6.0, 0.0);
+
+    for (int i = 0; i < 6; ++i) {
+        if (value <= myArray[i] && value >= myArray[i + 1]) {
+            // Calculate the fraction
+            float fraction = (value - myArray[i + 1]) / (myArray[i] - myArray[i + 1]);
+
+            return vec3(float(i), float(i + 1), fraction);
+        }
+    }
+
+    // Return -1 if something unexpected happens
+    return vec3(-1.0, -1.0, -1.0);
+}
 
 // Function to calculate the index from 2D coordinates (i, j)
 // Assuming the number of columns is 12
@@ -105,50 +125,73 @@ void main()
     // calculate UV coordinates (0 to 1) from particle position
     vec2 gridUV = vec2( posTemp.x / 4. + 0.5, posTemp.y / 2. + 0.5 );
 
+    // lets do linear interpolation between time steps and vertical levels (involving a total of 4 textures)
+
     // calculate the width of the UV segment each timesteps
     float segmentWidthX = 1.0 / textureTimesteps;
     float verticalLevels = 7.0;
     float segmentWidthY = 1.0 / verticalLevels;
+    // get vertical level indices
+    vec3 vertIndices = pressure2index(level);
 
     // Adjust the UV coordinates
     // X vertical levels
-    vec2 this_uv = gridUV;
-    vec2 next_uv = gridUV;
+    vec2 this_uv_lower = gridUV;
+    vec2 next_uv_lower = gridUV;
+    vec2 this_uv_upper = gridUV;
+    vec2 next_uv_upper = gridUV;
+
     // 1 or 12 timesteps in the horizontal
-    this_uv.x = uFrame / textureTimesteps + (this_uv.x * segmentWidthX);
-    next_uv.x = ( uFrame + 1.0) / textureTimesteps + (next_uv.x * segmentWidthX);
+    this_uv_lower.x = uFrame / textureTimesteps + (this_uv_lower.x * segmentWidthX);
+    next_uv_lower.x = ( uFrame + 1.0) / textureTimesteps + (next_uv_lower.x * segmentWidthX);
+    this_uv_upper.x = uFrame / textureTimesteps + (this_uv_upper.x * segmentWidthX);
+    next_uv_upper.x = ( uFrame + 1.0) / textureTimesteps + (next_uv_upper.x * segmentWidthX);
     // 7 vertical levels
-    this_uv.y = ( 1.0 - ( level + 1.0 ) * segmentWidthY ) + (this_uv.y * segmentWidthY);
-    next_uv.y = ( 1.0 - ( level + 1.0 ) * segmentWidthY ) + (next_uv.y * segmentWidthY);
+    this_uv_lower.y = ( 1.0 - ( vertIndices.x + 1.0 ) * segmentWidthY ) + (this_uv_lower.y * segmentWidthY);
+    next_uv_lower.y = ( 1.0 - ( vertIndices.x + 1.0 ) * segmentWidthY ) + (next_uv_lower.y * segmentWidthY);
+    this_uv_upper.y = ( 1.0 - ( vertIndices.y + 1.0 ) * segmentWidthY ) + (this_uv_upper.y * segmentWidthY);
+    next_uv_upper.y = ( 1.0 - ( vertIndices.y + 1.0 ) * segmentWidthY ) + (next_uv_upper.y * segmentWidthY);
 
-    vec4 intVelocities;
+    // look up model velocities at those UVs for all frames
+    vec4 thisFrameVel_lower = texture2D( dataTexture, this_uv_lower);
+    vec4 nextFrameVel_lower = texture2D( dataTexture, next_uv_lower); 
+    vec4 thisFrameVel_upper = texture2D( dataTexture, this_uv_upper);
+    vec4 nextFrameVel_upper = texture2D( dataTexture, next_uv_upper); 
 
-    // 2D surface velocity fields
-    // look up model velocities at those UVs for both frames
-    // vec4 thisFrameVel = texture2D( dataTexture, this_uv);
-    vec4 thisFrameVel = texture2D( dataTexture, this_uv);
-    vec4 nextFrameVel = texture2D( dataTexture, next_uv); 
-
+    // convert from relative to absolute velocities
     // flattended array[84]; // 7 * 12 = 84
     // To access the element at [i][j], calculate the index like this:
     // int i = 1; // Example row
     // int j = 2; // Example column
     // float value = yourArrayUniform[i * 12 + j];
-    // ... your shader code ...
-    int this2DIndex = getIndex(int(level), int(uFrame));
-    int next2DIndex = getIndex(int(level), int(uFrame +1.0));
+
+    // indices to access 2D array storing min/max values for each time ste/ vertical level
+    int this2DIndex_lower = getIndex(int(vertIndices.x), int(uFrame));
+    int next2DIndex_lower = getIndex(int(vertIndices.x), int(uFrame +1.0));
+    int this2DIndex_upper = getIndex(int(vertIndices.y), int(uFrame));
+    int next2DIndex_upper = getIndex(int(vertIndices.y), int(uFrame +1.0));
 
     // remap velocities from RGB image value [0,1] to cm/s [-50,50 cm/s] 
-    thisFrameVel.x = remap( thisFrameVel.x, 0.0, 1.0, dataMinU[this2DIndex], dataMaxU[this2DIndex] );
-    thisFrameVel.y = remap( thisFrameVel.y, 0.0, 1.0, dataMinV[this2DIndex], dataMaxV[this2DIndex] );
-    thisFrameVel.z = 0.0;
+    thisFrameVel_lower.x = remap( thisFrameVel_lower.x, 0.0, 1.0, dataMinU[this2DIndex_lower], dataMaxU[this2DIndex_lower] );
+    thisFrameVel_lower.y = remap( thisFrameVel_lower.y, 0.0, 1.0, dataMinV[this2DIndex_lower], dataMaxV[this2DIndex_lower] );
+    thisFrameVel_lower.z = 0.0;
+    nextFrameVel_lower.x = remap( nextFrameVel_lower.x, 0.0, 1.0, dataMinU[next2DIndex_lower], dataMaxU[next2DIndex_lower] );
+    nextFrameVel_lower.y = remap( nextFrameVel_lower.y, 0.0, 1.0, dataMinV[next2DIndex_lower], dataMaxV[next2DIndex_lower] );
+    nextFrameVel_lower.z = 0.0;
 
-    nextFrameVel.x = remap( nextFrameVel.x, 0.0, 1.0, dataMinU[next2DIndex], dataMaxU[next2DIndex] );
-    nextFrameVel.y = remap( nextFrameVel.y, 0.0, 1.0, dataMinV[next2DIndex], dataMaxV[next2DIndex] );
-    nextFrameVel.z = 0.0;
+    thisFrameVel_upper.x = remap( thisFrameVel_upper.x, 0.0, 1.0, dataMinU[this2DIndex_upper], dataMaxU[this2DIndex_upper] );
+    thisFrameVel_upper.y = remap( thisFrameVel_upper.y, 0.0, 1.0, dataMinV[this2DIndex_upper], dataMaxV[this2DIndex_upper] );
+    thisFrameVel_upper.z = 0.0;
+    nextFrameVel_upper.x = remap( nextFrameVel_upper.x, 0.0, 1.0, dataMinU[next2DIndex_upper], dataMaxU[next2DIndex_upper] );
+    nextFrameVel_upper.y = remap( nextFrameVel_upper.y, 0.0, 1.0, dataMinV[next2DIndex_upper], dataMaxV[next2DIndex_upper] );
+    nextFrameVel_upper.z = 0.0;
 
-    // interpolate velocities between frames
-    intVelocities = mix(thisFrameVel, nextFrameVel, uFrameWeight);
+    // interpolate velocities between horizontal frames
+    vec4 intVelocities_lower = mix(thisFrameVel_lower, nextFrameVel_lower, uFrameWeight);
+    vec4 intVelocities_upper = mix(thisFrameVel_upper, nextFrameVel_upper, uFrameWeight);
+    // and finally interpolate between vertical levels
+    vec4 intVelocities = mix(intVelocities_lower, intVelocities_upper, 1.0 - vertIndices.z);
+
 
     // get sphere position rotation quaternion at particle position
     vec4 quaternions = texture2D(quaternionTexture,gridUV);
@@ -215,7 +258,7 @@ void main()
     );
 
     vec2 angles = M_PI * vec2(-1.0 * map(posTemp.x,-2.0,2.0,0.0,2.0) , map(posTemp.y,1.0,-1.0,0.0,1.0));
-    vec3 sphCoordinates = anglesToSphereCoord(angles, 1.0 + posTemp.z + uHeightWinds + level * 0.03);
+    vec3 sphCoordinates = anglesToSphereCoord(angles, 1.0 + posTemp.z + uHeightWinds + ( vertIndices.x + (1.0 - vertIndices.z) ) * 0.03);
 
   //  vec3 vPositionScaledRotatedSphere = rotateAxis( vPositionScaled, normalize(-1. * posTemp.xyz), velAngle);
   //  vec3 vPositionScaledRotatedSphere = vPositionScaled;
@@ -226,7 +269,7 @@ void main()
 
     // calculate positions on plane
     vec3 planePos = vPositionScaledRotated+ posTemp.xyz;
-    planePos.z += uHeightWinds + level * 0.03;
+    planePos.z += uHeightWinds + ( vertIndices.x + (1.0 - vertIndices.z) ) * 0.03;
 
 //    vec3 planePos = vPositionScaledRotated + spherePositions;
 

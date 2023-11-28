@@ -21,7 +21,7 @@ function initComputeRendererWinds(windsInitialPositions, renderer, shaderUniform
     let positionUniforms = positionVariable.material.uniforms;
 
     positionUniforms[ "dataTexture" ] = { value: null };
-    positionUniforms[ "level" ] = { value: 0.0 };
+    positionUniforms[ "level" ] = { value: 1000.0 };
     positionUniforms[ "dataMinU" ] = {value: new Float32Array(1)};
     positionUniforms[ "dataMaxU" ] = {value: new Float32Array(1)};
     positionUniforms[ "dataMinV" ] = {value: new Float32Array(1)};

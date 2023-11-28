@@ -246,7 +246,7 @@ export const createVariableSlice: StateCreator<
       },
       winds: {
         name: EVarID.winds,
-        level: 0,
+        level: 1000,
         animation_speed: 0.2,
         min_speed: 2.0,
         reference_speed: 25,

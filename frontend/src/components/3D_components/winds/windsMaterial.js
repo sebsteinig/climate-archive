@@ -79,7 +79,7 @@ function createWindsMaterial(quaternionTexture, shaderUniforms, renderer, initia
                     wrapAmountUniform: { value: 0.0 },
                     uFrame: {value: null},
                     uFrameWeight: { value: null },
-                    level: { value: 0.0 },
+                    level: { value: 1000.0 },
                     uWindsParticleOpacity: { value: 1.0 },
                     uWindsArrowSize: shaderUniforms.uWindsArrowSize,
                     uWindsMaxArrowSize: { value: 1.0 },

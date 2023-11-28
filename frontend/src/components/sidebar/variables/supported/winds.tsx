@@ -18,19 +18,19 @@ export function Winds({
       controls={true}
     >
       <Rows>
-      {/* <RowWithSlider_reversed */}
-      <RowWithSlider
+      <RowWithSlider_reversed
+      /* <RowWithSlider */
           onChange={(n) => {
             winds.updateLevel(n)
           }}
-          // min={10}
-          // max={1000}
-          // step={1}
-          min={0}
-          max={6}
+          min={10}
+          max={1000}
           step={1}
+          // min={0}
+          // max={6}
+          // step={1}
           value={winds.level}
-          label="level"
+          label="level [hPa]"
         />
         <RowWithSlider
           onChange={(n) => {
