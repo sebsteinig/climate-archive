@@ -55,7 +55,7 @@ export function Tos({
         />
         <RowWithSlider
           onChange={(n) => {
-            pr.updateAnomalyMax(n)
+            tos.updateAnomalyMax(n)
           }}
           min={0}
           max={20}
