@@ -44,7 +44,7 @@ function initMap() {
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)
-  m.set(EVarID.pr, false)
+  m.set(EVarID.pr, true)
   m.set(EVarID.sic, false)
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
