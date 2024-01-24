@@ -44,11 +44,11 @@ function initMap() {
   m.set(EVarID.liconc, false)
   m.set(EVarID.mlotst, false)
   m.set(EVarID.pfts, false)
-  m.set(EVarID.pr, false)
+  m.set(EVarID.pr, true)
   m.set(EVarID.sic, false)
   m.set(EVarID.snc, false)
   m.set(EVarID.tas, false)
-  m.set(EVarID.tos, false)
+  m.set(EVarID.tos, true)
   m.set(EVarID.winds, false)
   return m
 }
@@ -154,7 +154,9 @@ export const createVariableSlice: StateCreator<
         name: EVarID.pr,
         min: 3.5,
         max: 12,
-        anomaly_range: 5,
+        anomaly_min: 2,
+        anomaly_max: 10,
+        opacity: 0.75,
         colormap: "rain.png",
         colormap_index: colormaps_list.indexOf("rain.png"),
         updateColormap: (name: string, index: number) => {
@@ -177,9 +179,17 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.pr.max = value
           }),
-        updateAnomalyRange: (value: number) =>
+        updateAnomalyMin: (value: number) =>
         set((state) => {
-          state.variables.pr.anomaly_range = value
+          state.variables.pr.anomaly_min = value
+        }),
+        updateAnomalyMax: (value: number) =>
+        set((state) => {
+          state.variables.pr.anomaly_max = value
+        }),
+        updateOpacity: (value: number) =>
+        set((state) => {
+          state.variables.pr.opacity = value
         }),
       },
       sic: {
@@ -194,15 +204,25 @@ export const createVariableSlice: StateCreator<
       tos: {
         min: -2,
         max: 36,
-        anomaly_range: 15,
-        anomalies_lower_bound: 2.5,
+        anomaly_min: 2,
+        anomaly_max: 15,
         sea_ice: true,
         name: EVarID.tos,
-        colormap: "ipccPrecip.png",
-        updateColormap: (value: string) =>
-          set((state) => {
-            state.variables.tos.colormap = value
-          }),
+        colormap: "thermal.png",
+        colormap_index: colormaps_list.indexOf("thermal.png"),
+        opacity: 1.0,
+        updateColormap: (name: string, index: number) => {
+          set((state) => ({
+            variables: {
+              ...state.variables,
+              tos: {
+                ...state.variables.tos,
+                colormap: name,
+                colormap_index: index,
+              },
+            },
+          }));
+        },
         updateMin: (value: number) =>
           set((state) => {
             state.variables.tos.min = value
@@ -211,32 +231,37 @@ export const createVariableSlice: StateCreator<
           set((state) => {
             state.variables.tos.max = value
           }),
-        updateAnomalyRange: (value: number) =>
-          set((state) => {
-            state.variables.tos.anomaly_range = value
-          }),
-        updateAnomaliesLowerBound: (value: number) =>
-          set((state) => {
-            state.variables.tos.anomalies_lower_bound = value
-          }),
-        toggleSeaIce: () =>
-          set((state) => {
-            state.variables.tos.sea_ice = !state.variables.tos.sea_ice
-          }),
+        updateAnomalyMin: (value: number) =>
+        set((state) => {
+          state.variables.tos.anomaly_min = value
+        }),
+        updateAnomalyMax: (value: number) =>
+        set((state) => {
+          state.variables.tos.anomaly_max = value
+        }),
+        updateOpacity: (value: number) =>
+        set((state) => {
+          state.variables.tos.opacity = value
+        }),
       },
       winds: {
         name: EVarID.winds,
-        animation_speed: 0.025,
-        min_speed: 20,
-        reference_speed: 35,
-        arrows: 10000,
-        arrows_size: 2,
+        level: 1000,
+        animation_speed: 0.2,
+        min_speed: 2.0,
+        reference_speed: 25,
+        arrows: 40000,
+        arrows_size: 2.5,
         scale_by_magnitude: true,
-        color_by_magnitude: true,
+        color_by_magnitude: false,
         colormap: "ipccPrecip.png",
         updateColormap: (value: string) =>
           set((state) => {
             state.variables.winds.colormap = value
+          }),
+        updateLevel: (value: number) =>
+          set((state) => {
+            state.variables.winds.level = value
           }),
         updateAnimationSpeed: (value: number) =>
           set((state) => {

@@ -45,13 +45,33 @@ export function Pr({
           />
         <RowWithSlider
           onChange={(n) => {
-            pr.updateAnomalyRange(n)
+            pr.updateAnomalyMin(n)
           }}
           min={0}
           max={20}
           step={0.1}
-          value={pr.anomaly_range}
-          label="anomaly [mm/day]"
+          value={pr.anomaly_min}
+          label="anomaly min [mm/day]"
+        />
+        <RowWithSlider
+          onChange={(n) => {
+            pr.updateAnomalyMax(n)
+          }}
+          min={0}
+          max={20}
+          step={0.1}
+          value={pr.anomaly_max}
+          label="anomaly max [mm/day]"
+        />
+        <RowWithSlider
+          onChange={(n) => {
+            pr.updateOpacity(n)
+          }}
+          min={0}
+          max={1.0}
+          step={0.01}
+          value={pr.opacity}
+          label="opacity"
         />
       </Rows>
     </Variable>

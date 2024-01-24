@@ -2,7 +2,7 @@ import { Variable, VariableProps } from "../Variable"
 import { useStore } from "@/utils/store/store"
 import { Rows } from "../utils/Rows"
 import { ColorMapRow } from "../utils/row.colormap"
-import { RowWithSlider } from "../utils/row.slider"
+import { RowWithSlider, RowWithSlider_reversed } from "../utils/row.slider"
 import { RowWithCheckBox } from "../utils/row.checkbox"
 
 export function Winds({
@@ -18,17 +18,27 @@ export function Winds({
       controls={true}
     >
       <Rows>
-        <ColorMapRow
-          colormap_name={winds.colormap}
-          onChange={(n) => winds.updateColormap(n)}
+      <RowWithSlider_reversed
+      /* <RowWithSlider */
+          onChange={(n) => {
+            winds.updateLevel(n)
+          }}
+          min={10}
+          max={1000}
+          step={1}
+          // min={0}
+          // max={6}
+          // step={1}
+          value={winds.level}
+          label="level [hPa]"
         />
         <RowWithSlider
           onChange={(n) => {
             winds.updateAnimationSpeed(n)
           }}
           min={0}
-          max={0.08}
-          step={0.0001}
+          max={1.0}
+          step={0.001}
           value={winds.animation_speed}
           label="animation speed"
         />
@@ -37,8 +47,8 @@ export function Winds({
             winds.updateMinSpeed(n)
           }}
           min={1}
-          max={100}
-          step={1}
+          max={50}
+          step={0.01}
           value={winds.min_speed}
           label="min speed [m/s]"
         />
@@ -52,7 +62,7 @@ export function Winds({
           value={winds.reference_speed}
           label="reference speed [m/s]"
         />
-        <RowWithSlider
+        {/* <RowWithSlider
           onChange={(n) => {
             winds.updateArrows(n)
           }}
@@ -61,7 +71,7 @@ export function Winds({
           step={100}
           value={winds.arrows}
           label="number of arrows"
-        />
+        /> */}
         <RowWithSlider
           onChange={(n) => {
             winds.updateArrowsSize(n)

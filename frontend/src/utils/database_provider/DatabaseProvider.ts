@@ -264,6 +264,7 @@ class DatabaseProvider {
     // let texture = this.cache.get("dont use cache")
     if (!texture) {
       texture = await this.database.textures.get({ path: path })
+      console.log(path)
       if (!texture) {
         console.log('load from server')
         texture = await this.loadFromServer(path)

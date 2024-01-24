@@ -6,6 +6,8 @@ uniform float uFrame;
 uniform float uFrameWeight;
 uniform float thisDataMin[12]; 
 uniform float thisDataMax[12];
+uniform float heightMin[1]; 
+uniform float heightMax[1]; 
 uniform float textureTimesteps;
 uniform float referenceDataMin[12];
 uniform float referenceDataMax[12];
@@ -17,8 +19,13 @@ uniform float numLon;
 uniform float numLat;
 uniform float colorMapIndex;
 
+uniform float referenceHeightMin[1];
+uniform float referenceHeightMax[1];
+
 uniform sampler2D dataTexture;
+uniform sampler2D heightTexture;
 uniform sampler2D referenceDataTexture;
+uniform sampler2D referenceHeightTexture;
 uniform sampler2D colorMap;
 
 uniform bool referenceDataFlag;
@@ -106,13 +113,12 @@ float segmentWidth = 1.0 / textureTimesteps;
 vec2 this_uv = vec2((uFrame / textureTimesteps) + (vUv.x * segmentWidth), vUv.y);
 vec2 next_uv = vec2((( uFrame + 1.0) / textureTimesteps) + (vUv.x * segmentWidth), vUv.y);
 
+
 // convert relative bitmap value to absolute value for both frames
 float thisFrameData = remap( 
-    textureBicubic(
+    texture2D(
         dataTexture, 
-        this_uv, 
-        numLon * textureTimesteps, 
-        numLat
+        this_uv
         ).r,
     0.0, 
     1.0, 
@@ -120,11 +126,9 @@ float thisFrameData = remap(
     thisDataMax[int(uFrame)]);
 
 float nextFrameData = remap( 
-    textureBicubic(
+    texture2D(
         dataTexture, 
-        next_uv, 
-        numLon * textureTimesteps, 
-        numLat
+        next_uv
         ).r, 
     0.0, 
     1.0, 
@@ -142,15 +146,14 @@ float dataRemapped = remap(
     0.0, 
     1.0 );
 
+float heightReference;
 // only process reference data if reference mode is active
 if (referenceDataFlag) {
 
     float thisReferenceData = remap( 
-        textureBicubic(
+        texture2D(
             referenceDataTexture, 
-            this_uv, 
-            numLon * textureTimesteps, 
-            numLat
+            this_uv
             ).r, 
         0.0, 
         1.0, 
@@ -158,11 +161,9 @@ if (referenceDataFlag) {
         referenceDataMax[int(uFrame)]);
 
     float nexReferenceData = remap( 
-        textureBicubic(
+        texture2D(
             referenceDataTexture, 
-            next_uv, 
-            numLon * textureTimesteps, 
-            numLat
+            next_uv
             ).r, 
         0.0, 
         1.0, 
@@ -172,7 +173,7 @@ if (referenceDataFlag) {
     // interpolate between absolute values of both frames
     float intReferenceData = mix(thisReferenceData, nexReferenceData, uFrameWeight);
     
-    intData = intReferenceData - intData;
+    intData = intData - intReferenceData;
 
     dataRemapped = remap( 
     intData, 
@@ -182,6 +183,17 @@ if (referenceDataFlag) {
     1.0 );
 
     cmap_index = 17.0;
+
+    heightReference = remap( 
+    texture2D(
+        referenceHeightTexture, 
+        vUv
+        ).r, 
+    0.0, 
+    1.0, 
+    referenceHeightMin[0], 
+    referenceHeightMax[0]);
+
 }
 
 
@@ -194,11 +206,36 @@ if (referenceDataFlag == false) {
         gl_FragColor = dataColor;
     }
 } else {
-    if (abs(intData) >= uUserMinValueAnomaly) {
+    if (abs(intData) >= uUserMinValueAnomaly && heightReference < 0.0) {
         gl_FragColor = dataColor;
+    } else if ( heightReference > 0.0) {
+       gl_FragColor = vec4(0.3, 0.3, 0.3,1.0);
     }
 }
 
 gl_FragColor.a *= uOpacity;
+
+// vec4 height_raw =texture2D(heightTexture,vUv );
+float height = remap( 
+    texture2D(
+        heightTexture, 
+        vUv
+        ).r, 
+    0.0, 
+    1.0, 
+    heightMin[0], 
+    heightMax[0]);
+
+if (height > 0.0) {
+    gl_FragColor.a = 0.0;
+}
+
+// if (referenceDataFlag) {
+
+//     if (heightReference > 0.0) {
+//         gl_FragColor.xyz = vec3(0.3);
+//     }
+
+//     }
 
 }

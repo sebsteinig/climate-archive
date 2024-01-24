@@ -7,6 +7,9 @@ import * as THREE from "three"
 import Lights from "./Lights"
 import { AtmosphereLayer, AtmosphereLayerRef } from "./AtmosphereLayer"
 import { SurfaceLayer, SurfaceLayerRef } from "./SurfaceLayer"
+import { WindLayer, WindLayerRef } from "./winds/WindsLayer"
+import { OceanLayer, OceanLayerRef } from "./OceanLayer"
+
 import { ALL_VARIABLES, EVarID } from "@/utils/store/variables/variable.types"
 import { TickFn } from "../../utils/tick/tick"
 import { Coordinate } from "@/utils/store/graph/graph.type"
@@ -24,6 +27,9 @@ export const World = memo(({ tick }: Props) => {
   
     const atmosphere_layer_ref = useRef<AtmosphereLayerRef>(null)
     const surface_layer_ref = useRef<SurfaceLayerRef>(null)
+    const winds_layer_ref = useRef<WindLayerRef>(null)
+    const ocean_layer_ref = useRef<OceanLayerRef>(null)
+
     const variables_state = useStore((state) => state.active_variables)
 
     // update shader uniforms when user uses GUI
@@ -39,6 +45,12 @@ export const World = memo(({ tick }: Props) => {
             }
             if (surface_layer_ref.current) {
               surface_layer_ref.current.updateUserUniforms(state.variables.height);
+            }
+            if (winds_layer_ref.current) {
+              winds_layer_ref.current.updateUserUniforms(state.variables.winds);
+            }
+            if (ocean_layer_ref.current) {
+              ocean_layer_ref.current.updateUserUniforms(state.variables.tos);
             }
         },
         userVariables
@@ -60,16 +72,18 @@ export const World = memo(({ tick }: Props) => {
         if (variables_state.get(EVarID.height)) {
           surface_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
         }
-        // if (wind_layer_ref.current) {
-        //   wind_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
-        // }
-
+        if (variables_state.get(EVarID.winds)) {
+          winds_layer_ref.current.tick(res.weight,res.uSphereWrapAmount, delta)
+        }
+        if (variables_state.get(EVarID.tos)) {
+          ocean_layer_ref.current.tick(res.weight,res.uSphereWrapAmount)
+        }
         // update textures only when necessary
         for (let variable of res.variables.keys()) {
         
           let data = res.variables.get(variable);
           let data_reference, reference_flag
-          
+
           switch (variable) {
 
             case EVarID.pr: {
@@ -89,11 +103,55 @@ export const World = memo(({ tick }: Props) => {
             }
 
             case EVarID.height: {
-                console.log('update height')
-                console.log(data)
-                data_reference = null
-                reference_flag = false
+              if (surface_layer_ref.current && res.update_texture) {
+                if (world_state.observed_world && res.reference) {
+                  // console.log("updating reference mode")
+                  data_reference = res.reference ? res.reference.get(variable) : undefined;
+                  reference_flag = true
+                } else {
+                  // console.log("updating standard mode")
+                  data_reference = null
+                  reference_flag = false
+                }
                 surface_layer_ref.current.updateTextures(data, data_reference, reference_flag);
+              }
+              break
+            }
+
+            case EVarID.winds: {
+              if (winds_layer_ref.current && res.update_texture) {
+                if (world_state.observed_world && res.reference) {
+                  // console.log("updating reference mode")
+                  data_reference = res.reference ? res.reference.get(variable) : undefined;
+                  reference_flag = true
+                } else {
+                  // console.log("updating standard mode")
+                  data_reference = null
+                  reference_flag = false
+                }
+                winds_layer_ref.current.updateTextures(data, data_reference, reference_flag);
+              }
+              break
+            }
+
+            case EVarID.tos: {
+              if (ocean_layer_ref.current && res.update_texture) {
+                if (world_state.observed_world && res.reference) {
+                  // console.log("updating reference mode")
+                  data_reference = res.reference ? res.reference.get(variable) : undefined;
+                  reference_flag = true
+                } else {
+                  // console.log("updating standard mode")
+                  data_reference = null
+                  reference_flag = false
+                }
+
+                if ( surface_layer_ref != null ) {
+                  ocean_layer_ref.current.updateTextures(data, data_reference, reference_flag, surface_layer_ref);
+                } else {
+                  ocean_layer_ref.current.updateTextures(data, data_reference, reference_flag);
+                }
+              }
               break
             }
 
@@ -116,11 +174,9 @@ export const World = memo(({ tick }: Props) => {
         <Lights />
         {variables_state.get(EVarID.height) && <SurfaceLayer ref={surface_layer_ref} />}
         {variables_state.get(EVarID.pr) && <AtmosphereLayer ref={atmosphere_layer_ref} />}
-        {/* <SurfaceLayer ref={surface_layer_ref} /> */}
-        {/* <AtmosphereLayer ref={atmosphere_layer_ref} /> */}
-        {/* <WindLayer ref={wind_layer_ref} /> */}
-  
-        <Perf position="top-right" />
+        {variables_state.get(EVarID.tos) && <OceanLayer ref={ocean_layer_ref} />}
+        {variables_state.get(EVarID.winds) && <WindLayer ref={winds_layer_ref} />}
+        {/* <Perf position="top-right" deepAnalyze="true"/> */}
       </>
     )
   });

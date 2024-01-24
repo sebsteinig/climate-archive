@@ -73,7 +73,7 @@ export function tickBuilder(
       // only update the world selected by the user (i.e. key world)
       // and sync other worlds with the key world
       if (world_id == worlds.animated_world) {
-        jumpTo(frame, frame.weight + delta, false)
+        jumpTo(frame, frame.weight + delta, false, world_data.time.controller)
       } else {
         let targetWeight = current_frame.current.get(worlds.animated_world)?.weight
         jumpTo(frame, targetWeight, false)
@@ -101,6 +101,8 @@ export function tickBuilder(
         console.time(computeLabel);
 
         for (let [variable, state] of frame.variables) {
+
+          console.log(variable)
       
 
           const data = await compute(variable, state, canvas, world_data)
@@ -109,9 +111,6 @@ export function tickBuilder(
             res.set(variable, data)
           }
         }
-
-         console.timeEnd(computeLabel);
-
 
         if (world_id === current_frame.current._observed_id) {
           current_frame.current.saveReference(res)

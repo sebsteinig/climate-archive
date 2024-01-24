@@ -20,7 +20,7 @@ const cmap = loader.load('../assets/colormaps/all_colormaps.png')
 cmap.minFilter = THREE.NearestFilter;
 cmap.magFilter = THREE.NearestFilter;
 
-const geometry = new THREE.PlaneGeometry(4, 2, 64*2, 32*2);
+const geometry = new THREE.PlaneGeometry(4, 2, 64*4, 32*4);
 
 type Props = {
 
@@ -58,10 +58,10 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
       thisDataMax: {value: new Float32Array(1)},
       nextDataMin: {value: null},
       nextDataMax: {value: null},
-      referenceDataFrame: {value: null},
+      referenceHeightTexture: {value: null},
       referenceDataMin: {value: null},
       referenceDataMax: {value: null},
-      referenceDataFlag: {value: false},
+      referenceDataHeightFlag: {value: false},
       uUserMinValue: {value: height_state.min},
       uUserMaxValue: {value: height_state.max},
       colorMap: {value: cmap},
@@ -95,6 +95,15 @@ const SurfaceLayer = memo(forwardRef<SurfaceLayerRef, Props>(({ }, ref) => {
     materialRef.current.uniforms.thisDataMax.value = dataMax
     materialRef.current.uniforms.textureTimesteps.value = 12.0
 
+    if ( reference_flag ) {
+
+      const referenceHeightTexture = await loader.loadAsync(URL.createObjectURL(reference.textures[0].current_url.image))
+      referenceHeightTexture.wrapS = referenceHeightTexture.wrapT = THREE.RepeatWrapping
+      materialRef.current.uniforms.referenceHeightTexture.value = referenceHeightTexture     
+      materialRef.current.uniforms.referenceDataMin.value =  new Float32Array(reference.info.min[0][0]);     
+      materialRef.current.uniforms.referenceDataMax.value =  new Float32Array(reference.info.max[0][0]);     
+
+    }
   }
   
 

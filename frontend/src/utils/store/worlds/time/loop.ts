@@ -44,19 +44,18 @@ export function goto(frame: TimeFrame, to: number, duration: number, controllerF
   })
 }
 
-export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: boolean, onComplete?: () => void) {
+export function jumpTo(frame: TimeFrame, targetWeight: number, controllerFlag: boolean, mode: number, onComplete?: () => void) {
   let previous_idx = Math.floor(frame.weight)
   let new_idx = Math.floor(targetWeight)
   frame.controllerFlag = controllerFlag
 
-  // works for monthly data, not for paleo
-  // if (targetWeight < frame.timesteps - EPSILON) {
-  //   frame.weight = targetWeight
-  // } else {
-  //   frame.weight = 0.
-  // }
+  if ( mode == 0 && targetWeight > frame.timesteps - EPSILON ) {
+    frame.weight = 0.
+  } else {
+    frame.weight = targetWeight
+  }
 
-  frame.weight = targetWeight
+  // frame.weight = targetWeight
 
   // hard-coded for annual cycle demo, need to be generalised
   if (previous_idx !== new_idx && new_idx !== targetWeight) {

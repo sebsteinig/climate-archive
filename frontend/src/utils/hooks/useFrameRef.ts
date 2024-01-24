@@ -153,6 +153,7 @@ export function useFrameRef() {
         frame.variables.set(variable, await sync(frame, variable, world_data))
       }
 
+      console.log(frame)
       this.map.set(world_id, frame)
     },
   })

@@ -42,7 +42,7 @@ export function Currents({
           value={currents.reference_speed}
           label="reference speed [cm/s]"
         />
-        <RowWithSlider
+        {/* <RowWithSlider
           onChange={(n) => {
             currents.updateArrows(n)
           }}
@@ -51,7 +51,7 @@ export function Currents({
           step={0.01}
           value={currents.arrows}
           label="number of arrows"
-        />
+        /> */}
         <RowWithSlider
           onChange={(n) => {
             currents.updateArrowsSize(n)

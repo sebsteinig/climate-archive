@@ -79,3 +79,7 @@
     font-variant: all-small-caps;
   }
 }
+
+.reversed-slider {
+  transform: scaleX(-1);
+}
