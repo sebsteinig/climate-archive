@@ -1,3 +1,9 @@
+This is a complete rewrite of the original [Climate Archive](https://climatearchive.org/) frontend for visualising (paleo)climate model data. The original version was written in vanilla JavaScript, this rewrite uses NextJS+React. The 3D visualisation uses the [react-three-fiber]https://github.com/pmndrs/react-three-fiber React renderer for threejs.
+
+This is still under heavy development and not yet in production use. Also, not all features from the original platform are already available, but will rather be added step-by-step. 
+
+Input model data for the visualisation assumes bitmap files produced with the [nimbus](https://github.com/sebsteinig/nimbus) package and stored in the [archive-db](https://github.com/WillemNicolas/archive-db) PostgreSQL database. 
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
